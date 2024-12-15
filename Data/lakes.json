@@ -1,0 +1,282 @@
+{
+  "lakes": [
+    {
+      "name": "Zürichsee",
+      "operators": ["ZSG"],
+      "stations": [
+        "Zürich Bürkliplatz",
+        "Zürich Wollishofen",
+        "Zürich Tiefenbrunnen",
+        "Zürichhorn",
+        "Zollikon",
+        "Küsnacht ZH",
+        "Erlenbach ZH",
+        "Thalwil",
+        "Rüschlikon",
+        "Ludretikon",
+        "Kilchberg ZH",
+        "Bendlikon",
+        "Meilen",
+        "Horgen",
+        "Oberrieden",
+        "Au ZH",
+        "Wädenswil",
+        "Männedorf",
+        "Stäfa",
+        "Uerikon",
+        "Schirmensee",
+        "Rapperswil",
+        "Richterswil",
+        "Uetikon am See",
+        "Meilerhof",
+        "Hurden",
+        "Insel Ufenau",
+        "Insel Lützelau",
+        "Pfäffikon SZ",
+        "Strandbad Wädenswil",
+        "Küsnacht ZH Heslibach"
+      ]
+    },
+    {
+      "name": "Vierwaldstättersee",
+      "operators": ["SGV"],
+      "stations": [
+        "Luzern Bahnhofquai",
+        "Verkehrshaus-Lido",
+        "Hertenstein",
+        "Weggis",
+        "Vitznau",
+        "Beckenried",
+        "Gersau",
+        "Treib",
+        "Brunnen",
+        "Sisikon",
+        "Flüelen",
+        "Bauen",
+        "Isleten",
+        "Tellsplatte",
+        "Rütli",
+        "Meggenhorn",
+        "Kehrsiten-Bürgenstock",
+        "Alpnachstad",
+        "Stansstad",
+        "Küssnacht am Rigi",
+        "Merlischachen",
+        "Seedorf",
+        "Buochs",
+        "Seelisberg",
+        "Kehrsiten",
+        "Kastanienbaum"
+      ]
+    },
+    {
+      "name": "Bodensee",
+      "operators": ["SBS", "BSB", "URh"],
+      "stations": [
+        "Romanshorn",
+        "Friedrichshafen",
+        "Konstanz",
+        "Kreuzlingen",
+        "Meersburg",
+        "Überlingen",
+        "Rorschach",
+        "Lindau",
+        "Bregenz",
+        "Wasserburg",
+        "Langenargen",
+        "Arbon",
+        "Horn",
+        "Altnau",
+        "Münsterlingen",
+        "Bottighofen",
+        "Kressbronn",
+        "Immenstaad",
+        "Mainau",
+        "Reichenau",
+        "Mannenbach",
+        "Steckborn",
+        "Berlingen",
+        "Mammern"
+      ]
+    },
+    {
+      "name": "Lac Léman",
+      "operators": ["CGN"],
+      "stations": [
+        "Lausanne-Ouchy",
+        "Genève",
+        "Nyon",
+        "Yvoire",
+        "Montreux",
+        "Vevey-Marché",
+        "Evian-les-Bains",
+        "Thonon-les-Bains",
+        "Rolle",
+        "Saint-Prex",
+        "Morges",
+        "Cully",
+        "Lutry",
+        "Saint-Gingolph",
+        "Le Bouveret",
+        "Clarens",
+        "Territet",
+        "Chillon",
+        "Pully",
+        "Villeneuve",
+        "Meillerie",
+        "Amphion",
+        "Ouchy",
+        "Tour-de-Peilz",
+        "Rivaz",
+        "Saint-Saphorin"
+      ]
+    },
+    {
+      "name": "Thunersee",
+      "operators": ["BLS"],
+      "stations": [
+        "Thun",
+        "Hilterfingen",
+        "Oberhofen",
+        "Gunten",
+        "Spiez",
+        "Faulensee",
+        "Merligen",
+        "Beatenbucht",
+        "Interlaken West",
+        "Neuhaus",
+        "Sundlauenen",
+        "Beatushöhlen",
+        "Leissigen",
+        "Därligen"
+      ]
+    },
+    {
+      "name": "Brienzersee",
+      "operators": ["BLS"],
+      "stations": [
+        "Interlaken Ost",
+        "Bönigen",
+        "Iseltwald",
+        "Giessbach",
+        "Brienz",
+        "Oberried",
+        "Niederried",
+        "Ringgenberg",
+        "Brienz Dorf"
+      ]
+    },
+    {
+      "name": "Lago Maggiore",
+      "operators": ["NLM"],
+      "stations": [
+        "Locarno",
+        "Muralto",
+        "Ascona",
+        "Brissago",
+        "Porto Ronco",
+        "Magadino",
+        "Gerra",
+        "Luino",
+        "Cannobio",
+        "Isole di Brissago"
+      ]
+    },
+    {
+      "name": "Lago di Lugano",
+      "operators": ["SNL"],
+      "stations": [
+        "Lugano",
+        "Paradiso",
+        "Melide",
+        "Morcote",
+        "Porto Ceresio",
+        "Gandria",
+        "Porlezza",
+        "Cantine di Gandria"
+      ]
+    },
+    {
+      "name": "Bielersee",
+      "operators": ["BSG"],
+      "stations": [
+        "Biel/Bienne",
+        "Nidau",
+        "Twann",
+        "Ligerz",
+        "La Neuveville",
+        "Erlach",
+        "Vinelz",
+        "Lüscherz",
+        "Mörigen",
+        "St. Petersinsel Nord",
+        "St. Petersinsel Süd"
+      ]
+    },
+    {
+      "name": "Neuenburgersee",
+      "operators": ["LNM"],
+      "stations": [
+        "Neuchâtel Port",
+        "Saint-Blaise",
+        "Cudrefin",
+        "Portalban",
+        "Chevroux",
+        "Estavayer-le-Lac",
+        "Gorgier-Chez-le-Bart",
+        "Yverdon",
+        "Grandson",
+        "Concise"
+      ]
+    },
+    {
+      "name": "Murtensee",
+      "operators": ["LNM"],
+      "stations": [
+        "Murten/Morat",
+        "Praz",
+        "Motier",
+        "Sugiez"
+      ]
+    },
+    {
+      "name": "Zugersee",
+      "operators": ["SGZ"],
+      "stations": [
+        "Zug",
+        "Zug Casino",
+        "Oberwil",
+        "Walchwil",
+        "Arth",
+        "Immensee",
+        "Risch",
+        "Cham"
+      ]
+    },
+    {
+      "name": "Walensee",
+      "operators": ["Walensee Schifffahrt"],
+      "stations": [
+        "Walenstadt",
+        "Weesen",
+        "Quinten",
+        "Murg",
+        "Unterterzen",
+        "Mols",
+        "Betlis"
+      ]
+    },
+    {
+      "name": "Hallwilersee",
+      "operators": ["SGH"],
+      "stations": [
+        "Meisterschwanden",
+        "Birrwil",
+        "Beinwil am See",
+        "Aesch LU",
+        "Seengen",
+        "Mosen"
+      ]
+    }
+  ]
+} 

@@ -1,0 +1,1659 @@
+{
+  "ship_stations": [
+    {
+      "name": "Biel/Bienne",
+      "coordinates": {
+        "lat": 47.1311465,
+        "lon": 7.2357898
+      },
+      "operator": "BSG",
+      "uic": "8504371",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Erlach",
+      "coordinates": {
+        "lat": 47.0483333,
+        "lon": 7.1
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "La Neuveville",
+      "coordinates": {
+        "lat": 47.0612927,
+        "lon": 7.0935328
+      },
+      "operator": "BSG",
+      "uic": "8504377",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Ligerz",
+      "coordinates": {
+        "lat": 47.0832911,
+        "lon": 7.1355205
+      },
+      "operator": "BSG",
+      "uic": "8504375",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Lüscherz",
+      "coordinates": {
+        "lat": 47.0533333,
+        "lon": 7.1116667
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Mörigen",
+      "coordinates": {
+        "lat": 47.0866667,
+        "lon": 7.1783333
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Nidau",
+      "coordinates": {
+        "lat": 47.1283333,
+        "lon": 7.2366667
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "St. Petersinsel Nord",
+      "coordinates": {
+        "lat": 47.0683572,
+        "lon": 7.1353671
+      },
+      "operator": "BSG",
+      "uic": "8504376",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "St. Petersinsel Süd",
+      "coordinates": {
+        "lat": 47.065,
+        "lon": 7.1366667
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Twann",
+      "coordinates": {
+        "lat": 47.0933551,
+        "lon": 7.1570474
+      },
+      "operator": "BSG",
+      "uic": "8504374",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Vinelz",
+      "coordinates": {
+        "lat": 47.0533333,
+        "lon": 7.145
+      },
+      "operator": "BSG",
+      "lake": "Bielersee"
+    },
+    {
+      "name": "Friedrichshafen",
+      "coordinates": {
+        "lat": 47.6512222,
+        "lon": 9.4786111
+      },
+      "operator": "BSB",
+      "uic": "8506114",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Konstanz",
+      "coordinates": {
+        "lat": 47.6599068,
+        "lon": 9.1777503
+      },
+      "operator": "BSB",
+      "uic": "8506111",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Kressbronn",
+      "coordinates": {
+        "lat": 47.5963468,
+        "lon": 9.6049337
+      },
+      "operator": "BSB",
+      "uic": "8506117",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Kreuzlingen",
+      "coordinates": {
+        "lat": 47.6506944,
+        "lon": 9.1761111
+      },
+      "operator": "SBS",
+      "uic": "8506109",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Langenargen",
+      "coordinates": {
+        "lat": 47.5989929,
+        "lon": 9.5491266
+      },
+      "operator": "BSB",
+      "uic": "8506116",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Lindau",
+      "coordinates": {
+        "lat": 47.5444444,
+        "lon": 9.6827778
+      },
+      "operator": "BSB",
+      "uic": "8506118",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Meersburg",
+      "coordinates": {
+        "lat": 47.6953611,
+        "lon": 9.2686111
+      },
+      "operator": "BSB",
+      "uic": "8506112",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Romanshorn",
+      "coordinates": {
+        "lat": 47.5666667,
+        "lon": 9.3833333
+      },
+      "operator": "SBS",
+      "uic": "8506110",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Rorschach Hafen (See)",
+      "coordinates": {
+        "lat": 47.4789372,
+        "lon": 9.4936373
+      },
+      "operator": "SBS",
+      "uic": "8506113",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Wasserburg",
+      "coordinates": {
+        "lat": 47.5666667,
+        "lon": 9.6333333
+      },
+      "operator": "BSB",
+      "uic": "8506119",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Überlingen",
+      "coordinates": {
+        "lat": 47.7666667,
+        "lon": 9.1666667
+      },
+      "operator": "BSB",
+      "uic": "8506115",
+      "lake": "Bodensee"
+    },
+    {
+      "name": "Brienz (See)",
+      "coordinates": {
+        "lat": 46.75422,
+        "lon": 8.0382719
+      },
+      "operator": "BLS-brs",
+      "uic": "8508376",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Brienz Dorf",
+      "coordinates": {
+        "lat": 46.7539836,
+        "lon": 8.0294492
+      },
+      "operator": "BLS-brs",
+      "uic": "8508375",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Bönigen",
+      "coordinates": {
+        "lat": 46.6893315,
+        "lon": 7.8980296
+      },
+      "operator": "BLS-brs",
+      "uic": "8508371",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Därligen",
+      "coordinates": {
+        "lat": 46.6666667,
+        "lon": 7.8
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Giessbach",
+      "coordinates": {
+        "lat": 46.734914,
+        "lon": 8.0194713
+      },
+      "operator": "BLS-brs",
+      "uic": "8508378",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Interlaken Ost",
+      "coordinates": {
+        "lat": 46.6866667,
+        "lon": 7.8666667
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Interlaken West",
+      "coordinates": {
+        "lat": 46.6833333,
+        "lon": 7.85
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Iseltwald",
+      "coordinates": {
+        "lat": 46.7166667,
+        "lon": 7.9666667
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Kienholz",
+      "coordinates": {
+        "lat": 46.7516667,
+        "lon": 8.0366667
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Niederried",
+      "coordinates": {
+        "lat": 46.7166667,
+        "lon": 7.9
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Oberried am Brienzersee",
+      "coordinates": {
+        "lat": 46.7333333,
+        "lon": 7.9833333
+      },
+      "operator": "BLS",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Ringgenberg (See)",
+      "coordinates": {
+        "lat": 46.7013738,
+        "lon": 7.8984136
+      },
+      "operator": "BLS-brs",
+      "uic": "8508372",
+      "lake": "Brienzersee"
+    },
+    {
+      "name": "Chillon",
+      "coordinates": {
+        "lat": 46.4141667,
+        "lon": 6.9275
+      },
+      "operator": "CGN",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Clarens",
+      "coordinates": {
+        "lat": 46.4383333,
+        "lon": 6.8958333
+      },
+      "operator": "CGN",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Cully",
+      "coordinates": {
+        "lat": 46.4883333,
+        "lon": 6.7316667
+      },
+      "operator": "CGN",
+      "uic": "8501186",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Evian-les-Bains",
+      "coordinates": {
+        "lat": 46.4011465,
+        "lon": 6.5857898
+      },
+      "operator": "CGN",
+      "uic": "8501182",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Lausanne-Ouchy",
+      "coordinates": {
+        "lat": 46.5068893,
+        "lon": 6.6287295
+      },
+      "operator": "CGN",
+      "uic": "8501180",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Lutry",
+      "coordinates": {
+        "lat": 46.505,
+        "lon": 6.6866667
+      },
+      "operator": "CGN",
+      "uic": "8501184",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Montreux",
+      "coordinates": {
+        "lat": 46.4336082,
+        "lon": 6.9097357
+      },
+      "operator": "CGN",
+      "uic": "8501187",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Morges",
+      "coordinates": {
+        "lat": 46.5083572,
+        "lon": 6.4953671
+      },
+      "operator": "CGN",
+      "uic": "8501181",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Nyon",
+      "coordinates": {
+        "lat": 46.3833551,
+        "lon": 6.2370474
+      },
+      "operator": "CGN",
+      "uic": "8501179",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Pully",
+      "coordinates": {
+        "lat": 46.5083333,
+        "lon": 6.6666667
+      },
+      "operator": "CGN",
+      "uic": "8501181",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Rolle",
+      "coordinates": {
+        "lat": 46.4583333,
+        "lon": 6.3366667
+      },
+      "operator": "CGN",
+      "uic": "8501182",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Saint-Prex",
+      "coordinates": {
+        "lat": 46.4833333,
+        "lon": 6.45
+      },
+      "operator": "CGN",
+      "uic": "8501183",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Territet",
+      "coordinates": {
+        "lat": 46.425,
+        "lon": 6.9166667
+      },
+      "operator": "CGN",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Thonon-les-Bains",
+      "coordinates": {
+        "lat": 46.3712927,
+        "lon": 6.4735328
+      },
+      "operator": "CGN",
+      "uic": "8501183",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Vevey-Marché",
+      "coordinates": {
+        "lat": 46.4617897,
+        "lon": 6.8419507
+      },
+      "operator": "CGN",
+      "uic": "8501185",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Yvoire",
+      "coordinates": {
+        "lat": 46.3732911,
+        "lon": 6.3255205
+      },
+      "operator": "CGN",
+      "uic": "8501184",
+      "lake": "Lac Léman"
+    },
+    {
+      "name": "Ascona",
+      "coordinates": {
+        "lat": 46.155,
+        "lon": 8.7716667
+      },
+      "operator": "NLM",
+      "uic": "8505573",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Brissago",
+      "coordinates": {
+        "lat": 46.1166667,
+        "lon": 8.7166667
+      },
+      "operator": "NLM",
+      "uic": "8505575",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Isole di Brissago",
+      "coordinates": {
+        "lat": 46.1326257,
+        "lon": 8.7345677
+      },
+      "operator": "Navigazione Laghi",
+      "uic": "8505577",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Locarno",
+      "coordinates": {
+        "lat": 46.1697222,
+        "lon": 8.7977778
+      },
+      "operator": "NLM",
+      "uic": "8505570",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Muralto",
+      "coordinates": {
+        "lat": 46.1683333,
+        "lon": 8.8033333
+      },
+      "operator": "NLM",
+      "uic": "8505571",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Porto Ronco",
+      "coordinates": {
+        "lat": 46.1333333,
+        "lon": 8.7333333
+      },
+      "operator": "NLM",
+      "uic": "8505574",
+      "lake": "Lago Maggiore"
+    },
+    {
+      "name": "Cantine di Gandria",
+      "coordinates": {
+        "lat": 45.9984469,
+        "lon": 9.016942
+      },
+      "operator": "SNL",
+      "uic": "8505545",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Gandria",
+      "coordinates": {
+        "lat": 46.006,
+        "lon": 8.9666667
+      },
+      "operator": "SNL",
+      "uic": "8505544",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Lugano Centrale",
+      "coordinates": {
+        "lat": 46.0036111,
+        "lon": 8.9513889
+      },
+      "operator": "SNL",
+      "uic": "8505540",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Morcote",
+      "coordinates": {
+        "lat": 45.9197222,
+        "lon": 8.9116667
+      },
+      "operator": "SNL",
+      "uic": "8505547",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Paradiso",
+      "coordinates": {
+        "lat": 45.9894444,
+        "lon": 8.9475
+      },
+      "operator": "SNL",
+      "uic": "8505541",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Porto Ceresio",
+      "coordinates": {
+        "lat": 45.9086111,
+        "lon": 8.9013889
+      },
+      "operator": "SNL",
+      "uic": "8505549",
+      "lake": "Luganersee (Lago di Lugano)"
+    },
+    {
+      "name": "Chevroux",
+      "coordinates": {
+        "lat": 46.9,
+        "lon": 6.9
+      },
+      "operator": "LNM",
+      "uic": "8504555",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Cudrefin",
+      "coordinates": {
+        "lat": 46.9483333,
+        "lon": 7.0166667
+      },
+      "operator": "LNM",
+      "uic": "8504552",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Estavayer-le-Lac",
+      "coordinates": {
+        "lat": 46.85,
+        "lon": 6.85
+      },
+      "operator": "LNM",
+      "uic": "8504556",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Gorgier - Chez-le-Bart",
+      "coordinates": {
+        "lat": 46.8998571,
+        "lon": 6.7875279
+      },
+      "operator": "LNM",
+      "uic": "8504554",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Motier",
+      "coordinates": {
+        "lat": 46.9467024,
+        "lon": 7.0841856
+      },
+      "operator": "LNM",
+      "uic": "8504574",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Murten/Morat",
+      "coordinates": {
+        "lat": 46.9283333,
+        "lon": 7.1166667
+      },
+      "operator": "LNM",
+      "uic": "8504570",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Neuchâtel Port",
+      "coordinates": {
+        "lat": 46.99,
+        "lon": 6.9316667
+      },
+      "operator": "LNM",
+      "uic": "8504550",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Portalban",
+      "coordinates": {
+        "lat": 46.9166667,
+        "lon": 6.95
+      },
+      "operator": "LNM",
+      "uic": "8504553",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Praz (Vully)",
+      "coordinates": {
+        "lat": 46.9383333,
+        "lon": 7.0983333
+      },
+      "operator": "LNM",
+      "uic": "8504573",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Saint-Blaise",
+      "coordinates": {
+        "lat": 47.0116667,
+        "lon": 6.9833333
+      },
+      "operator": "LNM",
+      "uic": "8504551",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Sugiez",
+      "coordinates": {
+        "lat": 46.955,
+        "lon": 7.1166667
+      },
+      "operator": "LNM",
+      "uic": "8504575",
+      "lake": "Neuenburgersee (Lac de Neuchâtel)"
+    },
+    {
+      "name": "Anlegestelle Rheinfallfelsen",
+      "coordinates": {
+        "lat": 47.6781566,
+        "lon": 8.614613
+      },
+      "operator": "Werner Mändli AG",
+      "lake": "Rhein"
+    },
+    {
+      "name": "Buchberg (Fähre)",
+      "coordinates": {
+        "lat": 47.553343,
+        "lon": 8.5583459
+      },
+      "uic": "8530836",
+      "lake": "Rhein"
+    },
+    {
+      "name": "Fähre Ellikon am Rhein - Nack",
+      "coordinates": {
+        "lat": 47.6057373,
+        "lon": 8.5967215
+      },
+      "operator": "BewET",
+      "uic": "8530652",
+      "lake": "Rhein"
+    },
+    {
+      "name": "Klingental Fähre \"Vogel Gryff\"",
+      "coordinates": {
+        "lat": 47.56266,
+        "lon": 7.5884673
+      },
+      "lake": "Rhein"
+    },
+    {
+      "name": "Schaffhausen",
+      "coordinates": {
+        "lat": 47.6576169,
+        "lon": 8.6157075
+      },
+      "operator": "URh",
+      "uic": "8506150",
+      "lake": "Rhein"
+    },
+    {
+      "name": "St. Alban Fähre \"Wild Maa\"",
+      "coordinates": {
+        "lat": 47.5567717,
+        "lon": 7.6023377
+      },
+      "lake": "Rhein"
+    },
+    {
+      "name": "St. Johann Fähre \"Ueli\"",
+      "coordinates": {
+        "lat": 47.5693967,
+        "lon": 7.5862033
+      },
+      "lake": "Rhein"
+    },
+    {
+      "name": "Stein am Rhein",
+      "coordinates": {
+        "lat": 47.6599068,
+        "lon": 8.8598442
+      },
+      "operator": "URh",
+      "uic": "8506153",
+      "lake": "Rhein"
+    },
+    {
+      "name": "Wilen Waldheim",
+      "coordinates": {
+        "lat": 46.8756355,
+        "lon": 8.2215145
+      },
+      "operator": "FWS",
+      "uic": "8530815",
+      "lake": "Sarnersee"
+    },
+    {
+      "name": "Beatenbucht",
+      "coordinates": {
+        "lat": 46.7,
+        "lon": 7.7666667
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Beatushöhlen-Sundlauenen",
+      "coordinates": {
+        "lat": 46.6833333,
+        "lon": 7.7833333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Einigen",
+      "coordinates": {
+        "lat": 46.7,
+        "lon": 7.6666667
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Faulensee",
+      "coordinates": {
+        "lat": 46.6833333,
+        "lon": 7.7166667
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Gunten",
+      "coordinates": {
+        "lat": 46.7166667,
+        "lon": 7.7
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Gwatt",
+      "coordinates": {
+        "lat": 46.7166667,
+        "lon": 7.65
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Hilterfingen",
+      "coordinates": {
+        "lat": 46.7333333,
+        "lon": 7.6666667
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Krattigen",
+      "coordinates": {
+        "lat": 46.6666667,
+        "lon": 7.7333333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Leissigen",
+      "coordinates": {
+        "lat": 46.6666667,
+        "lon": 7.7666667
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Merligen",
+      "coordinates": {
+        "lat": 46.7166667,
+        "lon": 7.7333333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Neuhaus",
+      "coordinates": {
+        "lat": 46.7,
+        "lon": 7.7833333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Oberhofen",
+      "coordinates": {
+        "lat": 46.7333333,
+        "lon": 7.6833333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Scherzligen",
+      "coordinates": {
+        "lat": 46.7472222,
+        "lon": 7.6388889
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Spiez",
+      "coordinates": {
+        "lat": 46.6833333,
+        "lon": 7.6833333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Strättligen",
+      "coordinates": {
+        "lat": 46.7333333,
+        "lon": 7.6333333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Thun",
+      "coordinates": {
+        "lat": 46.75,
+        "lon": 7.6333333
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Thun-Hofstetten",
+      "coordinates": {
+        "lat": 46.75,
+        "lon": 7.6277778
+      },
+      "operator": "BLS",
+      "lake": "Thunersee"
+    },
+    {
+      "name": "Berlingen",
+      "coordinates": {
+        "lat": 47.6755206,
+        "lon": 9.0177112
+      },
+      "operator": "URh",
+      "uic": "8506159",
+      "lake": "Untersee"
+    },
+    {
+      "name": "Mammern",
+      "coordinates": {
+        "lat": 47.6487028,
+        "lon": 8.9166078
+      },
+      "operator": "URh",
+      "uic": "8506155",
+      "lake": "Untersee"
+    },
+    {
+      "name": "Mannenbach",
+      "coordinates": {
+        "lat": 47.6753964,
+        "lon": 9.0472806
+      },
+      "operator": "URh",
+      "uic": "8506160",
+      "lake": "Untersee"
+    },
+    {
+      "name": "Steckborn",
+      "coordinates": {
+        "lat": 47.6687023,
+        "lon": 8.9812386
+      },
+      "operator": "URh",
+      "uic": "8506157",
+      "lake": "Untersee"
+    },
+    {
+      "name": "Alpnachstad",
+      "coordinates": {
+        "lat": 46.9540833,
+        "lon": 8.2824453
+      },
+      "operator": "SGV",
+      "uic": "8508460",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Arth am See (Schiff)",
+      "coordinates": {
+        "lat": 47.0647204,
+        "lon": 8.5222957
+      },
+      "operator": "SGZ",
+      "uic": "8505060",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Bauen",
+      "coordinates": {
+        "lat": 46.9494721,
+        "lon": 8.5901437
+      },
+      "operator": "SGV",
+      "uic": "8508470",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Beckenried",
+      "coordinates": {
+        "lat": 46.9672004,
+        "lon": 8.4753749
+      },
+      "operator": "SGV",
+      "uic": "8508465",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Brunnen",
+      "coordinates": {
+        "lat": 46.9986821,
+        "lon": 8.6055432
+      },
+      "operator": "SGV",
+      "uic": "8508467",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Flüelen",
+      "coordinates": {
+        "lat": 46.9039836,
+        "lon": 8.6244492
+      },
+      "operator": "SGV",
+      "uic": "8508474",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Gersau",
+      "coordinates": {
+        "lat": 46.9986821,
+        "lon": 8.5255432
+      },
+      "operator": "SGV",
+      "uic": "8508466",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Hertenstein (See)",
+      "coordinates": {
+        "lat": 47.0266161,
+        "lon": 8.4036364
+      },
+      "operator": "SGV",
+      "uic": "8508462",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Isleten",
+      "coordinates": {
+        "lat": 46.9427778,
+        "lon": 8.5927778
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Kehrsiten",
+      "coordinates": {
+        "lat": 46.9794721,
+        "lon": 8.4401437
+      },
+      "operator": "SGV",
+      "uic": "8508461",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Kehrsiten-Bürgenstock",
+      "coordinates": {
+        "lat": 46.9913889,
+        "lon": 8.3977778
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Küssnacht am Rigi",
+      "coordinates": {
+        "lat": 47.0833333,
+        "lon": 8.4333333
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Bauen",
+      "coordinates": {
+        "lat": 46.9494721,
+        "lon": 8.5901437
+      },
+      "operator": "SGV",
+      "uic": "8508470",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Gersau",
+      "coordinates": {
+        "lat": 46.9986821,
+        "lon": 8.5255432
+      },
+      "operator": "SGV",
+      "uic": "8508466",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Hertenstein",
+      "coordinates": {
+        "lat": 47.0267563,
+        "lon": 8.4034722
+      },
+      "operator": "SGV",
+      "uic": "8508462",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Rütli",
+      "coordinates": {
+        "lat": 46.9703027,
+        "lon": 8.5933833
+      },
+      "operator": "SGV",
+      "uic": "8508471",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Seedorf UR",
+      "coordinates": {
+        "lat": 46.8900624,
+        "lon": 8.5987492
+      },
+      "operator": "SGV",
+      "uic": "8530833",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Sisikon",
+      "coordinates": {
+        "lat": 46.9481993,
+        "lon": 8.619012
+      },
+      "operator": "SGV",
+      "uic": "8508472",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Tellsplatte",
+      "coordinates": {
+        "lat": 46.9340833,
+        "lon": 8.6124453
+      },
+      "operator": "SGV",
+      "uic": "8508473",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Treib",
+      "coordinates": {
+        "lat": 46.9872004,
+        "lon": 8.5853749
+      },
+      "operator": "SGV",
+      "uic": "8508469",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Vitznau",
+      "coordinates": {
+        "lat": 47.0075637,
+        "lon": 8.4821669
+      },
+      "operator": "SGV",
+      "uic": "8508464",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGV Weggis",
+      "coordinates": {
+        "lat": 47.031454,
+        "lon": 8.4330695
+      },
+      "operator": "SGV",
+      "uic": "8508463",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Landungssteg SGZ Arth am See",
+      "coordinates": {
+        "lat": 47.0647204,
+        "lon": 8.5222957
+      },
+      "operator": "SGZ",
+      "uic": "8505060",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Luzern Bahnhofquai",
+      "coordinates": {
+        "lat": 47.0513352,
+        "lon": 8.3111878
+      },
+      "operator": "SGV",
+      "uic": "8508492",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Meggenhorn",
+      "coordinates": {
+        "lat": 47.0422222,
+        "lon": 8.3308333
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Merlischachen",
+      "coordinates": {
+        "lat": 47.0372222,
+        "lon": 8.4011111
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Rütli",
+      "coordinates": {
+        "lat": 46.9707123,
+        "lon": 8.5933515
+      },
+      "operator": "SGV",
+      "uic": "8508471",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Seedorf UR",
+      "coordinates": {
+        "lat": 46.8900624,
+        "lon": 8.5987492
+      },
+      "operator": "SGV",
+      "uic": "8530833",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Seelisberg",
+      "coordinates": {
+        "lat": 46.9705556,
+        "lon": 8.5952778
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Sisikon",
+      "coordinates": {
+        "lat": 46.9481993,
+        "lon": 8.619012
+      },
+      "operator": "SGV",
+      "uic": "8508472",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Tellsplatte",
+      "coordinates": {
+        "lat": 46.9340833,
+        "lon": 8.6124453
+      },
+      "operator": "SGV",
+      "uic": "8508473",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Treib",
+      "coordinates": {
+        "lat": 46.9872004,
+        "lon": 8.5853749
+      },
+      "operator": "SGV",
+      "uic": "8508469",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Verkehrshaus-Lido",
+      "coordinates": {
+        "lat": 47.0522222,
+        "lon": 8.3344444
+      },
+      "operator": "SGV",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Vitznau",
+      "coordinates": {
+        "lat": 47.0075637,
+        "lon": 8.4821669
+      },
+      "operator": "SGV",
+      "uic": "8508464",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Weggis",
+      "coordinates": {
+        "lat": 47.031454,
+        "lon": 8.4330695
+      },
+      "operator": "SGV",
+      "uic": "8508463",
+      "lake": "Vierwaldstättersee"
+    },
+    {
+      "name": "Risch",
+      "coordinates": {
+        "lat": 47.1433333,
+        "lon": 8.4816667
+      },
+      "operator": "SGZ",
+      "lake": "Zugersee"
+    },
+    {
+      "name": "Zug Casino",
+      "coordinates": {
+        "lat": 47.1672222,
+        "lon": 8.5152778
+      },
+      "operator": "SGZ",
+      "lake": "Zugersee"
+    },
+    {
+      "name": "Au ZH",
+      "coordinates": {
+        "lat": 47.2483333,
+        "lon": 8.6433333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Bendlikon",
+      "coordinates": {
+        "lat": 47.3,
+        "lon": 8.5583333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Erlenbach ZH (See)",
+      "coordinates": {
+        "lat": 47.3030318,
+        "lon": 8.5891104
+      },
+      "operator": "ZSG",
+      "uic": "8503659",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Horgen (See)",
+      "coordinates": {
+        "lat": 47.2601721,
+        "lon": 8.595536
+      },
+      "operator": "ZSG",
+      "uic": "8503661",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Horgen Dampfschiffsteg",
+      "coordinates": {
+        "lat": 47.2601721,
+        "lon": 8.595536
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Hurden",
+      "coordinates": {
+        "lat": 47.2033333,
+        "lon": 8.785
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Insel Lützelau",
+      "coordinates": {
+        "lat": 47.22,
+        "lon": 8.7766667
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Insel Ufenau",
+      "coordinates": {
+        "lat": 47.2233333,
+        "lon": 8.79
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Kilchberg ZH (See)",
+      "coordinates": {
+        "lat": 47.321,
+        "lon": 8.545
+      },
+      "operator": "ZSG",
+      "uic": "8503657",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Küsnacht ZH (See)",
+      "coordinates": {
+        "lat": 47.3191667,
+        "lon": 8.5833333
+      },
+      "operator": "ZSG",
+      "uic": "8503658",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Küsnacht ZH Heslibach",
+      "coordinates": {
+        "lat": 47.3166667,
+        "lon": 8.5833333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Ludretikon",
+      "coordinates": {
+        "lat": 47.2816667,
+        "lon": 8.5633333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Meilen",
+      "coordinates": {
+        "lat": 47.2716667,
+        "lon": 8.6433333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Meilerhof",
+      "coordinates": {
+        "lat": 47.2683333,
+        "lon": 8.645
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Männedorf (See)",
+      "coordinates": {
+        "lat": 47.2527078,
+        "lon": 8.688949
+      },
+      "operator": "ZSG",
+      "uic": "8503664",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Oberrieden",
+      "coordinates": {
+        "lat": 47.2733333,
+        "lon": 8.5816667
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Pfäffikon SZ",
+      "coordinates": {
+        "lat": 47.2033333,
+        "lon": 8.785
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Rapperswil (See)",
+      "coordinates": {
+        "lat": 47.2266667,
+        "lon": 8.8183333
+      },
+      "operator": "ZSG",
+      "uic": "8503668",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Richterswil (See)",
+      "coordinates": {
+        "lat": 47.21,
+        "lon": 8.7016667
+      },
+      "operator": "ZSG",
+      "uic": "8503666",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Rüschlikon (See)",
+      "coordinates": {
+        "lat": 47.3083333,
+        "lon": 8.5533333
+      },
+      "operator": "ZSG",
+      "uic": "8503656",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Schirmensee",
+      "coordinates": {
+        "lat": 47.2283333,
+        "lon": 8.7633333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Strandbad Wädenswil",
+      "coordinates": {
+        "lat": 47.2266667,
+        "lon": 8.6616667
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Stäfa (See)",
+      "coordinates": {
+        "lat": 47.2433333,
+        "lon": 8.7233333
+      },
+      "operator": "ZSG",
+      "uic": "8503665",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Thalwil (See)",
+      "coordinates": {
+        "lat": 47.285,
+        "lon": 8.565
+      },
+      "operator": "ZSG",
+      "uic": "8503660",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Uerikon",
+      "coordinates": {
+        "lat": 47.2366667,
+        "lon": 8.7483333
+      },
+      "operator": "ZSG",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Uetikon am See (See)",
+      "coordinates": {
+        "lat": 47.2585032,
+        "lon": 8.6755178
+      },
+      "operator": "ZSG",
+      "uic": "8503663",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Wädenswil (See)",
+      "coordinates": {
+        "lat": 47.2266667,
+        "lon": 8.6666667
+      },
+      "operator": "ZSG",
+      "uic": "8503662",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Zollikon (See)",
+      "coordinates": {
+        "lat": 47.3390453,
+        "lon": 8.5672752
+      },
+      "operator": "ZSG",
+      "uic": "8503655",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Zürich Bürkliplatz",
+      "coordinates": {
+        "lat": 47.3666667,
+        "lon": 8.5416667
+      },
+      "operator": "ZSG",
+      "uic": "8503445",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Zürich Tiefenbrunnen",
+      "coordinates": {
+        "lat": 47.3483333,
+        "lon": 8.5583333
+      },
+      "operator": "ZSG",
+      "uic": "8503654",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Zürich Wollishofen (See)",
+      "coordinates": {
+        "lat": 47.345514,
+        "lon": 8.5368272
+      },
+      "operator": "ZSG",
+      "uic": "8503681",
+      "lake": "Zürichsee"
+    },
+    {
+      "name": "Zürichhorn",
+      "coordinates": {
+        "lat": 47.3519527,
+        "lon": 8.5531663
+      },
+      "operator": "ZSG",
+      "uic": "8503653",
+      "lake": "Zürichsee"
+    }
+  ]
+}

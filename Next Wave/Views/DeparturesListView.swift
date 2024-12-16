@@ -1,81 +1,168 @@
 import SwiftUI
+import UserNotifications
 
 struct DeparturesListView: View {
     let departures: [Journey]
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
+    @State private var scrolledToNext = false
+    @State private var previousDeparturesCount = 0
+    @State private var notifiedJourneys: Set<String> = []
+    @State private var currentTime = Date()
+    
+    let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+    
+    var isCurrentDay: Bool {
+        Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: Date())
+    }
     
     var body: some View {
         VStack {
-            
-            if !departures.isEmpty {
-                List {
-                    ForEach(Array(departures.enumerated()), id: \.element.id) { index, journey in
-                        if let departureTime = journey.stop.departure {
-                            HStack(alignment: .firstTextBaseline) {
-                                // Left side - Time
-                                VStack(alignment: .center, spacing: 4) {
-                                    Text(formatTime(departureTime))
-                                        .font(.system(size: 24, weight: .bold))
-                                    let formattedTime = formatTime(departureTime)
-                                    if let date = parseTime(formattedTime) {
-                                        let remainingTime = calculateRemainingTime(for: date)
-                                        Text(remainingTime)
-                                            .font(.caption)
-                                            .foregroundColor(getTimeColor(remainingTime))
-                                            .padding(.top, remainingTime == "missed" ? 6 : 0)
+            if viewModel.isLoading {
+                Spacer()
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .tint(Color("text-color"))
+                    .padding()
+                Text("Loading timetable...")
+                    .foregroundColor(Color("text-color"))
+                Spacer()
+            } else if !departures.isEmpty {
+                ScrollViewReader { proxy in
+                    List {
+                        ForEach(Array(departures.enumerated()), id: \.element.id) { index, journey in
+                            if let departureTime = journey.stop.departure {
+                                let formattedTime = formatTime(departureTime)
+                                let isPast = isCurrentDay ? isPastDeparture(formattedTime) : false
+                                
+                                HStack(alignment: .firstTextBaseline) {
+                                    // Left side - Time
+                                    VStack(alignment: .center, spacing: 4) {
+                                        Text(formattedTime)
+                                            .font(.system(size: 24, weight: .bold))
+                                            .foregroundColor(isPast ? .gray : .primary)
+                                        if isCurrentDay, let date = parseTime(formattedTime) {
+                                            let remainingTime = calculateRemainingTime(for: date)
+                                            Text(remainingTime)
+                                                .font(.caption)
+                                                .foregroundColor(getTimeColor(remainingTime))
+                                                .padding(.top, 6)
+                                        }
                                     }
-                                }
-                                .frame(width: 70)
-                                
-                                Spacer().frame(width: 16)
-                                
-                                // Middle section - Wave and Course number
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(alignment: .firstTextBaseline) {
-                                        Image(systemName: "water.waves")
-                                            .foregroundColor(.blue)
-                                        Text("\(index + 1). Wave of the Day")
-                                            .foregroundColor(.primary)
+                                    .frame(width: 70)
+                                    
+                                    Spacer().frame(width: 16)
+                                    
+                                    // Middle section - Wave and Course number
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack(alignment: .center) {
+                                            Image(systemName: "water.waves")
+                                                .foregroundColor(isPast ? .gray : .blue)
+                                            Text("\(index + 1). Wave")
+                                                .foregroundColor(isPast ? .gray : .primary)
+                                            
+                                            Spacer()
+                                            
+                                            if notifiedJourneys.contains(journey.id) {
+                                                Image(systemName: "bell.fill")
+                                                    .foregroundColor(.blue)
+                                                    .font(.system(size: 16))
+                                            }
+                                        }
+                                        
+                                        HStack(spacing: 8) {
+                                            if let name = journey.name {
+                                                Text(name.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))
+                                                    .font(.caption)
+                                                    .padding(.horizontal, 8)
+                                                    .padding(.vertical, 4)
+                                                    .background(Color.gray.opacity(0.1))
+                                                    .cornerRadius(12)
+                                            }
+                                            
+                                            if let passList = journey.passList,
+                                               passList.count > 1,
+                                               let nextStationName = passList[1].station.name {
+                                                Text("→ \(nextStationName)")
+                                                    .font(.caption)
+                                                    .foregroundColor(isPast ? .gray : .primary)
+                                            }
+                                        }
                                     }
                                     
-                                    if let name = journey.name {
-                                        Text("Course number: \(name.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))")
-                                            .font(.caption)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(Color.secondary.opacity(0.2))
-                                            .cornerRadius(8)
-                                            .foregroundColor(.secondary)
+                                    Spacer()
+                                }
+                                .id(journey.id)
+                                .opacity(isPast ? 0.6 : 1.0)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    if !isPast {
+                                        Button {
+                                            if notifiedJourneys.contains(journey.id) {
+                                                removeNotification(for: journey)
+                                            } else {
+                                                scheduleNotification(for: journey)
+                                            }
+                                        } label: {
+                                            Label(notifiedJourneys.contains(journey.id) ? "Remove" : "Notify", 
+                                                  systemImage: notifiedJourneys.contains(journey.id) ? "bell.slash" : "bell")
+                                        }
+                                        .tint(notifiedJourneys.contains(journey.id) ? .red : .blue)
                                     }
                                 }
-                                
-                                Spacer()
-                            }
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                Button {
-                                    // TODO: Add notification action
-                                } label: {
-                                    Label("Notify", systemImage: "bell.fill")
-                                }
-                                .tint(.blue)
-                            }
-                            .onAppear {
-                                viewModel.loadJourneyDetails(for: journey)
                             }
                         }
                     }
-                }
-                .listStyle(PlainListStyle())
-                .refreshable {
-                    await viewModel.refreshDepartures()
+                    .listStyle(PlainListStyle())
+                    .refreshable {
+                        await viewModel.refreshDepartures()
+                    }
+                    .onChange(of: previousDeparturesCount) { _ in
+                        scrollToNextDeparture(proxy: proxy)
+                    }
+                    .onAppear {
+                        if previousDeparturesCount != departures.count {
+                            previousDeparturesCount = departures.count
+                        }
+                        scrollToNextDeparture(proxy: proxy)
+                    }
                 }
             } else if selectedStation != nil {
-                Text("No departures available")
-                    .foregroundColor(.secondary)
-                    .padding()
+                Spacer()
+                Text("No departures found for \(selectedStation?.name ?? "")")
+                    .foregroundColor(Color("text-color"))
+                    .multilineTextAlignment(.center)
+                if !Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: Date()) {
+                    Text("on \(formattedDate(viewModel.selectedDate))")
+                        .foregroundColor(Color("text-color"))
+                        .padding(.top, 4)
+                }
+                Spacer()
             }
         }
+        .onReceive(timer) { _ in
+            currentTime = Date()
+        }
+    }
+    
+    private func scrollToNextDeparture(proxy: ScrollViewProxy) {
+        if !scrolledToNext {
+            if let nextDeparture = departures.first(where: { journey in
+                if let departureTime = journey.stop.departure {
+                    return !isPastDeparture(formatTime(departureTime))
+                }
+                return false
+            }) {
+                withAnimation {
+                    proxy.scrollTo(nextDeparture.id, anchor: .top)
+                }
+            }
+            scrolledToNext = true
+        }
+    }
+    
+    private func isPastDeparture(_ timeString: String) -> Bool {
+        guard let date = parseTime(timeString) else { return false }
+        return date < Date()
     }
     
     private func formatTime(_ timeString: String) -> String {
@@ -139,5 +226,50 @@ struct DeparturesListView: View {
         default:
             return .gray
         }
+    }
+    
+    private func scheduleNotification(for journey: Journey) {
+        guard let departureTime = journey.stop.departure,
+              let date = parseFullTime(departureTime) else { return }
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Wave is coming"
+        if let nextStation = journey.passList?.first(where: { $0.station.name != selectedStation?.name })?.station.name {
+            content.body = "Ship \(journey.name ?? "") to \(nextStation) at \(formatTime(departureTime))"
+        }
+        
+        if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
+        } else {
+            content.sound = .default
+        }
+        
+        let triggerDate = Calendar.current.date(byAdding: .minute, value: -5, to: date)!
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: journey.id, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+        notifiedJourneys.insert(journey.id)
+    }
+    
+    private func removeNotification(for journey: Journey) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [journey.id])
+        notifiedJourneys.remove(journey.id)
+    }
+    
+    private func parseFullTime(_ timeString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        return formatter.date(from: timeString)
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, d. MMMM"
+        formatter.locale = Locale(identifier: "de_CH")
+        return formatter.string(from: date)
     }
 } 

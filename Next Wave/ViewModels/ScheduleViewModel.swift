@@ -372,4 +372,34 @@ class ScheduleViewModel: ObservableObject {
         
         return "\(minutes) min"
     }
+    
+    func getDepartures(for station: Lake.Station, on date: Date) async -> [Journey]? {
+        guard let uicRef = station.uic_ref else { return nil }
+        
+        do {
+            let transportAPI = TransportAPI()
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef)
+            
+            // Filter journeys for the selected date
+            let calendar = Calendar.current
+            return journeys.filter { journey in
+                guard let departureTimeStr = journey.stop.departure,
+                      let departureDate = parseFullTime(departureTimeStr) else {
+                    return false
+                }
+                
+                return calendar.isDate(departureDate, inSameDayAs: date)
+            }
+        } catch {
+            print("Error fetching departures: \(error)")
+            return nil
+        }
+    }
+    
+    private func parseFullTime(_ timeString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        return formatter.date(from: timeString)
+    }
 }

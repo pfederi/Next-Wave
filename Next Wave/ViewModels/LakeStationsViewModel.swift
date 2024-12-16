@@ -8,6 +8,9 @@ class LakeStationsViewModel: ObservableObject {
     @Published var isTestMode: Bool = false
     @Published var journeyDetails: [String: [Journey.Stop]] = [:]
     @Published var expandedLakeId: String?
+    @Published var selectedDate: Date = Date()
+    @Published var isLoading = false
+    private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
     
@@ -40,13 +43,22 @@ class LakeStationsViewModel: ObservableObject {
         selectedStation = station
         if let uicRef = station.uic_ref {
             Task {
+                if !isInitialLoad {
+                    isLoading = true
+                }
                 do {
-                    let journeys = try await transportAPI.getStationboard(stationId: uicRef)
+                    let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
+                    if !isInitialLoad {
+                        try? await Task.sleep(nanoseconds: 1_000_000_000)
+                    }
                     DispatchQueue.main.async {
                         self.departures = journeys
+                        self.isLoading = false
+                        self.isInitialLoad = false
                     }
                 } catch {
                     print("Error fetching departures: \(error)")
+                    self.isLoading = false
                 }
             }
         }
@@ -54,14 +66,23 @@ class LakeStationsViewModel: ObservableObject {
     
     @MainActor
     func refreshDepartures() async {
-        if let station = selectedStation,
-           let uicRef = station.uic_ref {
-            do {
-                let journeys = try await transportAPI.getStationboard(stationId: uicRef)
-                self.departures = journeys
-            } catch {
-                print("Error refreshing departures: \(error)")
+        guard let station = selectedStation,
+              let uicRef = station.uic_ref else { return }
+        
+        if !isInitialLoad {
+            isLoading = true
+        }
+        do {
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
+            if !isInitialLoad {
+                try? await Task.sleep(nanoseconds: 250_000_000)
             }
+            self.departures = journeys
+            self.isLoading = false
+            self.isInitialLoad = false
+        } catch {
+            print("Error refreshing departures: \(error)")
+            self.isLoading = false
         }
     }
         

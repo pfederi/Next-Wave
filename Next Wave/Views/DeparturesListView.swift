@@ -116,7 +116,7 @@ struct DeparturesListView: View {
                     .refreshable {
                         await viewModel.refreshDepartures()
                     }
-                    .onChange(of: previousDeparturesCount) { _ in
+                    .onChange(of: previousDeparturesCount) { oldValue, newValue in
                         scrollToNextDeparture(proxy: proxy)
                     }
                     .onAppear {

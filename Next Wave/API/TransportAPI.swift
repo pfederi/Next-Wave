@@ -49,7 +49,7 @@ class TransportAPI {
     }
     
     func getJourneyDetails(for journey: Journey) async throws -> Journey {
-        let urlString = "https://transport.opendata.ch/v1/connections?from=\(journey.stop.station.id)&to=\(journey.to)&time=\(journey.stop.departure ?? "")&transportations[]=ship"
+        let urlString = "https://transport.opendata.ch/v1/connections?from=\(journey.stop.station.id)&to=\(journey.to ?? "")&time=\(journey.stop.departure ?? "")&transportations[]=ship"
         
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL

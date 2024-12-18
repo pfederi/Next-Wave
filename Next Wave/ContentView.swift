@@ -108,11 +108,11 @@ struct ContentView: View {
                     }
                 }
             }
-            .toolbarBackground(Color("primary-color"), for: .navigationBar)
+            .toolbarBackground(Color("nav-background"), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
         }
-        .background(Color("secondary-color"))
+        .background(Color("background-color"))
     }
     
     private var formattedDate: String {

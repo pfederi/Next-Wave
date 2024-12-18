@@ -269,7 +269,7 @@ struct DeparturesListView: View {
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE, d. MMMM"
-        formatter.locale = Locale(identifier: "de_CH")
+        formatter.locale = Locale(identifier: "en_US")
         return formatter.string(from: date)
     }
 } 

@@ -10,15 +10,15 @@ struct NextWaveApp: App {
         requestNotificationPermissions()
         // Setze die Hintergrundfarbe für die gesamte App
         let coloredAppearance = UINavigationBarAppearance()
-        coloredAppearance.backgroundColor = UIColor(Color("secondary-color"))
+        coloredAppearance.backgroundColor = UIColor(Color("background-color"))
         
         UINavigationBar.appearance().standardAppearance = coloredAppearance
         UINavigationBar.appearance().compactAppearance = coloredAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
         
         // Setze die Hintergrundfarbe für die gesamte App
-        UITableView.appearance().backgroundColor = UIColor(Color("secondary-color"))
-        UICollectionView.appearance().backgroundColor = UIColor(Color("secondary-color"))
+        UITableView.appearance().backgroundColor = UIColor(Color("background-color"))
+        UICollectionView.appearance().backgroundColor = UIColor(Color("background-color"))
     }
     
     var body: some Scene {

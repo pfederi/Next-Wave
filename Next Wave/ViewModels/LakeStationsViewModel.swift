@@ -4,7 +4,14 @@ import Foundation
 class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var lakes: [Lake] = []
     @Published var selectedLake: Lake?
-    @Published var selectedStation: Lake.Station?
+    @Published var selectedStation: Lake.Station? {
+        didSet {
+            if selectedStation?.id != oldValue?.id {
+                hasAttemptedLoad = false    // Reset load attempt
+                scrolledToNext = false      // Reset scroll state
+            }
+        }
+    }
     @Published var departures: [Journey] = []
     @Published var isTestMode: Bool = false
     @Published var journeyDetails: [String: [Journey.Stop]] = [:]
@@ -12,9 +19,17 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var selectedDate: Date = Date()
     @Published var isLoading = false
     @Published var hasAttemptedLoad = false
+    @Published var scrolledToNext = false  // Remove private(set)
     private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
+    
+    private var departuresCache: [String: [Journey]] = [:]  // [stationId_date: departures]
+    private let cacheFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
     
     init() {
         loadLakes()
@@ -40,17 +55,41 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         let lakes: [Lake]
     }
     
+    private func getCacheKey(for station: Lake.Station, date: Date) -> String {
+        let dateString = cacheFormatter.string(from: date)
+        return "\(station.id)_\(dateString)"
+    }
+    
     func refreshDepartures() async {
         guard let station = selectedStation,
               let uicRef = station.uic_ref else { return }
         
         isLoading = true
         
+        // Check cache for current day
+        let cacheKey = getCacheKey(for: station, date: selectedDate)
+        if Calendar.current.isDateInToday(selectedDate),
+           let cachedDepartures = departuresCache[cacheKey] {
+            self.departures = []  // Clear first
+            try? await Task.sleep(nanoseconds: 100_000_000)  // Wait a bit
+            self.departures = cachedDepartures  // Then set cached data
+            self.isLoading = false
+            self.isInitialLoad = false
+            self.hasAttemptedLoad = true
+            return
+        }
+        
         do {
             let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
             if !isInitialLoad {
                 try? await Task.sleep(nanoseconds: 250_000_000)
             }
+            
+            // Cache if it's today
+            if Calendar.current.isDateInToday(selectedDate) {
+                departuresCache[cacheKey] = journeys
+            }
+            
             self.departures = journeys
             self.isLoading = false
             self.isInitialLoad = false

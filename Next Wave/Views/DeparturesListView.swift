@@ -5,7 +5,6 @@ struct DeparturesListView: View {
     let departures: [Journey]
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
-    @State private var scrolledToNext = false
     @State private var previousDeparturesCount = 0
     @State private var notifiedJourneys: Set<String> = []
     @State private var currentTime = Date()
@@ -52,7 +51,6 @@ struct DeparturesListView: View {
                     }
                     .listStyle(PlainListStyle())
                     .refreshable {
-                        scrolledToNext = false
                         await viewModel.refreshDepartures()
                     }
                     .onChange(of: previousDeparturesCount) { oldValue, newValue in
@@ -88,7 +86,7 @@ struct DeparturesListView: View {
         }
         .onChange(of: viewModel.selectedDate) { oldValue, newValue in
             notifiedJourneys.removeAll()
-            scrolledToNext = false
+            viewModel.scrolledToNext = false  // Reset scroll state when date changes
             if Calendar.current.isDateInToday(newValue) {
                 // Aktualisiere den Benachrichtigungsstatus nur für den aktuellen Tag
                 for journey in departures {
@@ -99,7 +97,7 @@ struct DeparturesListView: View {
     }
     
     private func scrollToNextDeparture(proxy: ScrollViewProxy) {
-        if !scrolledToNext && isCurrentDay {
+        if !viewModel.scrolledToNext && isCurrentDay {
             if let nextDeparture = departures.first(where: { journey in
                 if let departureTime = journey.stop.departure {
                     return !isPastDeparture(formatTime(departureTime))
@@ -110,7 +108,7 @@ struct DeparturesListView: View {
                     proxy.scrollTo(nextDeparture.id, anchor: .top)
                 }
             }
-            scrolledToNext = true
+            viewModel.scrolledToNext = true
         }
     }
     

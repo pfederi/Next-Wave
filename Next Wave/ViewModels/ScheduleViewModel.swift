@@ -11,11 +11,8 @@ class ScheduleViewModel: ObservableObject {
     @Published var noWavesMessage: String? = nil
     
     private let userDefaults = UserDefaults.standard
-    private let notificationsKey = "scheduledNotifications"
-    private var timer: Timer?
-    
-    @Published var notifiedJourneys: Set<String> = []
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
+    private var timer: Timer?
     
     var availableStops: [String] {
         var stops = Set<String>()
@@ -38,18 +35,16 @@ class ScheduleViewModel: ObservableObject {
     }
     
     @Published var currentPeriod: String?
+    @Published var notifiedJourneys: Set<String> = []
     
     init() {
-        userDefaults.removeObject(forKey: notificationsKey)
-        
-        // Load saved notifications
         if let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) {
             notifiedJourneys = Set(savedNotifications)
         }
+        loadNotifications()
         
         loadSchedule()
         updateNextWaves()
-        loadNotifications()
         
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
@@ -137,7 +132,7 @@ class ScheduleViewModel: ObservableObject {
             return
         }
         
-        let savedNotifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
+        let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) ?? []
         var events: [WaveEvent] = []
         
         if let periodSchedule = schedule?.periods[currentPeriod] {
@@ -307,39 +302,19 @@ class ScheduleViewModel: ObservableObject {
     
     func removeNotification(for wave: WaveEvent) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [wave.id])
-        
         if let index = nextWaves.firstIndex(where: { $0.id == wave.id }) {
             nextWaves[index].hasNotification = false
-            removeNotification(wave.id)
         }
-    }
-    
-    private func saveNotification(_ id: String) {
-        var notifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
-        notifications.append(id)
-        userDefaults.set(notifications, forKey: notificationsKey)
-    }
-    
-    private func removeNotification(_ id: String) {
-        var notifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
-        notifications.removeAll { $0 == id }
-        userDefaults.set(notifications, forKey: notificationsKey)
+        notifiedJourneys.remove(wave.id)
+        saveNotifications()
     }
     
     private func loadNotifications() {
-        let notifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
-        
-        for notificationId in notifications {
-            if let wave = nextWaves.first(where: { $0.id == notificationId }) {
-                if wave.remainingTimeString == "missed" {
-                    removeNotification(for: wave)
-                    continue
-                }
-                
-                scheduleSystemNotification(for: wave)
-                if let index = nextWaves.firstIndex(where: { $0.id == wave.id }) {
-                    nextWaves[index].hasNotification = true
-                }
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            DispatchQueue.main.async {
+                let systemNotificationIds = Set(requests.map { $0.identifier })
+                self.notifiedJourneys = systemNotificationIds
+                self.saveNotifications()
             }
         }
     }
@@ -421,13 +396,20 @@ class ScheduleViewModel: ObservableObject {
         return hasNotification(for: notificationId)
     }
     
+    private func saveNotification(_ id: String) {
+        notifiedJourneys.insert(id)
+        saveNotifications()
+    }
+    
     func scheduleNotification(for journey: Journey) {
         guard let departureTime = journey.stop.departure,
               let date = parseFullTime(departureTime) else { return }
         
+        // Keine Notification für vergangene Zeiten
+        if date < Date() { return }
+        
         let content = UNMutableNotificationContent()
-        content.title = "Next Wave"
-        content.body = "Ship departing from \(journey.stop.station.name ?? "Unknown Station") in 15 minutes"
+        content.title = "Next Wave incoming. Get ready!"
         content.sound = .default
         
         let triggerDate = Calendar.current.date(byAdding: .minute, value: -15, to: date)
@@ -443,8 +425,7 @@ class ScheduleViewModel: ObservableObject {
         UNUserNotificationCenter.current().add(request) { error in
             if error == nil {
                 DispatchQueue.main.async {
-                    self.notifiedJourneys.insert(notificationId)
-                    self.saveNotifications()
+                    self.saveNotification(notificationId)
                 }
             }
         }

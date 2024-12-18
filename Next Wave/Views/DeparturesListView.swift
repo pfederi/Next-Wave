@@ -9,6 +9,7 @@ struct DeparturesListView: View {
     @State private var previousDeparturesCount = 0
     @State private var notifiedJourneys: Set<String> = []
     @State private var currentTime = Date()
+    @ObservedObject var scheduleViewModel: ScheduleViewModel
     
     let timer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     
@@ -35,85 +36,21 @@ struct DeparturesListView: View {
                                 let formattedTime = formatTime(departureTime)
                                 let isPast = isCurrentDay ? isPastDeparture(formattedTime) : false
                                 
-                                HStack(alignment: .firstTextBaseline) {
-                                    // Left side - Time
-                                    VStack(alignment: .center, spacing: 4) {
-                                        Text(formattedTime)
-                                            .font(.system(size: 24, weight: .bold))
-                                            .foregroundColor(isPast ? .gray : .primary)
-                                        if isCurrentDay, let date = parseTime(formattedTime) {
-                                            let remainingTime = calculateRemainingTime(for: date)
-                                            Text(remainingTime)
-                                                .font(.caption)
-                                                .foregroundColor(getTimeColor(remainingTime))
-                                                .padding(.top, 6)
-                                        }
-                                    }
-                                    .frame(width: 70)
-                                    
-                                    Spacer().frame(width: 16)
-                                    
-                                    // Middle section - Wave and Course number
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        HStack(alignment: .center) {
-                                            Image(systemName: "water.waves")
-                                                .foregroundColor(isPast ? .gray : .blue)
-                                            Text("\(index + 1). Wave")
-                                                .foregroundColor(isPast ? .gray : .primary)
-                                            
-                                            Spacer()
-                                            
-                                            if notifiedJourneys.contains(journey.id) {
-                                                Image(systemName: "bell.fill")
-                                                    .foregroundColor(.blue)
-                                                    .font(.system(size: 16))
-                                            }
-                                        }
-                                        
-                                        HStack(spacing: 8) {
-                                            if let name = journey.name {
-                                                Text(name.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))
-                                                    .font(.caption)
-                                                    .padding(.horizontal, 8)
-                                                    .padding(.vertical, 4)
-                                                    .background(Color.gray.opacity(0.1))
-                                                    .cornerRadius(12)
-                                            }
-                                            
-                                            if let passList = journey.passList,
-                                               passList.count > 1,
-                                               let nextStationName = passList[1].station.name {
-                                                Text("→ \(nextStationName)")
-                                                    .font(.caption)
-                                                    .foregroundColor(isPast ? .gray : .primary)
-                                            }
-                                        }
-                                    }
-                                    
-                                    Spacer()
-                                }
-                                .id(journey.id)
-                                .opacity(isPast ? 0.6 : 1.0)
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    if !isPast && isCurrentDay {
-                                        Button {
-                                            if notifiedJourneys.contains(journey.id) {
-                                                removeNotification(for: journey)
-                                            } else {
-                                                scheduleNotification(for: journey)
-                                            }
-                                        } label: {
-                                            Label(notifiedJourneys.contains(journey.id) ? "Remove" : "Notify", 
-                                                  systemImage: notifiedJourneys.contains(journey.id) ? "bell.slash" : "bell")
-                                        }
-                                        .tint(notifiedJourneys.contains(journey.id) ? .red : .blue)
-                                    }
-                                }
+                                DepartureRowView(
+                                    journey: journey,
+                                    index: index,
+                                    formattedTime: formattedTime,
+                                    isPast: isPast,
+                                    isCurrentDay: isCurrentDay,
+                                    notifiedJourneys: $notifiedJourneys,
+                                    scheduleViewModel: scheduleViewModel
+                                )
                             }
                         }
                     }
                     .listStyle(PlainListStyle())
                     .refreshable {
+                        scrolledToNext = false
                         await viewModel.refreshDepartures()
                     }
                     .onChange(of: previousDeparturesCount) { oldValue, newValue in
@@ -124,6 +61,11 @@ struct DeparturesListView: View {
                             previousDeparturesCount = departures.count
                         }
                         scrollToNextDeparture(proxy: proxy)
+                        
+                        // Lade den Benachrichtigungsstatus für alle Journeys
+                        for journey in departures {
+                            updateNotificationStatus(for: journey.id)
+                        }
                     }
                 }
             } else if selectedStation != nil {
@@ -143,15 +85,19 @@ struct DeparturesListView: View {
             currentTime = Date()
         }
         .onChange(of: viewModel.selectedDate) { oldValue, newValue in
-            if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
-                notifiedJourneys.removeAll()
-                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+            notifiedJourneys.removeAll()
+            scrolledToNext = false
+            if Calendar.current.isDateInToday(newValue) {
+                // Aktualisiere den Benachrichtigungsstatus nur für den aktuellen Tag
+                for journey in departures {
+                    updateNotificationStatus(for: journey.id)
+                }
             }
         }
     }
     
     private func scrollToNextDeparture(proxy: ScrollViewProxy) {
-        if !scrolledToNext {
+        if !scrolledToNext && isCurrentDay {
             if let nextDeparture = departures.first(where: { journey in
                 if let departureTime = journey.stop.departure {
                     return !isPastDeparture(formatTime(departureTime))
@@ -234,43 +180,6 @@ struct DeparturesListView: View {
         }
     }
     
-    private func scheduleNotification(for journey: Journey) {
-        guard let departureTime = journey.stop.departure,
-              let date = parseFullTime(departureTime),
-              Calendar.current.isDateInToday(date) else { return }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "Get ready to catch the wave"
-        
-        if let passList = journey.passList,
-           let nextStationIndex = passList.firstIndex(where: { $0.station.name != selectedStation?.name }),
-           let nextStationName = passList[nextStationIndex].station.name {
-            content.body = "Ship \(journey.name ?? "") to \(nextStationName) at \(formatTime(departureTime))"
-        } else {
-            content.body = "Ship \(journey.name ?? "") at \(formatTime(departureTime))"
-        }
-        
-        if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
-        } else {
-            content.sound = .default
-        }
-        
-        let triggerDate = Calendar.current.date(byAdding: .minute, value: -5, to: date)!
-        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        
-        let request = UNNotificationRequest(identifier: journey.id, content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request)
-        notifiedJourneys.insert(journey.id)
-    }
-    
-    private func removeNotification(for journey: Journey) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [journey.id])
-        notifiedJourneys.remove(journey.id)
-    }
-    
     private func parseFullTime(_ timeString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -283,5 +192,20 @@ struct DeparturesListView: View {
         formatter.dateFormat = "EEEE, d. MMMM"
         formatter.locale = Locale(identifier: "en_US")
         return formatter.string(from: date)
+    }
+    
+    private func updateNotificationStatus(for journeyId: String) {
+        if let journey = departures.first(where: { $0.id == journeyId }),
+           Calendar.current.isDateInToday(viewModel.selectedDate) {
+            let stationId = journey.stop.station.id
+            let notificationId = "\(stationId)_\(journeyId)"
+            if scheduleViewModel.hasNotification(for: notificationId) {
+                notifiedJourneys.insert(journeyId)
+            } else {
+                notifiedJourneys.remove(journeyId)
+            }
+        } else {
+            notifiedJourneys.remove(journeyId)
+        }
     }
 } 

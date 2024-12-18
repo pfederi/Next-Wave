@@ -20,6 +20,7 @@ struct ContentView: View {
         }
     }
     @State private var canGoBack = false
+    @EnvironmentObject var scheduleViewModel: ScheduleViewModel
     
     var body: some View {
         NavigationStack {
@@ -86,7 +87,8 @@ struct ContentView: View {
                         DeparturesListView(
                             departures: viewModel.departures,
                             selectedStation: viewModel.selectedStation,
-                            viewModel: viewModel
+                            viewModel: viewModel,
+                            scheduleViewModel: scheduleViewModel
                         )
                         .padding(.top, 16)
                     }

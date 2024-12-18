@@ -95,7 +95,7 @@ struct DeparturesListView: View {
                                 .id(journey.id)
                                 .opacity(isPast ? 0.6 : 1.0)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    if !isPast {
+                                    if !isPast && isCurrentDay {
                                         Button {
                                             if notifiedJourneys.contains(journey.id) {
                                                 removeNotification(for: journey)
@@ -141,6 +141,12 @@ struct DeparturesListView: View {
         }
         .onReceive(timer) { _ in
             currentTime = Date()
+        }
+        .onChange(of: viewModel.selectedDate) { oldValue, newValue in
+            if !Calendar.current.isDate(oldValue, inSameDayAs: newValue) {
+                notifiedJourneys.removeAll()
+                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+            }
         }
     }
     
@@ -230,10 +236,11 @@ struct DeparturesListView: View {
     
     private func scheduleNotification(for journey: Journey) {
         guard let departureTime = journey.stop.departure,
-              let date = parseFullTime(departureTime) else { return }
+              let date = parseFullTime(departureTime),
+              Calendar.current.isDateInToday(date) else { return }
         
         let content = UNMutableNotificationContent()
-        content.title = "Wave is coming"
+        content.title = "Get ready to catch the wave"
         
         if let passList = journey.passList,
            let nextStationIndex = passList.firstIndex(where: { $0.station.name != selectedStation?.name }),

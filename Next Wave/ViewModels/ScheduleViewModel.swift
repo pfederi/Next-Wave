@@ -14,6 +14,9 @@ class ScheduleViewModel: ObservableObject {
     private let notificationsKey = "scheduledNotifications"
     private var timer: Timer?
     
+    @Published var notifiedJourneys: Set<String> = []
+    private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
+    
     var availableStops: [String] {
         var stops = Set<String>()
         
@@ -38,6 +41,11 @@ class ScheduleViewModel: ObservableObject {
     
     init() {
         userDefaults.removeObject(forKey: notificationsKey)
+        
+        // Load saved notifications
+        if let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) as? [String] {
+            notifiedJourneys = Set(savedNotifications)
+        }
         
         loadSchedule()
         updateNextWaves()
@@ -404,8 +412,7 @@ class ScheduleViewModel: ObservableObject {
     }
     
     func hasNotification(for identifier: String) -> Bool {
-        let notifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
-        return notifications.contains(identifier)
+        return notifiedJourneys.contains(identifier)
     }
     
     func hasNotification(for journey: Journey) -> Bool {
@@ -416,42 +423,42 @@ class ScheduleViewModel: ObservableObject {
     
     func scheduleNotification(for journey: Journey) {
         guard let departureTime = journey.stop.departure,
-              let date = parseFullTime(departureTime),
-              Calendar.current.isDateInToday(date) else { return }
+              let date = parseFullTime(departureTime) else { return }
         
-        let stationId = journey.stop.station.id
         let content = UNMutableNotificationContent()
-        content.title = "Get ready to catch the wave"
+        content.title = "Next Wave"
+        content.body = "Ship departing from \(journey.stop.station.name) in 15 minutes"
+        content.sound = .default
         
-        if let passList = journey.passList,
-           let nextStationIndex = passList.firstIndex(where: { $0.station.name != journey.stop.station.name }),
-           let nextStationName = passList[nextStationIndex].station.name {
-            content.body = "Ship \(journey.name ?? "") to \(nextStationName)"
-        } else {
-            content.body = "Ship \(journey.name ?? "")"
-        }
+        let triggerDate = Calendar.current.date(byAdding: .minute, value: -15, to: date)
+        guard let triggerDate = triggerDate else { return }
         
-        if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {
-            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
-        } else {
-            content.sound = .default
-        }
-        
-        let triggerDate = Calendar.current.date(byAdding: .minute, value: -5, to: date)!
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         
+        let stationId = journey.stop.station.id
         let notificationId = "\(stationId)_\(journey.id)"
         let request = UNNotificationRequest(identifier: notificationId, content: content, trigger: trigger)
         
-        UNUserNotificationCenter.current().add(request)
-        saveNotification(notificationId)
+        UNUserNotificationCenter.current().add(request) { error in
+            if error == nil {
+                DispatchQueue.main.async {
+                    self.notifiedJourneys.insert(notificationId)
+                    self.saveNotifications()
+                }
+            }
+        }
     }
     
     func removeNotification(for journey: Journey) {
         let stationId = journey.stop.station.id
         let notificationId = "\(stationId)_\(journey.id)"
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationId])
-        removeNotification(notificationId)
+        notifiedJourneys.remove(notificationId)
+        saveNotifications()
+    }
+    
+    private func saveNotifications() {
+        userDefaults.set(Array(notifiedJourneys), forKey: notifiedJourneysKey)
     }
 }

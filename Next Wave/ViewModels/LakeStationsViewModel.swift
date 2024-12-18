@@ -31,8 +31,45 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         return formatter
     }()
     
-    init() {
+    private let scheduleViewModel: ScheduleViewModel
+    
+    private var midnightTimer: Timer?
+    
+    init(scheduleViewModel: ScheduleViewModel) {
+        self.scheduleViewModel = scheduleViewModel
         loadLakes()
+        scheduleMidnightRefresh()
+    }
+    
+    deinit {
+        midnightTimer?.invalidate()
+    }
+    
+    private func scheduleMidnightRefresh() {
+        // Cancel existing timer if any
+        midnightTimer?.invalidate()
+        
+        // Calculate time until next midnight
+        let calendar = Calendar.current
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date()),
+              let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: tomorrow) else {
+            return
+        }
+        
+        let timeInterval = nextMidnight.timeIntervalSinceNow
+        
+        // Schedule timer
+        midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.selectedDate = Date()  // Reset to current date
+                if self.selectedStation != nil {
+                    await self.refreshDepartures()
+                }
+                // Schedule next midnight refresh
+                self.scheduleMidnightRefresh()
+            }
+        }
     }
     
     private func loadLakes() {
@@ -114,6 +151,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     func selectStation(_ station: Lake.Station) {
         self.selectedStation = station
+        self.departures = []  // Clear departures immediately
+        scheduleViewModel.nextWaves = []  // Clear waves immediately
         Task {
             await refreshDepartures()
         }

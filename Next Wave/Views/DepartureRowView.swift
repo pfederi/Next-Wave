@@ -1,13 +1,12 @@
 import SwiftUI
 
 struct DepartureRowView: View {
-    let journey: Journey
+    let wave: WaveEvent
     let index: Int
     let formattedTime: String
     let isPast: Bool
     let isCurrentDay: Bool
-    @Binding var notifiedJourneys: Set<String>
-    let scheduleViewModel: ScheduleViewModel
+    @ObservedObject var scheduleViewModel: ScheduleViewModel
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -17,22 +16,20 @@ struct DepartureRowView: View {
             
             Spacer().frame(width: 16)
             
-            InfoColumn(journey: journey, 
+            InfoColumn(wave: wave, 
                       index: index, 
                       isPast: isPast, 
-                      hasNotification: isCurrentDay && notifiedJourneys.contains(journey.id))
+                      hasNotification: scheduleViewModel.hasNotification(for: wave))
             
             Spacer()
         }
-        .id(journey.id)
+        .id(wave.id)
         .opacity(isPast ? 0.6 : 1.0)
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             if !isPast && isCurrentDay {
-                NotificationButton(journey: journey,
-                                 hasNotification: notifiedJourneys.contains(journey.id),
+                NotificationButton(wave: wave,
                                  scheduleViewModel: scheduleViewModel,
-                                 isCurrentDay: isCurrentDay,
-                                 notifiedJourneys: $notifiedJourneys)
+                                 isCurrentDay: isCurrentDay)
             }
         }
     }
@@ -61,7 +58,7 @@ private struct TimeColumn: View {
 }
 
 private struct InfoColumn: View {
-    let journey: Journey
+    let wave: WaveEvent
     let index: Int
     let isPast: Bool
     let hasNotification: Bool
@@ -84,48 +81,38 @@ private struct InfoColumn: View {
             }
             
             HStack(spacing: 8) {
-                if let name = journey.name {
-                    Text(name.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(12)
-                }
+                Text(wave.routeNumber.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
                 
-                if let passList = journey.passList,
-                   passList.count > 1,
-                   let nextStationName = passList[1].station.name {
-                    Text("→ \(nextStationName)")
-                        .font(.caption)
-                        .foregroundColor(isPast ? .gray : .primary)
-                }
+                Text("→ \(wave.neighborStopName)")
+                    .font(.caption)
+                    .foregroundColor(isPast ? .gray : .primary)
             }
         }
     }
 }
 
 private struct NotificationButton: View {
-    let journey: Journey
-    let hasNotification: Bool
-    let scheduleViewModel: ScheduleViewModel
+    let wave: WaveEvent
+    @ObservedObject var scheduleViewModel: ScheduleViewModel
     let isCurrentDay: Bool
-    @Binding var notifiedJourneys: Set<String>
     
     var body: some View {
         Button {
-            if hasNotification {
-                scheduleViewModel.removeNotification(for: journey)
-                notifiedJourneys.remove(journey.id)
+            if scheduleViewModel.hasNotification(for: wave) {
+                scheduleViewModel.removeNotification(for: wave)
             } else if isCurrentDay {
-                scheduleViewModel.scheduleNotification(for: journey)
-                notifiedJourneys.insert(journey.id)
+                scheduleViewModel.scheduleNotification(for: wave)
             }
         } label: {
-            Label(hasNotification ? "Remove" : "Notify",
-                  systemImage: hasNotification ? "bell.slash" : "bell")
+            Label(scheduleViewModel.hasNotification(for: wave) ? "Remove" : "Notify",
+                  systemImage: scheduleViewModel.hasNotification(for: wave) ? "bell.slash" : "bell")
         }
-        .tint(hasNotification ? .red : .blue)
-        .disabled(!isCurrentDay && !hasNotification)
+        .tint(scheduleViewModel.hasNotification(for: wave) ? .red : .blue)
+        .disabled(!isCurrentDay && !scheduleViewModel.hasNotification(for: wave))
     }
 } 

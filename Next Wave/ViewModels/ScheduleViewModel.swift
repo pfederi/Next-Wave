@@ -191,11 +191,16 @@ class ScheduleViewModel: ObservableObject {
         let content = UNMutableNotificationContent()
         content.title = "Wave is coming"
         
-        let directionText = wave.isArrival ? "from" : "to"
         let location = wave.neighborStop.replacingOccurrences(of: "nach ", with: "")
                                   .replacingOccurrences(of: "von ", with: "")
+        let cleanedRouteName = wave.routeName.replacingOccurrences(
+            of: "\\((0+)",
+            with: "(",
+            options: .regularExpression
+        ).replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
         
-        content.body = "\(wave.routeName) \(directionText) \(location) at \(wave.timeString)"
+        let directionText = wave.isArrival ? "from" : "to"
+        content.body = "\(cleanedRouteName) \(directionText) \(location) at \(wave.timeString)"
         
         if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {
             content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
@@ -210,10 +215,6 @@ class ScheduleViewModel: ObservableObject {
         let request = UNNotificationRequest(identifier: wave.id, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request)
-        
-        if let index = nextWaves.firstIndex(where: { $0.id == wave.id }) {
-            nextWaves[index].hasNotification = true
-        }
     }
     
     public func isDateInRange(_ dateRange: String) -> Bool {

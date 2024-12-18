@@ -9,6 +9,7 @@ struct WaveEvent: Identifiable, Equatable {
     let routeNumber: String
     let routeName: String
     let neighborStop: String
+    let neighborStopName: String
     let period: String
     var hasNotification = false
     
@@ -17,26 +18,7 @@ struct WaveEvent: Identifiable, Equatable {
     }
     
     var remainingTimeString: String {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        let timeDiff = calendar.dateComponents([.hour, .minute], from: now, to: time)
-        let hours = timeDiff.hour ?? 0
-        let minutes = timeDiff.minute ?? 0
-        
-        if time < now {
-            return "missed"
-        }
-        
-        if hours == 0 && minutes >= -5 && minutes <= 5 {
-            return "now"
-        }
-        
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        }
-        
-        return "\(minutes)m"
+        return AppDateFormatter.formatRemainingTime(from: time)
     }
     
     var direction: Direction {
@@ -50,6 +32,7 @@ struct WaveEvent: Identifiable, Equatable {
         lhs.routeNumber == rhs.routeNumber &&
         lhs.routeName == rhs.routeName &&
         lhs.neighborStop == rhs.neighborStop &&
+        lhs.neighborStopName == rhs.neighborStopName &&
         lhs.period == rhs.period &&
         lhs.hasNotification == rhs.hasNotification
     }

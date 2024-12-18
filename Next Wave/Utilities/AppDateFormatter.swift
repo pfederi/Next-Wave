@@ -28,6 +28,14 @@ enum AppDateFormatter {
         return formatter
     }()
     
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "de_CH")
+        formatter.timeZone = zurichTimeZone
+        formatter.dateFormat = "d.M.yyyy"
+        return formatter
+    }()
+    
     static func parseTime(_ timeString: String) -> Date? {
         guard let date = timeFormatter.date(from: timeString) else { return nil }
         
@@ -52,5 +60,62 @@ enum AppDateFormatter {
     
     static func formatTime(_ date: Date) -> String {
         return timeFormatter.string(from: date)
+    }
+    
+    static func formatRemainingTime(from date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let timeDiff = calendar.dateComponents([.hour, .minute], from: now, to: date)
+        let hours = timeDiff.hour ?? 0
+        let minutes = timeDiff.minute ?? 0
+        
+        if date < now {
+            return "missed"
+        }
+        
+        if hours == 0 && minutes >= -5 && minutes <= 5 {
+            return "now"
+        }
+        
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        }
+        
+        return "\(minutes)m"
+    }
+    
+    static func parseDate(_ dateString: String, defaultYear: String? = nil) -> Date? {
+        if dateString.contains(".20") {
+            return dateFormatter.date(from: dateString)
+        }
+        
+        if let year = defaultYear {
+            return dateFormatter.date(from: dateString + "." + year)
+        }
+        
+        return nil
+    }
+    
+    static func calculateRemainingTime(for date: Date) -> String {
+        let now = Date()
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: now, to: date)
+        let hours = components.hour ?? 0
+        let minutes = components.minute ?? 0
+        
+        if minutes >= -5 && minutes <= 5 {
+            return "now"
+        }
+        
+        if minutes < -5 {
+            return "missed"
+        }
+        
+        if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        }
+        
+        return "\(minutes)m"
     }
 } 

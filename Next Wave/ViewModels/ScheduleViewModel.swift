@@ -43,7 +43,7 @@ class ScheduleViewModel: ObservableObject {
         userDefaults.removeObject(forKey: notificationsKey)
         
         // Load saved notifications
-        if let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) as? [String] {
+        if let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) {
             notifiedJourneys = Set(savedNotifications)
         }
         
@@ -427,7 +427,7 @@ class ScheduleViewModel: ObservableObject {
         
         let content = UNMutableNotificationContent()
         content.title = "Next Wave"
-        content.body = "Ship departing from \(journey.stop.station.name) in 15 minutes"
+        content.body = "Ship departing from \(journey.stop.station.name ?? "Unknown Station") in 15 minutes"
         content.sound = .default
         
         let triggerDate = Calendar.current.date(byAdding: .minute, value: -15, to: date)

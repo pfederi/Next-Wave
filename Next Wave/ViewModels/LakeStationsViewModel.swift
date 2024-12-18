@@ -11,6 +11,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var expandedLakeId: String?
     @Published var selectedDate: Date = Date()
     @Published var isLoading = false
+    @Published var hasAttemptedLoad = false
     private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
@@ -43,9 +44,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         guard let station = selectedStation,
               let uicRef = station.uic_ref else { return }
         
-        if !isInitialLoad {
-            isLoading = true
-        }
+        isLoading = true
+        
         do {
             let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
             if !isInitialLoad {
@@ -54,9 +54,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             self.departures = journeys
             self.isLoading = false
             self.isInitialLoad = false
+            self.hasAttemptedLoad = true
         } catch {
             print("Error refreshing departures: \(error)")
             self.isLoading = false
+            self.hasAttemptedLoad = true
         }
     }
     

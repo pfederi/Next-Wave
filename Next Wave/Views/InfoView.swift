@@ -15,7 +15,7 @@ struct InfoView: View {
                     
                     Text("How it works 🎯")
                         .font(.title2)
-                    Text("1. Select your spot\n2. Check the timetable\n3. Set notifications for your waves\n4. Enjoy your ride!")
+                    Text("1. Select your spot\n2. Check the timetable\n3. Set notifications with a swipe to the right\n4. Enjoy your ride!")
                         .font(.body)
                     
                     Text("Features 🌊")

@@ -19,7 +19,9 @@ struct DeparturesListView: View {
     
     var body: some View {
         VStack {
-            if viewModel.isLoading {
+            if selectedStation == nil {
+                // No station selected, show nothing
+            } else if viewModel.isLoading {
                 Spacer()
                 ProgressView()
                     .scaleEffect(1.5)
@@ -68,7 +70,7 @@ struct DeparturesListView: View {
                         }
                     }
                 }
-            } else if selectedStation != nil {
+            } else if viewModel.hasAttemptedLoad {
                 Spacer()
                 Text("No departures found for \(selectedStation?.name ?? "")")
                     .foregroundColor(Color("text-color"))

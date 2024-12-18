@@ -402,4 +402,56 @@ class ScheduleViewModel: ObservableObject {
         formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
         return formatter.date(from: timeString)
     }
+    
+    func hasNotification(for identifier: String) -> Bool {
+        let notifications = userDefaults.stringArray(forKey: notificationsKey) ?? []
+        return notifications.contains(identifier)
+    }
+    
+    func hasNotification(for journey: Journey) -> Bool {
+        let stationId = journey.stop.station.id
+        let notificationId = "\(stationId)_\(journey.id)"
+        return hasNotification(for: notificationId)
+    }
+    
+    func scheduleNotification(for journey: Journey) {
+        guard let departureTime = journey.stop.departure,
+              let date = parseFullTime(departureTime),
+              Calendar.current.isDateInToday(date) else { return }
+        
+        let stationId = journey.stop.station.id
+        let content = UNMutableNotificationContent()
+        content.title = "Get ready to catch the wave"
+        
+        if let passList = journey.passList,
+           let nextStationIndex = passList.firstIndex(where: { $0.station.name != journey.stop.station.name }),
+           let nextStationName = passList[nextStationIndex].station.name {
+            content.body = "Ship \(journey.name ?? "") to \(nextStationName)"
+        } else {
+            content.body = "Ship \(journey.name ?? "")"
+        }
+        
+        if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {
+            content.sound = UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
+        } else {
+            content.sound = .default
+        }
+        
+        let triggerDate = Calendar.current.date(byAdding: .minute, value: -5, to: date)!
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        
+        let notificationId = "\(stationId)_\(journey.id)"
+        let request = UNNotificationRequest(identifier: notificationId, content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request)
+        saveNotification(notificationId)
+    }
+    
+    func removeNotification(for journey: Journey) {
+        let stationId = journey.stop.station.id
+        let notificationId = "\(stationId)_\(journey.id)"
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [notificationId])
+        removeNotification(notificationId)
+    }
 }

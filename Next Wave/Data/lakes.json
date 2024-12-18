@@ -335,10 +335,6 @@
                   "uic_ref": "8504558"
               },
               {
-                  "name": "Yverdon-les-Bains",
-                  "uic_ref": "8504558"
-              },
-              {
                   "name": "Rolle (lac)",
                   "uic_ref": "8501320"
               },
@@ -454,6 +450,10 @@
                   "name": "Leissigen (See)",
                   "uic_ref": "8507167"
               },
+              {
+                "name": "Hünibach (See)",
+                "uic_ref": "8507161"
+            },
               {
                   "name": "Därligen (See)",
                   "uic_ref": "8507168"
@@ -656,7 +656,11 @@
               {
                   "name": "Concise (bateau)",
                   "uic_ref": "8504556"
-              }
+              },
+              {
+                "name": "Yverdon-les-Bains",
+                "uic_ref": "8504558"
+            }
           ]
       },
       {

@@ -403,13 +403,14 @@ class ScheduleViewModel: ObservableObject {
     
     func scheduleNotification(for journey: Journey) {
         guard let departureTime = journey.stop.departure,
-              let date = parseFullTime(departureTime) else { return }
+              let date = AppDateFormatter.parseFullTime(departureTime) else { return }
         
         // Keine Notification für vergangene Zeiten
         if date < Date() { return }
         
         let content = UNMutableNotificationContent()
-        content.title = "Next Wave incoming. Get ready!"
+        content.title = "Next Wave"
+        content.body = "Ship departing from \(journey.stop.station.name ?? "Unknown Station") in 15 minutes"
         content.sound = .default
         
         let triggerDate = Calendar.current.date(byAdding: .minute, value: -15, to: date)

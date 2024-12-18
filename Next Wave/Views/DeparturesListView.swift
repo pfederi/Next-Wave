@@ -146,40 +146,6 @@ struct DeparturesListView: View {
         return nil
     }
     
-    private func calculateRemainingTime(for date: Date) -> String {
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.minute], from: now, to: date)
-        let minutes = components.minute ?? 0
-        
-        if minutes >= -5 && minutes <= 5 {
-            return "now"
-        }
-        if minutes < -5 {
-            return "missed"
-        }
-        if minutes > 60 {
-            let hours = minutes / 60
-            let remainingMinutes = minutes % 60
-            if remainingMinutes == 0 {
-                return "\(hours)h"
-            }
-            return "\(hours)h \(remainingMinutes)min"
-        }
-        return "\(minutes)min"
-    }
-
-    private func getTimeColor(_ remainingTime: String) -> Color {
-        switch remainingTime {
-        case "now":
-            return .green
-        case "missed":
-            return .red
-        default:
-            return .gray
-        }
-    }
-    
     private func parseFullTime(_ timeString: String) -> Date? {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -188,10 +154,7 @@ struct DeparturesListView: View {
     }
     
     private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, d. MMMM"
-        formatter.locale = Locale(identifier: "en_US")
-        return formatter.string(from: date)
+        return AppDateFormatter.formatDisplayDate(date)
     }
     
     private func updateNotificationStatus(for journeyId: String) {

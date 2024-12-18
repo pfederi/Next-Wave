@@ -234,8 +234,13 @@ struct DeparturesListView: View {
         
         let content = UNMutableNotificationContent()
         content.title = "Wave is coming"
-        if let nextStation = journey.passList?.first(where: { $0.station.name != selectedStation?.name })?.station.name {
-            content.body = "Ship \(journey.name ?? "") to \(nextStation) at \(formatTime(departureTime))"
+        
+        if let passList = journey.passList,
+           let nextStationIndex = passList.firstIndex(where: { $0.station.name != selectedStation?.name }),
+           let nextStationName = passList[nextStationIndex].station.name {
+            content.body = "Ship \(journey.name ?? "") to \(nextStationName) at \(formatTime(departureTime))"
+        } else {
+            content.body = "Ship \(journey.name ?? "") at \(formatTime(departureTime))"
         }
         
         if let soundURL = Bundle.main.url(forResource: "boat-horn", withExtension: "wav") {

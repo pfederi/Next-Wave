@@ -8,7 +8,6 @@ struct NextWaveApp: App {
     
     init() {
         requestNotificationPermissions()
-        // Setze die Hintergrundfarbe für die gesamte App
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.backgroundColor = UIColor(Color("background-color"))
         
@@ -16,7 +15,6 @@ struct NextWaveApp: App {
         UINavigationBar.appearance().compactAppearance = coloredAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = coloredAppearance
         
-        // Setze die Hintergrundfarbe für die gesamte App
         UITableView.appearance().backgroundColor = UIColor(Color("background-color"))
         UICollectionView.appearance().backgroundColor = UIColor(Color("background-color"))
     }
@@ -40,9 +38,6 @@ struct NextWaveApp: App {
     
     private func requestNotificationPermissions() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-            if let error = error {
-                print("Notification permission error: \(error.localizedDescription)")
-            }
         }
     }
 }

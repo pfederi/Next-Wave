@@ -2,8 +2,7 @@
 //  ContentView.swift
 //  Next Wave
 //
-//  Created by Patrick Federi on 12.12.2024.
-//
+//  Created by Patrick Federi started at 12.12.2024.
 
 import SwiftUI
 
@@ -63,7 +62,6 @@ struct ContentView: View {
                                     }
                                 }
                                 
-                                // Center content with fixed width
                                 HStack {
                                     Spacer()
                                     Text(formattedDate)
@@ -143,7 +141,6 @@ struct ContentView: View {
                 .navigationBarTitleDisplayMode(.inline)
             }
             
-            // Overlay for the GIF
             EasterEggView(isShowing: $showingPirate, isOverlay: true)
         }
     }
@@ -151,13 +148,11 @@ struct ContentView: View {
     private var formattedDate: String {
         let formatter = DateFormatter()
         
-        // First get weekday abbreviation
         let weekdayFormatter = DateFormatter()
         weekdayFormatter.dateFormat = "EE"
         weekdayFormatter.locale = Locale(identifier: "en_US")
         let weekday = weekdayFormatter.string(from: selectedDate)
         
-        // Then get the date
         formatter.dateStyle = .medium
         formatter.locale = Locale(identifier: "en_US")
         let date = formatter.string(from: selectedDate)

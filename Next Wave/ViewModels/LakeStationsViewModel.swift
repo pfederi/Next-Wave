@@ -7,8 +7,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var selectedStation: Lake.Station? {
         didSet {
             if selectedStation?.id != oldValue?.id {
-                hasAttemptedLoad = false    // Reset load attempt
-                scrolledToNext = false      // Reset scroll state
+                hasAttemptedLoad = false
+                scrolledToNext = false
             }
         }
     }
@@ -19,12 +19,12 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var selectedDate: Date = Date()
     @Published var isLoading = false
     @Published var hasAttemptedLoad = false
-    @Published var scrolledToNext = false  // Remove private(set)
+    @Published var scrolledToNext = false
     private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
     
-    private var departuresCache: [String: [Journey]] = [:]  // [stationId_date: departures]
+    private var departuresCache: [String: [Journey]] = [:]
     private let cacheFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -46,10 +46,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     private func scheduleMidnightRefresh() {
-        // Cancel existing timer if any
         midnightTimer?.invalidate()
         
-        // Calculate time until next midnight
         let calendar = Calendar.current
         guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date()),
               let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: tomorrow) else {
@@ -58,15 +56,14 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         let timeInterval = nextMidnight.timeIntervalSinceNow
         
-        // Schedule timer
+
         midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
-                self.selectedDate = Date()  // Reset to current date
+                self.selectedDate = Date()
                 if self.selectedStation != nil {
                     await self.refreshDepartures()
                 }
-                // Schedule next midnight refresh
                 self.scheduleMidnightRefresh()
             }
         }
@@ -75,7 +72,6 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     private func loadLakes() {
         guard let url = Bundle.main.url(forResource: "lakes", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
-            print("Could not find lakes.json")
             return
         }
         
@@ -84,7 +80,6 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             let response = try decoder.decode(LakesResponse.self, from: data)
             self.lakes = response.lakes
         } catch {
-            print("Error decoding lakes data: \(error)")
         }
     }
     
@@ -103,12 +98,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         isLoading = true
         
-        // Check cache for current day
         let cacheKey = getCacheKey(for: station, date: selectedDate)
         if Calendar.current.isDateInToday(selectedDate),
            let cachedDepartures = departuresCache[cacheKey] {
-            self.departures = []  // Clear first
-            try? await Task.sleep(nanoseconds: 100_000_000)  // Wait a bit
+            self.departures = []
+            try? await Task.sleep(nanoseconds: 100_000_000)
             self.departures = cachedDepartures  // Then set cached data
             self.isLoading = false
             self.isInitialLoad = false
@@ -122,7 +116,6 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                 try? await Task.sleep(nanoseconds: 250_000_000)
             }
             
-            // Cache if it's today
             if Calendar.current.isDateInToday(selectedDate) {
                 departuresCache[cacheKey] = journeys
             }
@@ -143,16 +136,14 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             do {
                 let details = try await transportAPI.getJourneyDetails(for: journey)
                 self.journeyDetails[journey.id] = details.passList
-            } catch {
-                print("Error loading journey details: \(error)")
             }
         }
     }
     
     func selectStation(_ station: Lake.Station) {
         self.selectedStation = station
-        self.departures = []  // Clear departures immediately
-        scheduleViewModel.nextWaves = []  // Clear waves immediately
+        self.departures = []
+        scheduleViewModel.nextWaves = []
         Task {
             await refreshDepartures()
         }

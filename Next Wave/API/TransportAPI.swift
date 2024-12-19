@@ -31,20 +31,11 @@ class TransportAPI {
                 if journey.category == "BAT",
                    let passList = journey.passList,
                    !passList.isEmpty {
-                    // Debug: Print the pass list
-                    print("Journey \(journey.name ?? "unknown") pass list:")
-                    for stop in passList {
-                        print("- \(stop.station.name ?? "unknown")")
-                    }
                     return true
                 }
                 return false
             }
-            print("Found \(filteredJourneys.count) BAT journeys")
             return filteredJourneys
-        } catch {
-            print("Error decoding response: \(error)")
-            throw error
         }
     }
     
@@ -60,12 +51,6 @@ class TransportAPI {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw APIError.invalidResponse
-        }
-        
-        // Debug: Print the raw response
-        if let jsonString = String(data: data, encoding: .utf8) {
-            print("API Response for journey \(journey.id):")
-            print(jsonString)
         }
         
         let decoder = JSONDecoder()

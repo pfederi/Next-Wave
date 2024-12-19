@@ -3,9 +3,8 @@ import Foundation
 struct Lake: Codable, Identifiable, Hashable {
     let name: String
     let operators: [String]
-    private let _stations: [Station]  // Original stations array
+    private let _stations: [Station]
     
-    // Filtered stations array without duplicates, sorted alphabetically
     var stations: [Station] {
         Array(_stations.reduce(into: Set<Station>()) { result, station in
             result.insert(station)
@@ -50,7 +49,6 @@ struct Lake: Codable, Identifiable, Hashable {
     }
 }
 
-// Make Station conform to Hashable explicitly
 extension Lake.Station {
     static func == (lhs: Lake.Station, rhs: Lake.Station) -> Bool {
         lhs.id == rhs.id

@@ -34,7 +34,6 @@ class ScheduleViewModel: ObservableObject {
             notifiedJourneys = Set(savedNotifications)
         }
         
-        // Synchronisiere mit System-Notifications
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
             DispatchQueue.main.async {
                 let systemNotificationIds = Set(requests.map { $0.identifier })

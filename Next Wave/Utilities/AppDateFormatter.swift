@@ -39,7 +39,6 @@ enum AppDateFormatter {
     static func parseTime(_ timeString: String) -> Date? {
         guard let date = timeFormatter.date(from: timeString) else { return nil }
         
-        // Setze die Zeit auf heute
         let calendar = Calendar.current
         let now = Date()
         let components = calendar.dateComponents([.hour, .minute], from: date)

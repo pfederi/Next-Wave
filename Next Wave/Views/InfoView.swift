@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct InfoView: View {
+    @Environment(\.openURL) private var openURL
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
@@ -56,15 +58,16 @@ struct InfoView: View {
 
                 Group {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Privacy Policy")
-                            .font(.body)
-                            .foregroundColor(.accentColor)
-                            .underline(true, color: .accentColor)
-                            .onTapGesture {
-                                if let url = URL(string: "https://pumpfoiling.community/next-wave-app-privacy-policy/") {
-                                    UIApplication.shared.open(url)
-                                }
+                        Button(action: {
+                            if let url = URL(string: "https://pumpfoiling.community/next-wave-app-privacy-policy/") {
+                                openURL(url)
                             }
+                        }) {
+                            Text("Privacy Policy")
+                                .font(.body)
+                                .foregroundColor(.accentColor)
+                                .underline(true, color: .accentColor)
+                        }
 
                         Text("Visit pumpfoiling.community")
                             .font(.body)

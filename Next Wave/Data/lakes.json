@@ -1,803 +1,1163 @@
 {
-  "lakes": [
-      {
-          "name": "Zürichsee",
-          "operators": [
-              "ZSG"
-          ],
-          "stations": [
-              {
-                  "name": "Zürich Bürkliplatz (See)",
-                  "uic_ref": "8503651"
-              },
-              {
-                  "name": "Zürich Wollishofen (See)",
-                  "uic_ref": "8503681"
-              },
-              {
-                  "name": "Zürich Tiefenbrunnen (See)",
-                  "uic_ref": "8505332"
-              },
-              {
-                  "name": "Zürichhorn (See)",
-                  "uic_ref": "8503653"
-              },
-              {
-                  "name": "Zollikon (See)",
-                  "uic_ref": "8503655"
-              },
-              {
-                  "name": "Küsnacht ZH (See)",
-                  "uic_ref": "8503657"
-              },
-              {
-                  "name": "Erlenbach ZH (See)",
-                  "uic_ref": "8503659"
-              },
-              {
-                  "name": "Thalwil (See)",
-                  "uic_ref": "8503674"
-              },
-              {
-                  "name": "Rüschlikon (See)",
-                  "uic_ref": "8503675"
-              },
-              {
-                  "name": "Kilchberg ZH (See)",
-                  "uic_ref": "8503677"
-              },
-              {
-                  "name": "Horgen (See)",
-                  "uic_ref": "8503672"
-              },
-              {
-                  "name": "Oberrieden (See)",
-                  "uic_ref": "8503673"
-              },
-              {
-                  "name": "Wädenswil (See)",
-                  "uic_ref": "8503670"
-              },
-              {
-                  "name": "Männedorf (See)",
-                  "uic_ref": "8503664"
-              },
-              {
-                  "name": "Stäfa (See)",
-                  "uic_ref": "8503665"
-              },
-              {
-                  "name": "Uerikon (See)",
-                  "uic_ref": "8503666"
-              },
-              {
-                  "name": "Rapperswil SG (See)",
-                  "uic_ref": "8503667"
-              },
-              {
-                  "name": "Richterswil (See)",
-                  "uic_ref": "8503669"
-              },
-              {
-                  "name": "Uetikon am See (See)",
-                  "uic_ref": "8503663"
-              },
-              {
-                  "name": "Meilen (See)",
-                  "uic_ref": "8503661"
-              },
-              {
-                  "name": "Insel Ufenau",
-                  "uic_ref": "8503668"
-              },
-              {
-                  "name": "Pfäffikon SZ (See)",
-                  "uic_ref": "8503680"
-              },
-              {
-                  "name": "Wädenswil (See)",
-                  "uic_ref": "8503670"
-              },
-              {
-                  "name": "Küsnacht ZH Heslibach",
-                  "uic_ref": "8503682"
-              }
-          ]
-      },
-      {
-          "name": "Vierwaldstättersee",
-          "operators": [
-              "SGV"
-          ],
-          "stations": [
-              {
-                  "name": "Luzern Schweizerhofquai",
-                  "uic_ref": "8508505"
-              },
-              {
-                  "name": "Verkehrshaus-Lido",
-                  "uic_ref": "8508459"
-              },
-              {
-                  "name": "Hertenstein (See)",
-                  "uic_ref": "8508462"
-              },
-              {
-                  "name": "Weggis",
-                  "uic_ref": "8508463"
-              },
-              {
-                  "name": "Vitznau",
-                  "uic_ref": "8508464"
-              },
-              {
-                  "name": "Beckenried (See)",
-                  "uic_ref": "8508467"
-              },
-              {
-                  "name": "Landungssteg Gersau Förstli (Fähre)",
-                  "uic_ref": "8530722"
-              },
-              {
-                  "name": "Landungssteg SGV Treib",
-                  "uic_ref": "8508469"
-              },
-              {
-                  "name": "Landungssteg SGV Brunnen",
-                  "uic_ref": "8508470"
-              },
-              {
-                  "name": "Sisikon (See)",
-                  "uic_ref": "8508472"
-              },
-              {
-                  "name": "Flüelen (See)",
-                  "uic_ref": "8508476"
-              },
-              {
-                  "name": "Landungssteg SGV Isleten-Isenthal",
-                  "uic_ref": "8508475"
-              },
-              {
-                  "name": "Landungssteg SGV Bauen",
-                  "uic_ref": "8508474"
-              },
-              {
-                  "name": "Tellsplatte",
-                  "uic_ref": "8508473"
-              },
-              {
-                  "name": "Rütli",
-                  "uic_ref": "8508471"
-              },
-              {
-                  "name": "Meggenhorn",
-                  "uic_ref": "8508504"
-              },
-              {
-                  "name": "Kehrsiten-Bürgenstock",
-                  "uic_ref": "8508489"
-              },
-              {
-                  "name": "Alpnachstad (See)",
-                  "uic_ref": "8508503"
-              },
-              {
-                  "name": "Stansstad (See)",
-                  "uic_ref": "8508483"
-              },
-              {
-                  "name": "Küssnacht am Rigi (See)",
-                  "uic_ref": "8508488"
-              },
-              {
-                  "name": "Merlischachen (See)",
-                  "uic_ref": "8508486"
-              },
-              {
-                  "name": "Landungssteg SGV Seedorf UR",
-                  "uic_ref": "8530833"
-              },
-              {
-                  "name": "Buochs (See)",
-                  "uic_ref": "8508466"
-              },
-              {
-                  "name": "Seeburg",
-                  "uic_ref": "8508461"
-              },
-              {
-                  "name": "Kehrsiten Dorf",
-                  "uic_ref": "8508480"
-              },
-              {
-                  "name": "Kastanienbaum (See)",
-                  "uic_ref": "8508478"
-              }
-          ]
-      },
-      {
-          "name": "Bodensee",
-          "operators": [
-              "SBS",
-              "BSB",
-              "URh"
-          ],
-          "stations": [
-              {
-                  "name": "Romanshorn (See)",
-                  "uic_ref": "8506112"
-              },
-              "Leuzigen",
-              {
-                  "name": "Seeburg",
-                  "uic_ref": "8508461"
-              },
-              {
-                  "name": "Rorschach Hafen (See)",
-                  "uic_ref": "8506113"
-              },
-              {
-                  "name": "Nidau",
-                  "uic_ref": "8504369"
-              },
-              {
-                  "name": "Arbon (See)",
-                  "uic_ref": "8506110"
-              },
-              {
-                  "name": "Horn (See)",
-                  "uic_ref": "8506111"
-              },
-              {
-                  "name": "Altnau (See)",
-                  "uic_ref": "8530834"
-              },
-              {
-                  "name": "Bottighofen (See)",
-                  "uic_ref": "8530720"
-              },
-              {
-                  "name": "Mannenbach (See)",
-                  "uic_ref": "8506160"
-              },
-              {
-                  "name": "Steckborn (See)",
-                  "uic_ref": "8506157"
-              },
-              {
-                  "name": "Berlingen (See)",
-                  "uic_ref": "8506159"
-              },
-              {
-                  "name": "Mammern (See)",
-                  "uic_ref": "8506155"
-              }
-          ]
-      },
-      {
-          "name": "Lac Léman",
-          "operators": [
-              "CGN"
-          ],
-          "stations": [
-              {
-                  "name": "Lausanne-Ouchy",
-                  "uic_ref": "8501075"
-              },
-              {
-                  "name": "Genève-Eaux-Vives",
-                  "uic_ref": "8501311"
-              },
-              {
-                  "name": "Genève-Molard (lac)",
-                  "uic_ref": "8530699"
-              },
-              {
-                  "name": "Genève-Pâquis",
-                  "uic_ref": "8501238"
-              },
-              "Genève-Plage (Port-Noir)",
-              {
-                  "name": "Genève-Jardin-Anglais (lac)",
-                  "uic_ref": "8501236"
-              },
-              {
-                  "name": "Genève-De-Châteaubriand (lac)",
-                  "uic_ref": "8530701"
-              },
-              {
-                  "name": "Genève-Mt-Blanc",
-                  "uic_ref": "8501237"
-              },
-              {
-                  "name": "Genève-Quai des Moulins",
-                  "uic_ref": "8530704"
-              },
-              {
-                  "name": "Genève-Quai Gustave Ador (lac)",
-                  "uic_ref": "8530700"
-              },
-              {
-                  "name": "Nyon",
-                  "uic_ref": "8501227"
-              },
-              {
-                  "name": "Montreux",
-                  "uic_ref": "8501077"
-              },
-              {
-                  "name": "Vevey-Marché",
-                  "uic_ref": "8501248"
-              },
-              {
-                  "name": "Yverdon-les-Bains",
-                  "uic_ref": "8504558"
-              },
-              {
-                  "name": "Rolle (lac)",
-                  "uic_ref": "8501320"
-              },
-              {
-                  "name": "Saint-Prex",
-                  "uic_ref": "8501321"
-              },
-              {
-                  "name": "Morges",
-                  "uic_ref": "8501228"
-              },
-              {
-                  "name": "Cully",
-                  "uic_ref": "8501317"
-              },
-              {
-                  "name": "Lutry",
-                  "uic_ref": "8501318"
-              },
-              {
-                  "name": "Saint-Gingolph",
-                  "uic_ref": "8501078"
-              },
-              {
-                  "name": "Le Bouveret",
-                  "uic_ref": "8501079"
-              },
-              {
-                  "name": "Clarens",
-                  "uic_ref": "8501312"
-              },
-              {
-                  "name": "Territet",
-                  "uic_ref": "8501313"
-              },
-              {
-                  "name": "Château-de-Chillon",
-                  "uic_ref": "8501234"
-              },
-              {
-                  "name": "Pully",
-                  "uic_ref": "8501319"
-              },
-              {
-                  "name": "Villeneuve",
-                  "uic_ref": "8501314"
-              },
-              {
-                  "name": "Lausanne-Ouchy",
-                  "uic_ref": "8501075"
-              },
-              {
-                  "name": "Rivaz-Saint-Saphorin",
-                  "uic_ref": "8501243"
-              },
-              {
-                  "name": "Rivaz-Saint-Saphorin",
-                  "uic_ref": "8501243"
-              }
-          ]
-      },
-      {
-          "name": "Thunersee",
-          "operators": [
-              "BLS"
-          ],
-          "stations": [
-              {
-                  "name": "Thun (See)",
-                  "uic_ref": "8507150"
-              },
-              {
-                  "name": "Hilterfingen (See)",
-                  "uic_ref": "8507151"
-              },
-              {
-                  "name": "Oberhofen am Thunersee",
-                  "uic_ref": "8507152"
-              },
-              {
-                  "name": "Quinten",
-                  "uic_ref": "8530661"
-              },
-              {
-                  "name": "Spiez Schiffstation",
-                  "uic_ref": "8507154"
-              },
-              {
-                  "name": "Faulensee (See)",
-                  "uic_ref": "8507166"
-              },
-              {
-                  "name": "Merligen (See)",
-                  "uic_ref": "8507155"
-              },
-              {
-                  "name": "Beatenbucht (See)",
-                  "uic_ref": "8507156"
-              },
-              {
-                  "name": "Interlaken West (See)",
-                  "uic_ref": "8507169"
-              },
-              {
-                  "name": "Neuhaus (Unterseen) (See)",
-                  "uic_ref": "8507158"
-              },
-              {
-                  "name": "Beatushöhlen-Sundlauenen",
-                  "uic_ref": "8507157"
-              },
-              {
-                  "name": "Leissigen (See)",
-                  "uic_ref": "8507167"
-              },
-              {
-                "name": "Hünibach (See)",
-                "uic_ref": "8507161"
-            },
-              {
-                  "name": "Därligen (See)",
-                  "uic_ref": "8507168"
-              }
-          ]
-      },
-      {
-          "name": "Brienzersee",
-          "operators": [
-              "BLS"
-          ],
-          "stations": [
-              "Interlaken Ost (See)",
-              {
-                  "name": "Bönigen",
-                  "uic_ref": "8508371"
-              },
-              {
-                  "name": "Iseltwald (See)",
-                  "uic_ref": "8508379"
-              },
-              {
-                  "name": "Giessbach",
-                  "uic_ref": "8508378"
-              },
-              {
-                  "name": "Büren",
-                  "uic_ref": "8504366"
-              },
-              {
-                  "name": "Oberrieden (See)",
-                  "uic_ref": "8503673"
-              },
-              {
-                  "name": "Niederried (See)",
-                  "uic_ref": "8508373"
-              },
-              {
-                  "name": "Ringgenberg (See)",
-                  "uic_ref": "8508372"
-              },
-              {
-                  "name": "Brienz Dorf",
-                  "uic_ref": "8508375"
-              }
-          ]
-      },
-      {
-          "name": "Lago Maggiore",
-          "operators": [
-              "NLM"
-          ],
-          "stations": [
-              {
-                  "name": "Locarno",
-                  "uic_ref": "8505469"
-              },
-              {
-                  "name": "Ascona",
-                  "uic_ref": "8505573"
-              },
-              {
-                  "name": "Brissago",
-                  "uic_ref": "8505524"
-              },
-              {
-                  "name": "Porto Ronco",
-                  "uic_ref": "8505854"
-              },
-              {
-                  "name": "Magadino",
-                  "uic_ref": "8505570"
-              },
-              "Scalo di Gerra",
-              {
-                  "name": "Isole di Brissago",
-                  "uic_ref": "8505577"
-              }
-          ]
-      },
-      {
-          "name": "Lago di Lugano",
-          "operators": [
-              "SNL"
-          ],
-          "stations": [
-              {
-                  "name": "Lugano Centrale",
-                  "uic_ref": "8505550"
-              },
-              {
-                  "name": "Paradiso",
-                  "uic_ref": "8505553"
-              },
-              {
-                  "name": "Melide Cantine",
-                  "uic_ref": "8505651"
-              },
-              {
-                  "name": "Morcote",
-                  "uic_ref": "8505557"
-              },
-              {
-                  "name": "Gandria SNL",
-                  "uic_ref": "8505551"
-              },
-              {
-                  "name": "Cantine di Gandria",
-                  "uic_ref": "8505545"
-              }
-          ]
-      },
-      {
-          "name": "Bielersee",
-          "operators": [
-              "BSG"
-          ],
-          "stations": [
-              {
-                  "name": "Biel/Bienne",
-                  "uic_ref": "8504371"
-              },
-              {
-                  "name": "Nidau",
-                  "uic_ref": "8504369"
-              },
-              {
-                  "name": "Twann",
-                  "uic_ref": "8504374"
-              },
-              {
-                  "name": "Ligerz",
-                  "uic_ref": "8504375"
-              },
-              {
-                  "name": "La Neuveville",
-                  "uic_ref": "8504377"
-              },
-              {
-                  "name": "Erlach",
-                  "uic_ref": "8504378"
-              },
-              "Lüscherz",
-              {
-                  "name": "Bönigen",
-                  "uic_ref": "8508371"
-              },
-              {
-                  "name": "St. Petersinsel Nord",
-                  "uic_ref": "8504376"
-              },
-              {
-                  "name": "St. Petersinsel Süd",
-                  "uic_ref": "8504370"
-              }
-          ]
-      },
-      {
-          "name": "Neuenburgersee",
-          "operators": [
-              "LNM"
-          ],
-          "stations": [
-              {
-                  "name": "Neuchâtel",
-                  "uic_ref": "8504550"
-              },
-              {
-                  "name": "Saint-Blaise",
-                  "uic_ref": "8504560"
-              },
-              {
-                  "name": "Cudrefin",
-                  "uic_ref": "8504561"
-              },
-              {
-                  "name": "Portalban",
-                  "uic_ref": "8504562"
-              },
-              {
-                  "name": "Chevroux",
-                  "uic_ref": "8504563"
-              },
-              {
-                  "name": "Estavayer-le-Lac",
-                  "uic_ref": "8504564"
-              },
-              {
-                  "name": "Gorgier - Chez-le-Bart",
-                  "uic_ref": "8504554"
-              },
-              {
-                  "name": "Yverdon-les-Bains",
-                  "uic_ref": "8504558"
-              },
-              {
-                  "name": "Grandson",
-                  "uic_ref": "8504557"
-              },
-              {
-                  "name": "Concise (bateau)",
-                  "uic_ref": "8504556"
-              },
-              {
-                "name": "Yverdon-les-Bains",
-                "uic_ref": "8504558"
-            }
-          ]
-      },
-      {
-          "name": "Murtensee",
-          "operators": [
-              "LNM"
-          ],
-          "stations": [
-              {
-                  "name": "Murten/Morat (Schiff/bateau)",
-                  "uic_ref": "8504577"
-              },
-              {
-                  "name": "Praz (Vully)",
-                  "uic_ref": "8504573"
-              },
-              {
-                  "name": "Motier",
-                  "uic_ref": "8504574"
-              },
-              {
-                  "name": "Sugiez (bateau)",
-                  "uic_ref": "8504572"
-              }
-          ]
-      },
-      {
-          "name": "Zugersee",
-          "operators": [
-              "SGZ"
-          ],
-          "stations": [
-              {
-                  "name": "Zug Landsgemeindeplatz (See)",
-                  "uic_ref": "8502246"
-              },
-              {
-                  "name": "Zug Bahnhofsteg (See)",
-                  "uic_ref": "8502251"
-              },
-              {
-                  "name": "Oberwil bei Zug (See)",
-                  "uic_ref": "8502252"
-              },
-              {
-                  "name": "Walchwil (See)",
-                  "uic_ref": "8502258"
-              },
-              {
-                  "name": "Arth am See (Schiff)",
-                  "uic_ref": "8505060"
-              },
-              {
-                  "name": "Immensee (See)",
-                  "uic_ref": "8502257"
-              },
-              {
-                  "name": "Risch (See)",
-                  "uic_ref": "8502254"
-              },
-              {
-                  "name": "Cham (See)",
-                  "uic_ref": "8502250"
-              }
-          ]
-      },
-      {
-          "name": "Walensee",
-          "operators": [
-              "Walensee Schifffahrt"
-          ],
-          "stations": [
-              {
-                  "name": "Walenstadt (See)",
-                  "uic_ref": "8530665"
-              },
-              {
-                  "name": "Weesen (See)",
-                  "uic_ref": "8530658"
-              },
-              {
-                  "name": "Quinten",
-                  "uic_ref": "8530661"
-              },
-              {
-                  "name": "Murg Ost (See)",
-                  "uic_ref": "8530856"
-              },
-              {
-                  "name": "Murg West (See)",
-                  "uic_ref": "8530666"
-              },
-              {
-                  "name": "Unterterzen (See)",
-                  "uic_ref": "8530663"
-              },
-              {
-                  "name": "Mols (See)",
-                  "uic_ref": "8530664"
-              },
-              {
-                  "name": "Betlis",
-                  "uic_ref": "8530659"
-              }
-          ]
-      },
-      {
-          "name": "Hallwilersee",
-          "operators": [
-              "SGH"
-          ],
-          "stations": [
-              {
-                  "name": "Meisterschwanden Seerose",
-                  "uic_ref": "8530626"
-              },
-              {
-                  "name": "Birrwil (See)",
-                  "uic_ref": "8530628"
-              },
-              {
-                  "name": "Beinwil am See (See)",
-                  "uic_ref": "8530629"
-              },
-              {
-                  "name": "Aesch LU (See)",
-                  "uic_ref": "8530630"
-              },
-              {
-                  "name": "Seengen (See)",
-                  "uic_ref": "8530627"
-              },
-              {
-                  "name": "Mosen (See)",
-                  "uic_ref": "8530631"
-              }
-          ]
-      }
-  ]
+    "lakes": [
+        {
+            "name": "Zürichsee",
+            "operators": [
+                "ZSG"
+            ],
+            "stations": [
+                {
+                    "name": "Zürich Bürkliplatz (See)",
+                    "uic_ref": "8503651"
+                },
+                {
+                    "name": "Züricha Wollishofen (See)",
+                    "uic_ref": "8503681"
+                },
+                {
+                    "name": "Kilchberg ZH (See)",
+                    "uic_ref": "8503677"
+                },
+                {
+                    "name": "Rüschlikon (See)",
+                    "uic_ref": "8503675"
+                },
+                {
+                    "name": "Thalwil (See)",
+                    "uic_ref": "8503674"
+                },
+                {
+                    "name": "Oberrieden (See)",
+                    "uic_ref": "8503673"
+                },
+                {
+                    "name": "Horgen (See)",
+                    "uic_ref": "8503672"
+                },
+                {
+                    "name": "Halbinsel Au",
+                    "uic_ref": "8503671"
+                },
+                {
+                    "name": "Wädenswil (See)",
+                    "uic_ref": "8503670"
+                },
+                {
+                    "name": "Richterswil (See)",
+                    "uic_ref": "8503669"
+                },
+                {
+                    "name": "Pfäffikon SZ (See)",
+                    "uic_ref": "8503680"
+                },
+                {
+                    "name": "Altendorf Seestatt",
+                    "uic_ref": "8503683"
+                },
+                {
+                    "name": "Lachen SZ (See)",
+                    "uic_ref": "8503648"
+                },
+                {
+                    "name": "Schmerikon (See)",
+                    "uic_ref": "8503647"
+                },
+                {
+                    "name": "Rapperswil SG (See)",
+                    "uic_ref": "8503667"
+                },
+                {
+                    "name": "Insel Ufenau",
+                    "uic_ref": "8503668"
+                },
+                {
+                    "name": "Uerikon (See)",
+                    "uic_ref": "8503666"
+                },
+                {
+                    "name": "Stäfa (See)",
+                    "uic_ref": "8503665"
+                },
+                {
+                    "name": "Männedorf (See)",
+                    "uic_ref": "8503664"
+                },
+                {
+                    "name": "Meilen (See)",
+                    "uic_ref": "8503661"
+                },
+                {
+                    "name": "Herrliberg (See)",
+                    "uic_ref": "8503661"
+                },
+                {
+                    "name": "Erlenbach ZH (See)",
+                    "uic_ref": "8503659"
+                },
+                {
+                    "name": "Küsnacht ZH Heslibach",
+                    "uic_ref": "8503682"
+                },
+                {
+                    "name": "Küsnacht ZH (See)",
+                    "uic_ref": "8503657"
+                },
+                {
+                    "name": "Zollikon (See)",
+                    "uic_ref": "8503655"
+                },
+                {
+                    "name": "Zürich Tiefenbrunnen (See)",
+                    "uic_ref": "8505332"
+                },
+                {
+                    "name": "Zürichhorn (See)",
+                    "uic_ref": "8503653"
+                }
+            ]
+        },
+        {
+            "name": "Vierwaldstättersee",
+            "operators": [
+                "SGV"
+            ],
+            "stations": [
+                {
+                    "name": "Luzern Schweizerhofquai",
+                    "uic_ref": "8508505"
+                },
+                {
+                    "name": "Verkehrshaus-Lido",
+                    "uic_ref": "8508459"
+                },
+                {
+                    "name": "Kehrsiten-Bürgenstock",
+                    "uic_ref": "8508489"
+                },
+                {
+                    "name": "Hertenstein (See)",
+                    "uic_ref": "8508462"
+                },
+                {
+                    "name": "Weggis",
+                    "uic_ref": "8508463"
+                },
+                {
+                    "name": "Vitznau",
+                    "uic_ref": "8508464"
+                },
+                {
+                    "name": "Vitznau",
+                    "uic_ref": "8508464"
+                },
+                {
+                    "name": "Ennetbürgen (See)",
+                    "uic_ref": "8508465"
+                },
+                {
+                    "name": "Buochs (See)",
+                    "uic_ref": "8508466"
+                },
+                {
+                    "name": "Beckenried (See)",
+                    "uic_ref": "8508467"
+                },
+                {
+                    "name": "Landungssteg Gersau Förstli (Fähre)",
+                    "uic_ref": "8530722"
+                },
+                {
+                    "name": "Landungssteg SGV Treib",
+                    "uic_ref": "8508469"
+                },
+                {
+                    "name": "Landungssteg SGV Brunnen",
+                    "uic_ref": "8508470"
+                },
+                {
+                    "name": "Rütli",
+                    "uic_ref": "8508471"
+                },
+                {
+                    "name": "Sisikon (See)",
+                    "uic_ref": "8508472"
+                },
+                {
+                    "name": "Tellsplatte",
+                    "uic_ref": "8508473"
+                },
+                {
+                    "name": "Landungssteg SGV Bauen",
+                    "uic_ref": "8508474"
+                },
+                {
+                    "name": "Landungssteg SGV Isleten-Isenthal",
+                    "uic_ref": "8508475"
+                },
+                {
+                    "name": "Flüelen (See)",
+                    "uic_ref": "8508476"
+                },
+                {
+                    "name": "Kastanienbaum (See)",
+                    "uic_ref": "8508478"
+                },
+                {
+                    "name": "Kehrsiten Bürgenstock",
+                    "uic_ref": "8508489"
+                },
+                {
+                    "name": "Kehrsiten Dorf",
+                    "uic_ref": "8508480"
+                },
+                {
+                    "name": "Hergiswil (See)",
+                    "uic_ref": "8508481"
+                },
+                {
+                    "name": "Stansstad (See)",
+                    "uic_ref": "8508483"
+                },
+                {
+                    "name": "Alpnachstad (See)",
+                    "uic_ref": "8508503"
+                },
+                {
+                    "name": "Meggenhorn",
+                    "uic_ref": "8508504"
+                },
+                {
+                    "name": "Hermitage",
+                    "uic_ref": "8508485"
+                },
+                {
+                    "name": "Tribschen",
+                    "uic_ref": "8508479"
+                },
+                {
+                    "name": "Merlischachen (See)",
+                    "uic_ref": "8508486"
+                },
+                {
+                    "name": "Greppen",
+                    "uic_ref": "8508487"
+                },
+                {
+                    "name": "Küssnacht am Rigi (See)",
+                    "uic_ref": "8508488"
+                },
+                {
+                    "name": "Landungssteg SGV Seedorf UR",
+                    "uic_ref": "8530833"
+                }
+            ]
+        },
+        {
+            "name": "Bodensee",
+            "operators": [
+                "SBS",
+                "BSB",
+                "URh"
+            ],
+            "stations": [
+                {
+                    "name": "Lindau (Bodensee)",
+                    "uic_ref": "8506467"
+                },
+                {
+                    "name": "Altenrhein Schifflände",
+                    "uic_ref": "8506467"
+                },
+                {
+                    "name": "Staad SG Hafenmole",
+                    "uic_ref": "8530830"
+                },
+                {
+                    "name": "Rorschach Hafen (See)",
+                    "uic_ref": "8506113"
+                },
+                {
+                    "name": "Horn (See)",
+                    "uic_ref": "8506111"
+                },
+                {
+                    "name": "Arbon (See)",
+                    "uic_ref": "8506110"
+                },
+                {
+                    "name": "Romanshorn (See)",
+                    "uic_ref": "8506112"
+                },
+                {
+                    "name": "Uttwil (See)",
+                    "uic_ref": "8530835"
+                },
+                {
+                    "name": "Güttingen (See)",
+                    "uic_ref": "8595982"
+                },
+                {
+                    "name": "Altnau (See)",
+                    "uic_ref": "8530834"
+                },
+                {
+                    "name": "Bottighofen (See)",
+                    "uic_ref": "8530720"
+                },
+                {
+                    "name": "Kreuzlingen Hafen (See)",
+                    "uic_ref": "8506165"
+                },
+                {
+                    "name": "Konstanz Hafen",
+                    "uic_ref": "8014587"
+                },
+                {
+                    "name": "Gottlieben (Schifflände)",
+                    "uic_ref": "8506163"
+                },
+                {
+                    "name": "Ermatingen (See)",
+                    "uic_ref": "8506162"
+                },
+                {
+                    "name": "Mannenbach (See)",
+                    "uic_ref": "8506160"
+                },
+                {
+                    "name": "Berlingen (See)",
+                    "uic_ref": "8506159"
+                },
+                {
+                    "name": "Steckborn (See)",
+                    "uic_ref": "8506157"
+                },
+                {
+                    "name": "Mammern (See)",
+                    "uic_ref": "8506155"
+                },
+                {
+                    "name": "Oehningen",
+                    "uic_ref": "8506154"
+                },
+                {
+                    "name": "Stein am Rhein (Schifflände)",
+                    "uic_ref": "8506153"
+                },
+                {
+                    "name": "Wangen (Bodensee)",
+                    "uic_ref": "8506156"
+                },
+                {
+                    "name": "Hemmenhofen",
+                    "uic_ref": "8506189"
+                },
+                {
+                    "name": "Gaienhofen",
+                    "uic_ref": "8506158"
+                }
+            ]
+        },
+        {
+            "name": "Lac Léman",
+            "operators": [
+                "CGN"
+            ],
+            "stations": [
+                {
+                    "name": "Genève-Eaux-Vives (lac)",
+                    "uic_ref": "8501311"
+                },
+                {
+                    "name": "Genève-Quai Gustave Ador (lac)",
+                    "uic_ref": "8530700"
+                },
+                {
+                    "name": "Genève-Jardin-Anglais (lac)",
+                    "uic_ref": "8501236"
+                },
+                {
+                    "name": "Genève-Molard (lac)",
+                    "uic_ref": "8530699"
+                },
+                {
+                    "name": "Genève-Mt-Blanc",
+                    "uic_ref": "8501237"
+                },
+                {
+                    "name": "Genève-Pâquis (lac)",
+                    "uic_ref": "8501238"
+                },
+                {
+                    "name": "Genève-Pâquis SMGN",
+                    "uic_ref": "8530707"
+                },
+                {
+                    "name": "Genève-De-Châteaubriand (lac)",
+                    "uic_ref": "8530701"
+                },
+                {
+                    "name": "Bellevue GE (lac)",
+                    "uic_ref": "8501232"
+                },
+                {
+                    "name": "Versoix (lac)",
+                    "uic_ref": "8501322"
+                },
+                {
+                    "name": "Céligny (lac)",
+                    "uic_ref": "8501315"
+                },
+                {
+                    "name": "Nyon",
+                    "uic_ref": "8501227"
+                },
+                {
+                    "name": "Rolle (lac)",
+                    "uic_ref": "8501320"
+                },
+                {
+                    "name": "Saint-Prex",
+                    "uic_ref": "8501321"
+                },
+                {
+                    "name": "Morges",
+                    "uic_ref": "8501228"
+                },
+                {
+                    "name": "Lausanne-Ouchy",
+                    "uic_ref": "8501075"
+                },
+                {
+                    "name": "Pully",
+                    "uic_ref": "8501319"
+                },
+                {
+                    "name": "Lutry",
+                    "uic_ref": "8501318"
+                },
+                {
+                    "name": "Cully",
+                    "uic_ref": "8501317"
+                },
+                {
+                    "name": "Rivaz-Saint-Saphorin",
+                    "uic_ref": "8501243"
+                },
+                {
+                    "name": "Vevey-Marché",
+                    "uic_ref": "8501248"
+                },
+                {
+                    "name": "Vevey-La Tour (la",
+                    "uic_ref": "8501247"
+                },
+                {
+                    "name": "Clarens",
+                    "uic_ref": "8501312"
+                },
+                {
+                    "name": "Montreux",
+                    "uic_ref": "8501077"
+                },
+                {
+                    "name": "Territet",
+                    "uic_ref": "8501313"
+                },
+                {
+                    "name": "Château-de-Chillon",
+                    "uic_ref": "8501234"
+                },
+                {
+                    "name": "Villeneuve",
+                    "uic_ref": "8501314"
+                },
+                {
+                    "name": "Le Bouveret",
+                    "uic_ref": "8501079"
+                },
+                {
+                    "name": "Saint-Gingolph",
+                    "uic_ref": "8501078"
+                },
+                {
+                    "name": "Evian-les-Bains (F) (lac)",
+                    "uic_ref": "8501074"
+                },
+                {
+                    "name": "Thonon-les-Bains (F) (lac)",
+                    "uic_ref": "8501072"
+                },
+                {
+                    "name": "Margencel-Anthy-Séchex(F)(lac)",
+                    "uic_ref": "8501240"
+                },
+                {
+                    "name": "Sciez (F) (lac)",
+                    "uic_ref": "8501244"
+                },
+                {
+                    "name": "Excenevex (F) (lac)",
+                    "uic_ref": "8530763"
+                },
+                {
+                    "name": "Nernier (F) (lac)",
+                    "uic_ref": "8501242"
+                },
+                {
+                    "name": "Chens-sur-Léman (F) (lac)",
+                    "uic_ref": "8501233"
+                },
+                {
+                    "name": "Hermance (lac)",
+                    "uic_ref": "8501239"
+                },
+                {
+                    "name": "Anières (lac)",
+                    "uic_ref": "8501231"
+                },
+                {
+                    "name": "Hermance (lac)",
+                    "uic_ref": "8501239"
+                },
+                {
+                    "name": "Corsier GE (lac)",
+                    "uic_ref": "8501235"
+                },
+                {
+                    "name": "La Belotte (lac)",
+                    "uic_ref": "8530616"
+                }
+            ]
+        },
+        {
+            "name": "Thunersee",
+            "operators": [
+                "BLS"
+            ],
+            "stations": [
+                {
+                    "name": "Thun (See)",
+                    "uic_ref": "8507150"
+                },
+                {
+                    "name": "Hilterfingen (See)",
+                    "uic_ref": "8507151"
+                },
+                {
+                    "name": "Oberhofen am Thunersee",
+                    "uic_ref": "8507152"
+                },
+                {
+                    "name": "Gunten",
+                    "uic_ref": "8507153"
+                },
+                {
+                    "name": "Gwatt Deltapark (See)",
+                    "uic_ref": "8507159"
+                },
+                {
+                    "name": "Spiez Schiffstation",
+                    "uic_ref": "8507154"
+                },
+                {
+                    "name": "Einigen (See)",
+                    "uic_ref": "8507164"
+                },
+                {
+                    "name": "Hünibach (See)",
+                    "uic_ref": "8507161"
+                },
+                {
+                    "name": "Faulensee (See)",
+                    "uic_ref": "8507166"
+                },
+                {
+                    "name": "Merligen (See)",
+                    "uic_ref": "8507155"
+                },
+                {
+                    "name": "Beatenbucht (See)",
+                    "uic_ref": "8507156"
+                },
+                {
+                    "name": "Interlaken West (See)",
+                    "uic_ref": "8507169"
+                },
+                {
+                    "name": "Neuhaus (Unterseen) (See)",
+                    "uic_ref": "8507158"
+                },
+                {
+                    "name": "Beatushöhlen-Sundlauenen",
+                    "uic_ref": "8507157"
+                },
+                {
+                    "name": "Leissigen (See)",
+                    "uic_ref": "8507167"
+                },
+                {
+                    "name": "Hünibach (See)",
+                    "uic_ref": "8507161"
+                },
+                {
+                    "name": "Därligen (See)",
+                    "uic_ref": "8507168"
+                }
+            ]
+        },
+        {
+            "name": "Brienzersee",
+            "operators": [
+                "BLS"
+            ],
+            "stations": [
+                "Interlaken Ost (See)",
+                {
+                    "name": "Bönigen",
+                    "uic_ref": "8508371"
+                },
+                {
+                    "name": "Iseltwald (See)",
+                    "uic_ref": "8508379"
+                },
+                {
+                    "name": "Giessbach",
+                    "uic_ref": "8508378"
+                },
+                {
+                    "name": "Oberried am Brienzersee (See)",
+                    "uic_ref": "8508374"
+                },
+                {
+                    "name": "Niederried (See)",
+                    "uic_ref": "8508373"
+                },
+                {
+                    "name": "Ringgenberg (See)",
+                    "uic_ref": "8508372"
+                },
+                {
+                    "name": "Brienz Dorf",
+                    "uic_ref": "8508375"
+                }
+            ]
+        },
+        {
+            "name": "Lago Maggiore",
+            "operators": [
+                "NLM"
+            ],
+            "stations": [
+                {
+                    "name": "Ascona",
+                    "uic_ref": "8505573"
+                },
+                {
+                    "name": "Locarno",
+                    "uic_ref": "8505469"
+                },
+                {
+                    "name": "Tenero (lago)",
+                    "uic_ref": "8505519"
+                },
+                {
+                    "name": "Magadino",
+                    "uic_ref": "8505570"
+                },
+                {
+                    "name": "Vira (Gambarogno) (lago)",
+                    "uic_ref": "8505571"
+                },
+                {
+                    "name": "S. Nazzaro (lago)",
+                    "uic_ref": "8505518"
+                },
+                {
+                    "name": "Gerra (Gambarogno) (lago)",
+                    "uic_ref": "8505574"
+                },
+                {
+                    "name": "Ranzo (lago)",
+                    "uic_ref": "8505575"
+                },
+                {
+                    "name": "Brissago (lago)",
+                    "uic_ref": "8505524"
+                },
+                {
+                    "name": "Porto Ronco (lago)",
+                    "uic_ref": "8505854"
+                },
+                {
+                    "name": "Isole di Brissago",
+                    "uic_ref": "8505577"
+                }
+            ]
+        },
+        {
+            "name": "Lago di Lugano",
+            "operators": [
+                "SNL"
+            ],
+            "stations": [
+                {
+                    "name": "Paradiso (lago)",
+                    "uic_ref": "8505553"
+                },
+                {
+                    "name": "Lugano Centrale (lago)",
+                    "uic_ref": "8505550"
+                },
+                {
+                    "name": "Cassarate (lago)",
+                    "uic_ref": "8587842"
+                },
+                {
+                    "name": "Castagnola (lago)",
+                    "uic_ref": "8505559"
+                },
+                {
+                    "name": "Castagnola Heleneum (lago)",
+                    "uic_ref": "8530717"
+                },
+                {
+                    "name": "Gandria (lago)",
+                    "uic_ref": "8505551"
+                },
+                {
+                    "name": "Museo doganale svizzero (lago)",
+                    "uic_ref": "8505656"
+                },
+                {
+                    "name": "Cantine di Gandria (lago)",
+                    "uic_ref": "8505545"
+                },
+                {
+                    "name": "Grotto Pescatori (lago)",
+                    "uic_ref": "8505544"
+                },
+                {
+                    "name": "Ponte Tresa (lago)",
+                    "uic_ref": "8505677"
+                },
+                {
+                    "name": "Brusino Arsizio (lago)",
+                    "uic_ref": "8505556"
+                },
+                {
+                    "name": "Melide Cantine (lago)",
+                    "uic_ref": "8505651"
+                }
+            ]
+        },
+        {
+            "name": "Bielersee",
+            "operators": [
+                "BSG"
+            ],
+            "stations": [
+                {
+                    "name": "Biel/Bienne",
+                    "uic_ref": "8504371"
+                },
+                {
+                    "name": "Nidau",
+                    "uic_ref": "8504369"
+                },
+                {
+                    "name": "Twann",
+                    "uic_ref": "8504374"
+                },
+                {
+                    "name": "Ligerz",
+                    "uic_ref": "8504375"
+                },
+                {
+                    "name": "La Neuveville",
+                    "uic_ref": "8504377"
+                },
+                {
+                    "name": "Erlach",
+                    "uic_ref": "8504378"
+                },
+                {
+                    "name": "Engelberg-Wingreis ",
+                    "uic_ref": "Engelberg-Wingreis"
+                },
+                {
+                    "name": "Le Landeron débarcadère",
+                    "uic_ref": "8504565"
+                },
+                {
+                    "name": "Thielle-Wavre",
+                    "uic_ref": "8504567"
+                },
+                {
+                    "name": "St. Petersinsel Nord",
+                    "uic_ref": "8504376"
+                }
+            ]
+        },
+        {
+            "name": "Neuenburgersee",
+            "operators": [
+                "LNM"
+            ],
+            "stations": [
+                {
+                    "name": "Neuchâtel",
+                    "uic_ref": "8504550"
+                },
+                {
+                    "name": "Saint-Blaise",
+                    "uic_ref": "8504560"
+                },
+                {
+                    "name": "Cudrefin",
+                    "uic_ref": "8504561"
+                },
+                {
+                    "name": "Portalban",
+                    "uic_ref": "8504562"
+                },
+                {
+                    "name": "Chevroux",
+                    "uic_ref": "8504563"
+                },
+                {
+                    "name": "Estavayer-le-Lac",
+                    "uic_ref": "8504564"
+                },
+                {
+                    "name": "Gorgier - Chez-le-Bart",
+                    "uic_ref": "8504554"
+                },
+                {
+                    "name": "Yverdon-les-Bains",
+                    "uic_ref": "8504558"
+                },
+                {
+                    "name": "Grandson",
+                    "uic_ref": "8504557"
+                },
+                {
+                    "name": "Concise (bateau)",
+                    "uic_ref": "8504556"
+                },
+                {
+                    "name": "Vaumarcus débarcadère",
+                    "uic_ref": "8504243"
+                },
+                {
+                    "name": "St-Aubin NE (bateau)",
+                    "uic_ref": "8504555"
+                },
+                {
+                    "name": "Bevaix (bateau)",
+                    "uic_ref": "8504559"
+                },
+                {
+                    "name": "Cortaillod (bateau)",
+                    "uic_ref": "8530793"
+                },
+                {
+                    "name": "Auvernier (bateau)",
+                    "uic_ref": "8504552"
+                },
+                {
+                    "name": "Neuchâtel-Serrières (bateau)",
+                    "uic_ref": "8504551"
+                },
+                {
+                    "name": "Hauterive NE débarcadère",
+                    "uic_ref": "8504808"
+                },
+                {
+                    "name": "La Sauge (bateau)",
+                    "uic_ref": "8504571"
+                },
+                {
+                    "name": "Yverdon-les-Bains",
+                    "uic_ref": "8504558"
+                }
+            ]
+        },
+        {
+            "name": "Murtensee",
+            "operators": [
+                "LNM"
+            ],
+            "stations": [
+                {
+                    "name": "Murten/Morat (Schiff/bateau)",
+                    "uic_ref": "8504577"
+                },
+                {
+                    "name": "Praz (Vully)",
+                    "uic_ref": "8504573"
+                },
+                {
+                    "name": "Vallamand",
+                    "uic_ref": "8504575"
+                },
+                {
+                    "name": "Faoug débarcadère",
+                    "uic_ref": "8530821"
+                },
+                {
+                    "name": "Môtier",
+                    "uic_ref": "8504574"
+                },
+                {
+                    "name": "Trois-Lacs (camping)",
+                    "uic_ref": "8504499"
+                },
+                {
+                    "name": "Sugiez (bateau)",
+                    "uic_ref": "8504572"
+                }
+            ]
+        },
+        {
+            "name": "Aare",
+            "operators": [
+                "BSG"
+            ],
+            "stations": [
+                {
+                    "name": "Solothurn (Schiff)",
+                    "uic_ref": "8504379"
+                },
+                {
+                    "name": "Altreu",
+                    "uic_ref": "8504365"
+                },
+                {
+                    "name": "Grenchen (Schiff)",
+                    "uic_ref": "8504363"
+                },
+                {
+                    "name": "Büren (Schiff)",
+                    "uic_ref": "8504366"
+                },
+                {
+                    "name": "Brügg (Schiff)",
+                    "uic_ref": "8504368"
+                },
+                {
+                    "name": "Port",
+                    "uic_ref": "8504364"
+                }
+            ]
+        },
+        {
+            "name": "Zugersee",
+            "operators": [
+                "SGZ"
+            ],
+            "stations": [
+                {
+                    "name": "Zug Bahnhofsteg (See)",
+                    "uic_ref": "8502251"
+                },
+                {
+                    "name": "Zug Landsgemeindeplatz (See)",
+                    "uic_ref": "8502246"
+                },
+                {
+                    "name": "Oberwil bei Zug (See)",
+                    "uic_ref": "8502252"
+                },
+                {
+                    "name": "Lotenbach (See)",
+                    "uic_ref": "8502255"
+                },
+                {
+                    "name": "Walchwil (See)",
+                    "uic_ref": "8502258"
+                },
+                {
+                    "name": "Arth am See (Schiff)",
+                    "uic_ref": "8505060"
+                },
+                {
+                    "name": "Immensee (See)",
+                    "uic_ref": "8502257"
+                },
+                {
+                    "name": "Risch (See)",
+                    "uic_ref": "8502254"
+                },
+                {
+                    "name": "Buonas (See)",
+                    "uic_ref": "8502253"
+                },
+                {
+                    "name": "Cham (See)",
+                    "uic_ref": "8502250"
+                }
+            ]
+        },
+        {
+            "name": "Walensee",
+            "operators": [
+                "Walensee Schifffahrt"
+            ],
+            "stations": [
+                {
+                    "name": "Walenstadt (See)",
+                    "uic_ref": "8530665"
+                },
+                {
+                    "name": "Mols (See)",
+                    "uic_ref": "8530664"
+                },
+                {
+                    "name": "Unterterzen (See)",
+                    "uic_ref": "8530663"
+                },
+                {
+                    "name": "Murg Ost (See)",
+                    "uic_ref": "8530856"
+                },
+                {
+                    "name": "Murg West (See)",
+                    "uic_ref": "8530666"
+                },
+                {
+                    "name": "Mühlehorn (See)",
+                    "uic_ref": "8530660"
+                },
+                {
+                    "name": "Weesen (See)",
+                    "uic_ref": "8530658"
+                },
+                {
+                    "name": "Betlis",
+                    "uic_ref": "8530659"
+                },
+                {
+                    "name": "Quinten",
+                    "uic_ref": "8530661"
+                },
+                {
+                    "name": "Quinten Au",
+                    "uic_ref": "8530662"
+                }
+            ]
+        },
+        {
+            "name": "Hallwilersee",
+            "operators": [
+                "SGH"
+            ],
+            "stations": [
+                {
+                    "name": "Seengen (See)",
+                    "uic_ref": "8530627"
+                },
+                {
+                    "name": "Meisterschwanden Delphin",
+                    "uic_ref": "8530625"
+                },
+                {
+                    "name": "Meisterschwanden Seerose",
+                    "uic_ref": "8530626"
+                },
+                {
+                    "name": "Aesch LU (See)",
+                    "uic_ref": "8530630"
+                },
+                {
+                    "name": "Mosen (See)",
+                    "uic_ref": "8530631"
+                },
+                {
+                    "name": "Beinwil am See (See)",
+                    "uic_ref": "8530629"
+                },
+                {
+                    "name": "Birrwil (See)",
+                    "uic_ref": "8530628"
+                },
+                {
+                    "name": "Boniswil (See)",
+                    "uic_ref": "8530632"
+                }
+            ]
+        },
+        {
+            "name": "Aegerisee",
+            "operators": [
+                ""
+            ],
+            "stations": [
+                {
+                    "name": "Unterägeri (See)",
+                    "uic_ref": "8530742"
+                },
+                {
+                    "name": "Oberägeri (See)",
+                    "uic_ref": "8530743"
+                },
+                {
+                    "name": "Oberägeri Ländli (See)",
+                    "uic_ref": "8530857"
+                },
+                {
+                    "name": "Eierhals (See)",
+                    "uic_ref": "8530633"
+                },
+                {
+                    "name": "Morgarten Denkmal (See)",
+                    "uic_ref": "8530634"
+                },
+                {
+                    "name": "Morgarten Hotel (See)",
+                    "uic_ref": "8530635"
+                },
+                {
+                    "name": "Naas (See)",
+                    "uic_ref": "8530636"
+                }
+            ]
+        },
+        {
+            "name": "Lac de Joux",
+            "operators": [
+                ""
+            ],
+            "stations": [
+                {
+                    "name": "Le Pont (lac)",
+                    "uic_ref": "8530621"
+                },
+                {
+                    "name": "Les Bioux (lac)",
+                    "uic_ref": "8530623"
+                },
+                {
+                    "name": "Le Rocheray (lac",
+                    "uic_ref": "8530622"
+                },
+                {
+                    "name": "Le Lieu Roche Fendue (lac)",
+                    "uic_ref": "8530633"
+                },
+                {
+                    "name": "Morgarten Denkmal (See)",
+                    "uic_ref": "8530634"
+                },
+                {
+                    "name": "Morgarten Hotel (See)",
+                    "uic_ref": "8530635"
+                },
+                {
+                    "name": "Naas (See)",
+                    "uic_ref": "8530636"
+                }
+            ]
+        },
+    ]
 }

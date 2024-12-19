@@ -6,7 +6,10 @@ struct DeparturesListView: View {
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
-    @State private var previousDeparturesCount = 0
+    @State private var scrollTrigger = UUID()
+    @State private var isRefreshing = false
+    
+    let updateTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -28,16 +31,32 @@ struct DeparturesListView: View {
                     }
                 }
                 .listStyle(.plain)
-                .onChange(of: previousDeparturesCount) { oldValue, newValue in
-                    scrollToNextDeparture(proxy: proxy)
+                .refreshable {
+                    guard !isRefreshing else { return }
+                    isRefreshing = true
+                    await viewModel.refreshDepartures()
+                    scheduleViewModel.updateWaves(from: departures)
+                    scrollTrigger = UUID()
+                    isRefreshing = false
                 }
                 .onAppear {
                     scheduleViewModel.updateWaves(from: departures)
-                    if previousDeparturesCount != departures.count {
-                        previousDeparturesCount = departures.count
-                    }
+                    scrollTrigger = UUID()
+                }
+                .onChange(of: viewModel.selectedDate) { _, _ in
+                    scheduleViewModel.updateWaves(from: departures)
+                    scrollTrigger = UUID()
+                }
+                .onChange(of: scrollTrigger) { _, _ in
                     scrollToNextDeparture(proxy: proxy)
                 }
+            }
+            .overlay {
+                Color.clear
+                    .onReceive(updateTimer) { _ in
+                        guard !isRefreshing else { return }
+                        scheduleViewModel.updateWaves(from: departures)
+                    }
             }
         } else if viewModel.hasAttemptedLoad {
             VStack {

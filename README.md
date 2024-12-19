@@ -8,19 +8,19 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 - 🌊 Real-time boat schedule tracking
 - 🔔 Smart notifications 5 minutes before waves
-- 📍 Easy spot selection around Lake Zurich
-- 🎯 Precise wave timing and direction information
+- 📍 Easy spot selection on Swiss lakes
+- 🎯 Precise wave timing information
 - 🔊 Custom boat horn notifications
 - 🎨 Clean, intuitive interface
 
 ## Technical Details
 
-- Swift and SwiftUI
+- Built with Swift and SwiftUI
 - Minimum iOS Version: 17.0
-- Supports iPhone in portrait mode
-- Uses UserNotifications for local notifications
-- Includes custom sound assets
-- Schedule data stored in JSON format
+- iPhone support (portrait mode)
+- Local notifications using UserNotifications
+- Custom sound assets
+- Schedule data in JSON format
 
 ## Installation
 
@@ -28,26 +28,55 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 2. Open `Next Wave.xcodeproj` in Xcode
 3. Build and run the project
 
-## Data Structure
+## Privacy
+
+- No tracking or analytics
+- No personal data collection
+- All data stays on device
+
+## Support
+
+For questions or issues, please create an issue in the repository.
+
+
+## How to add a new lake or station
+
+### Data Structure
 
 The app uses a JSON schedule file with the following structure:
 
-json
 {
-"dates": "01.04.2024–31.10.2024",
-"routes": "Zürichsee",
-"routeNumber": "123",
-"frequency": "daily",
-"stops": {
-"location": {
-"departures": ["12:00"],
-"arrivals": ["12:30"]
-}
-}
+    "lakes": [
+        {
+            "name": "Lake",
+            "operators": [
+                "Operator"
+            ],
+            "stations": [
+                {
+                    "name": "Station Name",
+                    "uic_ref": "8503651"
+                },
+                {
+                    "name": "Züricha Wollishofen (See)",
+                    "uic_ref": "8503681"
+                }
+            ]
+        },
+    ]
 }
 
-The data is stored in an Excel file and is first exported as a CSV file and converted into a JSON. I use the service https://csvjson.com/csv2json with the settings Transpose and Array as output.
-The Excel file is located in the Data folder.
+To find the name and especially the station ID, use the tool https://overpass-turbo.osm.ch/ 
+Search for the lake on the map on the right and make it completely visible. enter the following query in the console on the left:
+
+node
+  [amenity=ferry_terminal]
+  ({{bbox}});
+out;
+
+All ship stations are displayed. Clicking on the station opens a window where you can find the station ID and the name of the station. uic_name and uic_ref. These two values are entered in the JSON file.
+
+You can check whether the station is available in the API via https://transport.opendata.ch/v1/locations?query=[uic_ref].
 
 ## Contributing
 
@@ -68,4 +97,4 @@ Always maintain a safe distance from boats and follow local water safety regulat
 ## Acknowledgments
 
 - Thanks to all beta testers
-- Special thanks to the Lake Zurich boat operators
+- Special thanks to the Lake boat operators - We would be delighted if you step on the gas a little more while departing from the dock.

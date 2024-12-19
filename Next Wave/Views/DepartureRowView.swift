@@ -39,6 +39,9 @@ private struct TimeColumn: View {
     let formattedTime: String
     let isPast: Bool
     let isCurrentDay: Bool
+    @State private var currentTime = Date()
+    
+    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
@@ -54,6 +57,9 @@ private struct TimeColumn: View {
             }
         }
         .frame(width: 70)
+        .onReceive(timer) { _ in
+            currentTime = Date()
+        }
     }
 }
 

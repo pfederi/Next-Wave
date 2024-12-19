@@ -113,10 +113,12 @@ struct ContentView: View {
                     
                     Spacer(minLength: 0)
                     
-                    Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 16)
+                    if viewModel.selectedStation == nil {
+                        Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 16)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color("background-color"))

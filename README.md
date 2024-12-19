@@ -2,7 +2,7 @@
 
 Next Wave is an iOS app that helps wake surfers and foilers catch their perfect wave on Lake Zurich by providing real-time boat schedules and smart notifications.
 
-<img src="Screenshots/next-wave1.png" alt="Screenshot1" width="250"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="250"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="250">
+<img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot3" width="200">
 
 ## Features
 

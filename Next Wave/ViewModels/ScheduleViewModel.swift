@@ -21,8 +21,8 @@ class ScheduleViewModel: ObservableObject {
                 isArrival: false,
                 routeNumber: journey.name ?? "Unknown",
                 routeName: journey.stop.station.name ?? "Unknown",
-                neighborStop: journey.stop.station.id,
-                neighborStopName: journey.stop.station.name ?? "Unknown",
+                neighborStop: journey.to ?? journey.stop.station.id,
+                neighborStopName: journey.passList?.dropFirst().first?.station.name ?? "Unknown",
                 period: "regular"
             )
         }
@@ -58,7 +58,7 @@ class ScheduleViewModel: ObservableObject {
             "🌊 Surf's up! Time to catch that wave!",
             "🌊 Ready, set, wave!",
             "🌊 Your wave taxi is arriving soon!",
-            "🌊 Time to ride the wave!",
+            "🌊 Time to ride that wave!",
             "🌊 Wave alert! Don't be late!",
             "🌊 Your wave chariot awaits!",
             "🌊 Catch the wave or catch regrets!",

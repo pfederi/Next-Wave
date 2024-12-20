@@ -130,8 +130,8 @@ struct ContentView: View {
                             .foregroundColor(Color("text-color"))
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: InfoView()) {
-                            Image(systemName: "info.circle")
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: "gearshape")
                                 .foregroundColor(Color("text-color"))
                         }
                     }

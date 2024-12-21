@@ -39,9 +39,6 @@ private struct TimeColumn: View {
     let formattedTime: String
     let isPast: Bool
     let isCurrentDay: Bool
-    @State private var currentTime = Date()
-    
-    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         VStack(alignment: .center, spacing: 4) {
@@ -49,15 +46,42 @@ private struct TimeColumn: View {
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(isPast ? .gray : .primary)
             if isCurrentDay, let date = DateTimeUtils.parseTime(formattedTime) {
-                let remainingTime = DateTimeUtils.calculateRemainingTime(for: date)
-                Text(remainingTime)
-                    .font(.caption)
-                    .foregroundColor(DateTimeUtils.getTimeColor(remainingTime))
+                RemainingTimeView(targetDate: date)
                     .padding(.top, 6)
             }
         }
         .frame(width: 70)
+    }
+}
+
+private struct RemainingTimeView: View {
+    let targetDate: Date
+    @State private var currentTime = Date()
+    
+    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    
+    var body: some View {
+        let timeInterval = targetDate.timeIntervalSince(currentTime)
+        let hours = max(0, Int(timeInterval) / 3600)
+        let minutes = max(0, Int(timeInterval) / 60 % 60)
+        
+        Text({
+            if timeInterval <= 0 {
+                return "now"
+            } else if hours > 0 {
+                return "\(hours)h \(minutes)m"
+            } else {
+                return "\(minutes)m"
+            }
+        }())
+        .font(.caption)
+        .foregroundColor(hours == 0 && minutes <= 15 ? .red : .primary)
         .onReceive(timer) { _ in
+            withAnimation {
+                currentTime = Date()
+            }
+        }
+        .onAppear {
             currentTime = Date()
         }
     }
@@ -68,6 +92,7 @@ private struct InfoColumn: View {
     let index: Int
     let isPast: Bool
     let hasNotification: Bool
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -91,7 +116,7 @@ private struct InfoColumn: View {
                     .font(.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color.gray.opacity(0.1))
+                    .background(Color.gray.opacity(colorScheme == .dark ? 0.4 : 0.1))
                     .cornerRadius(12)
                 
                 Text("→ \(wave.neighborStopName)")

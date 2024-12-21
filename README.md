@@ -59,7 +59,7 @@ The app uses a JSON schedule file with the following structure:
                     "uic_ref": "8503651"
                 },
                 {
-                    "name": "Züricha Wollishofen (See)",
+                    "name": "Zürich Wollishofen (See)",
                     "uic_ref": "8503681"
                 }
             ]

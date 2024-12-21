@@ -3,7 +3,6 @@ import AVFoundation
 
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
-    @AppStorage("notificationLeadTime") private var leadTime: Int = 5
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
     @State private var audioPlayer: AVAudioPlayer?
     
@@ -19,8 +18,10 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Neue Settings Section
                 Group {
+                    ThemeToggleView()
+                    Divider()
+                    
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Notification Lead Time")
                             .font(.headline)
@@ -28,13 +29,11 @@ struct SettingsView: View {
                         Menu {
                             ForEach(availableLeadTimes, id: \.self) { time in
                                 Button(action: {
-                                    DispatchQueue.main.async {
-                                        leadTime = time
-                                    }
+                                    scheduleViewModel.updateLeadTime(time)
                                 }) {
                                     HStack {
                                         Text("\(time) minutes")
-                                        if leadTime == time {
+                                        if scheduleViewModel.settings.leadTime == time {
                                             Spacer()
                                             Image(systemName: "checkmark")
                                                 .foregroundColor(.blue)
@@ -49,7 +48,7 @@ struct SettingsView: View {
                                     .font(.system(size: 20))
                                     .padding(.trailing, 8)
                                 
-                                Text("\(leadTime) minutes")
+                                Text("\(scheduleViewModel.settings.leadTime) minutes")
                                     .foregroundColor(Color("text-color"))
                                     .font(.system(size: 17, weight: .semibold))
                                 
@@ -72,26 +71,23 @@ struct SettingsView: View {
                             )
                         }
                         .frame(maxWidth: .infinity)
-                        
-                        Divider()
-                            .padding(.vertical)
-                        
                         Text("Notification Sound")
                             .font(.headline)
+                            .padding(.top)
                         
                         let soundKeys = ["boat-horn", "happy", "let-the-fun-begin", "short-beep", "ukulele", "system"]
                         
                         Menu {
                             ForEach(soundKeys, id: \.self) { key in
                                 Button(action: {
-                                    scheduleViewModel.selectedSound = key
+                                    scheduleViewModel.updateSound(key)
                                     if key != "system" {
                                         playSound(key)
                                     }
                                 }) {
                                     HStack {
                                         Text(scheduleViewModel.availableSounds[key] ?? "")
-                                        if scheduleViewModel.selectedSound == key {
+                                        if scheduleViewModel.settings.selectedSound == key {
                                             Spacer()
                                             Image(systemName: "checkmark")
                                                 .foregroundColor(.blue)
@@ -106,7 +102,7 @@ struct SettingsView: View {
                                     .font(.system(size: 20))
                                     .padding(.trailing, 8)
                                 
-                                Text(scheduleViewModel.availableSounds[scheduleViewModel.selectedSound] ?? "")
+                                Text(scheduleViewModel.availableSounds[scheduleViewModel.settings.selectedSound] ?? "")
                                     .foregroundColor(Color("text-color"))
                                     .font(.system(size: 17, weight: .semibold))
                                 
@@ -130,7 +126,6 @@ struct SettingsView: View {
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.bottom)
                 }
                 .foregroundColor(Color("text-color"))
                 

@@ -6,10 +6,7 @@ struct DeparturesListView: View {
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
-    @State private var scrollTrigger = UUID()
     @State private var isRefreshing = false
-    
-    let updateTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -36,27 +33,24 @@ struct DeparturesListView: View {
                     isRefreshing = true
                     await viewModel.refreshDepartures()
                     scheduleViewModel.updateWaves(from: departures)
-                    scrollTrigger = UUID()
                     isRefreshing = false
                 }
-                .onAppear {
+                .task {
                     scheduleViewModel.updateWaves(from: departures)
-                    scrollTrigger = UUID()
-                }
-                .onChange(of: viewModel.selectedDate) { _, _ in
-                    scheduleViewModel.updateWaves(from: departures)
-                    scrollTrigger = UUID()
-                }
-                .onChange(of: scrollTrigger) { _, _ in
-                    scrollToNextDeparture(proxy: proxy)
-                }
-            }
-            .overlay {
-                Color.clear
-                    .onReceive(updateTimer) { _ in
-                        guard !isRefreshing else { return }
-                        scheduleViewModel.updateWaves(from: departures)
+                    if let nextWave = scheduleViewModel.nextWaves.first(where: { !($0.time < Date()) }) {
+                        proxy.scrollTo(nextWave.id, anchor: .top)
                     }
+                }
+                .onChange(of: viewModel.selectedDate) { oldDate, newDate in
+                    scheduleViewModel.updateWaves(from: departures)
+                }
+                .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
+                    if let nextWave = newWaves.first(where: { !($0.time < Date()) }) {
+                        withAnimation {
+                            proxy.scrollTo(nextWave.id, anchor: .top)
+                        }
+                    }
+                }
             }
         } else if viewModel.hasAttemptedLoad {
             VStack {
@@ -69,14 +63,6 @@ struct DeparturesListView: View {
                         .foregroundColor(Color("text-color"))
                 }
                 Spacer()
-            }
-        }
-    }
-    
-    private func scrollToNextDeparture(proxy: ScrollViewProxy) {
-        if let nextWave = scheduleViewModel.nextWaves.first(where: { !($0.time < Date()) }) {
-            withAnimation {
-                proxy.scrollTo(nextWave.id, anchor: .top)
             }
         }
     }

@@ -132,7 +132,7 @@ struct ContentView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         NavigationLink(destination: SettingsView()) {
                             Image(systemName: "gearshape")
-                                .foregroundColor(Color("text-color"))
+                                .foregroundColor(.accentColor)
                         }
                     }
                 }

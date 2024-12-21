@@ -29,11 +29,13 @@ struct DeparturesListView: View {
                 }
                 .listStyle(.plain)
                 .refreshable {
-                    guard !isRefreshing else { return }
-                    isRefreshing = true
-                    await viewModel.refreshDepartures()
-                    scheduleViewModel.updateWaves(from: departures)
-                    isRefreshing = false
+                    if !isRefreshing {
+                        isRefreshing = true
+                        await viewModel.refreshDepartures()
+                        scheduleViewModel.updateWaves(from: departures)
+                        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                        isRefreshing = false
+                    }
                 }
                 .task {
                     scheduleViewModel.updateWaves(from: departures)

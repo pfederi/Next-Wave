@@ -62,20 +62,33 @@ private struct RemainingTimeView: View {
     
     var body: some View {
         let timeInterval = targetDate.timeIntervalSince(currentTime)
-        let hours = max(0, Int(timeInterval) / 3600)
-        let minutes = max(0, Int(timeInterval) / 60 % 60)
+        let minutes = Int(timeInterval) / 60
+        let hours = abs(minutes) / 60
+        let remainingMinutes = abs(minutes) % 60
         
         Text({
-            if timeInterval <= 0 {
+            if timeInterval <= -300 { // mehr als 5 Minuten her
+                return "missed"
+            } else if timeInterval <= 300 { // zwischen -5 Minuten und +5 Minuten
                 return "now"
             } else if hours > 0 {
-                return "\(hours)h \(minutes)m"
+                return "\(hours)h \(remainingMinutes)m"
             } else {
                 return "\(minutes)m"
             }
         }())
         .font(.caption)
-        .foregroundColor(hours == 0 && minutes <= 15 ? .red : .primary)
+        .foregroundColor({
+            if timeInterval <= -300 { // mehr als 5 Minuten her
+                return .red
+            } else if timeInterval <= 300 { // zwischen -5 Minuten und +5 Minuten
+                return .green
+            } else if hours == 0 && minutes <= 15 { // weniger als 15 Minuten
+                return .red
+            } else {
+                return .primary
+            }
+        }())
         .onReceive(timer) { _ in
             withAnimation {
                 currentTime = Date()

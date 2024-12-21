@@ -81,6 +81,7 @@ You can check whether the station is available in the API via https://transport.
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+Kanban Board is here: https://github.com/users/pfederi/projects/1
 
 ## License
 

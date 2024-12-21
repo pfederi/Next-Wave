@@ -3,9 +3,21 @@ import UserNotifications
 import SwiftUI
 
 class ScheduleViewModel: ObservableObject {
-    @AppStorage("notificationLeadTime") private var leadTime: Int = 5
-    @AppStorage("hidePastWaves") var hidePastWaves: Bool = false
-    @AppStorage("notificationSound") var selectedSound: String = "boat-horn"
+    @Published private(set) var settings: Settings {
+        didSet {
+            saveSettings()
+        }
+    }
+    
+    struct Settings: Codable {
+        var leadTime: Int
+        var selectedSound: String
+        
+        static let `default` = Settings(
+            leadTime: 5,
+            selectedSound: "boat-horn"
+        )
+    }
     
     let availableSounds = [
         "boat-horn": "Boat Horn",
@@ -23,9 +35,30 @@ class ScheduleViewModel: ObservableObject {
     
     private let userDefaults = UserDefaults.standard
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
+    private let settingsKey = "app.settings"
     
     init() {
+        if let data = userDefaults.data(forKey: settingsKey),
+           let decoded = try? JSONDecoder().decode(Settings.self, from: data) {
+            self.settings = decoded
+        } else {
+            self.settings = .default
+        }
         loadNotifications()
+    }
+    
+    private func saveSettings() {
+        if let encoded = try? JSONEncoder().encode(settings) {
+            userDefaults.set(encoded, forKey: settingsKey)
+        }
+    }
+    
+    func updateLeadTime(_ newValue: Int) {
+        settings = Settings(leadTime: newValue, selectedSound: settings.selectedSound)
+    }
+    
+    func updateSound(_ newValue: String) {
+        settings = Settings(leadTime: settings.leadTime, selectedSound: newValue)
     }
     
     func updateWaves(from departures: [Journey]) {
@@ -41,7 +74,7 @@ class ScheduleViewModel: ObservableObject {
             )
         }
         
-        nextWaves = hidePastWaves ? waves.filter { !($0.time < Date()) } : waves
+        nextWaves = waves
         hasAttemptedLoad = true
     }
     
@@ -91,7 +124,7 @@ class ScheduleViewModel: ObservableObject {
         content.body = notificationMessages.randomElement() ?? "Get ready to surf!"
         content.sound = getNotificationSound()
         
-        let triggerDate = Calendar.current.date(byAdding: .minute, value: -leadTime, to: wave.time)!
+        let triggerDate = Calendar.current.date(byAdding: .minute, value: -settings.leadTime, to: wave.time)!
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: triggerDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         
@@ -136,11 +169,11 @@ class ScheduleViewModel: ObservableObject {
     }
     
     private func getNotificationSound() -> UNNotificationSound {
-        if selectedSound == "system" {
+        if settings.selectedSound == "system" {
             return .default
         }
         
-        if let soundURL = Bundle.main.url(forResource: selectedSound, withExtension: "wav") {
+        if let soundURL = Bundle.main.url(forResource: settings.selectedSound, withExtension: "wav") {
             return UNNotificationSound(named: UNNotificationSoundName(rawValue: soundURL.lastPathComponent))
         }
         

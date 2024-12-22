@@ -79,26 +79,24 @@ class ScheduleViewModel: ObservableObject {
     }
     
     private func loadNotifications() {
-        if let savedNotifications = userDefaults.stringArray(forKey: notifiedJourneysKey) {
-            notifiedJourneys = Set(savedNotifications)
-        }
+        // Zuerst das Set leeren - wichtig für einen "frischen" Start
+        notifiedJourneys.removeAll()
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
             DispatchQueue.main.async {
                 let currentDate = Date()
                 let calendar = Calendar.current
-                let startOfToday = calendar.startOfDay(for: currentDate)
                 
                 let validRequests = requests.filter { request in
                     if let trigger = request.trigger as? UNCalendarNotificationTrigger,
                        let triggerDate = trigger.nextTriggerDate() {
-                        // Behalte nur Notifications für heute und die Zukunft
-                        return triggerDate >= startOfToday
+                        // Nur Notifications für heute behalten
+                        return calendar.isDate(triggerDate, inSameDayAs: currentDate)
                     }
                     return false
                 }
                 
-                // Update notifiedJourneys mit nur noch gültigen IDs
+                // Update notifiedJourneys nur mit heute gültigen IDs
                 self.notifiedJourneys = Set(validRequests.map { $0.identifier })
                 self.saveNotifications()
                 

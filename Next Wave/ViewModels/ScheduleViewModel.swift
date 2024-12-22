@@ -85,9 +85,32 @@ class ScheduleViewModel: ObservableObject {
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
             DispatchQueue.main.async {
-                let systemNotificationIds = Set(requests.map { $0.identifier })
-                self.notifiedJourneys = systemNotificationIds
+                let currentDate = Date()
+                let calendar = Calendar.current
+                let startOfToday = calendar.startOfDay(for: currentDate)
+                
+                let validRequests = requests.filter { request in
+                    if let trigger = request.trigger as? UNCalendarNotificationTrigger,
+                       let triggerDate = trigger.nextTriggerDate() {
+                        // Behalte nur Notifications für heute und die Zukunft
+                        return triggerDate >= startOfToday
+                    }
+                    return false
+                }
+                
+                // Update notifiedJourneys mit nur noch gültigen IDs
+                self.notifiedJourneys = Set(validRequests.map { $0.identifier })
                 self.saveNotifications()
+                
+                // Entferne alle ungültigen Notifications
+                let expiredIds = requests
+                    .filter { !validRequests.contains($0) }
+                    .map { $0.identifier }
+                
+                if !expiredIds.isEmpty {
+                    print("Removing \(expiredIds.count) expired notifications")
+                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: expiredIds)
+                }
             }
         }
     }
@@ -100,8 +123,6 @@ class ScheduleViewModel: ObservableObject {
         if wave.time < Date() { return }
         
         let content = UNMutableNotificationContent()
-        content.title = "Wave is coming!"
-        
         let notificationMessages = [
             "Wave is coming, get ready!",
             "Wave is coming, don't mess up the start!",
@@ -121,6 +142,8 @@ class ScheduleViewModel: ObservableObject {
             "Time to make waves!",
             "Your wave adventure begins soon!"
         ]
+        
+        content.title = "Next Wave"
         content.body = notificationMessages.randomElement() ?? "Get ready to surf!"
         content.sound = getNotificationSound()
         

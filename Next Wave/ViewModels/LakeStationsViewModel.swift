@@ -41,6 +41,13 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         scheduleMidnightRefresh()
     }
     
+    init() {
+        self.scheduleViewModel = ScheduleViewModel()
+        self.selectedDate = Date()
+        loadLakes()
+        scheduleMidnightRefresh()
+    }
+    
     deinit {
         midnightTimer?.invalidate()
     }
@@ -49,23 +56,35 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         midnightTimer?.invalidate()
         
         let calendar = Calendar.current
-        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date()),
-              let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: tomorrow) else {
+        let now = Date()
+        
+        // Berechne den nächsten Mitternachtszeitpunkt
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+              let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 1, of: tomorrow) else {
+            print("Failed to calculate next midnight")
             return
         }
         
-        let timeInterval = nextMidnight.timeIntervalSinceNow
+        let timeInterval = nextMidnight.timeIntervalSince(now)
+        print("Scheduling midnight refresh in \(timeInterval) seconds")
         
-
-        midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                self.selectedDate = Date()
-                if self.selectedStation != nil {
-                    await self.refreshDepartures()
+        // Stelle sicher, dass der Timer im Main Thread erstellt wird
+        DispatchQueue.main.async { [weak self] in
+            self?.midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+                print("Midnight refresh triggered")
+                Task { @MainActor [weak self] in
+                    guard let self = self else { return }
+                    self.selectedDate = Date()
+                    if self.selectedStation != nil {
+                        await self.refreshDepartures()
+                    }
+                    // Plane den nächsten Refresh
+                    self.scheduleMidnightRefresh()
                 }
-                self.scheduleMidnightRefresh()
             }
+            
+            // Wichtig: Timer zum RunLoop hinzufügen
+            RunLoop.current.add(self?.midnightTimer ?? Timer(), forMode: .common)
         }
     }
     
@@ -146,6 +165,15 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         scheduleViewModel.nextWaves = []
         Task {
             await refreshDepartures()
+        }
+    }
+    
+    func appWillEnterForeground() {
+        scheduleMidnightRefresh()
+        if selectedStation != nil {
+            Task {
+                await refreshDepartures()
+            }
         }
     }
 } 

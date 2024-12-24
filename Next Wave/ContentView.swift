@@ -50,12 +50,9 @@ struct ContentView: View {
                             }
                             
                             HStack {
-                                if canGoBack {
+                                if !Calendar.current.isDateInToday(selectedDate) {
                                     Button(action: {
                                         selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
-                                        if Calendar.current.isDate(selectedDate, inSameDayAs: Date()) {
-                                            canGoBack = false
-                                        }
                                     }) {
                                         Image(systemName: "chevron.left")
                                             .foregroundColor(Color("text-color"))
@@ -71,16 +68,16 @@ struct ContentView: View {
                                 }
                                 .frame(maxWidth: 200)
                                 
-                                Button(action: {
-                                    if let newDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate),
-                                       let maxDate = Calendar.current.date(byAdding: .day, value: 6, to: Date()),
-                                       newDate <= maxDate {
-                                        selectedDate = newDate
-                                        canGoBack = true
+                                if let maxDate = Calendar.current.date(byAdding: .day, value: 6, to: Date()),
+                                   selectedDate < maxDate {
+                                    Button(action: {
+                                        if let newDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) {
+                                            selectedDate = newDate
+                                        }
+                                    }) {
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(Color("text-color"))
                                     }
-                                }) {
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(Color("text-color"))
                                 }
                             }
                             .padding(.horizontal)

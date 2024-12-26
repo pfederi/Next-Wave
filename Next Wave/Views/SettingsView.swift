@@ -167,7 +167,7 @@ struct SettingsView: View {
                     DisclosureGroup("Features") {
                         VStack(alignment: .leading, spacing: 8) {
                             ForEach(["Real-time boat schedule tracking",
-                                    "Smart notifications 5 minutes before waves",
+                                    "Smart notifications 3,5,10 or 15 minutes before waves",
                                     "Easy spot selection on Swiss Lakes",
                                     "Precise wave timing information",
                                     "Custom boat horn notifications"], id: \.self) { feature in

@@ -54,7 +54,17 @@ enum AppDateFormatter {
     }
     
     static func formatDisplayDate(_ date: Date) -> String {
-        return displayDateFormatter.string(from: date)
+        let weekdayFormatter = DateFormatter()
+        weekdayFormatter.dateFormat = "E"
+        weekdayFormatter.locale = Locale(identifier: "en_US")
+        let weekday = weekdayFormatter.string(from: date)
+        
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "d. MMM"
+        dayFormatter.locale = Locale(identifier: "en_US")
+        let dayMonth = dayFormatter.string(from: date)
+        
+        return "\(weekday), \(dayMonth)"
     }
     
     static func formatTime(_ date: Date) -> String {
@@ -116,5 +126,9 @@ enum AppDateFormatter {
         }
         
         return "\(minutes)m"
+    }
+    
+    static func formatFullTime(_ date: Date) -> String {
+        return fullTimeFormatter.string(from: date)
     }
 } 

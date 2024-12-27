@@ -89,7 +89,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     private func loadLakes() {
-        guard let url = Bundle.main.url(forResource: "lakes", withExtension: "json"),
+        guard let url = Bundle.main.url(forResource: "stations", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
             return
         }

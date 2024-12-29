@@ -1,6 +1,38 @@
 import SwiftUI
 import MapKit
 
+class OpenStreetMapOverlay: MKTileOverlay {
+    init() {
+        let template = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        super.init(urlTemplate: template)
+        self.canReplaceMapContent = true
+    }
+}
+
+class OpenSeaMapOverlay: MKTileOverlay {
+    init() {
+        let template = "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
+        super.init(urlTemplate: template)
+        self.canReplaceMapContent = false
+    }
+}
+
+class ShippingRoutesOverlay: MKTileOverlay {
+    init() {
+        let template = "https://tiles.openseamap.org/routes/{z}/{x}/{y}.png"
+        super.init(urlTemplate: template)
+        self.canReplaceMapContent = false
+    }
+}
+
+class DepthContourOverlay: MKTileOverlay {
+    init() {
+        let template = "https://tiles.openseamap.org/depth/{z}/{x}/{y}.png"
+        super.init(urlTemplate: template)
+        self.canReplaceMapContent = false
+    }
+}
+
 struct MapView: View {
     @ObservedObject var viewModel: LakeStationsViewModel
     @EnvironmentObject var settings: AppSettings
@@ -45,6 +77,25 @@ struct MapViewRepresentable: UIViewRepresentable {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
         mapView.setRegion(initialRegion, animated: false)
+        
+        // OpenStreetMap als Basiskarte
+        let osmOverlay = OpenStreetMapOverlay()
+        mapView.addOverlay(osmOverlay, level: .aboveLabels)
+        
+        // Tiefenlinien Layer
+        let depthOverlay = DepthContourOverlay()
+        mapView.addOverlay(depthOverlay, level: .aboveLabels)
+        
+        // OpenSeaMap Layer
+        let seaMapOverlay = OpenSeaMapOverlay()
+        mapView.addOverlay(seaMapOverlay, level: .aboveLabels)
+        
+        // Schifffahrtswege Layer
+        let routesOverlay = ShippingRoutesOverlay()
+        mapView.addOverlay(routesOverlay, level: .aboveLabels)
+        
+        // Apple Karte ausblenden
+        mapView.mapType = .mutedStandard
         
         // Konfiguration
         mapView.register(
@@ -143,6 +194,14 @@ struct MapViewRepresentable: UIViewRepresentable {
         
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
             parent.onRegionChanged(mapView.region)
+        }
+        
+        // Renderer für OpenSeaMap Overlay
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if overlay is MKTileOverlay {
+                return MKTileOverlayRenderer(overlay: overlay)
+            }
+            return MKOverlayRenderer(overlay: overlay)
         }
     }
 }

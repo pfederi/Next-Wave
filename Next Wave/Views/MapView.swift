@@ -2,18 +2,120 @@ import SwiftUI
 import MapKit
 
 class OpenStreetMapOverlay: MKTileOverlay {
+    private let memoryCache = NSCache<NSString, NSData>()
+    private let fileManager = FileManager.default
+    private let cacheDirectory: URL
+    
     init() {
         let template = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        
+        // Cache-Verzeichnis erstellen
+        let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)[0]
+        cacheDirectory = URL(fileURLWithPath: cachePath).appendingPathComponent("OSMTileCache")
+        
         super.init(urlTemplate: template)
         self.canReplaceMapContent = true
+        
+        // Memory Cache konfigurieren
+        memoryCache.countLimit = 500
+        memoryCache.totalCostLimit = 50 * 1024 * 1024 // 50 MB
+        
+        // Cache-Verzeichnis erstellen falls nötig
+        try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+    }
+    
+    override func loadTile(at path: MKTileOverlayPath,
+                         result: @escaping (Data?, Error?) -> Void) {
+        let cacheKey = "\(path.x),\(path.y),\(path.z)" as NSString
+        let filePath = cacheDirectory.appendingPathComponent(cacheKey as String)
+        
+        // 1. Prüfe Memory Cache
+        if let cachedData = memoryCache.object(forKey: cacheKey) {
+            result(cachedData as Data, nil)
+            return
+        }
+        
+        // 2. Prüfe Disk Cache
+        if let diskData = try? Data(contentsOf: filePath) {
+            memoryCache.setObject(diskData as NSData, forKey: cacheKey)
+            result(diskData, nil)
+            return
+        }
+        
+        // 3. Lade von Netzwerk
+        super.loadTile(at: path) { [weak self] data, error in
+            guard let self = self, let tileData = data else {
+                result(data, error)
+                return
+            }
+            
+            // In Memory Cache speichern
+            self.memoryCache.setObject(tileData as NSData, forKey: cacheKey)
+            
+            // Auf Festplatte speichern
+            try? tileData.write(to: filePath)
+            
+            result(tileData, error)
+        }
     }
 }
 
 class ShippingRoutesOverlay: MKTileOverlay {
+    private let memoryCache = NSCache<NSString, NSData>()
+    private let fileManager = FileManager.default
+    private let cacheDirectory: URL
+    
     init() {
         let template = "https://tiles.openseamap.org/routes/{z}/{x}/{y}.png"
+        
+        // Cache-Verzeichnis erstellen
+        let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)[0]
+        cacheDirectory = URL(fileURLWithPath: cachePath).appendingPathComponent("SeaRouteTileCache")
+        
         super.init(urlTemplate: template)
         self.canReplaceMapContent = false
+        
+        // Memory Cache konfigurieren
+        memoryCache.countLimit = 500
+        memoryCache.totalCostLimit = 50 * 1024 * 1024 // 50 MB
+        
+        // Cache-Verzeichnis erstellen falls nötig
+        try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+    }
+    
+    override func loadTile(at path: MKTileOverlayPath,
+                         result: @escaping (Data?, Error?) -> Void) {
+        let cacheKey = "\(path.x),\(path.y),\(path.z)" as NSString
+        let filePath = cacheDirectory.appendingPathComponent(cacheKey as String)
+        
+        // 1. Prüfe Memory Cache
+        if let cachedData = memoryCache.object(forKey: cacheKey) {
+            result(cachedData as Data, nil)
+            return
+        }
+        
+        // 2. Prüfe Disk Cache
+        if let diskData = try? Data(contentsOf: filePath) {
+            memoryCache.setObject(diskData as NSData, forKey: cacheKey)
+            result(diskData, nil)
+            return
+        }
+        
+        // 3. Lade von Netzwerk
+        super.loadTile(at: path) { [weak self] data, error in
+            guard let self = self, let tileData = data else {
+                result(data, error)
+                return
+            }
+            
+            // In Memory Cache speichern
+            self.memoryCache.setObject(tileData as NSData, forKey: cacheKey)
+            
+            // Auf Festplatte speichern
+            try? tileData.write(to: filePath)
+            
+            result(tileData, error)
+        }
     }
 }
 
@@ -51,33 +153,83 @@ struct MapView: View {
     }
 }
 
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let locationManager = CLLocationManager()
+    @Published var userLocation: CLLocation?
+    
+    override init() {
+        super.init()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func requestLocationPermission() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    func startUpdatingLocation() {
+        locationManager.startUpdatingLocation()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        userLocation = location
+    }
+}
+
 struct MapViewRepresentable: UIViewRepresentable {
     let stations: [Lake.Station]
     let initialRegion: MKCoordinateRegion
     let onRegionChanged: (MKCoordinateRegion) -> Void
     let onStationSelected: (Lake.Station) -> Void
+    @StateObject private var locationManager = LocationManager()
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
         mapView.setRegion(initialRegion, animated: false)
         
-        // OpenStreetMap als Basiskarte
-        let osmOverlay = OpenStreetMapOverlay()
-        mapView.addOverlay(osmOverlay, level: .aboveLabels)
+        // Start mit Apple Maps
+        mapView.mapType = .standard
         
-        // Schifffahrtswege Layer
+        // OSM und Schifffahrtswege Layer vorbereiten
+        let osmOverlay = OpenStreetMapOverlay()
         let routesOverlay = ShippingRoutesOverlay()
+        
+        // Layer initial unsichtbar machen
+        context.coordinator.osmRenderer = MKTileOverlayRenderer(overlay: osmOverlay)
+        context.coordinator.osmRenderer?.alpha = 0
+        context.coordinator.routesRenderer = MKTileOverlayRenderer(overlay: routesOverlay)
+        context.coordinator.routesRenderer?.alpha = 0
+        
+        mapView.addOverlay(osmOverlay, level: .aboveLabels)
         mapView.addOverlay(routesOverlay, level: .aboveLabels)
         
-        // Apple Karte ausblenden
-        mapView.mapType = .mutedStandard
+        // Benutzerposition anzeigen
+        mapView.showsUserLocation = true
+        
+        // Location Manager starten
+        locationManager.requestLocationPermission()
+        locationManager.startUpdatingLocation()
         
         // Konfiguration
         mapView.register(
             MKMarkerAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier
         )
+        
+        // Locate Me Button hinzufügen
+        let locateButton = MKUserTrackingButton(mapView: mapView)
+        locateButton.layer.backgroundColor = UIColor.systemBackground.cgColor
+        locateButton.layer.cornerRadius = 5
+        locateButton.layer.borderWidth = 1
+        locateButton.layer.borderColor = UIColor.separator.cgColor
+        mapView.addSubview(locateButton)
+        locateButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            locateButton.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -16),
+            locateButton.topAnchor.constraint(equalTo: mapView.safeAreaLayoutGuide.topAnchor, constant: 16)
+        ])
         
         // Stationen hinzufügen
         let annotations = stations.compactMap { station -> StationAnnotation? in
@@ -123,6 +275,9 @@ struct MapViewRepresentable: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: MapViewRepresentable
+        var osmRenderer: MKTileOverlayRenderer?
+        var routesRenderer: MKTileOverlayRenderer?
+        private var isFirstTileLoaded = false
         
         init(_ parent: MapViewRepresentable) {
             self.parent = parent
@@ -173,10 +328,26 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            if overlay is MKTileOverlay {
-                return MKTileOverlayRenderer(overlay: overlay)
+            if let tileOverlay = overlay as? OpenStreetMapOverlay {
+                return osmRenderer ?? MKTileOverlayRenderer(overlay: tileOverlay)
+            } else if let tileOverlay = overlay as? ShippingRoutesOverlay {
+                return routesRenderer ?? MKTileOverlayRenderer(overlay: tileOverlay)
             }
             return MKOverlayRenderer(overlay: overlay)
+        }
+        
+        func mapView(_ mapView: MKMapView, didAdd renderers: [MKOverlayRenderer]) {
+            // Wenn die ersten Tiles geladen sind, blenden wir die Layer ein
+            guard !isFirstTileLoaded else { return }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                UIView.animate(withDuration: 0.3) {
+                    self.osmRenderer?.alpha = 1
+                    self.routesRenderer?.alpha = 1
+                    mapView.mapType = .mutedStandard
+                }
+                self.isFirstTileLoaded = true
+            }
         }
     }
 }

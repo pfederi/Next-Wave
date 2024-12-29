@@ -189,6 +189,15 @@ struct MapViewRepresentable: UIViewRepresentable {
         mapView.delegate = context.coordinator
         mapView.setRegion(initialRegion, animated: false)
         
+        // Force Light Mode
+        mapView.overrideUserInterfaceStyle = .light
+        
+        // Zoom-Beschränkungen setzen (OSM unterstützt Levels 0-19)
+        mapView.cameraZoomRange = MKMapView.CameraZoomRange(
+            minCenterCoordinateDistance: 500,  // Maximaler Zoom (weiter weg = weniger Zoom)
+            maxCenterCoordinateDistance: 1_000_000  // Minimaler Zoom
+        )
+        
         // Start mit Apple Maps
         mapView.mapType = .standard
         
@@ -289,6 +298,9 @@ struct MapViewRepresentable: UIViewRepresentable {
                 let view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
                     ?? MKMarkerAnnotationView(annotation: cluster, reuseIdentifier: identifier)
                 view.markerTintColor = .systemBlue
+                view.titleVisibility = .visible
+                view.subtitleVisibility = .hidden
+                view.displayPriority = .required
                 return view
             }
             
@@ -302,6 +314,9 @@ struct MapViewRepresentable: UIViewRepresentable {
             view.markerTintColor = .systemBlue
             view.glyphImage = UIImage(systemName: "mappin.circle.fill")
             view.canShowCallout = false
+            view.titleVisibility = .visible
+            view.subtitleVisibility = .hidden
+            view.displayPriority = .required
             
             return view
         }
@@ -342,11 +357,23 @@ struct MapViewRepresentable: UIViewRepresentable {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 UIView.animate(withDuration: 0.3) {
-                    self.osmRenderer?.alpha = 1
-                    self.routesRenderer?.alpha = 1
+                    self.osmRenderer?.alpha = 1.0  // OSM vollständig deckend
+                    self.routesRenderer?.alpha = 1.0  // Schifffahrtswege leicht transparent
                     mapView.mapType = .mutedStandard
                 }
                 self.isFirstTileLoaded = true
+            }
+        }
+        
+        func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+            // Verhindere zu starkes Zoomen
+            let maxZoom: CLLocationDistance = 500  // Gleicher Wert wie oben
+            let minZoom: CLLocationDistance = 1_000_000
+            
+            if mapView.camera.centerCoordinateDistance < maxZoom {
+                mapView.camera.centerCoordinateDistance = maxZoom
+            } else if mapView.camera.centerCoordinateDistance > minZoom {
+                mapView.camera.centerCoordinateDistance = minZoom
             }
         }
     }

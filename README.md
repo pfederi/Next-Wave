@@ -1,5 +1,7 @@
 # Next Wave
 
+https://img.shields.io/badge/Swift-FA7343?style=for-the-badge&logo=swift&logoColor=white https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white
+
 Next Wave is an iOS app that helps wake surfers and foilers catch their perfect wave on Lake Zurich by providing real-time boat schedules and smart notifications.
 
 <img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave5.png" alt="Screenshot3" width="200">
@@ -125,10 +127,19 @@ Some ideas that have been suggested:
 
 Note: International support is currently out of scope for this project. Feel free to fork the repository and create a version for your specific country!
 
+## Maintainers
+
+[@pfederi](https://github.com/pfederi).
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 Kanban Board is here: https://github.com/users/pfederi/projects/1
+
+### Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="graphs/contributors"><img src="https://opencollective.com/standard-readme/contributors.svg?width=890&button=false" /></a>
 
 ## License
 

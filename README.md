@@ -18,11 +18,22 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 ## Technical Details
 
 - Built with Swift and SwiftUI
+- Uses MapKit for base map functionality
+- OpenStreetMap and OpenSeaMap tile overlays
+- CoreLocation for user positioning
 - Minimum iOS Version: 17.0
 - iPhone support (portrait mode)
 - Local notifications using UserNotifications
 - Custom sound assets
 - Schedule data in JSON format
+
+## Map Features
+
+- OpenStreetMap integration for detailed water navigation
+- Shipping routes overlay for better orientation
+- Station clustering for better overview
+- Automatic map caching for offline use
+- Optimized for both light and dark mode
 
 ## Installation
 
@@ -90,7 +101,7 @@ The app uses a JSON schedule file with the following structure. Note that coordi
 }
 ```
 
-To find the name and especially the station ID, use the tool https://overpass-turbo.osm.ch/ 
+To find the name and especially the station ID, use the tool https://overpass-turbo.eu/
 Search for the lake on the map on the right and make it completely visible. enter the following query in the console on the left:
 
 ```
@@ -100,9 +111,19 @@ node
 out;
 ```
 
-All ship stations are displayed. Clicking on the station opens a window where you can find the station ID and the name of the station. uic_name and uic_ref. These two values are entered in the JSON file.
+All ship stations are displayed. Clicking on the station opens a window where you can find the station ID, the name of the station and the coordinates. uic_name and uic_ref. These values are entered in the JSON file.
 
 You can check whether the station is available in the API via https://transport.opendata.ch/v1/locations?query=[uic_ref].
+The link above is for Switzerland. For other countries, you have to find another api to find departure times.
+
+## Feature Ideas Welcome
+
+Have an idea for improving Next Wave? We're always open to suggestions from the community! Whether it's new features, usability improvements, or support for additional lakes - we'd love to hear from you. Feel free to open an issue on GitHub to discuss your ideas or contribute directly through a pull request.
+
+Some ideas that have been suggested:
+- Link to Foil Mates and vice versa for nearby spots
+
+Note: International support is currently out of scope for this project. Feel free to fork the repository and create a version for your specific country!
 
 ## Contributing
 

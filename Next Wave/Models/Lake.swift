@@ -22,6 +22,7 @@ struct Lake: Codable, Identifiable, Hashable {
     struct Station: Codable, Hashable, Identifiable {
         let name: String
         let uic_ref: String?
+        let coordinates: Coordinates?
         
         var id: String {
             if let ref = uic_ref {
@@ -35,16 +36,24 @@ struct Lake: Codable, Identifiable, Hashable {
                let stationName = try? container.decode(String.self) {
                 self.name = stationName
                 self.uic_ref = nil
+                self.coordinates = nil
             } else {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
                 self.name = try container.decode(String.self, forKey: .name)
                 self.uic_ref = try container.decode(String?.self, forKey: .uic_ref)
+                self.coordinates = try container.decodeIfPresent(Coordinates.self, forKey: .coordinates)
             }
         }
         
         enum CodingKeys: String, CodingKey {
             case name
             case uic_ref
+            case coordinates
+        }
+        
+        struct Coordinates: Codable, Hashable {
+            let latitude: Double
+            let longitude: Double
         }
     }
 }

@@ -136,11 +136,6 @@ Note: International support is currently out of scope for this project. Feel fre
 Contributions are welcome! Please feel free to submit a Pull Request.
 Kanban Board is here: https://github.com/users/pfederi/projects/1
 
-### Contributors
-
-This project exists thanks to all the people who contribute. 
-<a href="graphs/contributors"><img src="https://opencollective.com/standard-readme/contributors.svg?width=890&button=false" /></a>
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

@@ -1,7 +1,5 @@
 # Next Wave
 
-https://img.shields.io/badge/Swift-FA7343?style=for-the-badge&logo=swift&logoColor=white https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white
-
 Next Wave is an iOS app that helps wake surfers and foilers catch their perfect wave on Lake Zurich by providing real-time boat schedules and smart notifications.
 
 <img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave5.png" alt="Screenshot3" width="200">

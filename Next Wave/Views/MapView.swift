@@ -9,25 +9,9 @@ class OpenStreetMapOverlay: MKTileOverlay {
     }
 }
 
-class OpenSeaMapOverlay: MKTileOverlay {
-    init() {
-        let template = "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
-        super.init(urlTemplate: template)
-        self.canReplaceMapContent = false
-    }
-}
-
 class ShippingRoutesOverlay: MKTileOverlay {
     init() {
         let template = "https://tiles.openseamap.org/routes/{z}/{x}/{y}.png"
-        super.init(urlTemplate: template)
-        self.canReplaceMapContent = false
-    }
-}
-
-class DepthContourOverlay: MKTileOverlay {
-    init() {
-        let template = "https://tiles.openseamap.org/depth/{z}/{x}/{y}.png"
         super.init(urlTemplate: template)
         self.canReplaceMapContent = false
     }
@@ -81,14 +65,6 @@ struct MapViewRepresentable: UIViewRepresentable {
         // OpenStreetMap als Basiskarte
         let osmOverlay = OpenStreetMapOverlay()
         mapView.addOverlay(osmOverlay, level: .aboveLabels)
-        
-        // Tiefenlinien Layer
-        let depthOverlay = DepthContourOverlay()
-        mapView.addOverlay(depthOverlay, level: .aboveLabels)
-        
-        // OpenSeaMap Layer
-        let seaMapOverlay = OpenSeaMapOverlay()
-        mapView.addOverlay(seaMapOverlay, level: .aboveLabels)
         
         // Schifffahrtswege Layer
         let routesOverlay = ShippingRoutesOverlay()
@@ -196,7 +172,6 @@ struct MapViewRepresentable: UIViewRepresentable {
             parent.onRegionChanged(mapView.region)
         }
         
-        // Renderer für OpenSeaMap Overlay
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if overlay is MKTileOverlay {
                 return MKTileOverlayRenderer(overlay: overlay)

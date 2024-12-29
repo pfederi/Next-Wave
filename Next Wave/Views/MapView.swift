@@ -3,11 +3,30 @@ import MapKit
 
 struct MapView: View {
     @ObservedObject var viewModel: LakeStationsViewModel
+    @EnvironmentObject var settings: AppSettings
     
     var body: some View {
         MapViewRepresentable(
             stations: viewModel.lakes.flatMap { lake in
                 lake.stations.filter { $0.coordinates != nil }
+            },
+            initialRegion: MKCoordinateRegion(
+                center: CLLocationCoordinate2D(
+                    latitude: settings.lastMapRegion.latitude,
+                    longitude: settings.lastMapRegion.longitude
+                ),
+                span: MKCoordinateSpan(
+                    latitudeDelta: settings.lastMapRegion.latitudeDelta,
+                    longitudeDelta: settings.lastMapRegion.longitudeDelta
+                )
+            ),
+            onRegionChanged: { region in
+                settings.lastMapRegion = MapRegion(
+                    latitude: region.center.latitude,
+                    longitude: region.center.longitude,
+                    latitudeDelta: region.span.latitudeDelta,
+                    longitudeDelta: region.span.longitudeDelta
+                )
             },
             onStationSelected: { station in
                 viewModel.selectStation(station)
@@ -18,18 +37,14 @@ struct MapView: View {
 
 struct MapViewRepresentable: UIViewRepresentable {
     let stations: [Lake.Station]
+    let initialRegion: MKCoordinateRegion
+    let onRegionChanged: (MKCoordinateRegion) -> Void
     let onStationSelected: (Lake.Station) -> Void
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.delegate = context.coordinator
-        
-        // Initial region (Schweiz)
-        let region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417),
-            span: MKCoordinateSpan(latitudeDelta: 3, longitudeDelta: 3)
-        )
-        mapView.setRegion(region, animated: false)
+        mapView.setRegion(initialRegion, animated: false)
         
         // Konfiguration
         mapView.register(
@@ -124,6 +139,10 @@ struct MapViewRepresentable: UIViewRepresentable {
             }
             
             mapView.deselectAnnotation(view.annotation, animated: true)
+        }
+        
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+            parent.onRegionChanged(mapView.region)
         }
     }
 }

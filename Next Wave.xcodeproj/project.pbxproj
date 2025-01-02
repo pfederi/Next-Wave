@@ -34,22 +34,9 @@
 		8AD902ED2D135753004AAC0E /* jack_sparrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = jack_sparrow.gif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		8AD6DA2C2D21E54E00062F0B /* Exceptions for "Next Wave" folder in "Next Wave" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 8A225F302D0ABC6F008BA92B /* Next Wave */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8A225F332D0ABC6F008BA92B /* Next Wave */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				8AD6DA2C2D21E54E00062F0B /* Exceptions for "Next Wave" folder in "Next Wave" target */,
-			);
 			path = "Next Wave";
 			sourceTree = "<group>";
 		};

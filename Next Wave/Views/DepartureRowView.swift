@@ -67,9 +67,9 @@ private struct RemainingTimeView: View {
         let remainingMinutes = abs(minutes) % 60
         
         Text({
-            if timeInterval <= -300 { // mehr als 5 Minuten her
+            if timeInterval <= -300 {
                 return "missed"
-            } else if timeInterval <= 300 { // zwischen -5 Minuten und +5 Minuten
+            } else if timeInterval <= 300 {
                 return "now"
             } else if hours > 0 {
                 return "\(hours)h \(remainingMinutes)m"
@@ -79,11 +79,11 @@ private struct RemainingTimeView: View {
         }())
         .font(.caption)
         .foregroundColor({
-            if timeInterval <= -300 { // mehr als 5 Minuten her
+            if timeInterval <= -300 { 
                 return .red
-            } else if timeInterval <= 300 { // zwischen -5 Minuten und +5 Minuten
+            } else if timeInterval <= 300 {
                 return .green
-            } else if hours == 0 && minutes <= 15 { // weniger als 15 Minuten
+            } else if hours == 0 && minutes <= 15 {
                 return .red
             } else {
                 return .primary

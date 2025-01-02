@@ -29,6 +29,14 @@ struct LocationPickerView: View {
                                 dismiss()
                             }
                         }
+                        .onAppear {
+                            if let station = viewModel.selectedStation,
+                               let lake = viewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.id == station.id })
+                               }) {
+                                viewModel.expandedLakeId = lake.id
+                            }
+                        }
                 } else {
                     List {
                         ForEach(viewModel.lakes) { lake in

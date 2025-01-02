@@ -20,6 +20,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var isLoading = false
     @Published var hasAttemptedLoad = false
     @Published var scrolledToNext = false
+    @Published var error: String?
     private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
@@ -58,7 +59,6 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         let calendar = Calendar.current
         let now = Date()
         
-        // Berechne den nächsten Mitternachtszeitpunkt
         guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
               let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 1, of: tomorrow) else {
             print("Failed to calculate next midnight")
@@ -68,7 +68,6 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         let timeInterval = nextMidnight.timeIntervalSince(now)
         print("Scheduling midnight refresh in \(timeInterval) seconds")
         
-        // Stelle sicher, dass der Timer im Main Thread erstellt wird
         DispatchQueue.main.async { [weak self] in
             self?.midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
                 print("Midnight refresh triggered")
@@ -78,12 +77,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                     if self.selectedStation != nil {
                         await self.refreshDepartures()
                     }
-                    // Plane den nächsten Refresh
                     self.scheduleMidnightRefresh()
                 }
             }
-            
-            // Wichtig: Timer zum RunLoop hinzufügen
             RunLoop.current.add(self?.midnightTimer ?? Timer(), forMode: .common)
         }
     }
@@ -116,13 +112,14 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
               let uicRef = station.uic_ref else { return }
         
         isLoading = true
+        error = nil
         
         let cacheKey = getCacheKey(for: station, date: selectedDate)
         if Calendar.current.isDateInToday(selectedDate),
            let cachedDepartures = departuresCache[cacheKey] {
             self.departures = []
             try? await Task.sleep(nanoseconds: 100_000_000)
-            self.departures = cachedDepartures  // Then set cached data
+            self.departures = cachedDepartures
             self.isLoading = false
             self.isInitialLoad = false
             self.hasAttemptedLoad = true
@@ -143,8 +140,15 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             self.isLoading = false
             self.isInitialLoad = false
             self.hasAttemptedLoad = true
+            self.error = nil
+        } catch let apiError as TransportAPI.APIError {
+            self.error = apiError.userMessage
+            self.departures = []
+            self.isLoading = false
+            self.hasAttemptedLoad = true
         } catch {
-            print("Error refreshing departures: \(error)")
+            self.error = "Ein unerwarteter Fehler ist aufgetreten"
+            self.departures = []
             self.isLoading = false
             self.hasAttemptedLoad = true
         }

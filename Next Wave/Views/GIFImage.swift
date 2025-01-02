@@ -34,10 +34,9 @@ struct GIFImage: UIViewRepresentable {
             
             imageView.animationImages = images
             imageView.animationDuration = duration
-            imageView.animationRepeatCount = 1  // Play only once
+            imageView.animationRepeatCount = 1
             imageView.startAnimating()
             
-            // Schedule completion callback
             DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                 onAnimationComplete()
             }

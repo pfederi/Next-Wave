@@ -1,6 +1,7 @@
 import Foundation
 import UserNotifications
 import SwiftUI
+import BackgroundTasks
 
 class ScheduleViewModel: ObservableObject {
     @Published private(set) var settings: Settings {
@@ -37,6 +38,8 @@ class ScheduleViewModel: ObservableObject {
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
     private let settingsKey = "app.settings"
     
+    private var midnightTimer: Timer?
+    
     init() {
         if let data = userDefaults.data(forKey: settingsKey),
            let decoded = try? JSONDecoder().decode(Settings.self, from: data) {
@@ -45,6 +48,17 @@ class ScheduleViewModel: ObservableObject {
             self.settings = .default
         }
         loadNotifications()
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleMidnightUpdate),
+            name: NSNotification.Name("MidnightUpdate"),
+            object: nil
+        )
+    }
+    
+    deinit {
+        midnightTimer?.invalidate()
     }
     
     private func saveSettings() {
@@ -79,7 +93,6 @@ class ScheduleViewModel: ObservableObject {
     }
     
     private func loadNotifications() {
-        // Zuerst das Set leeren - wichtig für einen "frischen" Start
         notifiedJourneys.removeAll()
         
         UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
@@ -90,17 +103,14 @@ class ScheduleViewModel: ObservableObject {
                 let validRequests = requests.filter { request in
                     if let trigger = request.trigger as? UNCalendarNotificationTrigger,
                        let triggerDate = trigger.nextTriggerDate() {
-                        // Nur Notifications für heute behalten
                         return calendar.isDate(triggerDate, inSameDayAs: currentDate)
                     }
                     return false
                 }
                 
-                // Update notifiedJourneys nur mit heute gültigen IDs
                 self.notifiedJourneys = Set(validRequests.map { $0.identifier })
                 self.saveNotifications()
                 
-                // Entferne alle ungültigen Notifications
                 let expiredIds = requests
                     .filter { !validRequests.contains($0) }
                     .map { $0.identifier }
@@ -201,4 +211,10 @@ class ScheduleViewModel: ObservableObject {
         return .default
     }
     
+    @objc private func handleMidnightUpdate() {
+        DispatchQueue.main.async {
+            self.selectedDate = Date()
+            self.loadNotifications()
+        }
+    }
 }

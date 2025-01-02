@@ -45,7 +45,6 @@ class AppSettings: ObservableObject {
            let savedRegion = try? JSONDecoder().decode(MapRegion.self, from: savedRegionData) {
             self.lastMapRegion = savedRegion
         } else {
-            // Default to Switzerland
             self.lastMapRegion = MapRegion(
                 latitude: 47.3769,
                 longitude: 8.5417,

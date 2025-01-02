@@ -7,13 +7,25 @@ struct DeparturesListView: View {
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
     @State private var isRefreshing = false
+    @State private var errorMessage: String?
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
     }
     
     var body: some View {
-        if !departures.isEmpty {
+        if viewModel.isLoading {
+            LoaderView()
+        } else if let error = viewModel.error {
+            VStack {
+                Spacer()
+                Text(error)
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                Spacer()
+            }
+        } else if !departures.isEmpty {
             ScrollViewReader { proxy in
                 List {
                     ForEach(Array(scheduleViewModel.nextWaves.enumerated()), id: \.element.id) { index, wave in
@@ -33,7 +45,7 @@ struct DeparturesListView: View {
                         isRefreshing = true
                         await viewModel.refreshDepartures()
                         scheduleViewModel.updateWaves(from: departures)
-                        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                        try? await Task.sleep(nanoseconds: 500_000_000)
                         isRefreshing = false
                     }
                 }

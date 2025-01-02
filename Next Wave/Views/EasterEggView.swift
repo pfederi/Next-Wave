@@ -30,7 +30,6 @@ struct EasterEggView: View {
     
     var body: some View {
         if isOverlay {
-            // Full screen overlay with GIF
             if isShowing {
                 GeometryReader { geometry in
                     ZStack {
@@ -52,7 +51,6 @@ struct EasterEggView: View {
                 .ignoresSafeArea()
             }
         } else {
-            // Tap detector
             Color.clear
                 .contentShape(Rectangle())
                 .onTapGesture {

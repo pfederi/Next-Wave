@@ -333,6 +333,11 @@ struct MapViewRepresentable: UIViewRepresentable {
                 mapView.setRegion(region, animated: true)
             } else if let annotation = view.annotation as? StationAnnotation {
                 parent.onStationSelected(annotation.station)
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                   let window = windowScene.windows.first,
+                   let topController = window.rootViewController?.topMostViewController() {
+                    topController.dismiss(animated: true)
+                }
             }
             
             mapView.deselectAnnotation(view.annotation, animated: true)
@@ -352,13 +357,12 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
         
         func mapView(_ mapView: MKMapView, didAdd renderers: [MKOverlayRenderer]) {
-            // Wenn die ersten Tiles geladen sind, blenden wir die Layer ein
             guard !isFirstTileLoaded else { return }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 UIView.animate(withDuration: 0.3) {
-                    self.osmRenderer?.alpha = 1.0  // OSM vollständig deckend
-                    self.routesRenderer?.alpha = 1.0  // Schifffahrtswege leicht transparent
+                    self.osmRenderer?.alpha = 1.0
+                    self.routesRenderer?.alpha = 1.0
                     mapView.mapType = .mutedStandard
                 }
                 self.isFirstTileLoaded = true
@@ -366,8 +370,7 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
         
         func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-            // Verhindere zu starkes Zoomen
-            let maxZoom: CLLocationDistance = 500  // Gleicher Wert wie oben
+            let maxZoom: CLLocationDistance = 500
             let minZoom: CLLocationDistance = 1_000_000
             
             if mapView.camera.centerCoordinateDistance < maxZoom {
@@ -376,6 +379,21 @@ struct MapViewRepresentable: UIViewRepresentable {
                 mapView.camera.centerCoordinateDistance = minZoom
             }
         }
+    }
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if let presented = presentedViewController {
+            return presented.topMostViewController()
+        }
+        if let navigation = self as? UINavigationController {
+            return navigation.visibleViewController?.topMostViewController() ?? navigation
+        }
+        if let tab = self as? UITabBarController {
+            return tab.selectedViewController?.topMostViewController() ?? tab
+        }
+        return self
     }
 }
 

@@ -9,18 +9,15 @@ class OpenStreetMapOverlay: MKTileOverlay {
     init() {
         let template = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         
-        // Cache-Verzeichnis erstellen
         let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)[0]
         cacheDirectory = URL(fileURLWithPath: cachePath).appendingPathComponent("OSMTileCache")
         
         super.init(urlTemplate: template)
         self.canReplaceMapContent = true
         
-        // Memory Cache konfigurieren
         memoryCache.countLimit = 500
-        memoryCache.totalCostLimit = 50 * 1024 * 1024 // 50 MB
+        memoryCache.totalCostLimit = 50 * 1024 * 1024
         
-        // Cache-Verzeichnis erstellen falls nötig
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
     }
     
@@ -29,30 +26,25 @@ class OpenStreetMapOverlay: MKTileOverlay {
         let cacheKey = "\(path.x),\(path.y),\(path.z)" as NSString
         let filePath = cacheDirectory.appendingPathComponent(cacheKey as String)
         
-        // 1. Prüfe Memory Cache
         if let cachedData = memoryCache.object(forKey: cacheKey) {
             result(cachedData as Data, nil)
             return
         }
         
-        // 2. Prüfe Disk Cache
         if let diskData = try? Data(contentsOf: filePath) {
             memoryCache.setObject(diskData as NSData, forKey: cacheKey)
             result(diskData, nil)
             return
         }
         
-        // 3. Lade von Netzwerk
         super.loadTile(at: path) { [weak self] data, error in
             guard let self = self, let tileData = data else {
                 result(data, error)
                 return
             }
             
-            // In Memory Cache speichern
             self.memoryCache.setObject(tileData as NSData, forKey: cacheKey)
             
-            // Auf Festplatte speichern
             try? tileData.write(to: filePath)
             
             result(tileData, error)
@@ -68,18 +60,15 @@ class ShippingRoutesOverlay: MKTileOverlay {
     init() {
         let template = "https://tiles.openseamap.org/routes/{z}/{x}/{y}.png"
         
-        // Cache-Verzeichnis erstellen
         let cachePath = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true)[0]
         cacheDirectory = URL(fileURLWithPath: cachePath).appendingPathComponent("SeaRouteTileCache")
         
         super.init(urlTemplate: template)
         self.canReplaceMapContent = false
         
-        // Memory Cache konfigurieren
         memoryCache.countLimit = 500
-        memoryCache.totalCostLimit = 50 * 1024 * 1024 // 50 MB
+        memoryCache.totalCostLimit = 50 * 1024 * 1024
         
-        // Cache-Verzeichnis erstellen falls nötig
         try? fileManager.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
     }
     
@@ -88,30 +77,25 @@ class ShippingRoutesOverlay: MKTileOverlay {
         let cacheKey = "\(path.x),\(path.y),\(path.z)" as NSString
         let filePath = cacheDirectory.appendingPathComponent(cacheKey as String)
         
-        // 1. Prüfe Memory Cache
         if let cachedData = memoryCache.object(forKey: cacheKey) {
             result(cachedData as Data, nil)
             return
         }
         
-        // 2. Prüfe Disk Cache
         if let diskData = try? Data(contentsOf: filePath) {
             memoryCache.setObject(diskData as NSData, forKey: cacheKey)
             result(diskData, nil)
             return
         }
         
-        // 3. Lade von Netzwerk
         super.loadTile(at: path) { [weak self] data, error in
             guard let self = self, let tileData = data else {
                 result(data, error)
                 return
             }
             
-            // In Memory Cache speichern
             self.memoryCache.setObject(tileData as NSData, forKey: cacheKey)
             
-            // Auf Festplatte speichern
             try? tileData.write(to: filePath)
             
             result(tileData, error)
@@ -189,23 +173,18 @@ struct MapViewRepresentable: UIViewRepresentable {
         mapView.delegate = context.coordinator
         mapView.setRegion(initialRegion, animated: false)
         
-        // Force Light Mode
         mapView.overrideUserInterfaceStyle = .light
         
-        // Zoom-Beschränkungen setzen (OSM unterstützt Levels 0-19)
         mapView.cameraZoomRange = MKMapView.CameraZoomRange(
-            minCenterCoordinateDistance: 500,  // Maximaler Zoom (weiter weg = weniger Zoom)
-            maxCenterCoordinateDistance: 1_000_000  // Minimaler Zoom
+            minCenterCoordinateDistance: 500,
+            maxCenterCoordinateDistance: 1_000_000
         )
         
-        // Start mit Apple Maps
         mapView.mapType = .standard
         
-        // OSM und Schifffahrtswege Layer vorbereiten
         let osmOverlay = OpenStreetMapOverlay()
         let routesOverlay = ShippingRoutesOverlay()
         
-        // Layer initial unsichtbar machen
         context.coordinator.osmRenderer = MKTileOverlayRenderer(overlay: osmOverlay)
         context.coordinator.osmRenderer?.alpha = 0
         context.coordinator.routesRenderer = MKTileOverlayRenderer(overlay: routesOverlay)
@@ -214,20 +193,16 @@ struct MapViewRepresentable: UIViewRepresentable {
         mapView.addOverlay(osmOverlay, level: .aboveLabels)
         mapView.addOverlay(routesOverlay, level: .aboveLabels)
         
-        // Benutzerposition anzeigen
         mapView.showsUserLocation = true
         
-        // Location Manager starten
         locationManager.requestLocationPermission()
         locationManager.startUpdatingLocation()
         
-        // Konfiguration
         mapView.register(
             MKMarkerAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier
         )
         
-        // Locate Me Button hinzufügen
         let locateButton = MKUserTrackingButton(mapView: mapView)
         locateButton.layer.backgroundColor = UIColor.systemBackground.cgColor
         locateButton.layer.cornerRadius = 5
@@ -240,7 +215,6 @@ struct MapViewRepresentable: UIViewRepresentable {
             locateButton.topAnchor.constraint(equalTo: mapView.safeAreaLayoutGuide.topAnchor, constant: 16)
         ])
         
-        // Stationen hinzufügen
         let annotations = stations.compactMap { station -> StationAnnotation? in
             guard let coordinates = station.coordinates else { return nil }
             return StationAnnotation(
@@ -257,7 +231,6 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        // Update wenn sich Stationen ändern
         let currentAnnotations = mapView.annotations.compactMap { $0 as? StationAnnotation }
         let currentStationIds = Set(currentAnnotations.map { $0.station.id })
         let newStationIds = Set(stations.map { $0.id })

@@ -1,4 +1,3 @@
-//
 //  ContentView.swift
 //  Next Wave
 //

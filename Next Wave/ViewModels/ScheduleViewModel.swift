@@ -60,6 +60,7 @@ class ScheduleViewModel: ObservableObject {
     private let settingsKey = "app.settings"
     
     private var midnightTimer: Timer?
+    private var currentLoadingTask: Task<Void, Never>?
     
     init() {
         if let data = userDefaults.data(forKey: settingsKey),
@@ -80,6 +81,7 @@ class ScheduleViewModel: ObservableObject {
     
     deinit {
         midnightTimer?.invalidate()
+        currentLoadingTask?.cancel()
     }
     
     private func saveSettings() {
@@ -97,6 +99,9 @@ class ScheduleViewModel: ObservableObject {
     }
     
     func updateWaves(from departures: [Journey]) {
+        // Cancel any existing loading task
+        currentLoadingTask?.cancel()
+        
         let waves = departures.map { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
@@ -124,14 +129,17 @@ class ScheduleViewModel: ObservableObject {
         nextWaves = waves
         hasAttemptedLoad = true
         
-        // Load ship names asynchronously only for Lake Zurich
-        Task {
+        // Start new loading task
+        currentLoadingTask = Task { @MainActor in
             for index in waves.indices where waves[index].isZurichsee {
+                guard !Task.isCancelled else { return }
+                
                 if let shipName = await VesselAPI.shared.findShipName(
                     for: waves[index].routeNumber,
                     date: selectedDate
                 ) {
-                    await MainActor.run {
+                    guard !Task.isCancelled else { return }
+                    if index < nextWaves.count {
                         nextWaves[index].updateShipName(shipName)
                     }
                 }

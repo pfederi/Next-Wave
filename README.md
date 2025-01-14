@@ -15,18 +15,6 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - 🎨 Clean, intuitive interface
 - 📱 Light & Dark Mode
 
-## Technical Details
-
-- Built with Swift and SwiftUI
-- Uses MapKit for base map functionality
-- OpenStreetMap and OpenSeaMap tile overlays
-- CoreLocation for user positioning
-- Minimum iOS Version: 17.0
-- iPhone support (portrait mode)
-- Local notifications using UserNotifications
-- Custom sound assets
-- Schedule data in JSON format
-
 ## Map Features
 
 - OpenStreetMap integration for detailed water navigation
@@ -116,7 +104,106 @@ All ship stations are displayed. Clicking on the station opens a window where yo
 You can check whether the station is available in the API via https://transport.opendata.ch/v1/locations?query=[uic_ref].
 The link above is for Switzerland. For other countries, you have to find another api to find departure times.
 
-## Feature Ideas Welcome
+### Technical Details
+
+### Ship Data and Wave Calculation
+
+The app uses various systems for collecting ship data and calculating wave characteristics:
+
+#### 1. Vessel Data Scraper and Wave Calculation (`scripts/vesseldata.py`)
+- Automatically extracts technical data of all ZSG ships
+- Collects information like length, width, displacement etc.
+- Calculates based on technical data:
+  - Maximum wave height (m): `H = 0.04 * D * v² / (L * B)`
+  - Wave length (m): `λ = 2π * v² / g`
+  - Wave period (s): `T = √(2π * λ / g)`
+  - Wave velocity (m/s): `c = λ / T`
+  - Wave energy (J/m²): `E = (1/8) * ρ * g * H²`
+  - Wave power (W/m): `P = E * c`
+  - Impact force (N/m²): `F = ρ * g * H * (c²/2)`
+
+Where:
+- D = Displacement [t]
+- v = Velocity [m/s]
+- L = Length [m]
+- B = Beam width [m]
+- g = Gravitational acceleration (9.81 m/s²)
+- ρ = Water density (1000 kg/m³)
+- H = Wave height [m]
+- λ = Wave length [m]
+- T = Wave period [s]
+- c = Wave velocity [m/s]
+
+Additional factors:
+- Froude length number: `Fr_L = v / √(g * L)`
+- Froude depth number: `Fr_h = v / √(g * h)`
+- Reynolds number: `Re = (L * v) / ν`
+  - ν = Kinematic viscosity (1.0e-6 m²/s)
+
+The calculations consider:
+- Ship length and width
+- Displacement
+- Speed (18 km/h)
+- Water depth (10m default)
+- Froude and Reynolds numbers
+
+##### Wave Rating Calculation:
+
+1. **Input Data** for each ship:
+   - Technical data from scraper (length, width, displacement)
+   - Constant values:
+     - Speed: 18 km/h (5 m/s)
+     - Water depth: 10m
+     - Water density: 1000 kg/m³
+
+2. **Calculation Steps**:
+   a) Calculate maximum wave height (H)
+   b) Derive wave energy (E) and impact force (F)
+   c) Compare with thresholds:
+      - Energy: <150 J/m² → 1 wave, 150-250 J/m² → 2 waves, >250 J/m² → 3 waves
+      - Force: <45000 N/m² → 1 wave, 45000-55000 N/m² → 2 waves, >55000 N/m² → 3 waves
+   d) Final rating is the higher of both values
+
+3. **Example Calculation MS Panta Rhei**:
+   - Length: 56.6m, Width: 10.7m, Displacement: 382t
+   - Wave height: H = 0.63m
+   - Wave energy: E = 488 J/m² → 3 waves
+   - Impact force: F = 77347 N/m² → 3 waves
+   - Result: 3 waves
+
+4. **Example Calculation MS Bachtel**:
+   - Length: 33.3m, Width: 6.3m, Displacement: 64t
+   - Wave height: H = 0.31m
+   - Wave energy: E = 114 J/m² → 1 wave
+   - Impact force: F = 37409 N/m² → 1 wave
+   - Result: 1 wave
+
+##### Wave Rating (1-3 waves):
+- **Strong waves (3)**: MS Panta Rhei, MS Albis
+  - High wave energy (>250 J/m²)
+  - High impact force (>55000 N/m²)
+  
+- **Medium waves (2)**: MS Wädenswil, MS Limmat, MS Helvetia, MS Linth
+  - Medium wave energy (150-250 J/m²)
+  - Medium impact force (45000-55000 N/m²)
+  
+- **Light waves (1)**: MS Bachtel, DS Stadt Rapperswil, DS Stadt Zürich, MS Säntis
+  - Low wave energy (<150 J/m²)
+  - Low impact force (<45000 N/m²)
+
+Execution: `python3 scripts/vesseldata.py`
+Saves data to `schiffsdaten.csv`
+
+#### 2. Vessel API (`api/ships.ts`)
+- Vercel-based API for real-time ship deployments
+- Provides current ship-course assignments
+- Currently only available for Lake Zurich
+- Endpoint: `/api/ships`
+- Cache system for optimal performance
+- Automatic updates every 15 minutes
+- Nightly verification of ship deployments for the next day
+
+# Feature Ideas Welcome
 
 Have an idea for improving Next Wave? We're always open to suggestions from the community! Whether it's new features, usability improvements, or support for additional lakes - we'd love to hear from you. Feel free to open an issue on GitHub to discuss your ideas or contribute directly through a pull request.
 

@@ -11,7 +11,13 @@ struct WaveEvent: Identifiable, Equatable {
     let neighborStop: String
     let neighborStopName: String
     let period: String
+    let lake: String
+    private(set) var shipName: String?
     var hasNotification = false
+    
+    var isZurichsee: Bool {
+        lake == "Zürichsee"
+    }
     
     var timeString: String {
         return AppDateFormatter.formatTime(time)
@@ -25,6 +31,10 @@ struct WaveEvent: Identifiable, Equatable {
         isArrival ? .arrival : .departure
     }
     
+    mutating func updateShipName(_ name: String) {
+        shipName = name
+    }
+    
     static func == (lhs: WaveEvent, rhs: WaveEvent) -> Bool {
         lhs.id == rhs.id &&
         lhs.time == rhs.time &&
@@ -34,6 +44,8 @@ struct WaveEvent: Identifiable, Equatable {
         lhs.neighborStop == rhs.neighborStop &&
         lhs.neighborStopName == rhs.neighborStopName &&
         lhs.period == rhs.period &&
+        lhs.lake == rhs.lake &&
+        lhs.shipName == rhs.shipName &&
         lhs.hasNotification == rhs.hasNotification
     }
 }

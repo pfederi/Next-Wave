@@ -45,7 +45,7 @@ private struct TimeColumn: View {
             Text(formattedTime)
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(isPast ? .gray : .primary)
-            if isCurrentDay, let date = DateTimeUtils.parseTime(formattedTime) {
+            if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
                 RemainingTimeView(targetDate: date)
                     .padding(.top, 6)
             }
@@ -125,18 +125,55 @@ private struct InfoColumn: View {
             }
             
             HStack(spacing: 8) {
-                Text(wave.routeNumber.replacingOccurrences(of: "^0+", with: "", options: .regularExpression))
+                Text(wave.routeNumber)
                     .font(.caption)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(Color.gray.opacity(colorScheme == .dark ? 0.4 : 0.1))
                     .cornerRadius(12)
                 
-                Text("→ \(wave.neighborStopName)")
+                if wave.isZurichsee {
+                    HStack(spacing: 4) {
+                        HStack(spacing: 4) {
+                            Text(wave.shipName ?? "Loading...")
+                            if let shipName = wave.shipName {
+                                Image(getWaveIcon(for: shipName))
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 10)
+                            }
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.1))
+                        .cornerRadius(12)
+                        .fixedSize(horizontal: true, vertical: false)
+                    }
+                }
+                
+                Text("→")
                     .font(.caption)
                     .foregroundColor(isPast ? .gray : .primary)
+                
+                Text(wave.neighborStopName)
+                    .font(.caption)
+                    .foregroundColor(isPast ? .gray : .primary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
         }
+    }
+}
+
+private func getWaveIcon(for shipName: String) -> String {
+    switch shipName {
+        case "MS Panta Rhei", "MS Albis":
+            return "water.waves3"
+        case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth":
+            return "water.waves2"
+        default:
+            return "water.waves1"
     }
 }
 

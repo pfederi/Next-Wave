@@ -3,6 +3,17 @@ import UserNotifications
 import SwiftUI
 import BackgroundTasks
 
+// Helper extension for async map
+extension Array {
+    func asyncMap<T>(_ transform: (Element) async throws -> T) async rethrows -> [T] {
+        var values = [T]()
+        for element in self {
+            try await values.append(transform(element))
+        }
+        return values
+    }
+}
+
 class ScheduleViewModel: ObservableObject {
     @Published private(set) var settings: Settings {
         didSet {
@@ -13,10 +24,12 @@ class ScheduleViewModel: ObservableObject {
     struct Settings: Codable {
         var leadTime: Int
         var selectedSound: String
+        var shipName: String
         
         static let `default` = Settings(
             leadTime: 5,
-            selectedSound: "boat-horn"
+            selectedSound: "boat-horn",
+            shipName: "Unknown"
         )
     }
     
@@ -30,7 +43,15 @@ class ScheduleViewModel: ObservableObject {
     ]
     
     @Published var notifiedJourneys: Set<String> = []
-    @Published var selectedDate: Date = Date()
+    @Published var selectedDate: Date = Date() {
+        didSet {
+            if !Calendar.current.isDate(selectedDate, inSameDayAs: oldValue) {
+                // Clear waves when date changes
+                nextWaves = []
+                hasAttemptedLoad = false
+            }
+        }
+    }
     @Published var hasAttemptedLoad: Bool = false
     @Published var nextWaves: [WaveEvent] = []
     
@@ -68,28 +89,54 @@ class ScheduleViewModel: ObservableObject {
     }
     
     func updateLeadTime(_ newValue: Int) {
-        settings = Settings(leadTime: newValue, selectedSound: settings.selectedSound)
+        settings = Settings(leadTime: newValue, selectedSound: settings.selectedSound, shipName: settings.shipName)
     }
     
     func updateSound(_ newValue: String) {
-        settings = Settings(leadTime: settings.leadTime, selectedSound: newValue)
+        settings = Settings(leadTime: settings.leadTime, selectedSound: newValue, shipName: settings.shipName)
     }
     
     func updateWaves(from departures: [Journey]) {
-        let waves = departures.map { journey in
-            WaveEvent(
-                time: AppDateFormatter.parseFullTime(journey.stop.departure ?? "") ?? Date(),
-                isArrival: false,
-                routeNumber: journey.name ?? "Unknown",
+        let waves = departures.map { journey -> WaveEvent in
+            let routeNumber = (journey.name ?? "Unknown")
+                .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
+            
+            let departureTime = AppDateFormatter.parseFullTime(journey.stop.departure ?? "") ?? Date()
+            let nextStation = journey.passList?.dropFirst().first?.station
+            
+            // Nur ZSG Stationen (85036 prefix)
+            let isZurichsee = journey.stop.station.id.hasPrefix("85036")
+            
+            return WaveEvent(
+                time: departureTime,
+                isArrival: journey.stop.arrival != nil,
+                routeNumber: routeNumber,
                 routeName: journey.stop.station.name ?? "Unknown",
                 neighborStop: journey.to ?? journey.stop.station.id,
-                neighborStopName: journey.passList?.dropFirst().first?.station.name ?? "Unknown",
-                period: "regular"
+                neighborStopName: nextStation?.name ?? "Unknown",
+                period: "regular",
+                lake: isZurichsee ? "Zürichsee" : "Unknown",
+                shipName: nil,
+                hasNotification: false
             )
         }
         
         nextWaves = waves
         hasAttemptedLoad = true
+        
+        // Load ship names asynchronously only for Lake Zurich
+        Task {
+            for index in waves.indices where waves[index].isZurichsee {
+                if let shipName = await VesselAPI.shared.findShipName(
+                    for: waves[index].routeNumber,
+                    date: selectedDate
+                ) {
+                    await MainActor.run {
+                        nextWaves[index].updateShipName(shipName)
+                    }
+                }
+            }
+        }
     }
     
     private func loadNotifications() {

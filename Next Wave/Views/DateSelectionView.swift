@@ -3,6 +3,7 @@ import SwiftUI
 struct DateSelectionView: View {
     @Binding var selectedDate: Date
     let viewModel: LakeStationsViewModel
+    @EnvironmentObject var scheduleViewModel: ScheduleViewModel
     
     var body: some View {
         HStack {
@@ -11,6 +12,7 @@ struct DateSelectionView: View {
                     if let newDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) {
                         selectedDate = newDate
                         viewModel.selectedDate = newDate
+                        scheduleViewModel.selectedDate = newDate
                         Task {
                             await viewModel.refreshDepartures()
                         }
@@ -36,6 +38,7 @@ struct DateSelectionView: View {
                     if let newDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) {
                         selectedDate = newDate
                         viewModel.selectedDate = newDate
+                        scheduleViewModel.selectedDate = newDate
                         Task {
                             await viewModel.refreshDepartures()
                         }

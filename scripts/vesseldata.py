@@ -193,10 +193,10 @@ class ShipScraper:
                         table = accordion.find("table")
                         if table:
                             for row in table.find_all("tr"):
-                                cols = row.find_all("td")
+    cols = row.find_all("td")
                                 if len(cols) == 2:
-                                    key = cols[0].text.strip()
-                                    value = cols[1].text.strip()
+        key = cols[0].text.strip()
+        value = cols[1].text.strip()
                                     tech_info[key] = value
 
             # Add ship name and URL to the data

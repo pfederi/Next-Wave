@@ -6,7 +6,6 @@ struct DeparturesListView: View {
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
-    @State private var isRefreshing = false
     @State private var errorMessage: String?
     
     private var isCurrentDay: Bool {
@@ -28,41 +27,30 @@ struct DeparturesListView: View {
         } else if !departures.isEmpty {
             ScrollViewReader { proxy in
                 List {
-                    ForEach(Array(scheduleViewModel.nextWaves.enumerated()), id: \.element.id) { index, wave in
-                        DepartureRowView(
-                            wave: wave,
-                            index: index,
-                            formattedTime: AppDateFormatter.formatTime(wave.time),
-                            isPast: wave.time < Date(),
-                            isCurrentDay: isCurrentDay,
-                            scheduleViewModel: scheduleViewModel
-                        )
+                    if !scheduleViewModel.nextWaves.isEmpty {
+                        ForEach(scheduleViewModel.nextWaves) { wave in
+                            DepartureRowView(
+                                wave: wave,
+                                index: scheduleViewModel.nextWaves.firstIndex(of: wave) ?? 0,
+                                formattedTime: AppDateFormatter.formatTime(wave.time),
+                                isPast: wave.time < Date(),
+                                isCurrentDay: isCurrentDay,
+                                scheduleViewModel: scheduleViewModel
+                            )
+                        }
                     }
                 }
                 .listStyle(.plain)
-                .refreshable {
-                    if !isRefreshing {
-                        isRefreshing = true
-                        await viewModel.refreshDepartures()
-                        scheduleViewModel.updateWaves(from: departures)
-                        try? await Task.sleep(nanoseconds: 500_000_000)
-                        isRefreshing = false
-                    }
-                }
                 .task {
                     scheduleViewModel.updateWaves(from: departures)
-                    if let nextWave = scheduleViewModel.nextWaves.first(where: { !($0.time < Date()) }) {
-                        proxy.scrollTo(nextWave.id, anchor: .top)
+                    if !scheduleViewModel.nextWaves.isEmpty {
+                        scrollToNextWave(proxy: proxy)
                     }
                 }
                 .onChange(of: viewModel.selectedDate) { oldDate, newDate in
                     scheduleViewModel.updateWaves(from: departures)
-                }
-                .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
-                    if let nextWave = newWaves.first(where: { !($0.time < Date()) }) {
-                        withAnimation {
-                            proxy.scrollTo(nextWave.id, anchor: .top)
-                        }
+                    if !scheduleViewModel.nextWaves.isEmpty {
+                        scrollToNextWave(proxy: proxy)
                     }
                 }
             }
@@ -77,6 +65,14 @@ struct DeparturesListView: View {
                         .foregroundColor(Color("text-color"))
                 }
                 Spacer()
+            }
+        }
+    }
+    
+    private func scrollToNextWave(proxy: ScrollViewProxy) {
+        if let nextWave = scheduleViewModel.nextWaves.first(where: { !($0.time < Date()) }) {
+            withAnimation {
+                proxy.scrollTo(nextWave.id, anchor: .top)
             }
         }
     }

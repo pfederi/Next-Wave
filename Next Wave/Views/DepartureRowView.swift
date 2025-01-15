@@ -169,11 +169,11 @@ private struct InfoColumn: View {
 private func getWaveIcon(for shipName: String) -> String {
     switch shipName {
         case "MS Panta Rhei", "MS Albis":
-            return "water.waves3"
+            return "waves3"
         case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth":
-            return "water.waves2"
+            return "waves2"
         default:
-            return "water.waves1"
+            return "waves1"
     }
 }
 

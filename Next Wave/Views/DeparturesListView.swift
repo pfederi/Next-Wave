@@ -37,19 +37,20 @@ struct DeparturesListView: View {
                                 isCurrentDay: isCurrentDay,
                                 scheduleViewModel: scheduleViewModel
                             )
+                            .id(wave.id)
                         }
                     }
                 }
                 .listStyle(.plain)
-                .task {
+                .onAppear {
                     scheduleViewModel.updateWaves(from: departures)
-                    if !scheduleViewModel.nextWaves.isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         scrollToNextWave(proxy: proxy)
                     }
                 }
                 .onChange(of: viewModel.selectedDate) { oldDate, newDate in
                     scheduleViewModel.updateWaves(from: departures)
-                    if !scheduleViewModel.nextWaves.isEmpty {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         scrollToNextWave(proxy: proxy)
                     }
                 }
@@ -70,9 +71,13 @@ struct DeparturesListView: View {
     }
     
     private func scrollToNextWave(proxy: ScrollViewProxy) {
-        if let nextWave = scheduleViewModel.nextWaves.first(where: { !($0.time < Date()) }) {
+        let now = Date()
+        if let currentOrNextWave = scheduleViewModel.nextWaves.first(where: { wave in
+            let timeDifference = wave.time.timeIntervalSince(now)
+            return timeDifference >= -300 // Within 5 minutes in the past or any future departure
+        }) {
             withAnimation {
-                proxy.scrollTo(nextWave.id, anchor: .top)
+                proxy.scrollTo(currentOrNextWave.id, anchor: .top)
             }
         }
     }

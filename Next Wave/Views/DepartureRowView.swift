@@ -18,8 +18,9 @@ struct DepartureRowView: View {
             
             InfoColumn(wave: wave, 
                       index: index, 
-                      isPast: isPast, 
-                      hasNotification: scheduleViewModel.hasNotification(for: wave))
+                      isPast: isPast,
+                      hasNotification: scheduleViewModel.hasNotification(for: wave),
+                      isCurrentDay: isCurrentDay)
             
             Spacer()
         }
@@ -105,6 +106,7 @@ private struct InfoColumn: View {
     let index: Int
     let isPast: Bool
     let hasNotification: Bool
+    let isCurrentDay: Bool
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -132,7 +134,7 @@ private struct InfoColumn: View {
                     .background(Color.gray.opacity(colorScheme == .dark ? 0.4 : 0.1))
                     .cornerRadius(12)
                 
-                if wave.isZurichsee {
+                if wave.isZurichsee && isCurrentDay {
                     HStack(spacing: 4) {
                         HStack(spacing: 4) {
                             Text(wave.shipName ?? "Loading...")

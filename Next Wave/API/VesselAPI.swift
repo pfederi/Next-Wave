@@ -29,17 +29,17 @@ struct VesselResponse: Codable {
             return false
         }
         
-        return Date().timeIntervalSince(updateDate) < 24 * 60 * 60
+        // Prüfe ob die Daten vom gleichen Tag sind
+        return Calendar.current.isDate(updateDate, inSameDayAs: Date())
     }
 }
 
 class VesselAPI {
     static let shared = VesselAPI()
     private let baseURL = "https://vesseldata-api.vercel.app/api"
-    private let cacheTimeout: TimeInterval = 15 * 60 // 15 Minuten Cache
     
     private var cachedResponse: VesselResponse?
-    private var lastFetchTime: Date?
+    private var lastFetchDate: Date?
     
     // Cache für Schiffsnamen: [datum_kursnummer: schiffname]
     private var shipNameCache: [String: String] = [:]
@@ -53,9 +53,10 @@ class VesselAPI {
     private init() {}
     
     func fetchShipData() async throws -> VesselResponse {
+        // Prüfe ob wir bereits Daten vom heutigen Tag haben
         if let cached = cachedResponse,
-           let lastFetch = lastFetchTime,
-           Date().timeIntervalSince(lastFetch) < cacheTimeout {
+           let lastFetch = lastFetchDate,
+           Calendar.current.isDate(lastFetch, inSameDayAs: Date()) {
             return cached
         }
         
@@ -75,7 +76,9 @@ class VesselAPI {
         
         if vesselResponse.isDataCurrent {
             cachedResponse = vesselResponse
-            lastFetchTime = Date()
+            lastFetchDate = Date()
+            // Leere den shipNameCache wenn wir neue Daten erhalten
+            shipNameCache.removeAll()
         }
         
         return vesselResponse

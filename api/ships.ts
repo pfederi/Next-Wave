@@ -12,10 +12,18 @@ interface DailyDeployment {
   routes: ShipRoute[]
 }
 
+interface CachedData {
+  dailyDeployments: DailyDeployment[]
+  lastUpdated: string
+  debug: {
+    daysProcessed: number
+    firstDay: string
+    lastDay: string
+  }
+}
+
 function cleanShipName(rawName: string): string {
-  // Extract only the ship name from the title link
   const name = rawName.replace(/\n/g, ' ').trim()
-  // Remove any "Kurs" numbers that might be in the name
   return name.split('Kurs')[0].trim()
 }
 
@@ -41,11 +49,9 @@ async function fetchDayData(date: string): Promise<ShipRoute[]> {
 
   $('.ship').each((_, shipElement) => {
     const $ship = $(shipElement)
-    // Find the title link and clean the ship name
     const rawShipName = $ship.find('.legend .title').first().text()
     const shipName = cleanShipName(rawShipName)
 
-    // Only process ships that have routes
     if ($ship.find('.disposition').length > 0) {
       $ship.find('.disposition').each((_, routeElement) => {
         const courseNumber = $(routeElement).find('.cruise span:last-child').first().text().trim()
@@ -60,34 +66,33 @@ async function fetchDayData(date: string): Promise<ShipRoute[]> {
   return routes
 }
 
-export async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], debug?: any}> {
+// Get current date in Swiss timezone
+function getCurrentSwissDate(): Date {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Zurich' }))
+}
+
+async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], debug?: any}> {
   try {
     const dailyDeployments: DailyDeployment[] = []
-    const today = new Date()
+    const today = getCurrentSwissDate()
+    const currentDate = today.toISOString().split('T')[0]
     
-    // Fetch next 7 days in parallel
-    const promises = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(today)
-      date.setDate(date.getDate() + i)
-      return {
-        date: date.toISOString().split('T')[0],
-        promise: fetchDayData(date.toISOString().split('T')[0])
-      }
+    // Only fetch current day
+    const routes = await fetchDayData(currentDate)
+    
+    dailyDeployments.push({
+      date: currentDate,
+      routes: routes
     })
-    
-    const results = await Promise.all(promises.map(({ promise }) => promise))
-    
-    dailyDeployments.push(...promises.map(({ date }, index) => ({
-      date,
-      routes: results[index]
-    })))
 
     return { 
       dailyDeployments,
       debug: {
-        daysProcessed: dailyDeployments.length,
-        firstDay: dailyDeployments[0]?.date,
-        lastDay: dailyDeployments[dailyDeployments.length - 1]?.date
+        daysProcessed: 1,
+        firstDay: currentDate,
+        lastDay: currentDate,
+        processedDates: [currentDate],
+        swissTime: today.toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
       }
     }
     
@@ -97,26 +102,82 @@ export async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeploym
   }
 }
 
+// Check if data needs to be updated (once per day)
+function needsUpdate(lastUpdated: string): boolean {
+  const lastUpdate = new Date(lastUpdated)
+  const now = getCurrentSwissDate()
+  return lastUpdate.toDateString() !== now.toDateString()
+}
+
+// Cache key for the current day
+function getCacheKey(): string {
+  return `vessel-data-${getCurrentSwissDate().toISOString().split('T')[0]}`
+}
+
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET')
+  res.setHeader('Cache-Control', 's-maxage=86400') // Cache for 24 hours
   
   try {
-    const result = await parseZSGWebsite()
+    const cacheKey = getCacheKey()
+    const today = getCurrentSwissDate().toISOString().split('T')[0]
+    
+    // Try to get data from cache
+    const cachedData = await fetch(`https://${req.headers.host}/_vercel/kv/${cacheKey}`).then(r => r.json()).catch(() => null) as CachedData | null
+
+    let result: CachedData
+
+    // If no cached data or needs update, fetch new data
+    if (!cachedData || needsUpdate(cachedData.lastUpdated)) {
+      const newData = await parseZSGWebsite()
+      result = {
+        dailyDeployments: newData.dailyDeployments,
+        lastUpdated: getCurrentSwissDate().toISOString(),
+        debug: newData.debug
+      }
+
+      // Store new data in cache
+      await fetch(`https://${req.headers.host}/_vercel/kv/${cacheKey}`, {
+        method: 'PUT',
+        body: JSON.stringify(result),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    } else {
+      result = cachedData
+    }
+
+    // Filter to only return today's deployments
+    const todayDeployment = result.dailyDeployments.find(d => d.date === today) || {
+      date: today,
+      routes: []
+    }
+
     return res.status(200).json({
-      dailyDeployments: result.dailyDeployments,
-      lastUpdated: new Date().toISOString(),
-      debug: result.debug
+      dailyDeployments: [todayDeployment],
+      lastUpdated: result.lastUpdated,
+      debug: {
+        ...result.debug,
+        daysProcessed: 1,
+        firstDay: today,
+        lastDay: today,
+        currentSwissTime: getCurrentSwissDate().toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
+      }
     })
 
   } catch (error) {
     console.error('API Error:', error)
     return res.status(500).json({
-      dailyDeployments: [],
-      lastUpdated: new Date().toISOString(),
+      dailyDeployments: [{
+        date: getCurrentSwissDate().toISOString().split('T')[0],
+        routes: []
+      }],
+      lastUpdated: getCurrentSwissDate().toISOString(),
       error: error instanceof Error ? error.message : 'Unknown error'
     })
   }

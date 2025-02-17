@@ -6,6 +6,8 @@ struct DeparturesListView: View {
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
+    @StateObject private var analyticsViewModel = WaveAnalyticsViewModel()
+    @State private var showingAnalytics = false
     @State private var errorMessage: String?
     
     private var isCurrentDay: Bool {
@@ -13,59 +15,89 @@ struct DeparturesListView: View {
     }
     
     var body: some View {
-        if viewModel.isLoading {
-            LoaderView()
-        } else if let error = viewModel.error {
-            VStack {
-                Spacer()
-                Text(error)
-                    .foregroundColor(.red)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                Spacer()
-            }
-        } else if !departures.isEmpty {
-            ScrollViewReader { proxy in
-                List {
-                    if !scheduleViewModel.nextWaves.isEmpty {
-                        ForEach(scheduleViewModel.nextWaves) { wave in
-                            DepartureRowView(
-                                wave: wave,
-                                index: scheduleViewModel.nextWaves.firstIndex(of: wave) ?? 0,
-                                formattedTime: AppDateFormatter.formatTime(wave.time),
-                                isPast: wave.time < Date(),
-                                isCurrentDay: isCurrentDay,
-                                scheduleViewModel: scheduleViewModel
-                            )
-                            .id(wave.id)
+        VStack(spacing: 0) {
+            if showingAnalytics {
+                WaveAnalyticsView(
+                    viewModel: analyticsViewModel,
+                    spotId: selectedStation?.id ?? "",
+                    spotName: selectedStation?.name ?? "",
+                    allWaves: scheduleViewModel.nextWaves
+                )
+            } else {
+                if viewModel.isLoading {
+                    LoaderView()
+                } else if let error = viewModel.error {
+                    VStack {
+                        Spacer()
+                        Text(error)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Spacer()
+                    }
+                } else if !departures.isEmpty {
+                    ScrollViewReader { proxy in
+                        List {
+                            if !scheduleViewModel.nextWaves.isEmpty {
+                                ForEach(scheduleViewModel.nextWaves) { wave in
+                                    DepartureRowView(
+                                        wave: wave,
+                                        index: scheduleViewModel.nextWaves.firstIndex(of: wave) ?? 0,
+                                        formattedTime: AppDateFormatter.formatTime(wave.time),
+                                        isPast: wave.time < Date(),
+                                        isCurrentDay: isCurrentDay,
+                                        scheduleViewModel: scheduleViewModel
+                                    )
+                                    .id(wave.id)
+                                }
+                            }
+                        }
+                        .listStyle(.plain)
+                        .onAppear {
+                            scheduleViewModel.updateWaves(from: departures)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                scrollToNextWave(proxy: proxy)
+                            }
+                        }
+                        .onChange(of: viewModel.selectedDate) { oldDate, newDate in
+                            scheduleViewModel.updateWaves(from: departures)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                scrollToNextWave(proxy: proxy)
+                            }
                         }
                     }
-                }
-                .listStyle(.plain)
-                .onAppear {
-                    scheduleViewModel.updateWaves(from: departures)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        scrollToNextWave(proxy: proxy)
-                    }
-                }
-                .onChange(of: viewModel.selectedDate) { oldDate, newDate in
-                    scheduleViewModel.updateWaves(from: departures)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        scrollToNextWave(proxy: proxy)
+                } else if viewModel.hasAttemptedLoad {
+                    VStack {
+                        Spacer()
+                        Text("No departures found for \(selectedStation?.name ?? "")")
+                            .foregroundColor(Color("text-color"))
+                            .multilineTextAlignment(.center)
+                        if !Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: Date()) {
+                            Text("on \(formattedDate(viewModel.selectedDate))")
+                                .foregroundColor(Color("text-color"))
+                        }
+                        Spacer()
                     }
                 }
             }
-        } else if viewModel.hasAttemptedLoad {
-            VStack {
-                Spacer()
-                Text("No departures found for \(selectedStation?.name ?? "")")
-                    .foregroundColor(Color("text-color"))
-                    .multilineTextAlignment(.center)
-                if !Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: Date()) {
-                    Text("on \(formattedDate(viewModel.selectedDate))")
-                        .foregroundColor(Color("text-color"))
+        }
+        .toolbar {
+            if !departures.isEmpty {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingAnalytics.toggle()
+                        if showingAnalytics {
+                            analyticsViewModel.analyzeWaves(
+                                scheduleViewModel.nextWaves,
+                                for: selectedStation?.id ?? "",
+                                spotName: selectedStation?.name ?? ""
+                            )
+                        }
+                    }) {
+                        Image(systemName: showingAnalytics ? "list.bullet" : "chart.bar")
+                            .foregroundColor(.accentColor)
+                    }
                 }
-                Spacer()
             }
         }
     }

@@ -72,18 +72,19 @@ struct ContentView: View {
                                     )
                                     .padding(.top, 16)
                                 }
+                            } else {
+                                Image("background")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .padding(.top, 32)
+                                    .clipped()
+                                    .ignoresSafeArea(edges: .bottom)
                             }
                         }
                     }
                     
                     Spacer(minLength: 0)
-                    
-                    if viewModel.selectedStation == nil {
-                        Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 16)
-                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color("background-color"))
@@ -91,15 +92,30 @@ struct ContentView: View {
                     LocationPickerView(viewModel: viewModel)
                 }
                 .toolbar {
+                    if viewModel.selectedStation != nil {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button(action: {
+                                viewModel.selectedStation = nil
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chevron.left")
+                                    Text("Back")
+                                }
+                                .foregroundColor(.accentColor)
+                            }
+                        }
+                    }
                     ToolbarItem(placement: .principal) {
                         Text("Next Wave")
                             .font(.headline)
                             .foregroundColor(Color("text-color"))
                     }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: SettingsView()) {
-                            Image(systemName: "gearshape")
-                                .foregroundColor(.accentColor)
+                    if viewModel.selectedStation == nil {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            NavigationLink(destination: SettingsView()) {
+                                Image(systemName: "gearshape")
+                                    .foregroundColor(.accentColor)
+                            }
                         }
                     }
                 }

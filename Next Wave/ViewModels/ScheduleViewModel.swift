@@ -17,19 +17,19 @@ extension Array {
 class ScheduleViewModel: ObservableObject {
     @Published private(set) var settings: Settings {
         didSet {
-            saveSettings()
+            DispatchQueue.main.async {
+                self.saveSettings()
+            }
         }
     }
     
     struct Settings: Codable {
         var leadTime: Int
         var selectedSound: String
-        var shipName: String
         
         static let `default` = Settings(
             leadTime: 5,
-            selectedSound: "boat-horn",
-            shipName: "Unknown"
+            selectedSound: "boat-horn"
         )
     }
     
@@ -62,6 +62,8 @@ class ScheduleViewModel: ObservableObject {
     private var midnightTimer: Timer?
     private var currentLoadingTask: Task<Void, Never>?
     
+    private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen
+    
     init() {
         if let data = userDefaults.data(forKey: settingsKey),
            let decoded = try? JSONDecoder().decode(Settings.self, from: data) {
@@ -91,11 +93,15 @@ class ScheduleViewModel: ObservableObject {
     }
     
     func updateLeadTime(_ newValue: Int) {
-        settings = Settings(leadTime: newValue, selectedSound: settings.selectedSound, shipName: settings.shipName)
+        DispatchQueue.main.async {
+            self.settings = Settings(leadTime: newValue, selectedSound: self.settings.selectedSound)
+        }
     }
     
     func updateSound(_ newValue: String) {
-        settings = Settings(leadTime: settings.leadTime, selectedSound: newValue, shipName: settings.shipName)
+        DispatchQueue.main.async {
+            self.settings = Settings(leadTime: self.settings.leadTime, selectedSound: newValue)
+        }
     }
     
     func updateWaves(from departures: [Journey]) {
@@ -132,15 +138,21 @@ class ScheduleViewModel: ObservableObject {
         // Start new loading task
         currentLoadingTask = Task { @MainActor in
             for index in waves.indices where waves[index].isZurichsee {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled else {
+                    return
+                }
                 
                 if let shipName = await VesselAPI.shared.findShipName(
                     for: waves[index].routeNumber,
                     date: selectedDate
                 ) {
-                    guard !Task.isCancelled else { return }
+                    guard !Task.isCancelled else {
+                        return
+                    }
                     if index < nextWaves.count {
                         nextWaves[index].updateShipName(shipName)
+                    } else {
+                        print("Index \(index) out of bounds for nextWaves array with count \(nextWaves.count)")
                     }
                 }
             }
@@ -271,5 +283,35 @@ class ScheduleViewModel: ObservableObject {
             self.selectedDate = Date()
             self.loadNotifications()
         }
+    }
+    
+    func cancelCurrentTask() {
+        currentLoadingTask?.cancel()
+        currentLoadingTask = nil
+    }
+    
+    func preloadShipNames(for departures: [Journey]) {
+        // Capture what we need from self at the start
+        let selectedDate = self.selectedDate
+        
+        Task { @MainActor in
+            for journey in departures {
+                let routeNumber = (journey.name ?? "Unknown")
+                    .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
+                
+                // Check if name is already in cache
+                if self.shipNamesCache[routeNumber] == nil {
+                    if let shipName = await VesselAPI.shared.findShipName(for: routeNumber, date: selectedDate) {
+                        // Update cache directly on main actor
+                        self.shipNamesCache[routeNumber] = shipName
+                        print("Caching ship name: \(shipName) for route: \(routeNumber)")
+                    }
+                }
+            }
+        }
+    }
+
+    func getShipName(for routeNumber: String) -> String? {
+        return shipNamesCache[routeNumber]
     }
 }

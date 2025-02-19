@@ -7,6 +7,7 @@ struct WaveTimelineChart: View {
     @Environment(\.colorScheme) var colorScheme
     
     @State private var sunTimes: SunTimes?
+    @State private var scrollOffset: CGFloat = 0
     
     private let chartHeight: CGFloat = 80
     private let hourWidth: CGFloat = 120
@@ -208,6 +209,7 @@ struct WaveTimelineChart: View {
                     }
                 }
                 .padding(.horizontal, 16)
+                .offset(x: -scrollOffset)
             }
         }
         .frame(height: chartHeight + 16)
@@ -222,6 +224,16 @@ struct WaveTimelineChart: View {
                     sunTimes = try await SunTimeService.shared.getSunTimes(date: firstWave.time)
                 } catch {
                     print("Error fetching sun times: \(error)")
+                }
+            }
+            
+            // Calculate initial scroll position
+            if let range = chartRange {
+                let now = Date()
+                if now >= range.start && now <= range.end {
+                    let offset = xPosition(for: now)
+                    // Center the current time in the view
+                    scrollOffset = max(0, offset - 120) // 120 is about one hour width
                 }
             }
         }

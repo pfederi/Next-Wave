@@ -1,5 +1,14 @@
 import SwiftUI
 
+extension UserDefaults {
+    func bool(forKey key: String, defaultValue: Bool) -> Bool {
+        if object(forKey: key) == nil {
+            return defaultValue
+        }
+        return bool(forKey: key)
+    }
+}
+
 class AppSettings: ObservableObject {
     enum Theme: String, Codable {
         case light, dark, system
@@ -20,6 +29,12 @@ class AppSettings: ObservableObject {
     @Published var lastMapRegion: MapRegion {
         didSet {
             UserDefaults.standard.set(try? JSONEncoder().encode(lastMapRegion), forKey: "lastMapRegion")
+        }
+    }
+    
+    @Published var showNearestStation: Bool {
+        didSet {
+            UserDefaults.standard.set(showNearestStation, forKey: "showNearestStation")
         }
     }
     
@@ -52,6 +67,9 @@ class AppSettings: ObservableObject {
                 longitudeDelta: 3
             )
         }
+        
+        // Initialize showNearestStation with default value true
+        self.showNearestStation = UserDefaults.standard.bool(forKey: "showNearestStation", defaultValue: true)
     }
 }
 

@@ -4,6 +4,7 @@ import AVFoundation
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
+    @EnvironmentObject var appSettings: AppSettings
     @State private var audioPlayer: AVAudioPlayer?
     
     let availableLeadTimes = [3, 5, 10, 15]
@@ -20,6 +21,29 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Group {
                     ThemeToggleView()
+                    Divider()
+                    
+                    // Nearest Station Toggle
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Display Options")
+                            .font(.headline)
+                        
+                        Toggle(isOn: $appSettings.showNearestStation) {
+                            HStack {
+                                Image(systemName: "location.fill")
+                                    .foregroundColor(Color("text-color"))
+                                    .font(.system(size: 20))
+                                    .padding(.trailing, 8)
+                                
+                                Text("Show Nearest Station")
+                                    .foregroundColor(Color("text-color"))
+                                    .font(.system(size: 17, weight: .regular))
+                            }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                    }
+                    
                     Divider()
                     
                     VStack(alignment: .leading, spacing: 8) {

@@ -2,13 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>BGTaskSchedulerPermittedIdentifiers</key>
-    <array>
-        <string>com.nextwave.midnight</string>
-    </array>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Next Wave needs your location to find the nearest boat station.</string>
-    <key>NSLocationUsageDescription</key>
-    <string>Your location is needed to show you the nearest stations.</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.nextwave.midnight</string>
+	</array>
 </dict>
-</plist> 
+</plist>

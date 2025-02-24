@@ -181,6 +181,31 @@ struct SettingsView: View {
                         .padding(.vertical, 8)
                     }
                     .tint(Color("text-color"))
+
+                    DisclosureGroup("Other Useful Foiling Apps") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach([
+                                ("7lll Water", "https://apps.apple.com/us/app/7iii-water-downwind-winging/id6495238780"),
+                                ("Foil Mates", "https://apps.apple.com/ch/app/foil-mates/id6514323603")
+                            ], id: \.0) { app in
+                                HStack(alignment: .top, spacing: 8) {
+                                    Text("•")
+                                    Text(app.0)
+                                        .foregroundColor(.accentColor)
+                                        .underline(true, color: .accentColor)
+                                        .onTapGesture {
+                                            if let url = URL(string: app.1) {
+                                                openURL(url)
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                        .font(.body)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .tint(Color("text-color"))
                 }
                 .foregroundColor(Color("text-color"))
                 

@@ -9,19 +9,12 @@ struct WaveTimelineChart: View {
     @State private var sunTimes: SunTimes?
     @State private var currentTime = Date()
     @State private var timer: Timer?
-    @State private var scrollOffset: CGFloat = 0
-    @State private var isLoading = true
     
     private let chartHeight: CGFloat = 80
     private let hourWidth: CGFloat = 120
     
     private var twilightColor: Color {
         colorScheme == .dark ? Color.blue.opacity(0.3) : Color.blue.opacity(0.1)
-    }
-    
-    private var isToday: Bool {
-        guard let firstWave = waves.first?.time else { return false }
-        return Calendar.current.isDateInToday(firstWave)
     }
     
     private var chartRange: (start: Date, end: Date)? {
@@ -82,24 +75,75 @@ struct WaveTimelineChart: View {
     }
     
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView()
-                    .frame(height: chartHeight + 16)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
-                    )
+        ScrollView(.horizontal, showsIndicators: false) {
+            if waves.isEmpty {
+                Text("No waves available")
+                    .foregroundColor(.secondary)
+                    .frame(height: chartHeight)
+                    .padding(.horizontal, 16)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    if waves.isEmpty {
-                        Text("No waves available")
-                            .foregroundColor(.secondary)
-                            .frame(height: chartHeight)
-                            .padding(.horizontal, 16)
-                    } else {
+                ScrollViewReader { proxy in
+                    ZStack(alignment: .topLeading) {
+                        // Background
+                        Color.clear
+                            .frame(width: CGFloat(visibleHours.count) * hourWidth, height: chartHeight)
+                        
+                        // Night and Twilight zones
+                        if let sunTimes = sunTimes, let range = chartRange {
+                            // Night before morning twilight
+                            if sunTimes.civilTwilightBegin >= range.start {
+                                let nightWidth = xPosition(for: sunTimes.civilTwilightBegin)
+                                Rectangle()
+                                    .fill(twilightColor)
+                                    .frame(width: nightWidth, height: chartHeight - 20)
+                                    .offset(x: 0, y: 10)
+                            }
+                            
+                            // Morning twilight
+                            if sunTimes.civilTwilightBegin >= range.start && sunTimes.civilTwilightBegin <= range.end {
+                                let twilightWidth = xPosition(for: sunTimes.sunrise) - xPosition(for: sunTimes.civilTwilightBegin)
+                                Rectangle()
+                                    .fill(LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            twilightColor,
+                                            twilightColor.opacity(0.0)
+                                        ]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    ))
+                                    .frame(width: max(0, twilightWidth), height: chartHeight - 20)
+                                    .offset(x: xPosition(for: sunTimes.civilTwilightBegin), y: 10)
+                            }
+                            
+                            // Evening twilight
+                            if sunTimes.civilTwilightEnd >= range.start && sunTimes.civilTwilightEnd <= range.end {
+                                let twilightWidth = xPosition(for: sunTimes.civilTwilightEnd) - xPosition(for: sunTimes.sunset)
+                                Rectangle()
+                                    .fill(LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            twilightColor.opacity(0.0),
+                                            twilightColor
+                                        ]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    ))
+                                    .frame(width: max(0, twilightWidth), height: chartHeight - 20)
+                                    .offset(x: xPosition(for: sunTimes.sunset), y: 10)
+                            }
+                            
+                            // Night after evening twilight
+                            if sunTimes.civilTwilightEnd <= range.end {
+                                let nightStartX = xPosition(for: sunTimes.civilTwilightEnd)
+                                let totalWidth = CGFloat(visibleHours.count) * hourWidth
+                                let nightWidth = totalWidth - nightStartX
+                                Rectangle()
+                                    .fill(twilightColor)
+                                    .frame(width: max(0, nightWidth), height: chartHeight - 20)
+                                    .offset(x: nightStartX, y: 10)
+                            }
+                        }
+                        
+                        // Time axis with lines
                         ZStack(alignment: .topLeading) {
                             // Background
                             Color.clear
@@ -174,14 +218,6 @@ struct WaveTimelineChart: View {
                                 .offset(x: xPosition(for: hour))
                             }
                             
-                            // Current time indicator (only for today)
-                            if isToday {
-                                Rectangle()
-                                    .fill(Color.red)
-                                    .frame(width: 2, height: chartHeight - 20)
-                                    .offset(x: xPosition(for: currentTime), y: 10)
-                            }
-                            
                             // Selected session highlight
                             if let slot = selectedSlot {
                                 let startX = xPosition(for: slot.startTime)
@@ -235,38 +271,48 @@ struct WaveTimelineChart: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .offset(x: -scrollOffset)
+                        
+                        // Current time indicator (add after other elements)
+                        if Calendar.current.isDateInToday(waves[0].time) {
+                            Rectangle()
+                                .fill(Color.red)
+                                .frame(width: 2)
+                                .frame(height: chartHeight - 20)
+                                .offset(x: xPosition(for: currentTime), y: 10)
+                                .id("currentTime")
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .onAppear {
+                        // Start timer to update current time
+                        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+                            withAnimation {
+                                currentTime = Date()
+                            }
+                        }
+                        
+                        // Initial scroll to current time
+                        if Calendar.current.isDateInToday(waves[0].time) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation {
+                                    proxy.scrollTo("currentTime", anchor: .center)
+                                }
+                            }
+                        }
+                    }
+                    .onDisappear {
+                        timer?.invalidate()
+                        timer = nil
                     }
                 }
-                .frame(height: chartHeight + 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.systemBackground))
-                        .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
-                )
             }
         }
-        .onAppear {
-            if isToday {
-                // Start timer to update current time
-                timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
-                    currentTime = Date()
-                }
-                
-                // Initial scroll to current time
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    scrollOffset = max(0, xPosition(for: currentTime) - 100) // 100 points before current time
-                    isLoading = false
-                }
-            } else {
-                isLoading = false
-            }
-        }
-        .onDisappear {
-            timer?.invalidate()
-            timer = nil
-        }
+        .frame(height: chartHeight + 16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+        )
         .task {
             if let firstWave = waves.first {
                 do {

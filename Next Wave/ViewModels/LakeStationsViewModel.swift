@@ -180,4 +180,60 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             }
         }
     }
+    
+    func selectStation(withId id: String) {
+        selectedStation = lakes.flatMap { $0.stations }.first { $0.id == id }
+        if selectedStation != nil {
+            Task {
+                await refreshDepartures()
+            }
+        }
+    }
+    
+    func getNextDeparture(for stationId: String) async -> Date? {
+        guard let station = lakes.flatMap({ $0.stations }).first(where: { $0.id == stationId }),
+              let uicRef = station.uic_ref else { 
+            return nil 
+        }
+        
+        let now = Date()
+        
+        // Check cache first
+        let cacheKey = getCacheKey(for: station, date: selectedDate)
+        if Calendar.current.isDateInToday(selectedDate),
+           let cachedDepartures = departuresCache[cacheKey] {
+            // Find next departure from cache
+            if let nextDeparture = cachedDepartures
+                .compactMap({ journey -> Date? in
+                    guard let departureStr = journey.stop.departure else { return nil }
+                    return AppDateFormatter.parseFullTime(departureStr)
+                })
+                .first(where: { $0 > now }) {
+                return nextDeparture
+            }
+        }
+        
+        do {
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
+            
+            // Update cache if it's today
+            if Calendar.current.isDateInToday(selectedDate) {
+                departuresCache[cacheKey] = journeys
+            }
+            
+            // Find next departure from fresh data
+            if let nextDeparture = journeys
+                .compactMap({ journey -> Date? in
+                    guard let departureStr = journey.stop.departure else { return nil }
+                    return AppDateFormatter.parseFullTime(departureStr)
+                })
+                .first(where: { $0 > now }) {
+                return nextDeparture
+            }
+        } catch {
+            print("Error fetching next departure: \(error)")
+        }
+        
+        return nil
+    }
 } 

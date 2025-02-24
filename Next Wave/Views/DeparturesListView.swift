@@ -9,6 +9,8 @@ struct DeparturesListView: View {
     @StateObject private var analyticsViewModel = WaveAnalyticsViewModel()
     @State private var showingAnalytics = false
     @State private var errorMessage: String?
+    @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
+    @State private var showingMaxFavoritesAlert = false
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -84,21 +86,43 @@ struct DeparturesListView: View {
         .toolbar {
             if !departures.isEmpty {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAnalytics.toggle()
-                        if showingAnalytics {
-                            analyticsViewModel.analyzeWaves(
-                                scheduleViewModel.nextWaves,
-                                for: selectedStation?.id ?? "",
-                                spotName: selectedStation?.name ?? ""
-                            )
+                    HStack {
+                        if let station = selectedStation {
+                            Button(action: {
+                                if favoritesManager.isFavorite(station) {
+                                    favoritesManager.removeFavorite(station)
+                                } else if favoritesManager.favorites.count >= FavoriteStation.maxFavorites {
+                                    showingMaxFavoritesAlert = true
+                                } else {
+                                    favoritesManager.addFavorite(station)
+                                }
+                            }) {
+                                Image(systemName: favoritesManager.isFavorite(station) ? "heart.fill" : "heart")
+                                    .foregroundColor(.accentColor)
+                            }
                         }
-                    }) {
-                        Image(systemName: showingAnalytics ? "list.bullet" : "chart.bar")
-                            .foregroundColor(.accentColor)
+                        
+                        Button(action: {
+                            showingAnalytics.toggle()
+                            if showingAnalytics {
+                                analyticsViewModel.analyzeWaves(
+                                    scheduleViewModel.nextWaves,
+                                    for: selectedStation?.id ?? "",
+                                    spotName: selectedStation?.name ?? ""
+                                )
+                            }
+                        }) {
+                            Image(systemName: showingAnalytics ? "list.bullet" : "chart.bar")
+                                .foregroundColor(.accentColor)
+                        }
                     }
                 }
             }
+        }
+        .alert("Maximum Favorites Reached", isPresented: $showingMaxFavoritesAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("You can have a maximum of \(FavoriteStation.maxFavorites) favorite spots. Please remove one before adding another.")
         }
     }
     

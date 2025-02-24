@@ -10,6 +10,7 @@ struct SunTimes {
 class SunTimeService {
     static let shared = SunTimeService()
     private var cache: [String: SunTimes] = [:]
+    private let maxRetries = 3
     
     // Zentrale Koordinaten der Schweiz (ungefähr Mitte Vierwaldstättersee)
     private let swissLatitude = 47.0136
@@ -31,28 +32,72 @@ class SunTimeService {
         // Format date for API
         let formattedDate = dateFormatter.string(from: date)
         
-        // Create URL with fixed Swiss coordinates
-        let urlString = "https://api.sunrise-sunset.org/json?lat=\(swissLatitude)&lng=\(swissLongitude)&date=\(formattedDate)&formatted=0"
-        guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
+        var lastError: Error?
+        for attempt in 1...maxRetries {
+            do {
+                // Create URL with fixed Swiss coordinates
+                let urlString = "https://api.sunrise-sunset.org/json?lat=\(swissLatitude)&lng=\(swissLongitude)&date=\(formattedDate)&formatted=0"
+                guard let url = URL(string: urlString) else {
+                    throw URLError(.badURL)
+                }
+                
+                print("Fetching sun times (attempt \(attempt)/\(maxRetries)): \(urlString)")
+                
+                // Configure URLSession with timeout
+                let config = URLSessionConfiguration.default
+                config.timeoutIntervalForRequest = 10
+                config.timeoutIntervalForResource = 20
+                let session = URLSession(configuration: config)
+                
+                // Make request
+                let (data, response) = try await session.data(from: url)
+                
+                // Check HTTP response
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw URLError(.badServerResponse)
+                }
+                
+                guard httpResponse.statusCode == 200 else {
+                    print("HTTP Error: \(httpResponse.statusCode)")
+                    if let responseString = String(data: data, encoding: .utf8) {
+                        print("Response: \(responseString)")
+                    }
+                    throw URLError(.badServerResponse)
+                }
+                
+                // Try to decode the response
+                let sunTimeResponse = try JSONDecoder().decode(SunTimeResponse.self, from: data)
+                
+                guard sunTimeResponse.status.lowercased() == "ok" else {
+                    throw URLError(.badServerResponse)
+                }
+                
+                // Convert UTC times to local time
+                let sunTimes = SunTimes(
+                    sunrise: sunTimeResponse.results.sunrise.toLocalTime(),
+                    sunset: sunTimeResponse.results.sunset.toLocalTime(),
+                    civilTwilightBegin: sunTimeResponse.results.civil_twilight_begin.toLocalTime(),
+                    civilTwilightEnd: sunTimeResponse.results.civil_twilight_end.toLocalTime()
+                )
+                
+                // Cache the result
+                cache[cacheKey] = sunTimes
+                
+                return sunTimes
+                
+            } catch {
+                lastError = error
+                print("Error fetching sun times (attempt \(attempt)/\(maxRetries)): \(error)")
+                
+                if attempt < maxRetries {
+                    // Wait before retrying (exponential backoff)
+                    try await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(attempt)) * 1_000_000_000))
+                }
+            }
         }
         
-        // Make request
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(SunTimeResponse.self, from: data)
-        
-        // Convert UTC times to local time
-        let sunTimes = SunTimes(
-            sunrise: response.results.sunrise.toLocalTime(),
-            sunset: response.results.sunset.toLocalTime(),
-            civilTwilightBegin: response.results.civil_twilight_begin.toLocalTime(),
-            civilTwilightEnd: response.results.civil_twilight_end.toLocalTime()
-        )
-        
-        // Cache the result
-        cache[cacheKey] = sunTimes
-        
-        return sunTimes
+        // If we get here, all retries failed
+        throw lastError ?? URLError(.unknown)
     }
 }
 

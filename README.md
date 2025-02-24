@@ -11,6 +11,10 @@ https://apps.apple.com/ch/app/next-wave/id6739363035
 - 🌊 Real-time boat schedule tracking
 - 🔔 Smart notifications 3,5,10 or 15 minutes before waves
 - 📍 Easy spot selection on Swiss lakes
+- 🆕 Store up to 5 favorite stations
+- 🆕 Nearby station is displayed
+- 🆕 New Analytics View with session recommendations, wave timeline, best session detection and wave frequency analysis
+- 🆕 Daylight Integration with sunrise, sunset, twilight phase visualization, smart session planning based on daylight and beautiful gradient visualization
 - 🎯️ Interactive map with OpenStreetMap integration
 - 🎯 Precise wave timing information
 - 🔊 Custom sound notifications
@@ -36,7 +40,7 @@ https://apps.apple.com/ch/app/next-wave/id6739363035
 - No tracking or analytics
 - No personal data collection
 - All data stays on device
-- Location data is only used to show your position on the map and is never stored or shared
+- Location data is only used to show nearest station and your position on the map and is never stored or shared
 - Location access can be denied without losing core app functionality
 
 ## Location Permission
@@ -44,10 +48,12 @@ https://apps.apple.com/ch/app/next-wave/id6739363035
 The app requests location access to:
 - Show your position on the map
 - Enable the location tracking button
+- Show nearest station
 
 You can use the app without granting location access. In this case:
 - Your position won't be shown on the map
 - The location tracking button will be disabled
+- The nearest station will not be shown
 
 ## Support
 
@@ -238,5 +244,7 @@ Always maintain a safe distance from boats and follow local water safety regulat
 ## Acknowledgments
 
 - Thanks to all beta testers
+- Special thanks to Alex for all your good ideas and testing
+- Special thanks to Nils Mango for the favorite and nearby station feature requests
 - Map data © OpenStreetMap contributors
 - Special thanks to the Lake boat operators - We would be delighted if you step on the gas a little more while departing from the dock.

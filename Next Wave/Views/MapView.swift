@@ -106,6 +106,7 @@ class ShippingRoutesOverlay: MKTileOverlay {
 struct MapView: View {
     @ObservedObject var viewModel: LakeStationsViewModel
     @EnvironmentObject var settings: AppSettings
+    @StateObject private var locationManager = LocationManager()
     
     var body: some View {
         MapViewRepresentable(
@@ -122,17 +123,24 @@ struct MapView: View {
                     longitudeDelta: settings.lastMapRegion.longitudeDelta
                 )
             ),
-            onRegionChanged: { region in
-                settings.lastMapRegion = MapRegion(
-                    latitude: region.center.latitude,
-                    longitude: region.center.longitude,
-                    latitudeDelta: region.span.latitudeDelta,
-                    longitudeDelta: region.span.longitudeDelta
-                )
+            onRegionChanged: { [settings] region in
+                // Use a weak reference to settings to avoid retain cycles
+                DispatchQueue.main.async { [weak settings] in
+                    settings?.lastMapRegion = MapRegion(
+                        latitude: region.center.latitude,
+                        longitude: region.center.longitude,
+                        latitudeDelta: region.span.latitudeDelta,
+                        longitudeDelta: region.span.longitudeDelta
+                    )
+                }
             },
-            onStationSelected: { station in
-                viewModel.selectStation(station)
-            }
+            onStationSelected: { [viewModel] station in
+                // Dispatch station selection to the next run loop
+                DispatchQueue.main.async { [weak viewModel] in
+                    viewModel?.selectStation(station)
+                }
+            },
+            locationManager: locationManager
         )
     }
 }
@@ -140,6 +148,7 @@ struct MapView: View {
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
     @Published var userLocation: CLLocation?
+    var onLocationUpdate: ((CLLocation) -> Void)?
     
     override init() {
         super.init()
@@ -157,7 +166,11 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        userLocation = location
+        // Dispatch published updates to the next run loop
+        DispatchQueue.main.async {
+            self.userLocation = location
+            self.onLocationUpdate?(location)
+        }
     }
 }
 
@@ -166,7 +179,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     let initialRegion: MKCoordinateRegion
     let onRegionChanged: (MKCoordinateRegion) -> Void
     let onStationSelected: (Lake.Station) -> Void
-    @StateObject private var locationManager = LocationManager()
+    let locationManager: LocationManager
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
@@ -260,6 +273,9 @@ struct MapViewRepresentable: UIViewRepresentable {
         var osmRenderer: MKTileOverlayRenderer?
         var routesRenderer: MKTileOverlayRenderer?
         private var isFirstTileLoaded = false
+        private var lastRegionUpdate: Date = Date()
+        private let updateThrottle: TimeInterval = 0.1 // 100ms throttle
+        private var regionUpdateWorkItem: DispatchWorkItem?
         
         init(_ parent: MapViewRepresentable) {
             self.parent = parent
@@ -305,11 +321,14 @@ struct MapViewRepresentable: UIViewRepresentable {
                 )
                 mapView.setRegion(region, animated: true)
             } else if let annotation = view.annotation as? StationAnnotation {
-                parent.onStationSelected(annotation.station)
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                   let window = windowScene.windows.first,
-                   let topController = window.rootViewController?.topMostViewController() {
-                    topController.dismiss(animated: true)
+                // Dispatch the selection to avoid view update conflicts
+                DispatchQueue.main.async { [weak self] in
+                    self?.parent.onStationSelected(annotation.station)
+                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let window = windowScene.windows.first,
+                       let topController = window.rootViewController?.topMostViewController() {
+                        topController.dismiss(animated: true)
+                    }
                 }
             }
             
@@ -317,7 +336,24 @@ struct MapViewRepresentable: UIViewRepresentable {
         }
         
         func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-            parent.onRegionChanged(mapView.region)
+            let now = Date()
+            if now.timeIntervalSince(lastRegionUpdate) >= updateThrottle {
+                lastRegionUpdate = now
+                
+                // Cancel any pending update
+                regionUpdateWorkItem?.cancel()
+                
+                // Create new work item for this update
+                let workItem = DispatchWorkItem { [weak self, weak mapView] in
+                    guard let self = self, let mapView = mapView else { return }
+                    self.parent.onRegionChanged(mapView.region)
+                }
+                
+                regionUpdateWorkItem = workItem
+                
+                // Dispatch after a small delay to debounce rapid updates
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: workItem)
+            }
         }
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

@@ -7,7 +7,7 @@
         <string>com.nextwave.midnight</string>
     </array>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Your location is needed to show you the nearest stations.</string>
+    <string>Next Wave needs your location to find the nearest boat station.</string>
     <key>NSLocationUsageDescription</key>
     <string>Your location is needed to show you the nearest stations.</string>
 </dict>

@@ -8,6 +8,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var viewModel: LakeStationsViewModel
     @StateObject private var favoritesManager = FavoriteStationsManager.shared
+    @EnvironmentObject private var appSettings: AppSettings
     @State private var showingLocationPicker = false
     @State private var showingInfoView = false
     @State private var showingPirate = false
@@ -77,7 +78,8 @@ struct ContentView: View {
                                 ScrollView {
                                     VStack(spacing: 0) {
                                         // Nearest station
-                                        if let nearest = viewModel.nearestStation {
+                                        if appSettings.showNearestStation,
+                                           let nearest = viewModel.nearestStation {
                                             VStack(alignment: .leading, spacing: 8) {
                                                 Text("Nearest Station")
                                                     .font(.headline)

@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 @MainActor
 class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
@@ -12,6 +13,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             }
         }
     }
+    @Published var nearestStation: (station: Lake.Station, distance: Double)?
     @Published var departures: [Journey] = []
     @Published var isTestMode: Bool = false
     @Published var journeyDetails: [String: [Journey.Stop]] = [:]
@@ -36,10 +38,20 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     private var midnightTimer: Timer?
     
+    private let locationManager = LocationManager()
+    
     init(scheduleViewModel: ScheduleViewModel) {
         self.scheduleViewModel = scheduleViewModel
         loadLakes()
         scheduleMidnightRefresh()
+        
+        // Setup location updates
+        locationManager.onLocationUpdate = { [weak self] _ in
+            self?.updateNearestStation()
+        }
+        locationManager.requestLocationPermission()
+        locationManager.startUpdatingLocation()
+        updateNearestStation() // Initial update
     }
     
     init() {
@@ -47,6 +59,14 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         self.selectedDate = Date()
         loadLakes()
         scheduleMidnightRefresh()
+        
+        // Setup location updates
+        locationManager.onLocationUpdate = { [weak self] _ in
+            self?.updateNearestStation()
+        }
+        locationManager.requestLocationPermission()
+        locationManager.startUpdatingLocation()
+        updateNearestStation() // Initial update
     }
     
     deinit {
@@ -184,6 +204,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     func selectStation(withId id: String) {
         selectedStation = lakes.flatMap { $0.stations }.first { $0.id == id }
         if selectedStation != nil {
+            selectedDate = Date() // Reset to current date
             Task {
                 await refreshDepartures()
             }
@@ -235,5 +256,33 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         return nil
+    }
+    
+    private func updateNearestStation() {
+        guard let userLocation = locationManager.userLocation else { return }
+        
+        var nearestStation: Lake.Station?
+        var shortestDistance = Double.infinity
+        
+        for lake in lakes {
+            for station in lake.stations {
+                guard let coordinates = station.coordinates else { continue }
+                
+                let stationLocation = CLLocation(
+                    latitude: coordinates.latitude,
+                    longitude: coordinates.longitude
+                )
+                
+                let distance = userLocation.distance(from: stationLocation) / 1000 // Convert to kilometers
+                if distance < shortestDistance {
+                    shortestDistance = distance
+                    nearestStation = station
+                }
+            }
+        }
+        
+        if let station = nearestStation {
+            self.nearestStation = (station: station, distance: shortestDistance)
+        }
     }
 } 

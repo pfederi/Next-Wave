@@ -1,12 +1,13 @@
 import SwiftUI
+import CoreLocation
 
-struct FavoriteStationTileView: View {
-    let station: FavoriteStation
+struct NearestStationTileView: View {
+    let station: Lake.Station
+    let distance: Double
     let onTap: () -> Void
     @ObservedObject var viewModel: LakeStationsViewModel
     @State private var nextDeparture: Date?
     @State private var timer: Timer?
-    @State private var errorMessage: String?
     
     private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -14,19 +15,29 @@ struct FavoriteStationTileView: View {
         return formatter
     }()
     
+    private let distanceFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 1
+        formatter.minimumFractionDigits = 1
+        return formatter
+    }()
+    
     var body: some View {
         Button(action: onTap) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(station.name)
-                        .font(.headline)
-                        .foregroundColor(Color("text-color"))
-                    
-                    if let error = errorMessage {
-                        Text(error)
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(.blue)
+                        Text(station.name)
+                            .font(.headline)
+                            .foregroundColor(Color("text-color"))
+                        Text("(\(distanceFormatter.string(from: NSNumber(value: distance)) ?? "0.0") km)")
                             .font(.subheadline)
-                            .foregroundColor(.red)
-                    } else if let departure = nextDeparture {
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    if let departure = nextDeparture {
                         if departure > Date() {
                             HStack(spacing: 4) {
                                 Image(systemName: "water.waves")
@@ -76,16 +87,12 @@ struct FavoriteStationTileView: View {
         }
     }
     
-    @MainActor
     private func refreshDeparture() async {
-        let departure = await viewModel.getNextDeparture(for: station.id)
-        // Only update the nextDeparture if it's a future departure or nil
-        if departure == nil || departure! > Date() {
-            nextDeparture = departure
-        } else {
-            // If the departure is in the past, mark as no more departures
-            nextDeparture = nil
+        nextDeparture = await viewModel.getNextDeparture(for: station.id)
+        
+        // If the next departure is in the past, refresh to get the new next departure
+        if let departure = nextDeparture, departure <= Date() {
+            nextDeparture = await viewModel.getNextDeparture(for: station.id)
         }
-        errorMessage = nil
     }
 } 

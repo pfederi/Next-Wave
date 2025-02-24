@@ -73,30 +73,57 @@ struct ContentView: View {
                                     )
                                     .padding(.top, 16)
                                 }
-                            } else if !favoritesManager.favorites.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Favorite Spots")
-                                        .font(.headline)
-                                        .foregroundColor(Color("text-color"))
-                                        .padding(.horizontal)
-                                        .padding(.top, 32)
-                                    
-                                    VStack(spacing: 8) {
-                                        ForEach(favoritesManager.favorites) { favorite in
-                                            FavoriteStationTileView(
-                                                station: favorite,
-                                                onTap: {
-                                                    viewModel.selectStation(withId: favorite.id)
-                                                },
-                                                viewModel: viewModel
-                                            )
-                                            .padding(.horizontal)
+                            } else {
+                                ScrollView {
+                                    VStack(spacing: 0) {
+                                        // Nearest station
+                                        if let nearest = viewModel.nearestStation {
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                Text("Nearest Station")
+                                                    .font(.headline)
+                                                    .foregroundColor(Color("text-color"))
+                                                    .padding(.horizontal)
+                                                    .padding(.top, 32)
+                                                
+                                                NearestStationTileView(
+                                                    station: nearest.station,
+                                                    distance: nearest.distance,
+                                                    onTap: {
+                                                        viewModel.selectStation(nearest.station)
+                                                    },
+                                                    viewModel: viewModel
+                                                )
+                                                .padding(.horizontal)
+                                            }
                                         }
+                                        
+                                        // Favorite stations
+                                        if !favoritesManager.favorites.isEmpty {
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                Text("Favorite Spots")
+                                                    .font(.headline)
+                                                    .foregroundColor(Color("text-color"))
+                                                    .padding(.horizontal)
+                                                    .padding(.top, 32)
+                                                
+                                                VStack(spacing: 8) {
+                                                    ForEach(favoritesManager.favorites) { favorite in
+                                                        FavoriteStationTileView(
+                                                            station: favorite,
+                                                            onTap: {
+                                                                viewModel.selectStation(withId: favorite.id)
+                                                            },
+                                                            viewModel: viewModel
+                                                        )
+                                                        .padding(.horizontal)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        Spacer(minLength: 32)
                                     }
                                 }
-                                Spacer()
-                            } else {
-                                Spacer()
                             }
                         }
                     }

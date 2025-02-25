@@ -2,10 +2,12 @@
 
 Next Wave is an iOS app that helps wake surfers and foilers catch their perfect wave on Lake Zurich by providing real-time boat schedules and smart notifications.
 
-<img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot4" width="200"><img src="Screenshots/next-wave5.png" alt="Screenshot5" width="200"><img src="Screenshots/next-wave6.png" alt="Screenshot6" width="200"><img src="Screenshots/next-wave7png" alt="Screenshot7" width="200">
+<img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot4" width="200"><img src="Screenshots/next-wave5.png" alt="Screenshot5" width="200"><img src="Screenshots/next-wave6.png" alt="Screenshot6" width="200"><img src="Screenshots/next-wave7.png" alt="Screenshot7" width="200">
 
 
-https://apps.apple.com/ch/app/next-wave/id6739363035
+<a href="https://apps.apple.com/ch/app/next-wave/id6739363035">
+    <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1705363200" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;">
+</a>
 
 ## Features
 

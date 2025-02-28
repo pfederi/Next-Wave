@@ -50,10 +50,12 @@ struct ContentView: View {
                                 }
                             }
                             
-                            DateSelectionView(
-                                selectedDate: $selectedDate,
-                                viewModel: viewModel
-                            )
+                            if viewModel.selectedStation != nil {
+                                DateSelectionView(
+                                    selectedDate: $selectedDate,
+                                    viewModel: viewModel
+                                )
+                            }
                             
                             StationButton(
                                 stationName: viewModel.selectedStation?.name,
@@ -91,7 +93,7 @@ struct ContentView: View {
                                                     station: nearest.station,
                                                     distance: nearest.distance,
                                                     onTap: {
-                                                        viewModel.selectStation(nearest.station)
+                                                        viewModel.selectStation(withId: nearest.station.id)
                                                     },
                                                     viewModel: viewModel
                                                 )
@@ -169,6 +171,11 @@ struct ContentView: View {
             }
             
             EasterEggView(isShowing: $showingPirate, isOverlay: true)
+        }
+        .onReceive(viewModel.$selectedDate) { newDate in
+            if selectedDate != newDate {
+                selectedDate = newDate
+            }
         }
     }
     

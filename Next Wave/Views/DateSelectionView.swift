@@ -51,5 +51,10 @@ struct DateSelectionView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 16)
+        .onChange(of: viewModel.selectedDate) { oldValue, newValue in
+            if selectedDate != newValue {
+                selectedDate = newValue
+            }
+        }
     }
 }

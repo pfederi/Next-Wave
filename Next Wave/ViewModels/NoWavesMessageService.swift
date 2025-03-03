@@ -14,13 +14,11 @@ class NoWavesMessageService {
         "The wave train's done for today – ride continues mañana!",
         "Today's waves are history – tomorrow's swell is brewing!",
         "Ship's on pause – fresh rides coming soon!",
-        "That’s all, folks! But don’t worry, tomorrow’s a new ride!",
-        "No more bumps to ride – but tomorrow’s looking rad!",
-        "Last wave’s gone – time to dream of tomorrow’s rides!",
-        "Aloha, da waves pau for today – but mo’ coming tomorrow!",
+        "That's all, folks! But don't worry, tomorrow's a new ride!",
+        "No more bumps to ride – but tomorrow's looking rad!",
+        "Last wave's gone – time to dream of tomorrow's rides!",
+        "Aloha, da waves pau for today – but mo' coming tomorrow!",
         "Chill time, ʻohana! Waves gonna roll in fresh tomorrow!",
-        "Da sea say ‘A hui hou’ – see ya for fresh rides tomorrow!",
-        "Nā nalu pau i kēia lā – e hoʻi mai ana i ka lā ʻapōpō!",
         "No more surf – the sea life needs some chill time too!",
         "Post-pumping high is real – but even the ships need a break!",
         "Waves are done, but that post-pumping high lasts all night!",
@@ -28,7 +26,16 @@ class NoWavesMessageService {
         "No more wake waves, just that sweet post-pumping afterglow!"
     ]
     
+    private let noServiceMessages = [
+        "No service available at this station",
+        "This station is currently not in service",
+        "No waves scheduled for this station",
+        "This spot is taking a break from the waves",
+        "No boats stopping at this station today"
+    ]
+    
     private var usedMessages: Set<String> = []
+    private var usedNoServiceMessages: Set<String> = []
     
     private init() {}
     
@@ -44,7 +51,20 @@ class NoWavesMessageService {
         return message
     }
     
+    func getNoServiceMessage() -> String {
+        if usedNoServiceMessages.count >= noServiceMessages.count {
+            // If all messages have been used, reset the used messages
+            usedNoServiceMessages.removeAll()
+        }
+        
+        let availableMessages = noServiceMessages.filter { !usedNoServiceMessages.contains($0) }
+        let message = availableMessages.randomElement() ?? noServiceMessages[0]
+        usedNoServiceMessages.insert(message)
+        return message
+    }
+    
     func reset() {
         usedMessages.removeAll()
+        usedNoServiceMessages.removeAll()
     }
 } 

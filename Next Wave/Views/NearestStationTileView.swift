@@ -9,6 +9,9 @@ struct NearestStationTileView: View {
     @State private var nextDeparture: Date?
     @State private var timer: Timer?
     @State private var noWavesMessage: String = NoWavesMessageService.shared.getMessage()
+    @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
+    @State private var hasTomorrowDepartures: Bool = true
+    @State private var isLoading: Bool = true
     
     private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -38,7 +41,11 @@ struct NearestStationTileView: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    if let departure = nextDeparture {
+                    if isLoading {
+                        Text("Loading...")
+                            .font(.subheadline)
+                            .foregroundColor(Color("text-color"))
+                    } else if let departure = nextDeparture {
                         if departure > Date() {
                             HStack(spacing: 4) {
                                 Image(systemName: "water.waves")
@@ -53,9 +60,15 @@ struct NearestStationTileView: View {
                                 .foregroundColor(Color("text-color"))
                         }
                     } else {
-                        Text(noWavesMessage)
-                            .font(.subheadline)
-                            .foregroundColor(Color("text-color"))
+                        if hasTomorrowDepartures {
+                            Text(noWavesMessage)
+                                .font(.subheadline)
+                                .foregroundColor(Color("text-color"))
+                        } else {
+                            Text(noServiceMessage)
+                                .font(.subheadline)
+                                .foregroundColor(Color("text-color"))
+                        }
                     }
                 }
                 
@@ -88,12 +101,20 @@ struct NearestStationTileView: View {
         }
     }
     
+    @MainActor
     private func refreshDeparture() async {
+        isLoading = true
         nextDeparture = await viewModel.getNextDeparture(for: station.id)
         
-        // If the next departure is in the past, refresh to get the new next departure
-        if let departure = nextDeparture, departure <= Date() {
-            nextDeparture = await viewModel.getNextDeparture(for: station.id)
+        // If the next departure is in the past or nil, check if there are departures tomorrow
+        if nextDeparture == nil || nextDeparture! <= Date() {
+            hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
+            
+            // If the next departure is in the past, refresh to get the new next departure
+            if let departure = nextDeparture, departure <= Date() {
+                nextDeparture = await viewModel.getNextDeparture(for: station.id)
+            }
         }
+        isLoading = false
     }
 } 

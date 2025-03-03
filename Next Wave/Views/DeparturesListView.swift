@@ -11,6 +11,8 @@ struct DeparturesListView: View {
     @State private var errorMessage: String?
     @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @State private var showingMaxFavoritesAlert = false
+    @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
+    @State private var hasTomorrowDepartures: Bool = true
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -71,37 +73,38 @@ struct DeparturesListView: View {
                 } else if viewModel.hasAttemptedLoad {
                     VStack {
                         Spacer()
-                        Text("No departures found for \(selectedStation?.name ?? "")")
+                        Text(noServiceMessage)
                             .foregroundColor(Color("text-color"))
                             .multilineTextAlignment(.center)
-                        if !Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: Date()) {
-                            Text("on \(formattedDate(viewModel.selectedDate))")
-                                .foregroundColor(Color("text-color"))
-                        }
                         Spacer()
+                    }
+                    .task {
+                        if let station = selectedStation {
+                            hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
+                        }
                     }
                 }
             }
         }
         .toolbar {
-            if !departures.isEmpty {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        if let station = selectedStation {
-                            Button(action: {
-                                if favoritesManager.isFavorite(station) {
-                                    favoritesManager.removeFavorite(station)
-                                } else if favoritesManager.favorites.count >= FavoriteStation.maxFavorites {
-                                    showingMaxFavoritesAlert = true
-                                } else {
-                                    favoritesManager.addFavorite(station)
-                                }
-                            }) {
-                                Image(systemName: favoritesManager.isFavorite(station) ? "heart.fill" : "heart")
-                                    .foregroundColor(.accentColor)
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    if let station = selectedStation {
+                        Button(action: {
+                            if favoritesManager.isFavorite(station) {
+                                favoritesManager.removeFavorite(station)
+                            } else if favoritesManager.favorites.count >= FavoriteStation.maxFavorites {
+                                showingMaxFavoritesAlert = true
+                            } else {
+                                favoritesManager.addFavorite(station)
                             }
+                        }) {
+                            Image(systemName: favoritesManager.isFavorite(station) ? "heart.fill" : "heart")
+                                .foregroundColor(.accentColor)
                         }
-                        
+                    }
+                    
+                    if !departures.isEmpty {
                         Button(action: {
                             showingAnalytics.toggle()
                             if showingAnalytics {

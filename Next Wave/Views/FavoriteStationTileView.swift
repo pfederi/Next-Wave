@@ -8,6 +8,9 @@ struct FavoriteStationTileView: View {
     @State private var timer: Timer?
     @State private var errorMessage: String?
     @State private var noWavesMessage: String = NoWavesMessageService.shared.getMessage()
+    @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
+    @State private var hasTomorrowDepartures: Bool = true
+    @State private var isLoading: Bool = true
     
     private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -23,7 +26,11 @@ struct FavoriteStationTileView: View {
                         .font(.headline)
                         .foregroundColor(Color("text-color"))
                     
-                    if let error = errorMessage {
+                    if isLoading {
+                        Text("Loading...")
+                            .font(.subheadline)
+                            .foregroundColor(Color("text-color"))
+                    } else if let error = errorMessage {
                         Text(error)
                             .font(.subheadline)
                             .foregroundColor(.red)
@@ -42,9 +49,15 @@ struct FavoriteStationTileView: View {
                                 .foregroundColor(Color("text-color"))
                         }
                     } else {
-                        Text(noWavesMessage)
-                            .font(.subheadline)
-                            .foregroundColor(Color("text-color"))
+                        if hasTomorrowDepartures {
+                            Text(noWavesMessage)
+                                .font(.subheadline)
+                                .foregroundColor(Color("text-color"))
+                        } else {
+                            Text(noServiceMessage)
+                                .font(.subheadline)
+                                .foregroundColor(Color("text-color"))
+                        }
                     }
                 }
                 
@@ -79,14 +92,23 @@ struct FavoriteStationTileView: View {
     
     @MainActor
     private func refreshDeparture() async {
+        isLoading = true
         let departure = await viewModel.getNextDeparture(for: station.id)
         // Only update the nextDeparture if it's a future departure or nil
         if departure == nil || departure! > Date() {
             nextDeparture = departure
+            
+            // If no departures today, check if there are departures tomorrow
+            if departure == nil {
+                hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
+            }
         } else {
             // If the departure is in the past, mark as no more departures
             nextDeparture = nil
+            // Check if there are departures tomorrow
+            hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
         }
         errorMessage = nil
+        isLoading = false
     }
 } 

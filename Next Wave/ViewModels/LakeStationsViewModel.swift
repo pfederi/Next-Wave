@@ -254,6 +254,35 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         return nil
     }
+    
+    func hasDeparturesTomorrow(for stationId: String) async -> Bool {
+        guard let station = lakes.flatMap({ $0.stations }).first(where: { $0.id == stationId }),
+              let uicRef = station.uic_ref else { 
+            return false 
+        }
+        
+        // Get tomorrow's date
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+        
+        // Check cache first
+        let cacheKey = getCacheKey(for: station, date: tomorrow)
+        if let cachedDepartures = departuresCache[cacheKey], !cachedDepartures.isEmpty {
+            return true
+        }
+        
+        do {
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow)
+            
+            // Update cache
+            departuresCache[cacheKey] = journeys
+            
+            return !journeys.isEmpty
+        } catch {
+            print("Error checking tomorrow's departures: \(error)")
+        }
+        
+        return false
+    }
 
     func getNextDeparture(for stationId: String) async -> Date? {
         // For the StationView, use the selected date

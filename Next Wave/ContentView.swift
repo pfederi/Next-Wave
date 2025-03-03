@@ -6,9 +6,9 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel: LakeStationsViewModel
-    @StateObject private var favoritesManager = FavoriteStationsManager.shared
+    @StateObject private var viewModel = LakeStationsViewModel()
     @EnvironmentObject private var appSettings: AppSettings
+    @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @State private var showingLocationPicker = false
     @State private var showingInfoView = false
     @State private var showingPirate = false
@@ -22,6 +22,7 @@ struct ContentView: View {
     }
     @State private var canGoBack = false
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
+    @State private var editMode: EditMode = .inactive
     
     init() {
         let scheduleVM = ScheduleViewModel()
@@ -103,26 +104,7 @@ struct ContentView: View {
                                         
                                         // Favorite stations
                                         if !favoritesManager.favorites.isEmpty {
-                                            VStack(alignment: .leading, spacing: 8) {
-                                                Text("Favorite Spots")
-                                                    .font(.headline)
-                                                    .foregroundColor(Color("text-color"))
-                                                    .padding(.horizontal)
-                                                    .padding(.top, 32)
-                                                
-                                                VStack(spacing: 8) {
-                                                    ForEach(favoritesManager.favorites) { favorite in
-                                                        FavoriteStationTileView(
-                                                            station: favorite,
-                                                            onTap: {
-                                                                viewModel.selectStation(withId: favorite.id)
-                                                            },
-                                                            viewModel: viewModel
-                                                        )
-                                                        .padding(.horizontal)
-                                                    }
-                                                }
-                                            }
+                                            FavoritesListView(viewModel: viewModel)
                                         }
                                         
                                         Spacer(minLength: 32)

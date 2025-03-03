@@ -1450,6 +1450,14 @@
                     }
                 },
                 {
+                    "name": "Tüscherz",
+                    "uic_ref": "8504372",
+                    "coordinates": {
+                        "latitude": 47.1124025,
+                        "longitude": 7.1937804
+                    }
+                },
+                {
                     "name": "Nidau",
                     "uic_ref": "8504369",
                     "coordinates": {

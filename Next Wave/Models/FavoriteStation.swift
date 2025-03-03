@@ -46,4 +46,9 @@ class FavoriteStationsManager: ObservableObject {
     func isFavorite(_ station: Lake.Station) -> Bool {
         favorites.contains { $0.id == station.id }
     }
+    
+    func reorderFavorites(fromOffsets source: IndexSet, toOffset destination: Int) {
+        favorites.move(fromOffsets: source, toOffset: destination)
+        saveFavorites()
+    }
 } 

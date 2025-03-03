@@ -1,6 +1,7 @@
 import SwiftUI
+import CoreLocation
 
-struct FavoriteStationTileView: View {
+struct FavoriteStationTileView: View, Equatable {
     let station: FavoriteStation
     let onTap: () -> Void
     @ObservedObject var viewModel: LakeStationsViewModel
@@ -12,6 +13,16 @@ struct FavoriteStationTileView: View {
     @State private var hasTomorrowDepartures: Bool = true
     @State private var isLoading: Bool = true
     
+    // Wetter-Daten
+    @State private var weatherInfo: WeatherAPI.WeatherInfo?
+    @State private var isLoadingWeather: Bool = true
+    @State private var weatherError: String?
+    
+    // Implementiere Equatable, um unnötige Neuzeichnungen zu vermeiden
+    static func == (lhs: FavoriteStationTileView, rhs: FavoriteStationTileView) -> Bool {
+        return lhs.station.id == rhs.station.id
+    }
+    
     private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -20,52 +31,122 @@ struct FavoriteStationTileView: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(station.name)
-                        .font(.headline)
-                        .foregroundColor(Color("text-color"))
-                    
-                    if isLoading {
-                        Text("Loading...")
-                            .font(.subheadline)
+            VStack(spacing: 8) {
+                // Hauptinformationen
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(station.name)
+                            .font(.headline)
                             .foregroundColor(Color("text-color"))
-                    } else if let error = errorMessage {
-                        Text(error)
-                            .font(.subheadline)
-                            .foregroundColor(.red)
-                    } else if let departure = nextDeparture {
-                        if departure > Date() {
-                            HStack(spacing: 4) {
-                                Image(systemName: "water.waves")
-                                    .foregroundColor(.blue)
-                                Text("Next wave: \(timeFormatter.string(from: departure))")
+                        
+                        if isLoading {
+                            Text("Loading...")
+                                .font(.subheadline)
+                                .foregroundColor(Color("text-color"))
+                        } else if let error = errorMessage {
+                            Text(error)
+                                .font(.subheadline)
+                                .foregroundColor(.red)
+                        } else if let departure = nextDeparture {
+                            if departure > Date() {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "water.waves")
+                                        .foregroundColor(.blue)
+                                    Text("Next wave: \(timeFormatter.string(from: departure))")
+                                        .foregroundColor(Color("text-color"))
+                                }
+                                .font(.subheadline)
+                            } else {
+                                Text(noWavesMessage)
+                                    .font(.subheadline)
                                     .foregroundColor(Color("text-color"))
                             }
-                            .font(.subheadline)
                         } else {
-                            Text(noWavesMessage)
-                                .font(.subheadline)
+                            if hasTomorrowDepartures {
+                                Text(noWavesMessage)
+                                    .font(.subheadline)
+                                    .foregroundColor(Color("text-color"))
+                            } else {
+                                Text(noServiceMessage)
+                                    .font(.subheadline)
+                                    .foregroundColor(Color("text-color"))
+                            }
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 14, weight: .semibold))
+                }
+                
+                // Wetter-Informationen
+                if let weather = weatherInfo {
+                    Divider()
+                    
+                    HStack(alignment: .center, spacing: 8) {
+                        // Wetter-Icon und Beschreibung
+                        AsyncImage(url: WeatherAPI.shared.getWeatherIconURL(icon: weather.weatherIcon)) { image in
+                            image.resizable().frame(width: 20, height: 20)
+                        } placeholder: {
+                            Image(systemName: "cloud").frame(width: 20, height: 20)
+                        }
+                        
+                        Text(weather.weatherDescription.capitalized)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(Color("text-color"))
+                            .lineLimit(1)
+                        
+                        Spacer()
+                        
+                        // Temperatur
+                        HStack(spacing: 4) {
+                            Image(systemName: "thermometer")
+                                .foregroundColor(Color.gray)
+                                .frame(width: 20, height: 20)
+                            
+                            Text(String(format: "%.1f°C", weather.temperature))
+                                .font(.system(size: 14))
                                 .foregroundColor(Color("text-color"))
                         }
-                    } else {
-                        if hasTomorrowDepartures {
-                            Text(noWavesMessage)
-                                .font(.subheadline)
-                                .foregroundColor(Color("text-color"))
-                        } else {
-                            Text(noServiceMessage)
-                                .font(.subheadline)
+                        
+                        Spacer()
+                            .frame(width: 8) // Kleinerer Abstand zwischen Temperatur und Wind
+                        
+                        // Wind-Information
+                        HStack(spacing: 4) {
+                            Image(systemName: "wind")
+                                .foregroundColor(Color.gray)
+                                .frame(width: 20, height: 20)
+                            
+                            Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
+                                .font(.system(size: 14))
                                 .foregroundColor(Color("text-color"))
                         }
                     }
+                    .padding(.top, 4)
+                } else if isLoadingWeather {
+                    Divider()
+                    HStack {
+                        Text("Loading weather...")
+                            .font(.system(size: 14))
+                            .foregroundColor(Color("text-color"))
+                        Spacer()
+                    }
+                    .padding(.top, 4)
+                } else if let error = weatherError {
+                    Divider()
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundColor(.orange)
+                        Text(error)
+                            .font(.system(size: 14))
+                            .foregroundColor(.orange)
+                        Spacer()
+                    }
+                    .padding(.top, 4)
                 }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
-                    .font(.system(size: 14, weight: .semibold))
             }
             .padding()
             .background(
@@ -77,10 +158,13 @@ struct FavoriteStationTileView: View {
         .buttonStyle(PlainButtonStyle())
         .task {
             await refreshDeparture()
+            await loadWeather()
+            
             // Start timer for periodic updates
-            timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
                 Task {
                     await refreshDeparture()
+                    await loadWeather()
                 }
             }
         }
@@ -93,22 +177,103 @@ struct FavoriteStationTileView: View {
     @MainActor
     private func refreshDeparture() async {
         isLoading = true
-        let departure = await viewModel.getNextDeparture(for: station.id)
-        // Only update the nextDeparture if it's a future departure or nil
-        if departure == nil || departure! > Date() {
-            nextDeparture = departure
-            
-            // If no departures today, check if there are departures tomorrow
-            if departure == nil {
-                hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
+        let departure = await viewModel.getNextDepartureForToday(for: station.id)
+        
+        // Nur aktualisieren, wenn sich der Wert tatsächlich geändert hat
+        if departure != nextDeparture {
+            // Only update the nextDeparture if it's a future departure or nil
+            if departure == nil || departure! > Date() {
+                nextDeparture = departure
+                
+                // If no departures today, check if there are departures tomorrow
+                if departure == nil {
+                    let hasTomorrowDeps = await viewModel.hasDeparturesTomorrow(for: station.id)
+                    if hasTomorrowDeps != hasTomorrowDepartures {
+                        hasTomorrowDepartures = hasTomorrowDeps
+                    }
+                }
+            } else {
+                // If the departure is in the past, mark as no more departures
+                nextDeparture = nil
+                // Check if there are departures tomorrow
+                let hasTomorrowDeps = await viewModel.hasDeparturesTomorrow(for: station.id)
+                if hasTomorrowDeps != hasTomorrowDepartures {
+                    hasTomorrowDepartures = hasTomorrowDeps
+                }
             }
-        } else {
-            // If the departure is in the past, mark as no more departures
-            nextDeparture = nil
-            // Check if there are departures tomorrow
-            hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
         }
+        
         errorMessage = nil
         isLoading = false
+    }
+    
+    @MainActor
+    private func loadWeather() async {
+        isLoadingWeather = true
+        
+        print("Loading weather for station: \(station.name)")
+        print("Station coordinates: lat=\(station.latitude ?? 0), lon=\(station.longitude ?? 0)")
+        print("Station UIC ref: \(station.uic_ref ?? "none")")
+        
+        // Versuche, die Koordinaten direkt aus der FavoriteStation zu verwenden
+        if let latitude = station.latitude, let longitude = station.longitude {
+            print("Using direct coordinates: \(latitude), \(longitude)")
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            await fetchWeather(for: location)
+        } 
+        // Wenn keine direkten Koordinaten verfügbar sind, versuche die Station anhand der UIC-Referenz zu finden
+        else if let uicRef = station.uic_ref {
+            print("Searching for station with UIC ref: \(uicRef)")
+            // Suche in allen Lakes nach einer Station mit der gleichen UIC-Referenz
+            for lake in viewModel.lakes {
+                if let matchingStation = lake.stations.first(where: { $0.uic_ref == uicRef }) {
+                    if let coordinates = matchingStation.coordinates {
+                        print("Found matching station with coordinates: \(coordinates.latitude), \(coordinates.longitude)")
+                        let location = CLLocationCoordinate2D(
+                            latitude: coordinates.latitude,
+                            longitude: coordinates.longitude
+                        )
+                        await fetchWeather(for: location)
+                        return
+                    }
+                }
+            }
+            print("No coordinates found for station with UIC ref: \(uicRef)")
+            weatherError = "No coordinates found for station"
+        } else {
+            print("Searching for station by name: \(station.name)")
+            // Versuche, die Station anhand des Namens zu finden
+            for lake in viewModel.lakes {
+                if let matchingStation = lake.stations.first(where: { $0.name == station.name }) {
+                    if let coordinates = matchingStation.coordinates {
+                        print("Found matching station with coordinates: \(coordinates.latitude), \(coordinates.longitude)")
+                        let location = CLLocationCoordinate2D(
+                            latitude: coordinates.latitude,
+                            longitude: coordinates.longitude
+                        )
+                        await fetchWeather(for: location)
+                        return
+                    }
+                }
+            }
+            print("No coordinates available for station: \(station.name)")
+            weatherError = "No coordinates available"
+        }
+        
+        isLoadingWeather = false
+    }
+    
+    @MainActor
+    private func fetchWeather(for location: CLLocationCoordinate2D) async {
+        do {
+            let weather = try await WeatherAPI.shared.getWeather(for: location, stationId: station.id)
+            weatherInfo = weather
+            weatherError = nil
+        } catch {
+            weatherError = "Failed to load weather"
+            print("Weather error: \(error)")
+        }
+        
+        isLoadingWeather = false
     }
 } 

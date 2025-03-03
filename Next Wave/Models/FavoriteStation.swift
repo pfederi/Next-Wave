@@ -3,6 +3,9 @@ import Foundation
 struct FavoriteStation: Codable, Identifiable {
     let id: String // station id
     let name: String
+    let latitude: Double?
+    let longitude: Double?
+    let uic_ref: String?
     
     static let maxFavorites = 5
 }
@@ -33,7 +36,13 @@ class FavoriteStationsManager: ObservableObject {
     
     func addFavorite(_ station: Lake.Station) {
         guard !isFavorite(station) && favorites.count < FavoriteStation.maxFavorites else { return }
-        let favorite = FavoriteStation(id: station.id, name: station.name)
+        let favorite = FavoriteStation(
+            id: station.id, 
+            name: station.name,
+            latitude: station.coordinates?.latitude,
+            longitude: station.coordinates?.longitude,
+            uic_ref: station.uic_ref
+        )
         favorites.append(favorite)
         saveFavorites()
     }

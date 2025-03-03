@@ -1,1 +1,4 @@
 .vercel
+
+# API Configuration mit sensiblen Daten
+Next Wave/API/APIConfig.swift

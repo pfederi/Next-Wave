@@ -8,7 +8,7 @@ struct NearestStationTileView: View {
     @ObservedObject var viewModel: LakeStationsViewModel
     @State private var nextDeparture: Date?
     @State private var timer: Timer?
-    @State private var noWavesMessage: String = Self.randomNoWavesMessage()
+    @State private var noWavesMessage: String = NoWavesMessageService.shared.getMessage()
     
     private let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -22,21 +22,6 @@ struct NearestStationTileView: View {
         formatter.minimumFractionDigits = 1
         return formatter
     }()
-    
-    private static let noWavesMessages = [
-        "No more waves today – back in the lineup tomorrow!",
-        "Flat for now, but fresh sets rolling in tomorrow!",
-        "Wave machine's off – catch the next swell tomorrow!",
-        "Boat's are taking a break – tomorrow's a new ride!",
-        "No wake waves left today – time to chill 'til sunrise!",
-        "That's it for today – fresh waves incoming tomorrow!",
-        "No waves, no worries – time to dry your wetsuit for tomorrow!",
-        "The wave train's done for today – ride continues mañana!"
-    ]
-    
-    private static func randomNoWavesMessage() -> String {
-        noWavesMessages.randomElement() ?? noWavesMessages[0]
-    }
     
     var body: some View {
         Button(action: onTap) {

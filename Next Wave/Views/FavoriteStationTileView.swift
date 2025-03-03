@@ -85,44 +85,54 @@ struct FavoriteStationTileView: View, Equatable {
                 if let weather = weatherInfo {
                     Divider()
                     
-                    HStack(alignment: .center, spacing: 8) {
-                        // Wetter-Icon und Beschreibung
-                        AsyncImage(url: WeatherAPI.shared.getWeatherIconURL(icon: weather.weatherIcon)) { image in
-                            image.resizable().frame(width: 20, height: 20)
-                        } placeholder: {
-                            Image(systemName: "cloud").frame(width: 20, height: 20)
+                    VStack(spacing: 4) {
+                        // Wenn es keine Abfahrten für heute gibt, aber für morgen, oder wenn das Wetter ein Vorhersagedatum hat
+                        if ((nextDeparture == nil && hasTomorrowDepartures) || weather.forecastDate != nil) {
+                            HStack {
+                                Text("Weather forecast for tomorrow")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color.gray)
+                                Spacer()
+                            }
+                            .padding(.bottom, 4)
                         }
                         
-                        Text(weather.weatherDescription.capitalized)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(Color("text-color"))
-                            .lineLimit(1)
-                        
-                        Spacer()
-                        
-                        // Temperatur
-                        HStack(spacing: 4) {
-                            Image(systemName: "thermometer")
-                                .foregroundColor(Color.gray)
-                                .frame(width: 20, height: 20)
+                        HStack(alignment: .center, spacing: 8) {
+                            // Wetter-Icon und Beschreibung
+                            AsyncImage(url: WeatherAPI.shared.getWeatherIconURL(icon: weather.weatherIcon)) { image in
+                                image.resizable().frame(width: 32, height: 32)
+                            } placeholder: {
+                                Image(systemName: "cloud").frame(width: 32, height: 32)
+                            }
                             
-                            Text(String(format: "%.1f°C", weather.temperature))
-                                .font(.system(size: 14))
+                            Text(weather.weatherDescription.capitalized)
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(Color("text-color"))
-                        }
-                        
-                        Spacer()
-                            .frame(width: 8) // Kleinerer Abstand zwischen Temperatur und Wind
-                        
-                        // Wind-Information
-                        HStack(spacing: 4) {
-                            Image(systemName: "wind")
-                                .foregroundColor(Color.gray)
-                                .frame(width: 20, height: 20)
+                                .lineLimit(1)
                             
-                            Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
-                                .font(.system(size: 14))
-                                .foregroundColor(Color("text-color"))
+                            Spacer()
+                            
+                            // Temperatur
+                            HStack(spacing: 4) {
+                                Image(systemName: "thermometer")
+                                    .foregroundColor(Color.gray)
+                                    .frame(width: 20, height: 20)
+                                
+                                Text(String(format: "%.1f°C", weather.temperature))
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color("text-color"))
+                            }
+                            
+                            // Wind-Information
+                            HStack(spacing: 4) {
+                                Image(systemName: "wind")
+                                    .foregroundColor(Color.gray)
+                                    .frame(width: 20, height: 20)
+                                
+                                Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color("text-color"))
+                            }
                         }
                     }
                     .padding(.top, 4)
@@ -179,6 +189,10 @@ struct FavoriteStationTileView: View, Equatable {
         isLoading = true
         let departure = await viewModel.getNextDepartureForToday(for: station.id)
         
+        // Prüfe, ob sich der Wellen-Status geändert hat
+        var statusChanged = (nextDeparture == nil && departure != nil) || 
+                           (nextDeparture != nil && departure == nil)
+        
         // Nur aktualisieren, wenn sich der Wert tatsächlich geändert hat
         if departure != nextDeparture {
             // Only update the nextDeparture if it's a future departure or nil
@@ -190,6 +204,7 @@ struct FavoriteStationTileView: View, Equatable {
                     let hasTomorrowDeps = await viewModel.hasDeparturesTomorrow(for: station.id)
                     if hasTomorrowDeps != hasTomorrowDepartures {
                         hasTomorrowDepartures = hasTomorrowDeps
+                        statusChanged = true
                     }
                 }
             } else {
@@ -199,7 +214,13 @@ struct FavoriteStationTileView: View, Equatable {
                 let hasTomorrowDeps = await viewModel.hasDeparturesTomorrow(for: station.id)
                 if hasTomorrowDeps != hasTomorrowDepartures {
                     hasTomorrowDepartures = hasTomorrowDeps
+                    statusChanged = true
                 }
+            }
+            
+            // Wenn sich der Status geändert hat, lade die Wetterdaten neu
+            if statusChanged {
+                await loadWeather()
             }
         }
         
@@ -266,8 +287,24 @@ struct FavoriteStationTileView: View, Equatable {
     @MainActor
     private func fetchWeather(for location: CLLocationCoordinate2D) async {
         do {
-            let weather = try await WeatherAPI.shared.getWeather(for: location, stationId: station.id)
-            weatherInfo = weather
+            // Hole sowohl aktuelle als auch Vorhersagedaten in einem Aufruf
+            let (current, tomorrow) = try await WeatherAPI.shared.getWeatherData(for: location, stationId: station.id)
+            
+            // Wenn keine Wellen mehr für heute, aber Wellen für morgen verfügbar sind,
+            // zeigen wir die Wettervorhersage für morgen an
+            if nextDeparture == nil && hasTomorrowDepartures {
+                if let tomorrowWeather = tomorrow {
+                    weatherInfo = tomorrowWeather
+                } else {
+                    // Fallback auf aktuelle Daten, falls keine Vorhersage verfügbar ist
+                    weatherInfo = current
+                    weatherError = "No forecast available, showing current weather"
+                }
+            } else {
+                // Ansonsten zeigen wir die aktuellen Wetterdaten an
+                weatherInfo = current
+            }
+            
             weatherError = nil
         } catch {
             weatherError = "Failed to load weather"

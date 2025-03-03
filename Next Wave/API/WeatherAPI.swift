@@ -5,38 +5,12 @@ class WeatherAPI {
     static let shared = WeatherAPI()
     
     private let apiKey = APIConfig.openWeatherMapAPIKey
-    private let baseURL = "https://api.openweathermap.org/data/2.5/weather"
+    private let oneCallURL = "https://api.openweathermap.org/data/3.0/onecall"
     
     // Speichert historische Luftdruckwerte für jede Station
     private var pressureHistory: [String: [(timestamp: Date, pressure: Int)]] = [:]
     
     private init() {}
-    
-    struct WeatherData: Codable {
-        let main: Main
-        let wind: Wind
-        let weather: [Weather]
-        
-        struct Main: Codable {
-            let temp: Double
-            let temp_min: Double
-            let temp_max: Double
-            let pressure: Int
-        }
-        
-        struct Wind: Codable {
-            let speed: Double
-            let deg: Int
-            let gust: Double?
-        }
-        
-        struct Weather: Codable {
-            let id: Int
-            let main: String
-            let description: String
-            let icon: String
-        }
-    }
     
     struct WeatherInfo {
         let temperature: Double // in Celsius
@@ -49,6 +23,7 @@ class WeatherAPI {
         let weatherDescription: String
         let weatherIcon: String
         var pressureTrend: PressureTrend = .stable // Standardwert, wird später aktualisiert
+        let forecastDate: Date? // Datum der Vorhersage, nil für aktuelle Daten
         
         enum PressureTrend {
             case rising
@@ -136,13 +111,144 @@ class WeatherAPI {
         }
     }
     
-    func getWeather(for location: CLLocationCoordinate2D, stationId: String = "default") async throws -> WeatherInfo {
-        var components = URLComponents(string: baseURL)
+    // Struktur für die One Call API 3.0 Antwort
+    struct OneCallResponse: Codable {
+        let lat: Double
+        let lon: Double
+        let timezone: String
+        let timezone_offset: Int
+        let current: CurrentWeather
+        let minutely: [MinutelyForecast]?
+        let hourly: [HourlyForecast]?
+        let daily: [DailyForecast]?
+        let alerts: [Alert]?
+        
+        struct CurrentWeather: Codable {
+            let dt: Int
+            let sunrise: Int
+            let sunset: Int
+            let temp: Double
+            let feels_like: Double
+            let pressure: Int
+            let humidity: Int
+            let dew_point: Double
+            let uvi: Double
+            let clouds: Int
+            let visibility: Int
+            let wind_speed: Double
+            let wind_deg: Int
+            let wind_gust: Double?
+            let weather: [Weather]
+            let rain: Rain?
+            let snow: Snow?
+            
+            struct Rain: Codable {
+                let oneHour: Double?
+                
+                enum CodingKeys: String, CodingKey {
+                    case oneHour = "1h"
+                }
+            }
+            
+            struct Snow: Codable {
+                let oneHour: Double?
+                
+                enum CodingKeys: String, CodingKey {
+                    case oneHour = "1h"
+                }
+            }
+        }
+        
+        struct MinutelyForecast: Codable {
+            let dt: Int
+            let precipitation: Double
+        }
+        
+        struct HourlyForecast: Codable {
+            let dt: Int
+            let temp: Double
+            let feels_like: Double
+            let pressure: Int
+            let humidity: Int
+            let dew_point: Double
+            let uvi: Double
+            let clouds: Int
+            let visibility: Int
+            let wind_speed: Double
+            let wind_deg: Int
+            let wind_gust: Double?
+            let weather: [Weather]
+            let pop: Double
+            let rain: CurrentWeather.Rain?
+            let snow: CurrentWeather.Snow?
+        }
+        
+        struct DailyForecast: Codable {
+            let dt: Int
+            let sunrise: Int
+            let sunset: Int
+            let moonrise: Int
+            let moonset: Int
+            let moon_phase: Double
+            let summary: String
+            let temp: Temperature
+            let feels_like: FeelsLike
+            let pressure: Int
+            let humidity: Int
+            let dew_point: Double
+            let wind_speed: Double
+            let wind_deg: Int
+            let wind_gust: Double?
+            let weather: [Weather]
+            let clouds: Int
+            let pop: Double
+            let rain: Double?
+            let snow: Double?
+            let uvi: Double
+            
+            struct Temperature: Codable {
+                let day: Double
+                let min: Double
+                let max: Double
+                let night: Double
+                let eve: Double
+                let morn: Double
+            }
+            
+            struct FeelsLike: Codable {
+                let day: Double
+                let night: Double
+                let eve: Double
+                let morn: Double
+            }
+        }
+        
+        struct Weather: Codable {
+            let id: Int
+            let main: String
+            let description: String
+            let icon: String
+        }
+        
+        struct Alert: Codable {
+            let sender_name: String
+            let event: String
+            let start: Int
+            let end: Int
+            let description: String
+            let tags: [String]?
+        }
+    }
+    
+    // Ruft aktuelle Wetterdaten und Vorhersagen ab
+    func getWeatherData(for location: CLLocationCoordinate2D, stationId: String = "default") async throws -> (current: WeatherInfo, tomorrow: WeatherInfo?) {
+        var components = URLComponents(string: oneCallURL)
         components?.queryItems = [
             URLQueryItem(name: "lat", value: String(location.latitude)),
             URLQueryItem(name: "lon", value: String(location.longitude)),
             URLQueryItem(name: "appid", value: apiKey),
-            URLQueryItem(name: "units", value: "metric")
+            URLQueryItem(name: "units", value: "metric"),
+            URLQueryItem(name: "exclude", value: "minutely") // Wir brauchen keine minütlichen Daten
         ]
         
         guard let url = components?.url else {
@@ -150,7 +256,7 @@ class WeatherAPI {
             throw URLError(.badURL)
         }
         
-        print("Making weather request to: \(url.absoluteString)")
+        print("Making One Call API request to: \(url.absoluteString)")
         
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
@@ -167,24 +273,48 @@ class WeatherAPI {
             }
             
             do {
-                let weatherData = try JSONDecoder().decode(WeatherData.self, from: data)
+                let oneCallResponse = try JSONDecoder().decode(OneCallResponse.self, from: data)
                 
-                var weatherInfo = WeatherInfo(
-                    temperature: weatherData.main.temp,
-                    tempMin: weatherData.main.temp_min,
-                    tempMax: weatherData.main.temp_max,
-                    windSpeed: weatherData.wind.speed,
-                    windDirection: weatherData.wind.deg,
-                    windGust: weatherData.wind.gust,
-                    pressure: weatherData.main.pressure,
-                    weatherDescription: weatherData.weather.first?.description ?? "Unknown",
-                    weatherIcon: weatherData.weather.first?.icon ?? "01d"
+                // Aktuelle Wetterdaten
+                var currentWeatherInfo = WeatherInfo(
+                    temperature: oneCallResponse.current.temp,
+                    tempMin: oneCallResponse.daily?.first?.temp.min ?? oneCallResponse.current.temp,
+                    tempMax: oneCallResponse.daily?.first?.temp.max ?? oneCallResponse.current.temp,
+                    windSpeed: oneCallResponse.current.wind_speed,
+                    windDirection: oneCallResponse.current.wind_deg,
+                    windGust: oneCallResponse.current.wind_gust,
+                    pressure: oneCallResponse.current.pressure,
+                    weatherDescription: oneCallResponse.current.weather.first?.description ?? "Unknown",
+                    weatherIcon: oneCallResponse.current.weather.first?.icon ?? "01d",
+                    forecastDate: nil
                 )
                 
-                // Berechne den Luftdrucktrend
-                weatherInfo.pressureTrend = calculatePressureTrend(for: stationId, currentPressure: weatherData.main.pressure)
+                // Berechne den Luftdrucktrend für aktuelle Daten
+                currentWeatherInfo.pressureTrend = calculatePressureTrend(for: stationId, currentPressure: oneCallResponse.current.pressure)
                 
-                return weatherInfo
+                // Vorhersage für morgen (zweiter Tag in der täglichen Vorhersage)
+                var tomorrowWeatherInfo: WeatherInfo? = nil
+                
+                if let dailyForecasts = oneCallResponse.daily, dailyForecasts.count > 1 {
+                    let tomorrowForecast = dailyForecasts[1]
+                    let tomorrowDate = Date(timeIntervalSince1970: TimeInterval(tomorrowForecast.dt))
+                    
+                    tomorrowWeatherInfo = WeatherInfo(
+                        temperature: tomorrowForecast.temp.day,
+                        tempMin: tomorrowForecast.temp.min,
+                        tempMax: tomorrowForecast.temp.max,
+                        windSpeed: tomorrowForecast.wind_speed,
+                        windDirection: tomorrowForecast.wind_deg,
+                        windGust: tomorrowForecast.wind_gust,
+                        pressure: tomorrowForecast.pressure,
+                        weatherDescription: tomorrowForecast.weather.first?.description ?? "Unknown",
+                        weatherIcon: tomorrowForecast.weather.first?.icon ?? "01d",
+                        pressureTrend: .stable, // Für Vorhersagen verwenden wir einen stabilen Trend
+                        forecastDate: tomorrowDate
+                    )
+                }
+                
+                return (currentWeatherInfo, tomorrowWeatherInfo)
             } catch {
                 print("JSON decoding error: \(error)")
                 throw error
@@ -193,6 +323,23 @@ class WeatherAPI {
             print("Network error: \(error)")
             throw error
         }
+    }
+    
+    // Hilfsmethode für aktuelle Wetterdaten
+    func getWeather(for location: CLLocationCoordinate2D, stationId: String = "default") async throws -> WeatherInfo {
+        let (current, _) = try await getWeatherData(for: location, stationId: stationId)
+        return current
+    }
+    
+    // Hilfsmethode für Wettervorhersage für morgen
+    func getForecast(for location: CLLocationCoordinate2D, stationId: String = "default") async throws -> WeatherInfo {
+        let (_, tomorrow) = try await getWeatherData(for: location, stationId: stationId)
+        
+        guard let tomorrowWeather = tomorrow else {
+            throw URLError(.cannotParseResponse)
+        }
+        
+        return tomorrowWeather
     }
     
     func getWeatherIconURL(icon: String) -> URL? {

@@ -4,9 +4,9 @@ import CoreLocation
 class WeatherAPI {
     static let shared = WeatherAPI()
     
-    // OpenWeather API URLs und Key
-    private let apiKey = "06de570cc7607ea17842332e0be7a605"
+    // OpenWeather API URLs
     private let baseURL = "https://api.openweathermap.org/data/2.5"
+    private let apiKey = Config.openWeatherApiKey
     
     // Speichert historische Luftdruckwerte für jede Station
     private var pressureHistory: [String: [(timestamp: Date, pressure: Int)]] = [:]

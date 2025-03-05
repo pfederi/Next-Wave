@@ -34,29 +34,14 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         return formatter
     }()
     
-    private let scheduleViewModel: ScheduleViewModel
+    private var scheduleViewModel: ScheduleViewModel?
     
     private var midnightTimer: Timer?
     
     private let locationManager = LocationManager()
     
-    init(scheduleViewModel: ScheduleViewModel) {
+    init(scheduleViewModel: ScheduleViewModel? = nil) {
         self.scheduleViewModel = scheduleViewModel
-        loadLakes()
-        scheduleMidnightRefresh()
-        
-        // Setup location updates
-        locationManager.onLocationUpdate = { [weak self] _ in
-            self?.updateNearestStation()
-        }
-        locationManager.requestLocationPermission()
-        locationManager.startUpdatingLocation()
-        updateNearestStation() // Initial update
-    }
-    
-    init() {
-        self.scheduleViewModel = ScheduleViewModel()
-        self.selectedDate = Date()
         loadLakes()
         scheduleMidnightRefresh()
         
@@ -186,7 +171,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     func selectStation(_ station: Lake.Station) {
         self.selectedStation = station
         self.departures = []
-        scheduleViewModel.nextWaves = []
+        if let scheduleViewModel {
+            scheduleViewModel.nextWaves = []
+        }
         Task {
             await refreshDepartures()
         }
@@ -363,5 +350,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         if let station = nearestStation {
             self.nearestStation = (station: station, distance: shortestDistance)
         }
+    }
+    
+    func setScheduleViewModel(_ viewModel: ScheduleViewModel) {
+        self.scheduleViewModel = viewModel
     }
 } 

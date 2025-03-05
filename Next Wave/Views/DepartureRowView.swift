@@ -7,20 +7,110 @@ struct DepartureRowView: View {
     let isPast: Bool
     let isCurrentDay: Bool
     @ObservedObject var scheduleViewModel: ScheduleViewModel
+    @EnvironmentObject var appSettings: AppSettings
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            TimeColumn(formattedTime: formattedTime, 
-                      isPast: isPast, 
-                      isCurrentDay: isCurrentDay)
+            VStack(alignment: .center, spacing: 12) {
+                Text(formattedTime)
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(isPast ? .gray : .primary)
+                if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
+                    RemainingTimeView(targetDate: date)
+                }
+            }
+            .frame(width: 70)
             
             Spacer().frame(width: 16)
             
-            InfoColumn(wave: wave, 
-                      index: index, 
-                      isPast: isPast,
-                      hasNotification: scheduleViewModel.hasNotification(for: wave),
-                      isCurrentDay: isCurrentDay)
+            VStack(alignment: .leading, spacing: 8) {
+                // Erste Zeile: Wave-Nummer, Notification und Wetter
+                HStack(alignment: .firstTextBaseline) {
+                    Image(systemName: "water.waves")
+                        .foregroundColor(isPast ? .gray : .blue)
+                    Text("\(index + 1). Wave")
+                        .foregroundColor(isPast ? .gray : .primary)
+                    
+                    Spacer()
+                    
+                    // Wetteranzeige
+                    if !isPast && appSettings.showWeatherInfo {
+                        if let weather = wave.weather {
+                            HStack(spacing: 4) {
+                                Image(systemName: weather.weatherIcon)
+                                    .font(.system(size: 16))
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 12))
+                                
+                                Text(String(format: "%.1f°", weather.temperature))
+                                    .font(.system(size: 12))
+                                    .foregroundColor(isPast ? .gray : .primary)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 12))
+                                
+                                Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(isPast ? .gray : .primary)
+                            }
+                        } else {
+                            Text("Loading weather...")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    if scheduleViewModel.hasNotification(for: wave) {
+                        Image(systemName: "bell.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 16))
+                    }
+                }
+                
+                // Zweite Zeile: Route, Schiff und Ziel
+                HStack(alignment: .center, spacing: 8) {
+                    // Route-Nummer
+                    Text(wave.routeNumber)
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(12)
+                    
+                    if wave.isZurichsee && isCurrentDay {
+                        // Schiffsname mit Icon
+                        HStack(spacing: 4) {
+                            Text(wave.shipName ?? "Loading...")
+                                .fixedSize(horizontal: true, vertical: false)
+                            if let shipName = wave.shipName {
+                                Image(getWaveIcon(for: shipName))
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 10)
+                            }
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(12)
+                    }
+                    
+                    Text("→")
+                        .font(.caption)
+                        .foregroundColor(isPast ? .gray : .primary)
+                    
+                    Text(wave.neighborStopName)
+                        .font(.caption)
+                        .foregroundColor(isPast ? .gray : .primary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                }
+            }
             
             Spacer()
         }
@@ -33,25 +123,6 @@ struct DepartureRowView: View {
                                  isCurrentDay: isCurrentDay)
             }
         }
-    }
-}
-
-private struct TimeColumn: View {
-    let formattedTime: String
-    let isPast: Bool
-    let isCurrentDay: Bool
-    
-    var body: some View {
-        VStack(alignment: .center, spacing: 4) {
-            Text(formattedTime)
-                .font(.system(size: 24, weight: .bold))
-                .foregroundColor(isPast ? .gray : .primary)
-            if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
-                RemainingTimeView(targetDate: date)
-                    .padding(.top, 6)
-            }
-        }
-        .frame(width: 70)
     }
 }
 
@@ -97,73 +168,6 @@ private struct RemainingTimeView: View {
         }
         .onAppear {
             currentTime = Date()
-        }
-    }
-}
-
-private struct InfoColumn: View {
-    let wave: WaveEvent
-    let index: Int
-    let isPast: Bool
-    let hasNotification: Bool
-    let isCurrentDay: Bool
-    @Environment(\.colorScheme) var colorScheme
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center) {
-                Image(systemName: "water.waves")
-                    .foregroundColor(isPast ? .gray : .blue)
-                Text("\(index + 1). Wave")
-                    .foregroundColor(isPast ? .gray : .primary)
-                
-                Spacer()
-                
-                if hasNotification {
-                    Image(systemName: "bell.fill")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 16))
-                }
-            }
-            
-            HStack(spacing: 8) {
-                Text(wave.routeNumber)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.gray.opacity(colorScheme == .dark ? 0.4 : 0.1))
-                    .cornerRadius(12)
-                
-                if wave.isZurichsee && isCurrentDay {
-                    HStack(spacing: 4) {
-                        HStack(spacing: 4) {
-                            Text(wave.shipName ?? "Loading...")
-                            if let shipName = wave.shipName {
-                                Image(getWaveIcon(for: shipName))
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 10)
-                            }
-                        }
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(colorScheme == .dark ? 0.3 : 0.1))
-                        .cornerRadius(12)
-                        .fixedSize(horizontal: true, vertical: false)
-                    }
-                }
-                
-                Text("→")
-                    .font(.caption)
-                    .foregroundColor(isPast ? .gray : .primary)
-                
-                Text(wave.neighborStopName)
-                    .font(.caption)
-                    .foregroundColor(isPast ? .gray : .primary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
         }
     }
 }

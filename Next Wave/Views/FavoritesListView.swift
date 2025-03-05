@@ -3,25 +3,28 @@ import SwiftUI
 struct FavoritesListView: View {
     @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @ObservedObject var viewModel: LakeStationsViewModel
+    @EnvironmentObject var appSettings: AppSettings
     @State private var editMode: EditMode = .inactive
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Favorite Spots")
+                Text("Favorite Stations")
                     .font(.headline)
                     .foregroundColor(Color("text-color"))
                 
                 Spacer()
                 
-                Button(action: {
-                    withAnimation {
-                        editMode = editMode == .inactive ? .active : .inactive
+                if favoritesManager.favorites.count >= 2 {
+                    Button(action: {
+                        withAnimation {
+                            editMode = editMode == .inactive ? .active : .inactive
+                        }
+                    }) {
+                        Text(editMode == .active ? "Done" : "Edit")
+                            .foregroundColor(.accentColor)
+                            .font(.system(size: 14))
                     }
-                }) {
-                    Text(editMode == .active ? "Done" : "Edit")
-                        .foregroundColor(.accentColor)
-                        .font(.system(size: 14))
                 }
             }
             .padding(.horizontal)
@@ -42,6 +45,7 @@ struct FavoritesListView: View {
                             },
                             viewModel: viewModel
                         )
+                        .environmentObject(appSettings)
                         .padding(.horizontal)
                         .onLongPressGesture {
                             withAnimation {

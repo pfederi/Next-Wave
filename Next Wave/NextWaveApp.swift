@@ -50,12 +50,17 @@ class BackgroundTaskManager {
 
 @main
 struct NextWaveApp: App {
-    @StateObject private var viewModel = ScheduleViewModel()
-    @StateObject private var appSettings = AppSettings()
+    @StateObject private var appSettings: AppSettings
+    @StateObject private var viewModel: ScheduleViewModel
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var systemColorScheme
     
     init() {
+        let appSettings = AppSettings()
+        let viewModel = ScheduleViewModel(appSettings: appSettings)
+        self._appSettings = StateObject(wrappedValue: appSettings)
+        self._viewModel = StateObject(wrappedValue: viewModel)
+        
         requestNotificationPermissions()
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.backgroundColor = UIColor(Color("background-color"))

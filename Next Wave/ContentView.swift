@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var viewModel = LakeStationsViewModel()
+    @StateObject private var viewModel: LakeStationsViewModel
     @EnvironmentObject private var appSettings: AppSettings
     @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @State private var showingLocationPicker = false
@@ -25,8 +25,7 @@ struct ContentView: View {
     @State private var editMode: EditMode = .inactive
     
     init() {
-        let scheduleVM = ScheduleViewModel()
-        self._viewModel = StateObject(wrappedValue: LakeStationsViewModel(scheduleViewModel: scheduleVM))
+        self._viewModel = StateObject(wrappedValue: LakeStationsViewModel())
     }
     
     var body: some View {
@@ -158,6 +157,9 @@ struct ContentView: View {
             if selectedDate != newDate {
                 selectedDate = newDate
             }
+        }
+        .onAppear {
+            viewModel.setScheduleViewModel(scheduleViewModel)
         }
     }
     

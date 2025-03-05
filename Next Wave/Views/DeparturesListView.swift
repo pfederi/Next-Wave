@@ -58,13 +58,17 @@ struct DeparturesListView: View {
                         }
                         .listStyle(.plain)
                         .onAppear {
-                            scheduleViewModel.updateWaves(from: departures)
+                            if let station = viewModel.selectedStation {
+                                scheduleViewModel.updateWaves(from: departures, station: station)
+                            }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 scrollToNextWave(proxy: proxy)
                             }
                         }
                         .onChange(of: viewModel.selectedDate) { oldDate, newDate in
-                            scheduleViewModel.updateWaves(from: departures)
+                            if let station = viewModel.selectedStation {
+                                scheduleViewModel.updateWaves(from: departures, station: station)
+                            }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 scrollToNextWave(proxy: proxy)
                             }

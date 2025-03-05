@@ -38,6 +38,12 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var showWeatherInfo: Bool {
+        didSet {
+            UserDefaults.standard.set(showWeatherInfo, forKey: "showWeatherInfo")
+        }
+    }
+    
     var isDarkMode: Bool {
         switch theme {
         case .light:
@@ -70,6 +76,9 @@ class AppSettings: ObservableObject {
         
         // Initialize showNearestStation with default value true
         self.showNearestStation = UserDefaults.standard.bool(forKey: "showNearestStation", defaultValue: true)
+        
+        // Initialize showWeatherInfo with default value true
+        self.showWeatherInfo = UserDefaults.standard.bool(forKey: "showWeatherInfo", defaultValue: true)
     }
 }
 

@@ -5,6 +5,7 @@ struct FavoriteStationTileView: View, Equatable {
     let station: FavoriteStation
     let onTap: () -> Void
     @ObservedObject var viewModel: LakeStationsViewModel
+    @EnvironmentObject var appSettings: AppSettings
     @State private var nextDeparture: Date?
     @State private var timer: Timer?
     @State private var errorMessage: String?
@@ -81,32 +82,30 @@ struct FavoriteStationTileView: View, Equatable {
                         .font(.system(size: 14, weight: .semibold))
                 }
                 
-                // Wetter-Informationen
-                if let weather = weatherInfo {
+                // Wetteranzeige nur anzeigen, wenn showWeatherInfo aktiviert ist
+                if appSettings.showWeatherInfo, let weather = weatherInfo {
                     Divider()
                     
-                    VStack(spacing: 4) {
-                        // Wenn es keine Abfahrten für heute gibt, aber für morgen, oder wenn das Wetter ein Vorhersagedatum hat
-                        if ((nextDeparture == nil && hasTomorrowDepartures) || weather.forecastDate != nil) {
-                            HStack {
-                                Text("Weather forecast for tomorrow")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color.gray)
-                                Spacer()
-                            }
-                            .padding(.bottom, 4)
+                    // Wettervorhersage für morgen anzeigen, wenn keine Wellen mehr für heute, aber Wellen für morgen verfügbar sind
+                    // oder wenn die Wetterdaten ein Vorhersagedatum haben
+                    if (nextDeparture == nil && hasTomorrowDepartures) || weather.forecastDate != nil {
+                        HStack {
+                            Text("Weather forecast for tomorrow")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(Color("text-color"))
+                            Spacer()
                         }
-                        
-                        HStack(alignment: .center, spacing: 8) {
+                    }
+                    
+                    VStack(spacing: 8) {
+                        HStack(alignment: .center, spacing: 2) {
                             // Wetter-Icon und Beschreibung
-                            AsyncImage(url: WeatherAPI.shared.getWeatherIconURL(icon: weather.weatherIcon)) { image in
-                                image.resizable().frame(width: 32, height: 32)
-                            } placeholder: {
-                                Image(systemName: "cloud").frame(width: 32, height: 32)
-                            }
+                            Image(systemName: weather.weatherIcon)
+                                .font(.system(size: 16))
+                                .padding(.trailing, 4)
                             
                             Text(weather.weatherDescription.capitalized)
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color("text-color"))
                                 .lineLimit(1)
                             
@@ -115,28 +114,51 @@ struct FavoriteStationTileView: View, Equatable {
                             // Temperatur
                             HStack(spacing: 4) {
                                 Image(systemName: "thermometer")
-                                    .foregroundColor(Color.gray)
-                                    .frame(width: 20, height: 20)
+                                    .font(.system(size: 12))
                                 
-                                Text(String(format: "%.1f°C", weather.temperature))
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color("text-color"))
+                                if weather.forecastDate != nil {
+                                    // Wenn es eine Wettervorhersage ist, zeige Morgen- und Nachmittagstemperatur
+                                    if let morning = weather.morningTemp, let afternoon = weather.afternoonTemp {
+                                        Text(String(format: "%.0f° / %.0f°", morning, afternoon))
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Color("text-color"))
+                                    } else {
+                                        // Fallback auf Min/Max wenn keine spezifischen Zeiten verfügbar sind
+                                        Text(String(format: "%.0f° / %.0f°", weather.tempMin, weather.tempMax))
+                                            .font(.system(size: 12))
+                                            .foregroundColor(Color("text-color"))
+                                    }
+                                } else {
+                                    // Für aktuelle Wetterdaten zeige nur die aktuelle Temperatur
+                                    Text(String(format: "%.1f°C", weather.temperature))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                }
                             }
+
+                            Spacer().frame(width: 4)
                             
                             // Wind-Information
                             HStack(spacing: 4) {
                                 Image(systemName: "wind")
-                                    .foregroundColor(Color.gray)
-                                    .frame(width: 20, height: 20)
+                                    .font(.system(size: 12))
                                 
-                                Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color("text-color"))
+                                if weather.forecastDate != nil, let maxWind = weather.maxWindSpeedKnots {
+                                    // Für Wettervorhersage die maximale Windgeschwindigkeit anzeigen
+                                    Text(String(format: "max %.1f kn", maxWind))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                } else {
+                                    // Für aktuelle Wetterdaten die aktuelle Windgeschwindigkeit mit Richtung anzeigen
+                                    Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                }
                             }
                         }
                     }
                     .padding(.top, 4)
-                } else if isLoadingWeather {
+                } else if appSettings.showWeatherInfo && isLoadingWeather {
                     Divider()
                     HStack {
                         Text("Loading weather...")
@@ -145,12 +167,12 @@ struct FavoriteStationTileView: View, Equatable {
                         Spacer()
                     }
                     .padding(.top, 4)
-                } else if let error = weatherError {
+                } else if appSettings.showWeatherInfo && weatherError != nil {
                     Divider()
                     HStack {
                         Image(systemName: "exclamationmark.triangle")
                             .foregroundColor(.orange)
-                        Text(error)
+                        Text(weatherError ?? "Unknown error")
                             .font(.system(size: 14))
                             .foregroundColor(.orange)
                         Spacer()
@@ -168,12 +190,25 @@ struct FavoriteStationTileView: View, Equatable {
         .buttonStyle(PlainButtonStyle())
         .task {
             await refreshDeparture()
-            await loadWeather()
+            // Lade Wetterdaten nur, wenn die Einstellung aktiviert ist
+            if appSettings.showWeatherInfo {
+                await loadWeather()
+            }
             
             // Start timer for periodic updates
             timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
-                Task {
+                Task { @MainActor in
                     await refreshDeparture()
+                    if appSettings.showWeatherInfo {
+                        await loadWeather()
+                    }
+                }
+            }
+        }
+        .onChange(of: appSettings.showWeatherInfo) { oldValue, newValue in
+            // Wenn die Einstellung aktiviert wird, lade die Wetterdaten
+            if newValue {
+                Task { @MainActor in
                     await loadWeather()
                 }
             }

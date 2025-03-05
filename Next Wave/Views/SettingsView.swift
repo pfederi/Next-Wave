@@ -42,6 +42,21 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 12)
                         .padding(.horizontal, 16)
+                        
+                        Toggle(isOn: $appSettings.showWeatherInfo) {
+                            HStack {
+                                Image(systemName: "cloud.sun.fill")
+                                    .foregroundColor(Color("text-color"))
+                                    .font(.system(size: 20))
+                                    .padding(.trailing, 8)
+                                
+                                Text("Show Weather Information")
+                                    .foregroundColor(Color("text-color"))
+                                    .font(.system(size: 17, weight: .regular))
+                            }
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
                     }
                     
                     Divider()
@@ -210,7 +225,8 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             ForEach([
                                 ("7lll Water", "https://apps.apple.com/us/app/7iii-water-downwind-winging/id6495238780"),
-                                ("Foil Mates", "https://apps.apple.com/ch/app/foil-mates/id6514323603")
+                                ("Foil Mates", "https://apps.apple.com/ch/app/foil-mates/id6514323603"),
+                                ("Foilmotion", "https://foilmotion.webchoice.ch/")
                             ], id: \.0) { app in
                                 HStack(alignment: .top, spacing: 8) {
                                     Text("•")

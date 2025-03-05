@@ -14,6 +14,7 @@ struct WaveEvent: Identifiable, Equatable {
     let lake: String
     private(set) var shipName: String?
     var hasNotification = false
+    var weather: WeatherAPI.WeatherInfo?
     
     var isZurichsee: Bool {
         lake == "Zürichsee"
@@ -35,6 +36,10 @@ struct WaveEvent: Identifiable, Equatable {
         shipName = name
     }
     
+    mutating func updateWeather(_ weatherInfo: WeatherAPI.WeatherInfo) {
+        weather = weatherInfo
+    }
+    
     static func == (lhs: WaveEvent, rhs: WaveEvent) -> Bool {
         lhs.id == rhs.id &&
         lhs.time == rhs.time &&
@@ -46,7 +51,10 @@ struct WaveEvent: Identifiable, Equatable {
         lhs.period == rhs.period &&
         lhs.lake == rhs.lake &&
         lhs.shipName == rhs.shipName &&
-        lhs.hasNotification == rhs.hasNotification
+        lhs.hasNotification == rhs.hasNotification &&
+        lhs.weather?.weatherIcon == rhs.weather?.weatherIcon &&
+        lhs.weather?.temperature == rhs.weather?.temperature &&
+        lhs.weather?.windSpeedKnots == rhs.weather?.windSpeedKnots
     }
 }
 

@@ -2,6 +2,7 @@ import Foundation
 import UserNotifications
 import SwiftUI
 import BackgroundTasks
+import CoreLocation
 
 // Helper extension for async map
 extension Array {
@@ -23,17 +24,21 @@ class ScheduleViewModel: ObservableObject {
         }
     }
     
+    @ObservedObject var appSettings: AppSettings
+    
+    var selectedStation: Lake.Station?
+    
     struct Settings: Codable {
         var leadTime: Int
         var selectedSound: String
         
         static let `default` = Settings(
-            leadTime: 5,
+            leadTime: 15,
             selectedSound: "boat-horn"
         )
     }
     
-    let availableSounds = [
+    var availableSounds: [String: String] = [
         "boat-horn": "Boat Horn",
         "happy": "Happy Tune",
         "let-the-fun-begin": "Fun Time",
@@ -53,18 +58,24 @@ class ScheduleViewModel: ObservableObject {
         }
     }
     @Published var hasAttemptedLoad: Bool = false
-    @Published var nextWaves: [WaveEvent] = []
+    @Published var nextWaves: [WaveEvent] = [] {
+        didSet {
+            loadWeatherForWaves()
+        }
+    }
     
     private let userDefaults = UserDefaults.standard
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
-    private let settingsKey = "app.settings"
+    private let settingsKey = "NotificationSettings"
     
     private var midnightTimer: Timer?
     private var currentLoadingTask: Task<Void, Never>?
+    private var weatherLoadingTask: Task<Void, Never>?
     
     private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen
     
-    init() {
+    init(appSettings: AppSettings) {
+        self.appSettings = appSettings
         if let data = userDefaults.data(forKey: settingsKey),
            let decoded = try? JSONDecoder().decode(Settings.self, from: data) {
             self.settings = decoded
@@ -84,6 +95,7 @@ class ScheduleViewModel: ObservableObject {
     deinit {
         midnightTimer?.invalidate()
         currentLoadingTask?.cancel()
+        weatherLoadingTask?.cancel()
     }
     
     private func saveSettings() {
@@ -104,9 +116,13 @@ class ScheduleViewModel: ObservableObject {
         }
     }
     
-    func updateWaves(from departures: [Journey]) {
+    func updateWaves(from departures: [Journey], station: Lake.Station) {
+        // Set the selected station
+        self.selectedStation = station
+        
         // Cancel any existing loading task
         currentLoadingTask?.cancel()
+        weatherLoadingTask?.cancel()
         
         let waves = departures.map { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
@@ -132,29 +148,75 @@ class ScheduleViewModel: ObservableObject {
             )
         }
         
+        // Setze die Wellen einmal initial
         nextWaves = waves
         hasAttemptedLoad = true
         
-        // Start new loading task
+        // Starte einen einzelnen Task für beide Updates
         currentLoadingTask = Task { @MainActor in
-            for index in waves.indices where waves[index].isZurichsee {
-                guard !Task.isCancelled else {
-                    return
+            guard let coordinates = station.coordinates else { return }
+            let location = CLLocationCoordinate2D(
+                latitude: coordinates.latitude,
+                longitude: coordinates.longitude
+            )
+            
+            // Erstelle eine Kopie der Wellen für die Verarbeitung
+            var updatedWaves = waves
+            
+            // 1. Lade zuerst alle Wetterdaten parallel
+            let weatherData = await updatedWaves.asyncMap { wave -> WeatherAPI.WeatherInfo? in
+                guard !Task.isCancelled else { return nil }
+                // Nur für zukünftige Wellen Wetter laden und wenn Wetteranzeige aktiviert ist
+                guard wave.time > Date() && appSettings.showWeatherInfo else { return nil }
+                do {
+                    let weather = try await WeatherAPI.shared.getWeatherForTime(
+                        location: location,
+                        time: wave.time
+                    )
+                    return weather
+                } catch {
+                    print("Error loading weather for wave: \(error)")
+                    return nil
+                }
+            }
+            
+            // 2. Lade dann alle Schiffsnamen parallel
+            let shipNames = await updatedWaves.asyncMap { wave -> String? in
+                guard !Task.isCancelled else { return nil }
+                guard wave.isZurichsee else { return nil }
+                
+                // Prüfe zuerst den Cache
+                if let cachedName = shipNamesCache[wave.routeNumber] {
+                    return cachedName
                 }
                 
-                if let shipName = await VesselAPI.shared.findShipName(
-                    for: waves[index].routeNumber,
+                // Wenn nicht im Cache, lade von der API
+                let shipName = await VesselAPI.shared.findShipName(
+                    for: wave.routeNumber,
                     date: selectedDate
-                ) {
-                    guard !Task.isCancelled else {
-                        return
-                    }
-                    if index < nextWaves.count {
-                        nextWaves[index].updateShipName(shipName)
-                    } else {
-                        print("Index \(index) out of bounds for nextWaves array with count \(nextWaves.count)")
-                    }
+                )
+                
+                // Speichere im Cache
+                if let shipName = shipName {
+                    shipNamesCache[wave.routeNumber] = shipName
                 }
+                
+                return shipName
+            }
+            
+            // 3. Aktualisiere die Wellen mit beiden Informationen
+            for i in updatedWaves.indices {
+                if let weather = weatherData[i] {
+                    updatedWaves[i].updateWeather(weather)
+                }
+                if let shipName = shipNames[i] {
+                    updatedWaves[i].updateShipName(shipName)
+                }
+            }
+            
+            // 4. Aktualisiere die UI nur einmal am Ende
+            if !Task.isCancelled {
+                nextWaves = updatedWaves
             }
         }
     }
@@ -313,5 +375,9 @@ class ScheduleViewModel: ObservableObject {
 
     func getShipName(for routeNumber: String) -> String? {
         return shipNamesCache[routeNumber]
+    }
+    
+    private func loadWeatherForWaves() {
+        // Diese Methode wird nicht mehr benötigt, da das Wetter jetzt in updateWaves geladen wird
     }
 }

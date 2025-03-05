@@ -2,3 +2,24 @@
 
 # API Configuration mit sensiblen Daten
 Next Wave/API/APIConfig.swift
+
+# Xcode
+.DS_Store
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/
+DerivedData/
+build/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Config files with sensitive data
+Next Wave/Config.swift
+
+# Other
+*.log
+.env
+*.env.local

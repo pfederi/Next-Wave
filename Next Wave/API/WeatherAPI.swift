@@ -6,7 +6,7 @@ class WeatherAPI {
     
     // OpenWeather API URLs
     private let baseURL = "https://api.openweathermap.org/data/2.5"
-    private let apiKey = Config.openWeatherApiKey
+    private let apiKey: String = AppConfig.Weather.openWeatherApiKey
     
     // Speichert historische Luftdruckwerte für jede Station
     private var pressureHistory: [String: [(timestamp: Date, pressure: Int)]] = [:]

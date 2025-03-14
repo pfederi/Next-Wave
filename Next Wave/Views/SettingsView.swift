@@ -193,7 +193,7 @@ struct SettingsView: View {
                     
                     DisclosureGroup("How it works") {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("1.") + Text(" Select your spot")
+                            Text("1.") + Text(" Select your station")
                             Text("2.") + Text(" Check the timetable")
                             Text("3.") + Text(" Set notifications with a swipe from right to left")
                             Text("4.") + Text(" Enjoy your ride!")
@@ -207,7 +207,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             ForEach(["Real-time boat schedule tracking",
                                     "Smart notifications 3, 5, 10 or 15 minutes before waves",
-                                    "Easy spot selection on Swiss Lakes",
+                                    "Easy station selection on Swiss Lakes",
                                     "Precise wave timing information",
                                     "Custom boat horn notifications"], id: \.self) { feature in
                                 HStack(alignment: .top, spacing: 8) {
@@ -254,7 +254,7 @@ struct SettingsView: View {
                 Group {
                     VStack(alignment: .leading, spacing: 10) {
                         Button(action: {
-                            if let url = URL(string: "https://pumpfoiling.community/next-wave-app-privacy-policy/") {
+                            if let url = URL(string: "https://nextwaveapp.ch/privacy.html") {
                                 openURL(url)
                             }
                         }) {

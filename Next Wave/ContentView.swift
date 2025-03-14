@@ -1,5 +1,5 @@
 //  ContentView.swift
-//  Next Wave
+//  NextWave
 //
 //  Created by Patrick Federi started at 12.12.2024.
 
@@ -133,7 +133,7 @@ struct ContentView: View {
                         }
                     }
                     ToolbarItem(placement: .principal) {
-                        Text("Next Wave")
+                        Text("NextWave")
                             .font(.headline)
                             .foregroundColor(Color("text-color"))
                     }

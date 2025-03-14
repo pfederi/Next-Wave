@@ -280,7 +280,7 @@ class ScheduleViewModel: ObservableObject {
             "Your wave adventure begins soon!"
         ]
         
-        content.title = "Next Wave"
+        content.title = "NextWave"
         content.body = notificationMessages.randomElement() ?? "Get ready to surf!"
         content.sound = getNotificationSound()
         

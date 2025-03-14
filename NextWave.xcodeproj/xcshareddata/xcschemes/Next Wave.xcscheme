@@ -18,7 +18,7 @@
                BlueprintIdentifier = "8A225F302D0ABC6F008BA92B"
                BuildableName = "Next Wave.app"
                BlueprintName = "Next Wave"
-               ReferencedContainer = "container:Next Wave.xcodeproj">
+               ReferencedContainer = "container:NextWave.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -43,7 +43,7 @@
                BlueprintIdentifier = "8A225F402D0ABC70008BA92B"
                BuildableName = "Next WaveTests.xctest"
                BlueprintName = "Next WaveTests"
-               ReferencedContainer = "container:Next Wave.xcodeproj">
+               ReferencedContainer = "container:NextWave.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -54,7 +54,7 @@
                BlueprintIdentifier = "8A225F4A2D0ABC70008BA92B"
                BuildableName = "Next WaveUITests.xctest"
                BlueprintName = "Next WaveUITests"
-               ReferencedContainer = "container:Next Wave.xcodeproj">
+               ReferencedContainer = "container:NextWave.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -76,7 +76,7 @@
             BlueprintIdentifier = "8A225F302D0ABC6F008BA92B"
             BuildableName = "Next Wave.app"
             BlueprintName = "Next Wave"
-            ReferencedContainer = "container:Next Wave.xcodeproj">
+            ReferencedContainer = "container:NextWave.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -93,7 +93,7 @@
             BlueprintIdentifier = "8A225F302D0ABC6F008BA92B"
             BuildableName = "Next Wave.app"
             BlueprintName = "Next Wave"
-            ReferencedContainer = "container:Next Wave.xcodeproj">
+            ReferencedContainer = "container:NextWave.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

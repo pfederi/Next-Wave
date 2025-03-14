@@ -212,7 +212,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 8A225F2C2D0ABC6F008BA92B /* Build configuration list for PBXProject "Next Wave" */;
+			buildConfigurationList = 8A225F2C2D0ABC6F008BA92B /* Build configuration list for PBXProject "NextWave" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -573,7 +573,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8A225F2C2D0ABC6F008BA92B /* Build configuration list for PBXProject "Next Wave" */ = {
+		8A225F2C2D0ABC6F008BA92B /* Build configuration list for PBXProject "NextWave" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8A225F532D0ABC70008BA92B /* Debug */,

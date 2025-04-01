@@ -16,12 +16,15 @@ class SunTimeService {
     private let swissLatitude = 47.0136
     private let swissLongitude = 8.4324
     
+    private let zurichTimeZone = TimeZone(identifier: "Europe/Zurich")!
+    
     private init() {}
     
     func getSunTimes(date: Date) async throws -> SunTimes {
         // Create cache key from date
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.timeZone = zurichTimeZone
         let cacheKey = dateFormatter.string(from: date)
         
         // Return cached value if available
@@ -121,6 +124,7 @@ private struct SunTimeResults: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)! // UTC
         
         let sunriseString = try container.decode(String.self, forKey: .sunrise)
         guard let sunrise = dateFormatter.date(from: sunriseString) else {
@@ -150,8 +154,12 @@ private struct SunTimeResults: Codable {
 
 private extension Date {
     func toLocalTime() -> Date {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: self))
-        return Date(timeInterval: seconds, since: self)
+        let zurichTimeZone = TimeZone(identifier: "Europe/Zurich")!
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = zurichTimeZone
+        
+        // Konvertiere die UTC-Zeit in die Zürich-Zeit
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: self)
+        return calendar.date(from: components) ?? self
     }
 } 

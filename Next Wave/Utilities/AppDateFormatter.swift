@@ -4,6 +4,12 @@ enum AppDateFormatter {
     private static let zurichTimeZone = TimeZone(identifier: "Europe/Zurich")!
     private static let swissLocale = Locale(identifier: "de_CH")
     
+    private static let calendar: Calendar = {
+        var calendar = Calendar.current
+        calendar.timeZone = zurichTimeZone
+        return calendar
+    }()
+    
     private static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -39,7 +45,6 @@ enum AppDateFormatter {
     static func parseTime(_ timeString: String) -> Date? {
         guard let date = timeFormatter.date(from: timeString) else { return nil }
         
-        let calendar = Calendar.current
         let now = Date()
         let components = calendar.dateComponents([.hour, .minute], from: date)
         
@@ -72,7 +77,6 @@ enum AppDateFormatter {
     }
     
     static func formatRemainingTime(from date: Date) -> String {
-        let calendar = Calendar.current
         let now = Date()
         
         let timeDiff = calendar.dateComponents([.hour, .minute], from: now, to: date)
@@ -108,7 +112,6 @@ enum AppDateFormatter {
     
     static func calculateRemainingTime(for date: Date) -> String {
         let now = Date()
-        let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: now, to: date)
         let hours = components.hour ?? 0
         let minutes = components.minute ?? 0

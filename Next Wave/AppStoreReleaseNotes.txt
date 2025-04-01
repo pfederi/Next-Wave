@@ -1,0 +1,8 @@
+What's New in Version 1.1:
+
+• Fixed time zone handling for sunrise and sunset times after daylight saving time change
+• Improved weather forecast display with morning and afternoon temperatures
+• Enhanced wave analysis with better time slot calculations
+• Various UI improvements and bug fixes
+
+Thank you for using Next Wave! We're continuously working to improve your experience with the app. 

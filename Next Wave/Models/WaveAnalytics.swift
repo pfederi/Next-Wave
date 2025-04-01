@@ -7,6 +7,12 @@ struct WaveTimeSlot: Identifiable {
     let waveCount: Int
     let waves: [WaveEvent]
     
+    private static let calendar: Calendar = {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(identifier: "Europe/Zurich")!
+        return calendar
+    }()
+    
     var duration: TimeInterval {
         endTime.timeIntervalSince(startTime)
     }
@@ -14,6 +20,14 @@ struct WaveTimeSlot: Identifiable {
     var wavesPerHour: Double {
         let hours = duration / 3600
         return Double(waveCount) / hours
+    }
+    
+    var startTimeString: String {
+        AppDateFormatter.formatTime(startTime)
+    }
+    
+    var endTimeString: String {
+        AppDateFormatter.formatTime(endTime)
     }
 }
 

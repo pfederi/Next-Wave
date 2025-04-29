@@ -20,7 +20,7 @@
 		<string>complication</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>Next Wave</string>
+	<string>NextWave</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.federi.Next-Wave.NextWaveWidget</string>
 	<key>CFBundleName</key>

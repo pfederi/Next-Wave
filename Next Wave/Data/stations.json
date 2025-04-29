@@ -1346,6 +1346,22 @@
                     }
                 },
                 {
+                    "name": "Bissone (lago)",
+                    "uic_ref": "8505650",
+                    "coordinates": {
+                        "latitude": 45.949789,
+                        "longitude": 8.9641943
+                    }
+                },
+                {
+                    "name": "Bissone (lago)",
+                    "uic_ref": "8505650",
+                    "coordinates": {
+                        "latitude": 45.949789,
+                        "longitude": 8.9641943
+                    }
+                },
+                {
                     "name": "Lugano Centrale (lago)",
                     "uic_ref": "8505550",
                     "coordinates": {
@@ -1431,6 +1447,30 @@
                     "coordinates": {
                         "latitude": 45.9504055,
                         "longitude": 8.9425862
+                    }
+                },
+                {
+                    "name": "Morcote (lago)",
+                    "uic_ref": "8505557",
+                    "coordinates": {
+                        "latitude": 45.922649,
+                        "longitude": 8.9170751
+                    }
+                },
+                {
+                    "name": "Maroggio (lago)",
+                    "uic_ref": "8531259",
+                    "coordinates": {
+                        "latitude": 45.9357234,
+                        "longitude": 8.9683065
+                    }
+                },
+                {
+                    "name": "Melano (lago)",
+                    "uic_ref": "8505548",
+                    "coordinates": {
+                        "latitude": 45.9208895,
+                        "longitude": 8.9808767
                     }
                 }
             ]

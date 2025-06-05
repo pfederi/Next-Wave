@@ -92,30 +92,60 @@ struct NextWaveWidgetEntryView: View {
         let timeInterval = departure.nextDeparture.timeIntervalSince(Date())
         return max(0, Int(timeInterval / 60))
     }
+    
+    private var formattedTimeUntilDeparture: String {
+        let minutes = minutesUntilDeparture
+        if minutes > 60 {
+            let hours = minutes / 60
+            let remainingMinutes = minutes % 60
+            if remainingMinutes == 0 {
+                return "\(hours)h"
+            } else {
+                return "\(hours)h \(remainingMinutes)min"
+            }
+        } else {
+            return "\(minutes)min"
+        }
+    }
 
     var body: some View {
         if let departure = entry.departure {
             switch widgetFamily {
             case .accessoryCircular:
                 VStack(spacing: 0) {
-                    Text("\(minutesUntilDeparture)")
-                        .font(.system(.title, design: .rounded, weight: .bold))
-                        .foregroundColor(.cyan)
-                        .multilineTextAlignment(.center)
-                    Text("min")
-                        .font(.system(.caption2, design: .rounded, weight: .medium))
-                        .foregroundColor(.cyan)
-                        .multilineTextAlignment(.center)
+                    if minutesUntilDeparture > 60 {
+                        let hours = minutesUntilDeparture / 60
+                        let remainingMinutes = minutesUntilDeparture % 60
+                        Text("\(hours)h")
+                            .font(.system(.title3, design: .rounded, weight: .bold))
+                            .foregroundColor(.cyan)
+                            .multilineTextAlignment(.center)
+                        if remainingMinutes > 0 {
+                            Text("\(remainingMinutes)min")
+                                .font(.system(.caption2, design: .rounded, weight: .medium))
+                                .foregroundColor(.cyan)
+                                .multilineTextAlignment(.center)
+                        }
+                    } else {
+                        Text("\(minutesUntilDeparture)")
+                            .font(.system(.title, design: .rounded, weight: .bold))
+                            .foregroundColor(.cyan)
+                            .multilineTextAlignment(.center)
+                        Text("min")
+                            .font(.system(.caption2, design: .rounded, weight: .medium))
+                            .foregroundColor(.cyan)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .multilineTextAlignment(.center)
             case .accessoryCorner:
-                Text("\(minutesUntilDeparture)min")
+                Text(formattedTimeUntilDeparture)
                     .font(.system(.body, design: .rounded, weight: .bold))
                     .foregroundColor(.cyan)
                     .multilineTextAlignment(.trailing)
             case .accessoryInline:
-                Text("\(departure.stationName) → \(departure.direction) in \(minutesUntilDeparture)min")
+                Text("\(departure.stationName) → \(departure.direction) in \(formattedTimeUntilDeparture)")
                     .font(.system(.caption, design: .rounded))
                     .multilineTextAlignment(.trailing)
             case .accessoryRectangular:
@@ -132,7 +162,7 @@ struct NextWaveWidgetEntryView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.leading)
-                    Text("in \(minutesUntilDeparture) min")
+                    Text("in \(formattedTimeUntilDeparture)")
                         .font(.subheadline)
                         .foregroundColor(.cyan)
                         .fontWeight(.bold)
@@ -140,7 +170,7 @@ struct NextWaveWidgetEntryView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             @unknown default:
-                Text("\(minutesUntilDeparture)min")
+                Text(formattedTimeUntilDeparture)
                     .foregroundColor(.cyan)
                     .multilineTextAlignment(.trailing)
             }

@@ -159,9 +159,16 @@ struct DepartureRow: View {
     }
     
     private var minutesText: String {
-        if minutesUntilDeparture > 1440 { // Mehr als 24 Stunden
+        if isTomorrow {
+            return "" // Keine Zeitanzeige für morgen
+        } else if minutesUntilDeparture > 60 {
             let hours = minutesUntilDeparture / 60
-            return "\(hours)h"
+            let remainingMinutes = minutesUntilDeparture % 60
+            if remainingMinutes == 0 {
+                return "\(hours)h"
+            } else {
+                return "\(hours)h \(remainingMinutes)min"
+            }
         } else {
             return "\(minutesUntilDeparture)min"
         }
@@ -203,10 +210,12 @@ struct DepartureRow: View {
                 
                 Spacer()
                 
-                Text(minutesText)
-                    .font(.system(.body, design: .monospaced))
-                    .foregroundColor(minutesColor)
-                    .fontWeight(.bold)
+                if !minutesText.isEmpty {
+                    Text(minutesText)
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(minutesColor)
+                        .fontWeight(.bold)
+                }
             }
             
             HStack(spacing: 4) {

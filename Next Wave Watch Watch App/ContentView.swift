@@ -60,6 +60,8 @@ struct ContentView: View {
                 
                 ForEach(viewModel.stationOrder, id: \.self) { station in
                     if let stationDepartures = viewModel.departuresByStation[station] {
+                        // Use refreshTrigger to ensure live filtering
+                        let _ = viewModel.refreshTrigger
                         let now = Date()
                         let nextDepartures = stationDepartures
                             .filter { $0.nextDeparture > now } // Nur zukünftige Abfahrten
@@ -137,8 +139,11 @@ struct ContentView: View {
 struct DepartureRow: View {
     let departure: DepartureInfo
     let isNext: Bool
+    @EnvironmentObject var viewModel: WatchViewModel
     
     private var minutesUntilDeparture: Int {
+        // Use viewModel.refreshTrigger to force recalculation every 30 seconds
+        let _ = viewModel.refreshTrigger
         let now = Date()
         let timeInterval = departure.nextDeparture.timeIntervalSince(now)
         return max(0, Int(timeInterval / 60))
@@ -161,6 +166,8 @@ struct DepartureRow: View {
     private var minutesText: String {
         if isTomorrow {
             return "" // Keine Zeitanzeige für morgen
+        } else if minutesUntilDeparture == 0 {
+            return "now"
         } else if minutesUntilDeparture > 60 {
             let hours = minutesUntilDeparture / 60
             let remainingMinutes = minutesUntilDeparture % 60
@@ -189,7 +196,9 @@ struct DepartureRow: View {
     }
     
     private var minutesColor: Color {
-        if minutesUntilDeparture <= 5 {
+        if minutesUntilDeparture == 0 {
+            return .green
+        } else if minutesUntilDeparture <= 5 {
             return .red
         } else if minutesUntilDeparture <= 15 {
             return .orange

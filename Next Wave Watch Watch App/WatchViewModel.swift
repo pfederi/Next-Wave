@@ -9,11 +9,13 @@ class WatchViewModel: ObservableObject {
     @Published var stationOrder: [String] = [] // Reihenfolge der Stationen wie in iOS-App
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var refreshTrigger = Date() // Force UI refresh every 30 seconds
     
     private let sharedDataManager = SharedDataManager.shared
     private let transportAPI = TransportAPI()
     private let logger = WatchLogger.shared
     private var timer: Timer?
+    private var uiRefreshTimer: Timer?
     private var favoritesObserver: NSObjectProtocol?
     private var connectivityObserver: NSObjectProtocol?
     private var forceUpdateObserver: NSObjectProtocol?
@@ -24,10 +26,12 @@ class WatchViewModel: ObservableObject {
         setupConnectivityObserver()
         setupForceUpdateObserver()
         startPeriodicUpdates()
+        startUIRefreshTimer()
     }
     
     deinit {
         timer?.invalidate()
+        uiRefreshTimer?.invalidate()
         if let observer = favoritesObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -107,14 +111,78 @@ class WatchViewModel: ObservableObject {
             await updateDepartures()
         }
         
-        // Update every minute
-        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+        // Start with smart adaptive updates
+        scheduleNextUpdate()
+        logger.debug("Started adaptive update scheduling")
+    }
+    
+    private func startUIRefreshTimer() {
+        logger.info("Starting UI refresh timer")
+        
+        // Timer to force UI refresh every 30 seconds to update minute counters
+        uiRefreshTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                // Force UI refresh by updating refresh trigger
+                self.refreshTrigger = Date()
+                self.logger.debug("UI refreshed for minute counter updates")
+            }
+        }
+        logger.debug("UI refresh timer scheduled for every 30 seconds")
+    }
+    
+    private func scheduleNextUpdate() {
+        timer?.invalidate()
+        
+        let updateInterval = calculateOptimalUpdateInterval()
+        logger.info("Scheduling next API update in \(updateInterval) seconds")
+        
+        timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 await self.updateDepartures()
+                // Schedule next update after this one completes
+                self.scheduleNextUpdate()
             }
         }
-        logger.debug("Timer scheduled for updates every minute")
+    }
+    
+    private func calculateOptimalUpdateInterval() -> TimeInterval {
+        let cachedDepartures = sharedDataManager.loadNextDepartures()
+        let now = Date()
+        
+        // Find the next departure
+        let nextDeparture = cachedDepartures
+            .filter { $0.nextDeparture > now }
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+            .first
+        
+        guard let departure = nextDeparture else {
+            // No departures found - check every 2 hours
+            logger.debug("No upcoming departures - scheduling update in 2 hours")
+            return 7200 // 2 hours
+        }
+        
+        let minutesUntilDeparture = departure.nextDeparture.timeIntervalSince(now) / 60
+        
+        // Adaptive frequency based on next departure
+        switch minutesUntilDeparture {
+        case ...10:
+            // Very soon - every 2 minutes for real-time delays
+            return 120
+        case 11...30:
+            // Soon - every 5 minutes
+            return 300
+        case 31...120:
+            // Within 2 hours - every 15 minutes
+            return 900
+        case 121...360:
+            // Within 6 hours - every 30 minutes
+            return 1800
+        default:
+            // More than 6 hours away - every 2 hours
+            return 7200
+        }
     }
     
     func updateDepartures() async {

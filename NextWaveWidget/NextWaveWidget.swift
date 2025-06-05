@@ -33,47 +33,38 @@ struct Provider: TimelineProvider {
         // Load the next departure from the first favorite station
         if let nextDeparture = SharedDataManager.shared.getNextDepartureForFirstFavorite() {
             print("Widget: Found next departure for station \(nextDeparture.stationName) at \(nextDeparture.nextDeparture)")
-            let entry = SimpleEntry(date: Date(), departure: nextDeparture)
-            entries.append(entry)
             
-            // Calculate VERY aggressive update time for better responsiveness
-            let minutesUntilDeparture = Int(nextDeparture.nextDeparture.timeIntervalSince(Date()) / 60)
-            let updateInterval: TimeInterval
+            let now = Date()
+            let minutesUntilDeparture = Int(nextDeparture.nextDeparture.timeIntervalSince(now) / 60)
             
-            if minutesUntilDeparture <= 2 {
-                updateInterval = 15 // Update every 15 seconds if departure is very soon
-            } else if minutesUntilDeparture <= 5 {
-                updateInterval = 30 // Update every 30 seconds if departure is soon
-            } else if minutesUntilDeparture <= 15 {
-                updateInterval = 60 // Update every minute if departure is within 15 min
-            } else {
-                updateInterval = 120 // Update every 2 minutes otherwise
+            // Simple approach: Create entries every minute for the next hour
+            // This forces the widget to update every minute
+            for i in 0..<61 { // 61 entries = next 60 minutes
+                let entryDate = now.addingTimeInterval(TimeInterval(i * 60))
+                let entry = SimpleEntry(date: entryDate, departure: nextDeparture)
+                entries.append(entry)
             }
             
-            print("Widget: Setting update interval to \(updateInterval) seconds (departure in \(minutesUntilDeparture) min)")
+            print("Widget: Created 61 timeline entries for guaranteed minute updates")
+            print("Widget: Departure in \(minutesUntilDeparture) minutes")
             
-            // Use .atEnd policy for more aggressive updates
+            // Use .atEnd to force more frequent reloads
             let timeline = Timeline(entries: entries, policy: .atEnd)
             completion(timeline)
             
-            // Schedule next update
-            DispatchQueue.main.asyncAfter(deadline: .now() + updateInterval) {
-                WidgetCenter.shared.reloadTimelines(ofKind: "NextWaveWidget")
-            }
         } else {
             print("Widget: No departure found for first favorite station")
-            // Very frequent fallback updates when no favorites are set
-            let fallbackEntry = SimpleEntry(date: Date(), departure: nil)
-            entries.append(fallbackEntry)
             
-            // Check every 15 seconds if no favorites are set
-        let timeline = Timeline(entries: entries, policy: .atEnd)
-        completion(timeline)
-            
-            // Schedule next update
-            DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-                WidgetCenter.shared.reloadTimelines(ofKind: "NextWaveWidget")
+            let now = Date()
+            // Even without departures, create entries to keep widget responsive
+            for i in 0..<30 {
+                let entryDate = now.addingTimeInterval(TimeInterval(i * 60))
+                let entry = SimpleEntry(date: entryDate, departure: nil)
+                entries.append(entry)
             }
+            
+            let timeline = Timeline(entries: entries, policy: .atEnd)
+            completion(timeline)
         }
     }
 }
@@ -89,23 +80,34 @@ struct NextWaveWidgetEntryView: View {
 
     private var minutesUntilDeparture: Int {
         guard let departure = entry.departure else { return 0 }
+        // Always calculate from current time, not entry.date
         let timeInterval = departure.nextDeparture.timeIntervalSince(Date())
         return max(0, Int(timeInterval / 60))
     }
     
-    private var formattedTimeUntilDeparture: String {
-        let minutes = minutesUntilDeparture
-        if minutes > 60 {
-            let hours = minutes / 60
-            let remainingMinutes = minutes % 60
-            if remainingMinutes == 0 {
-                return "\(hours)h"
-            } else {
-                return "\(hours)h \(remainingMinutes)min"
-            }
-        } else {
-            return "\(minutes)min"
+    private var departureTimeText: String {
+        guard let departure = entry.departure else { return "--:--" }
+        
+        let now = Date()
+        let calendar = Calendar.current
+        
+        // Check if departure is in the next few minutes (show "now" for immediate departures)
+        let minutesUntil = Int(departure.nextDeparture.timeIntervalSince(now) / 60)
+        if minutesUntil <= 0 {
+            return "now"
         }
+        
+        // Check if departure is tomorrow
+        if !calendar.isDate(departure.nextDeparture, inSameDayAs: now) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            return "tmrw \(formatter.string(from: departure.nextDeparture))"
+        }
+        
+        // Same day - show "at HH:MM"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return "at \(formatter.string(from: departure.nextDeparture))"
     }
 
     var body: some View {
@@ -113,39 +115,47 @@ struct NextWaveWidgetEntryView: View {
             switch widgetFamily {
             case .accessoryCircular:
                 VStack(spacing: 0) {
-                    if minutesUntilDeparture > 60 {
-                        let hours = minutesUntilDeparture / 60
-                        let remainingMinutes = minutesUntilDeparture % 60
-                        Text("\(hours)h")
+                    if departureTimeText == "now" {
+                        Text("now")
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .foregroundColor(.green)
+                            .multilineTextAlignment(.center)
+                    } else if departureTimeText.starts(with: "tmrw") {
+                        let timeOnly = String(departureTimeText.dropFirst(5)) // Remove "tmrw "
+                        Text("tmrw")
+                            .font(.system(.caption, design: .rounded, weight: .medium))
+                            .foregroundColor(.purple)
+                            .multilineTextAlignment(.center)
+                        Text(timeOnly)
                             .font(.system(.title3, design: .rounded, weight: .bold))
-                            .foregroundColor(.cyan)
+                            .foregroundColor(.purple)
                             .multilineTextAlignment(.center)
-                        if remainingMinutes > 0 {
-                            Text("\(remainingMinutes)min")
-                                .font(.system(.caption2, design: .rounded, weight: .medium))
-                                .foregroundColor(.cyan)
-                                .multilineTextAlignment(.center)
-                        }
                     } else {
-                        Text("\(minutesUntilDeparture)")
-                            .font(.system(.title, design: .rounded, weight: .bold))
+                        let timeOnly = String(departureTimeText.dropFirst(3)) // Remove "at "
+                        Image(systemName: "ferry.fill")
+                            .font(.system(.caption2, weight: .medium))
                             .foregroundColor(.cyan)
-                            .multilineTextAlignment(.center)
-                        Text("min")
-                            .font(.system(.caption2, design: .rounded, weight: .medium))
+                        Text(timeOnly)
+                            .font(.system(.caption, design: .rounded, weight: .bold))
                             .foregroundColor(.cyan)
                             .multilineTextAlignment(.center)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .multilineTextAlignment(.center)
+                .background(
+                    Circle()
+                        .fill(Color(red: 0.15, green: 0.15, blue: 0.15))
+                        .opacity(0.2)
+                )
             case .accessoryCorner:
-                Text(formattedTimeUntilDeparture)
+                Text(departureTimeText)
                     .font(.system(.body, design: .rounded, weight: .bold))
-                    .foregroundColor(.cyan)
+                    .foregroundColor(departureTimeText == "now" ? .green : 
+                                   departureTimeText.starts(with: "tmrw") ? .purple : .cyan)
                     .multilineTextAlignment(.trailing)
             case .accessoryInline:
-                Text("\(departure.stationName) → \(departure.direction) in \(formattedTimeUntilDeparture)")
+                Text("\(departure.stationName) → \(departure.direction) \(departureTimeText)")
                     .font(.system(.caption, design: .rounded))
                     .multilineTextAlignment(.trailing)
             case .accessoryRectangular:
@@ -162,16 +172,18 @@ struct NextWaveWidgetEntryView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.leading)
-                    Text("in \(formattedTimeUntilDeparture)")
+                    Text(departureTimeText)
                         .font(.subheadline)
-                        .foregroundColor(.cyan)
+                        .foregroundColor(departureTimeText == "now" ? .green : 
+                                       departureTimeText.starts(with: "tmrw") ? .purple : .cyan)
                         .fontWeight(.bold)
                         .multilineTextAlignment(.leading)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             @unknown default:
-                Text(formattedTimeUntilDeparture)
-                    .foregroundColor(.cyan)
+                Text(departureTimeText)
+                    .foregroundColor(departureTimeText == "now" ? .green : 
+                                   departureTimeText.starts(with: "tmrw") ? .purple : .cyan)
                     .multilineTextAlignment(.trailing)
             }
         } else {

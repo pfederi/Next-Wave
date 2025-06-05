@@ -1,8 +1,0 @@
-What's New in TestFlight:
-
-• Fixed time zone handling for sunrise and sunset times after daylight saving time change
-• Improved weather forecast display with morning and afternoon temperatures
-• Enhanced wave analysis with better time slot calculations
-• Various UI improvements and bug fixes
-
-Please test the app and let us know if you encounter any issues. Your feedback helps us improve the app for everyone. 

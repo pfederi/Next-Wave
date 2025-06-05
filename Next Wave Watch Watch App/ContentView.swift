@@ -20,6 +20,10 @@ struct ContentView: View {
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
+            .onAppear {
+                // Refresh location when app appears
+                viewModel.refreshLocation()
+            }
             
             List {
                 if viewModel.isLoading && viewModel.departures.isEmpty {
@@ -136,38 +140,69 @@ struct ContentView: View {
                 
                 if !hasAnyFavorites && !viewModel.isLoading && !hasNearestStation {
                     VStack(alignment: .center, spacing: 12) {
-                        Image(systemName: "heart.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(
-                                LinearGradient(
-                                    colors: [.pink, .purple],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                        // Check if station data is available
+                        if !StationManager.shared.hasStations {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.largeTitle)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.orange, .red],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
                                 )
-                            )
-                        
-                        Text("No Favorites Set")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.center)
-                        
-                        VStack(spacing: 8) {
-                            Text("Add favorite stations in the iOS app")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                            
+                            Text("Station Data Unavailable")
+                                .font(.headline)
+                                .foregroundColor(.primary)
                                 .multilineTextAlignment(.center)
                             
-                            Text("OR")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .fontWeight(.bold)
+                            VStack(spacing: 8) {
+                                Text("Unable to load station data")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                
+                                Text("Nearest station feature is not available")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(.horizontal)
+                        } else {
+                            Image(systemName: "heart.fill")
+                                .font(.largeTitle)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [.pink, .purple],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
                             
-                            Text("Enable 'Use nearest station' in iOS app settings")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                            Text("No Favorites Set")
+                                .font(.headline)
+                                .foregroundColor(.primary)
                                 .multilineTextAlignment(.center)
+                            
+                            VStack(spacing: 8) {
+                                Text("Add favorite stations in the iOS app")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                
+                                Text("OR")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .fontWeight(.bold)
+                                
+                                Text("Enable 'Use nearest station' in iOS app settings")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
@@ -239,7 +274,7 @@ struct ContentView: View {
             for: .navigationBar
         )
         .refreshable {
-            await viewModel.updateDepartures()
+            await viewModel.refreshLocationAndDepartures()
         }
         .onAppear {
             // Initialize WatchConnectivity Manager

@@ -194,9 +194,18 @@ class WatchViewModel: ObservableObject {
             .sink { [weak self] newNearestStation in
                 guard let self = self else { return }
                 if let station = newNearestStation {
+                    let previousStation = self.nearestStation
                     self.nearestStation = station
                     self.logger.info("Location manager found new nearest station: \(station.name)")
                     print("🔧 WatchViewModel: Location manager found new nearest station: \(station.name)")
+                    
+                    // If the nearest station actually changed, update departures
+                    if previousStation?.name != station.name {
+                        self.logger.info("Nearest station changed from '\(previousStation?.name ?? "none")' to '\(station.name)' - updating departures")
+                        Task {
+                            await self.updateDepartures()
+                        }
+                    }
                     
                     // Update widgets when nearest station changes
                     WidgetCenter.shared.reloadAllTimelines()
@@ -212,6 +221,8 @@ class WatchViewModel: ObservableObject {
         // Start location updates if needed
         if useNearestStationForWidget {
             locationManager.startLocationUpdates()
+            // Also request immediate location update
+            locationManager.requestLocation()
         }
     }
     
@@ -236,6 +247,8 @@ class WatchViewModel: ObservableObject {
             if useNearestStationForWidget {
                 logger.info("Starting location updates for nearest station")
                 locationManager.startLocationUpdates()
+                // Also request immediate location update
+                locationManager.requestLocation()
             } else {
                 logger.info("Stopping location updates - nearest station disabled")
                 locationManager.stopLocationUpdates()
@@ -306,6 +319,27 @@ class WatchViewModel: ObservableObject {
             // More than 6 hours away - every 2 hours
             return 7200
         }
+    }
+    
+    func refreshLocation() {
+        guard useNearestStationForWidget else { return }
+        logger.info("Manual location refresh requested")
+        locationManager.requestLocation()
+    }
+    
+    func refreshLocationAndDepartures() async {
+        logger.info("Manual refresh: updating location and departures")
+        
+        // First refresh location if using nearest station
+        if useNearestStationForWidget {
+            locationManager.requestLocation()
+            
+            // Give location manager a moment to update
+            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+        }
+        
+        // Then update departures with potentially updated nearest station
+        await updateDepartures()
     }
     
     func updateDepartures() async {

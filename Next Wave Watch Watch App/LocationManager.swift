@@ -18,7 +18,7 @@ class WatchLocationManager: NSObject, ObservableObject {
         
         // Configure for Watch
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager.distanceFilter = 100 // Update when moved 100m
+        locationManager.distanceFilter = 50 // Update when moved 50m (more responsive)
         
         logger.info("🗺️ WatchLocationManager initialized")
     }
@@ -54,6 +54,16 @@ class WatchLocationManager: NSObject, ObservableObject {
             return
         }
         
+        // Check if station data is available
+        guard StationManager.shared.hasStations else {
+            logger.debug("🗺️ No station data available for nearest station calculation")
+            self.nearestStation = nil
+            SharedDataManager.shared.saveNearestStation(nil as FavoriteStation?)
+            return
+        }
+        
+        logger.info("🗺️ Calculating nearest station from location: \(userLocation.coordinate.latitude), \(userLocation.coordinate.longitude)")
+        
         // Find nearest station from ALL available stations, not just favorites
         if let result = StationManager.shared.findNearestStation(to: userLocation) {
             let nearestFavoriteStation = FavoriteStation(
@@ -64,8 +74,14 @@ class WatchLocationManager: NSObject, ObservableObject {
                 uic_ref: result.station.uic_ref
             )
             
+            let previousStation = self.nearestStation
             self.nearestStation = nearestFavoriteStation
-            logger.info("🗺️ Found nearest station from ALL stations: \(result.station.name) at \(String(format: "%.1f", result.distance))km")
+            
+            if previousStation?.name != nearestFavoriteStation.name {
+                logger.info("🗺️ Nearest station CHANGED from '\(previousStation?.name ?? "none")' to '\(result.station.name)' at \(String(format: "%.1f", result.distance))km")
+            } else {
+                logger.info("🗺️ Nearest station remains: \(result.station.name) at \(String(format: "%.1f", result.distance))km")
+            }
             
             // Save to SharedDataManager for Widget access
             SharedDataManager.shared.saveNearestStation(nearestFavoriteStation)

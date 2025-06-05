@@ -1,0 +1,2231 @@
+{
+    "lakes": [
+        {
+            "name": "Zürichsee",
+            "operators": [
+                "ZSG"
+            ],
+            "stations": [
+                {
+                    "name": "Zürich Bürkliplatz (See)",
+                    "uic_ref": "8503651",
+                    "coordinates": {
+                        "latitude": 47.365662,
+                        "longitude": 8.541005
+                    }
+                },
+                {
+                    "name": "Zürich Wollishofen (See)",
+                    "uic_ref": "8503681",
+                    "coordinates": {
+                        "latitude": 47.345465,
+                        "longitude": 8.536657
+                    }
+                },
+                {
+                    "name": "Kilchberg ZH (See)",
+                    "uic_ref": "8503677",
+                    "coordinates": {
+                        "latitude": 47.322553,
+                        "longitude": 8.551782
+                    }
+                },
+                {
+                    "name": "Rüschlikon (See)",
+                    "uic_ref": "8503675",
+                    "coordinates": {
+                        "latitude": 47.309769,
+                        "longitude": 8.55838
+                    }
+                },
+                {
+                    "name": "Thalwil (See)",
+                    "uic_ref": "8503674",
+                    "coordinates": {
+                        "latitude": 47.296677,
+                        "longitude": 8.568049
+                    }
+                },
+                {
+                    "name": "Oberrieden (See)",
+                    "uic_ref": "8503673",
+                    "coordinates": {
+                        "latitude": 47.278604,
+                        "longitude": 8.581836
+                    }
+                },
+                {
+                    "name": "Horgen (See)",
+                    "uic_ref": "8503672",
+                    "coordinates": {
+                        "latitude": 47.261887,
+                        "longitude": 8.59752
+                    }
+                },
+                {
+                    "name": "Halbinsel Au",
+                    "uic_ref": "8503671",
+                    "coordinates": {
+                        "latitude": 47.250414,
+                        "longitude": 8.648663
+                    }
+                },
+                {
+                    "name": "Wädenswil (See)",
+                    "uic_ref": "8503670",
+                    "coordinates": {
+                        "latitude": 47.230133,
+                        "longitude": 8.675343
+                    }
+                },
+                {
+                    "name": "Richterswil (See)",
+                    "uic_ref": "8503669",
+                    "coordinates": {
+                        "latitude": 47.209095,
+                        "longitude": 8.707292
+                    }
+                },
+                {
+                    "name": "Pfäffikon SZ (See)",
+                    "uic_ref": "8503680",
+                    "coordinates": {
+                        "latitude": 47.207941,
+                        "longitude": 8.775131
+                    }
+                },
+                {
+                    "name": "Altendorf Seestatt",
+                    "uic_ref": "8503683",
+                    "coordinates": {
+                        "latitude": 47.194891,
+                        "longitude": 8.832481
+                    }
+                },
+                {
+                    "name": "Lachen SZ (See)",
+                    "uic_ref": "8503648",
+                    "coordinates": {
+                        "latitude": 47.193649,
+                        "longitude": 8.850226
+                    }
+                },
+                {
+                    "name": "Schmerikon (See)",
+                    "uic_ref": "8503647",
+                    "coordinates": {
+                        "latitude": 47.224573,
+                        "longitude": 8.940312
+                    }
+                },
+                {
+                    "name": "Rapperswil SG (See)",
+                    "uic_ref": "8503667",
+                    "coordinates": {
+                        "latitude": 47.225705,
+                        "longitude": 8.813555
+                    }
+                },
+                {
+                    "name": "Insel Ufenau",
+                    "uic_ref": "8503668",
+                    "coordinates": {
+                        "latitude": 47.218035,
+                        "longitude": 8.776638
+                    }
+                },
+                {
+                    "name": "Uerikon (See)",
+                    "uic_ref": "8503666",
+                    "coordinates": {
+                        "latitude": 47.233487,
+                        "longitude": 8.758165
+                    }
+                },
+                {
+                    "name": "Stäfa (See)",
+                    "uic_ref": "8503665",
+                    "coordinates": {
+                        "latitude": 47.238703,
+                        "longitude": 8.718443
+                    }
+                },
+                {
+                    "name": "Männedorf (See)",
+                    "uic_ref": "8503664",
+                    "coordinates": {
+                        "latitude": 47.252789,
+                        "longitude": 8.689093
+                    }
+                },
+                {
+                    "name": "Meilen (See)",
+                    "uic_ref": "8503661",
+                    "coordinates": {
+                        "latitude": 47.267547,
+                        "longitude": 8.640329
+                    }
+                },
+                {
+                    "name": "Herrliberg (See)",
+                    "uic_ref": "8503661",
+                    "coordinates": {
+                        "latitude": 47.283303,
+                        "longitude": 8.6095295
+                    }
+                },
+                {
+                    "name": "Erlenbach ZH (See)",
+                    "uic_ref": "8503659",
+                    "coordinates": {
+                        "latitude": 47.303025,
+                        "longitude": 8.589302
+                    }
+                },
+                {
+                    "name": "Küsnacht ZH Heslibach",
+                    "uic_ref": "8503682",
+                    "coordinates": {
+                        "latitude": 47.308399,
+                        "longitude": 8.584392
+                    }
+                },
+                {
+                    "name": "Küsnacht ZH (See)",
+                    "uic_ref": "8503657",
+                    "coordinates": {
+                        "latitude": 47.318993,
+                        "longitude": 8.578297
+                    }
+                },
+                {
+                    "name": "Zollikon (See)",
+                    "uic_ref": "8503655",
+                    "coordinates": {
+                        "latitude": 47.339069,
+                        "longitude": 8.567424
+                    }
+                },
+                {
+                    "name": "Zürich Tiefenbrunnen (See)",
+                    "uic_ref": "8505332",
+                    "coordinates": {
+                        "latitude": 47.349858,
+                        "longitude": 8.560585
+                    }
+                },
+                {
+                    "name": "Zürichhorn (See)",
+                    "uic_ref": "8503653",
+                    "coordinates": {
+                        "latitude": 47.35262,
+                        "longitude": 8.553125
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Vierwaldstättersee",
+            "operators": [
+                "SGV"
+            ],
+            "stations": [
+                {
+                    "name": "Luzern Schweizerhofquai",
+                    "uic_ref": "8508505",
+                    "coordinates": {
+                        "latitude": 47.05363,
+                        "longitude": 8.309939
+                    }
+                },
+                {
+                    "name": "Verkehrshaus-Lido",
+                    "uic_ref": "8508459",
+                    "coordinates": {
+                        "latitude": 47.0511,
+                        "longitude": 8.334878
+                    }
+                },
+                {
+                    "name": "Kehrsiten-Bürgenstock",
+                    "uic_ref": "8508489",
+                    "coordinates": {
+                        "latitude": 47.002987,
+                        "longitude": 8.382426
+                    }
+                },
+                {
+                    "name": "Hertenstein (See)",
+                    "uic_ref": "8508462",
+                    "coordinates": {
+                        "latitude": 47.026885,
+                        "longitude": 8.403448
+                    }
+                },
+                {
+                    "name": "Weggis",
+                    "uic_ref": "8508463",
+                    "coordinates": {
+                        "latitude": 47.031417,
+                        "longitude": 8.433224
+                    }
+                },
+                {
+                    "name": "Vitznau",
+                    "uic_ref": "8508464",
+                    "coordinates": {
+                        "latitude": 47.009354,
+                        "longitude": 8.482384
+                    }
+                },
+                {
+                    "name": "Vitznau",
+                    "uic_ref": "8508464",
+                    "coordinates": {
+                        "latitude": 47.009354,
+                        "longitude": 8.482384
+                    }
+                },
+                {
+                    "name": "Ennetbürgen (See)",
+                    "uic_ref": "8508465",
+                    "coordinates": {
+                        "latitude": 46.987846,
+                        "longitude": 8.421164
+                    }
+                },
+                {
+                    "name": "Buochs (See)",
+                    "uic_ref": "8508466",
+                    "coordinates": {
+                        "latitude": 46.975351,
+                        "longitude": 8.42639
+                    }
+                },
+                {
+                    "name": "Beckenried (See)",
+                    "uic_ref": "8508467",
+                    "coordinates": {
+                        "latitude": 46.966964,
+                        "longitude": 8.475607
+                    }
+                },
+                {
+                    "name": "Landungssteg Gersau Förstli (Fähre)",
+                    "uic_ref": "8530722",
+                    "coordinates": {
+                        "latitude": 46.992002,
+                        "longitude": 8.502845
+                    }
+                },
+                {
+                    "name": "Landungssteg SGV Treib",
+                    "uic_ref": "8508469",
+                    "coordinates": {
+                        "latitude": 46.987218,
+                        "longitude": 8.585664
+                    }
+                },
+                {
+                    "name": "Landungssteg SGV Brunnen",
+                    "uic_ref": "8508470",
+                    "coordinates": {
+                        "latitude": 46.993551,
+                        "longitude": 8.605311
+                    }
+                },
+                {
+                    "name": "Rütli",
+                    "uic_ref": "8508471",
+                    "coordinates": {
+                        "latitude": 46.970328,
+                        "longitude": 8.593294
+                    }
+                },
+                {
+                    "name": "Sisikon (See)",
+                    "uic_ref": "8508472",
+                    "coordinates": {
+                        "latitude": 46.948195,
+                        "longitude": 8.61917
+                    }
+                },
+                {
+                    "name": "Tellsplatte",
+                    "uic_ref": "8508473",
+                    "coordinates": {
+                        "latitude": 46.934039,
+                        "longitude": 8.612569
+                    }
+                },
+                {
+                    "name": "Landungssteg SGV Bauen",
+                    "uic_ref": "8508474",
+                    "coordinates": {
+                        "latitude": 46.935183,
+                        "longitude": 8.580456
+                    }
+                },
+                {
+                    "name": "Landungssteg SGV Isleten-Isenthal",
+                    "uic_ref": "8508475",
+                    "coordinates": {
+                        "latitude": 46.919825,
+                        "longitude": 8.595754
+                    }
+                },
+                {
+                    "name": "Flüelen (See)",
+                    "uic_ref": "8508476",
+                    "coordinates": {
+                        "latitude": 46.902687,
+                        "longitude": 8.62392
+                    }
+                },
+                {
+                    "name": "Kastanienbaum (See)",
+                    "uic_ref": "8508478",
+                    "coordinates": {
+                        "latitude": 47.008088,
+                        "longitude": 8.341051
+                    }
+                },
+                {
+                    "name": "Kehrsiten Bürgenstock",
+                    "uic_ref": "8508489",
+                    "coordinates": {
+                        "latitude": 47.002987,
+                        "longitude": 8.382426
+                    }
+                },
+                {
+                    "name": "Kehrsiten Dorf",
+                    "uic_ref": "8508480",
+                    "coordinates": {
+                        "latitude": 47.000335,
+                        "longitude": 8.365746
+                    }
+                },
+                {
+                    "name": "Hergiswil (See)",
+                    "uic_ref": "8508481",
+                    "coordinates": {
+                        "latitude": 46.984462,
+                        "longitude": 8.312458
+                    }
+                },
+                {
+                    "name": "Stansstad (See)",
+                    "uic_ref": "8508483",
+                    "coordinates": {
+                        "latitude": 46.980635,
+                        "longitude": 8.336186
+                    }
+                },
+                {
+                    "name": "Alpnachstad (See)",
+                    "uic_ref": "8508503",
+                    "coordinates": {
+                        "latitude": 46.955666,
+                        "longitude": 8.278763
+                    }
+                },
+                {
+                    "name": "Meggenhorn",
+                    "uic_ref": "8508504",
+                    "coordinates": {
+                        "latitude": 47.033702,
+                        "longitude": 8.354244
+                    }
+                },
+                {
+                    "name": "Hermitage",
+                    "uic_ref": "8508485",
+                    "coordinates": {
+                        "latitude": 47.042518,
+                        "longitude": 8.34971
+                    }
+                },
+                {
+                    "name": "Tribschen",
+                    "uic_ref": "8508479",
+                    "coordinates": {
+                        "latitude": 47.042019,
+                        "longitude": 8.330739
+                    }
+                },
+                {
+                    "name": "Merlischachen (See)",
+                    "uic_ref": "8508486",
+                    "coordinates": {
+                        "latitude": 47.063869,
+                        "longitude": 8.407405
+                    }
+                },
+                {
+                    "name": "Greppen",
+                    "uic_ref": "8508487",
+                    "coordinates": {
+                        "latitude": 47.056183,
+                        "longitude": 8.426839
+                    }
+                },
+                {
+                    "name": "Küssnacht am Rigi (See)",
+                    "uic_ref": "8508488",
+                    "coordinates": {
+                        "latitude": 47.079981,
+                        "longitude": 8.43884
+                    }
+                },
+                {
+                    "name": "Landungssteg SGV Seedorf UR",
+                    "uic_ref": "8530833",
+                    "coordinates": {
+                        "latitude": 46.890052,
+                        "longitude": 8.5987627
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Bodensee",
+            "operators": [
+                "SBS",
+                "BSB",
+                "URh"
+            ],
+            "stations": [
+                {
+                    "name": "Lindau (Bodensee)",
+                    "uic_ref": "8506467",
+                    "coordinates": {
+                        "latitude": 47.497518,
+                        "longitude": 9.561171
+                    }
+                },
+                {
+                    "name": "Altenrhein Schifflände",
+                    "uic_ref": "8506467",
+                    "coordinates": {
+                        "latitude": 47.497518,
+                        "longitude": 9.561171
+                    }
+                },
+                {
+                    "name": "Staad SG Hafenmole",
+                    "uic_ref": "8530830",
+                    "coordinates": {
+                        "latitude": 47.482176,
+                        "longitude": 9.532129
+                    }
+                },
+                {
+                    "name": "Rorschach Hafen (See)",
+                    "uic_ref": "8506113",
+                    "coordinates": {
+                        "latitude": 47.478902,
+                        "longitude": 9.493434
+                    }
+                },
+                {
+                    "name": "Horn (See)",
+                    "uic_ref": "8506111",
+                    "coordinates": {
+                        "latitude": 47.496641,
+                        "longitude": 9.462948
+                    }
+                },
+                {
+                    "name": "Arbon (See)",
+                    "uic_ref": "8506110",
+                    "coordinates": {
+                        "latitude": 47.512644,
+                        "longitude": 9.440318
+                    }
+                },
+                {
+                    "name": "Romanshorn (See)",
+                    "uic_ref": "8506112",
+                    "coordinates": {
+                        "latitude": 47.565564,
+                        "longitude": 9.379971
+                    }
+                },
+                {
+                    "name": "Uttwil (See)",
+                    "uic_ref": "8530835",
+                    "coordinates": {
+                        "latitude": 47.586434,
+                        "longitude": 9.345349
+                    }
+                },
+                {
+                    "name": "Güttingen (See)",
+                    "uic_ref": "8595982",
+                    "coordinates": {
+                        "latitude": 47.612874,
+                        "longitude": 9.29601
+                    }
+                },
+                {
+                    "name": "Altnau (See)",
+                    "uic_ref": "8530834",
+                    "coordinates": {
+                        "latitude": 47.623135,
+                        "longitude": 9.269078
+                    }
+                },
+                {
+                    "name": "Bottighofen (See)",
+                    "uic_ref": "8530720",
+                    "coordinates": {
+                        "latitude": 47.64474,
+                        "longitude": 9.211891
+                    }
+                },
+                {
+                    "name": "Kreuzlingen Hafen (See)",
+                    "uic_ref": "8506165",
+                    "coordinates": {
+                        "latitude": 47.652586,
+                        "longitude": 9.182637
+                    }
+                },
+                {
+                    "name": "Konstanz Hafen",
+                    "uic_ref": "8014587",
+                    "coordinates": {
+                        "latitude": 47.659865,
+                        "longitude": 9.179535
+                    }
+                },
+                {
+                    "name": "Gottlieben (Schifflände)",
+                    "uic_ref": "8506163",
+                    "coordinates": {
+                        "latitude": 47.664667,
+                        "longitude": 9.13467
+                    }
+                },
+                {
+                    "name": "Ermatingen (See)",
+                    "uic_ref": "8506162",
+                    "coordinates": {
+                        "latitude": 47.675234,
+                        "longitude": 9.085435
+                    }
+                },
+                {
+                    "name": "Mannenbach (See)",
+                    "uic_ref": "8506160",
+                    "coordinates": {
+                        "latitude": 47.674494,
+                        "longitude": 9.048427
+                    }
+                },
+                {
+                    "name": "Berlingen (See)",
+                    "uic_ref": "8506159",
+                    "coordinates": {
+                        "latitude": 47.675339,
+                        "longitude": 9.017661
+                    }
+                },
+                {
+                    "name": "Steckborn (See)",
+                    "uic_ref": "8506157",
+                    "coordinates": {
+                        "latitude": 47.668647,
+                        "longitude": 8.981426
+                    }
+                },
+                {
+                    "name": "Mammern (See)",
+                    "uic_ref": "8506155",
+                    "coordinates": {
+                        "latitude": 47.648287,
+                        "longitude": 8.916727
+                    }
+                },
+                {
+                    "name": "Oehningen",
+                    "uic_ref": "8506154",
+                    "coordinates": {
+                        "latitude": 47.6517227,
+                        "longitude": 8.8944607
+                    }
+                },
+                {
+                    "name": "Stein am Rhein (Schifflände)",
+                    "uic_ref": "8506153",
+                    "coordinates": {
+                        "latitude": 47.659911,
+                        "longitude": 8.856645
+                    }
+                },
+                {
+                    "name": "Wangen (Bodensee)",
+                    "uic_ref": "8506156",
+                    "coordinates": {
+                        "latitude": 47.6582455,
+                        "longitude": 8.929709
+                    }
+                },
+                {
+                    "name": "Hemmenhofen",
+                    "uic_ref": "8506189",
+                    "coordinates": {
+                        "latitude": 47.6705193,
+                        "longitude": 8.9689229
+                    }
+                },
+                {
+                    "name": "Gaienhofen",
+                    "uic_ref": "8506158",
+                    "coordinates": {
+                        "latitude": 47.6783495,
+                        "longitude": 8.9833709
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Lac Léman",
+            "operators": [
+                "CGN"
+            ],
+            "stations": [
+                {
+                    "name": "Genève-Eaux-Vives (lac)",
+                    "uic_ref": "8501311",
+                    "coordinates": {
+                        "latitude": 46.209402,
+                        "longitude": 6.162333
+                    }
+                },
+                {
+                    "name": "Genève-Quai Gustave Ador (lac)",
+                    "uic_ref": "8530700",
+                    "coordinates": {
+                        "latitude": 46.20497,
+                        "longitude": 6.155453
+                    }
+                },
+                {
+                    "name": "Genève-Jardin-Anglais (lac)",
+                    "uic_ref": "8501236",
+                    "coordinates": {
+                        "latitude": 46.205068,
+                        "longitude": 6.150604
+                    }
+                },
+                {
+                    "name": "Genève-Molard (lac)",
+                    "uic_ref": "8530699",
+                    "coordinates": {
+                        "latitude": 46.204641,
+                        "longitude": 6.148671
+                    }
+                },
+                {
+                    "name": "Genève-Mt-Blanc",
+                    "uic_ref": "8501237",
+                    "coordinates": {
+                        "latitude": 46.207347,
+                        "longitude": 6.148542
+                    }
+                },
+                {
+                    "name": "Genève-Pâquis (lac)",
+                    "uic_ref": "8501238",
+                    "coordinates": {
+                        "latitude": 46.208733,
+                        "longitude": 6.150971
+                    }
+                },
+                {
+                    "name": "Genève-Pâquis SMGN",
+                    "uic_ref": "8530707",
+                    "coordinates": {
+                        "latitude": 46.2095399,
+                        "longitude": 6.1515189
+                    }
+                },
+                {
+                    "name": "Genève-De-Châteaubriand (lac)",
+                    "uic_ref": "8530701",
+                    "coordinates": {
+                        "latitude": 46.217783,
+                        "longitude": 6.151691
+                    }
+                },
+                {
+                    "name": "Bellevue GE (lac)",
+                    "uic_ref": "8501232",
+                    "coordinates": {
+                        "latitude": 46.255178,
+                        "longitude": 6.15602
+                    }
+                },
+                {
+                    "name": "Versoix (lac)",
+                    "uic_ref": "8501322",
+                    "coordinates": {
+                        "latitude": 46.277528,
+                        "longitude": 6.169714
+                    }
+                },
+                {
+                    "name": "Céligny (lac)",
+                    "uic_ref": "8501315",
+                    "coordinates": {
+                        "latitude": 46.348354,
+                        "longitude": 6.208413
+                    }
+                },
+                {
+                    "name": "Nyon",
+                    "uic_ref": "8501227",
+                    "coordinates": {
+                        "latitude": 46.382306,
+                        "longitude": 6.24355
+                    }
+                },
+                {
+                    "name": "Rolle (lac)",
+                    "uic_ref": "8501320",
+                    "coordinates": {
+                        "latitude": 46.455002,
+                        "longitude": 6.337273
+                    }
+                },
+                {
+                    "name": "Saint-Prex",
+                    "uic_ref": "8501321",
+                    "coordinates": {
+                        "latitude": 46.478759,
+                        "longitude": 6.4619
+                    }
+                },
+                {
+                    "name": "Morges",
+                    "uic_ref": "8501228",
+                    "coordinates": {
+                        "latitude": 46.50842,
+                        "longitude": 6.500428
+                    }
+                },
+                {
+                    "name": "Lausanne-Ouchy",
+                    "uic_ref": "8501075",
+                    "coordinates": {
+                        "latitude": 46.505081,
+                        "longitude": 6.627607
+                    }
+                },
+                {
+                    "name": "Pully",
+                    "uic_ref": "8501319",
+                    "coordinates": {
+                        "latitude": 46.505352,
+                        "longitude": 6.661204
+                    }
+                },
+                {
+                    "name": "Lutry",
+                    "uic_ref": "8501318",
+                    "coordinates": {
+                        "latitude": 46.501268,
+                        "longitude": 6.683996
+                    }
+                },
+                {
+                    "name": "Cully",
+                    "uic_ref": "8501317",
+                    "coordinates": {
+                        "latitude": 46.487478,
+                        "longitude": 6.731609
+                    }
+                },
+                {
+                    "name": "Rivaz-Saint-Saphorin",
+                    "uic_ref": "8501243",
+                    "coordinates": {
+                        "latitude": 46.473641,
+                        "longitude": 6.784095
+                    }
+                },
+                {
+                    "name": "Vevey-Marché",
+                    "uic_ref": "8501248",
+                    "coordinates": {
+                        "latitude": 46.458911,
+                        "longitude": 6.840533
+                    }
+                },
+                {
+                    "name": "Vevey-La Tour (la",
+                    "uic_ref": "8501247",
+                    "coordinates": {
+                        "latitude": 46.457306,
+                        "longitude": 6.850118
+                    }
+                },
+                {
+                    "name": "Clarens",
+                    "uic_ref": "8501312",
+                    "coordinates": {
+                        "latitude": 46.439804,
+                        "longitude": 6.895995
+                    }
+                },
+                {
+                    "name": "Montreux",
+                    "uic_ref": "8501077",
+                    "coordinates": {
+                        "latitude": 46.434542,
+                        "longitude": 6.909502
+                    }
+                },
+                {
+                    "name": "Territet",
+                    "uic_ref": "8501313",
+                    "coordinates": {
+                        "latitude": 46.425704,
+                        "longitude": 6.922311
+                    }
+                },
+                {
+                    "name": "Château-de-Chillon",
+                    "uic_ref": "8501234",
+                    "coordinates": {
+                        "latitude": 46.412836,
+                        "longitude": 6.929261
+                    }
+                },
+                {
+                    "name": "Villeneuve",
+                    "uic_ref": "8501314",
+                    "coordinates": {
+                        "latitude": 46.39862,
+                        "longitude": 6.924701
+                    }
+                },
+                {
+                    "name": "Le Bouveret",
+                    "uic_ref": "8501079",
+                    "coordinates": {
+                        "latitude": 46.386833,
+                        "longitude": 6.85187
+                    }
+                },
+                {
+                    "name": "Saint-Gingolph",
+                    "uic_ref": "8501078",
+                    "coordinates": {
+                        "latitude": 46.393395,
+                        "longitude": 6.805878
+                    }
+                },
+                {
+                    "name": "Evian-les-Bains (F) (lac)",
+                    "uic_ref": "8501074",
+                    "coordinates": {
+                        "latitude": 46.4017237,
+                        "longitude": 6.5947302
+                    }
+                },
+                {
+                    "name": "Thonon-les-Bains (F) (lac)",
+                    "uic_ref": "8501072",
+                    "coordinates": {
+                        "latitude": 46.3760894,
+                        "longitude": 6.4751625
+                    }
+                },
+                {
+                    "name": "Margencel-Anthy-Séchex(F)(lac)",
+                    "uic_ref": "8501240",
+                    "coordinates": {
+                        "latitude": 46.3516277,
+                        "longitude": 6.4039648
+                    }
+                },
+                {
+                    "name": "Sciez (F) (lac)",
+                    "uic_ref": "8501244",
+                    "coordinates": {
+                        "latitude": 46.3415764,
+                        "longitude": 6.3901455
+                    }
+                },
+                {
+                    "name": "Excenevex (F) (lac)",
+                    "uic_ref": "8530763",
+                    "coordinates": {
+                        "latitude": 46.3556833,
+                        "longitude": 6.3567785
+                    }
+                },
+                {
+                    "name": "Nernier (F) (lac)",
+                    "uic_ref": "8501242",
+                    "coordinates": {
+                        "latitude": 46.3658381,
+                        "longitude": 6.3017527
+                    }
+                },
+                {
+                    "name": "Chens-sur-Léman (F) (lac)",
+                    "uic_ref": "8501233",
+                    "coordinates": {
+                        "latitude": 46.3233268,
+                        "longitude": 6.2555989
+                    }
+                },
+                {
+                    "name": "Hermance (lac)",
+                    "uic_ref": "8501239",
+                    "coordinates": {
+                        "latitude": 46.301647,
+                        "longitude": 6.241532
+                    }
+                },
+                {
+                    "name": "Anières (lac)",
+                    "uic_ref": "8501231",
+                    "coordinates": {
+                        "latitude": 46.278381,
+                        "longitude": 6.221232
+                    }
+                },
+                {
+                    "name": "Hermance (lac)",
+                    "uic_ref": "8501239",
+                    "coordinates": {
+                        "latitude": 46.301647,
+                        "longitude": 6.241532
+                    }
+                },
+                {
+                    "name": "Corsier GE (lac)",
+                    "uic_ref": "8501235",
+                    "coordinates": {
+                        "latitude": 46.266528,
+                        "longitude": 6.210834
+                    }
+                },
+                {
+                    "name": "La Belotte (lac)",
+                    "uic_ref": "8530616",
+                    "coordinates": {
+                        "latitude": 46.235541,
+                        "longitude": 6.191644
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Thunersee",
+            "operators": [
+                "BLS"
+            ],
+            "stations": [
+                {
+                    "name": "Thun (See)",
+                    "uic_ref": "8507150",
+                    "coordinates": {
+                        "latitude": 46.754101,
+                        "longitude": 7.63132
+                    }
+                },
+                {
+                    "name": "Hilterfingen (See)",
+                    "uic_ref": "8507151",
+                    "coordinates": {
+                        "latitude": 46.735055,
+                        "longitude": 7.657459
+                    }
+                },
+                {
+                    "name": "Oberhofen am Thunersee",
+                    "uic_ref": "8507152",
+                    "coordinates": {
+                        "latitude": 46.730358,
+                        "longitude": 7.667487
+                    }
+                },
+                {
+                    "name": "Gunten",
+                    "uic_ref": "8507153",
+                    "coordinates": {
+                        "latitude": 46.712467,
+                        "longitude": 7.700315
+                    }
+                },
+                {
+                    "name": "Gwatt Deltapark (See)",
+                    "uic_ref": "8507159",
+                    "coordinates": {
+                        "latitude": 46.720495,
+                        "longitude": 7.635831
+                    }
+                },
+                {
+                    "name": "Spiez Schiffstation",
+                    "uic_ref": "8507154",
+                    "coordinates": {
+                        "latitude": 46.688472,
+                        "longitude": 7.689885
+                    }
+                },
+                {
+                    "name": "Einigen (See)",
+                    "uic_ref": "8507164",
+                    "coordinates": {
+                        "latitude": 46.709752,
+                        "longitude": 7.647195
+                    }
+                },
+                {
+                    "name": "Hünibach (See)",
+                    "uic_ref": "8507161",
+                    "coordinates": {
+                        "latitude": 46.743565,
+                        "longitude": 7.642667
+                    }
+                },
+                {
+                    "name": "Faulensee (See)",
+                    "uic_ref": "8507166",
+                    "coordinates": {
+                        "latitude": 46.675992,
+                        "longitude": 7.703576
+                    }
+                },
+                {
+                    "name": "Merligen (See)",
+                    "uic_ref": "8507155",
+                    "coordinates": {
+                        "latitude": 46.696364,
+                        "longitude": 7.737172
+                    }
+                },
+                {
+                    "name": "Beatenbucht (See)",
+                    "uic_ref": "8507156",
+                    "coordinates": {
+                        "latitude": 46.686599,
+                        "longitude": 7.74602
+                    }
+                },
+                {
+                    "name": "Interlaken West (See)",
+                    "uic_ref": "8507169",
+                    "coordinates": {
+                        "latitude": 46.682202,
+                        "longitude": 7.850731
+                    }
+                },
+                {
+                    "name": "Neuhaus (Unterseen) (See)",
+                    "uic_ref": "8507158",
+                    "coordinates": {
+                        "latitude": 46.67832,
+                        "longitude": 7.815818
+                    }
+                },
+                {
+                    "name": "Beatushöhlen-Sundlauenen",
+                    "uic_ref": "8507157",
+                    "coordinates": {
+                        "latitude": 46.684997,
+                        "longitude": 7.789918
+                    }
+                },
+                {
+                    "name": "Leissigen (See)",
+                    "uic_ref": "8507167",
+                    "coordinates": {
+                        "latitude": 46.655432,
+                        "longitude": 7.770508
+                    }
+                },
+                {
+                    "name": "Hünibach (See)",
+                    "uic_ref": "8507161",
+                    "coordinates": {
+                        "latitude": 46.743565,
+                        "longitude": 7.642667
+                    }
+                },
+                {
+                    "name": "Därligen (See)",
+                    "uic_ref": "8507168",
+                    "coordinates": {
+                        "latitude": 46.6646598,
+                        "longitude": 7.8062511
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Brienzersee",
+            "operators": [
+                "BLS"
+            ],
+            "stations": [
+                "Interlaken Ost (See)",
+                {
+                    "name": "Bönigen",
+                    "uic_ref": "8508371",
+                    "coordinates": {
+                        "latitude": 46.689389,
+                        "longitude": 7.898057
+                    }
+                },
+                {
+                    "name": "Iseltwald (See)",
+                    "uic_ref": "8508379",
+                    "coordinates": {
+                        "latitude": 46.711816,
+                        "longitude": 7.962552
+                    }
+                },
+                {
+                    "name": "Giessbach",
+                    "uic_ref": "8508378",
+                    "coordinates": {
+                        "latitude": 46.734822,
+                        "longitude": 8.019468
+                    }
+                },
+                {
+                    "name": "Oberried am Brienzersee (See)",
+                    "uic_ref": "8508374",
+                    "coordinates": {
+                        "latitude": 46.73658,
+                        "longitude": 7.96278
+                    }
+                },
+                {
+                    "name": "Niederried (See)",
+                    "uic_ref": "8508373",
+                    "coordinates": {
+                        "latitude": 46.717744,
+                        "longitude": 7.932318
+                    }
+                },
+                {
+                    "name": "Ringgenberg (See)",
+                    "uic_ref": "8508372",
+                    "coordinates": {
+                        "latitude": 46.70137,
+                        "longitude": 7.898407
+                    }
+                },
+                {
+                    "name": "Brienz Dorf",
+                    "uic_ref": "8508375",
+                    "coordinates": {
+                        "latitude": 46.7539836,
+                        "longitude": 8.0294492
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Lago Maggiore",
+            "operators": [
+                "NLM"
+            ],
+            "stations": [
+                {
+                    "name": "Ascona",
+                    "uic_ref": "8505573",
+                    "coordinates": {
+                        "latitude": 46.153784,
+                        "longitude": 8.768723
+                    }
+                },
+                {
+                    "name": "Locarno",
+                    "uic_ref": "8505469",
+                    "coordinates": {
+                        "latitude": 46.170141,
+                        "longitude": 8.801173
+                    }
+                },
+                {
+                    "name": "Tenero (lago)",
+                    "uic_ref": "8505519",
+                    "coordinates": {
+                        "latitude": 46.173842,
+                        "longitude": 8.843446
+                    }
+                },
+                {
+                    "name": "Magadino",
+                    "uic_ref": "8505570",
+                    "coordinates": {
+                        "latitude": 46.147728,
+                        "longitude": 8.854656
+                    }
+                },
+                {
+                    "name": "Vira (Gambarogno) (lago)",
+                    "uic_ref": "8505571",
+                    "coordinates": {
+                        "latitude": 46.1449193,
+                        "longitude": 8.8413117
+                    }
+                },
+                {
+                    "name": "S. Nazzaro (lago)",
+                    "uic_ref": "8505518",
+                    "coordinates": {
+                        "latitude": 46.13327,
+                        "longitude": 8.804251
+                    }
+                },
+                {
+                    "name": "Gerra (Gambarogno) (lago)",
+                    "uic_ref": "8505574",
+                    "coordinates": {
+                        "latitude": 46.12473,
+                        "longitude": 8.788717
+                    }
+                },
+                {
+                    "name": "Ranzo (lago)",
+                    "uic_ref": "8505575",
+                    "coordinates": {
+                        "latitude": 46.112987,
+                        "longitude": 8.770019
+                    }
+                },
+                {
+                    "name": "Brissago (lago)",
+                    "uic_ref": "8505524",
+                    "coordinates": {
+                        "latitude": 46.118212,
+                        "longitude": 8.710945
+                    }
+                },
+                {
+                    "name": "Porto Ronco (lago)",
+                    "uic_ref": "8505854",
+                    "coordinates": {
+                        "latitude": 46.140498,
+                        "longitude": 8.726698
+                    }
+                },
+                {
+                    "name": "Isole di Brissago",
+                    "uic_ref": "8505577",
+                    "coordinates": {
+                        "latitude": 46.132579,
+                        "longitude": 8.734716
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Lago di Lugano",
+            "operators": [
+                "SNL"
+            ],
+            "stations": [
+                {
+                    "name": "Paradiso (lago)",
+                    "uic_ref": "8505553",
+                    "coordinates": {
+                        "latitude": 45.993261,
+                        "longitude": 8.946759
+                    }
+                },
+                {
+                    "name": "Bissone (lago)",
+                    "uic_ref": "8505650",
+                    "coordinates": {
+                        "latitude": 45.949789,
+                        "longitude": 8.9641943
+                    }
+                },
+                {
+                    "name": "Bissone (lago)",
+                    "uic_ref": "8505650",
+                    "coordinates": {
+                        "latitude": 45.949789,
+                        "longitude": 8.9641943
+                    }
+                },
+                {
+                    "name": "Lugano Centrale (lago)",
+                    "uic_ref": "8505550",
+                    "coordinates": {
+                        "latitude": 46.002967,
+                        "longitude": 8.951558
+                    }
+                },
+                {
+                    "name": "Cassarate (lago)",
+                    "uic_ref": "8587842",
+                    "coordinates": {
+                        "latitude": 46.00514,
+                        "longitude": 8.969836
+                    }
+                },
+                {
+                    "name": "Castagnola (lago)",
+                    "uic_ref": "8505559",
+                    "coordinates": {
+                        "latitude": 46.002717,
+                        "longitude": 8.9715434
+                    }
+                },
+                {
+                    "name": "Castagnola Heleneum (lago)",
+                    "uic_ref": "8530717",
+                    "coordinates": {
+                        "latitude": 46.0005303,
+                        "longitude": 8.9833257
+                    }
+                },
+                {
+                    "name": "Gandria (lago)",
+                    "uic_ref": "8505551",
+                    "coordinates": {
+                        "latitude": 46.005544,
+                        "longitude": 9.003958
+                    }
+                },
+                {
+                    "name": "Museo doganale svizzero (lago)",
+                    "uic_ref": "8505656",
+                    "coordinates": {
+                        "latitude": 45.9994739,
+                        "longitude": 9.0212416
+                    }
+                },
+                {
+                    "name": "Cantine di Gandria (lago)",
+                    "uic_ref": "8505545",
+                    "coordinates": {
+                        "latitude": 45.9984469,
+                        "longitude": 9.016942
+                    }
+                },
+                {
+                    "name": "Grotto Pescatori (lago)",
+                    "uic_ref": "8505544",
+                    "coordinates": {
+                        "latitude": 45.9901054,
+                        "longitude": 8.9933948
+                    }
+                },
+                {
+                    "name": "Ponte Tresa (lago)",
+                    "uic_ref": "8505677",
+                    "coordinates": {
+                        "latitude": 45.967392,
+                        "longitude": 8.859821
+                    }
+                },
+                {
+                    "name": "Brusino Arsizio (lago)",
+                    "uic_ref": "8505556",
+                    "coordinates": {
+                        "latitude": 45.929932,
+                        "longitude": 8.937988
+                    }
+                },
+                {
+                    "name": "Melide Cantine (lago)",
+                    "uic_ref": "8505651",
+                    "coordinates": {
+                        "latitude": 45.9504055,
+                        "longitude": 8.9425862
+                    }
+                },
+                {
+                    "name": "Morcote (lago)",
+                    "uic_ref": "8505557",
+                    "coordinates": {
+                        "latitude": 45.922649,
+                        "longitude": 8.9170751
+                    }
+                },
+                {
+                    "name": "Maroggio (lago)",
+                    "uic_ref": "8531259",
+                    "coordinates": {
+                        "latitude": 45.9357234,
+                        "longitude": 8.9683065
+                    }
+                },
+                {
+                    "name": "Melano (lago)",
+                    "uic_ref": "8505548",
+                    "coordinates": {
+                        "latitude": 45.9208895,
+                        "longitude": 8.9808767
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Bielersee",
+            "operators": [
+                "BSG"
+            ],
+            "stations": [
+                {
+                    "name": "Biel/Bienne",
+                    "uic_ref": "8504371",
+                    "coordinates": {
+                        "latitude": 47.131207,
+                        "longitude": 7.235292
+                    }
+                },
+                {
+                    "name": "Tüscherz",
+                    "uic_ref": "8504372",
+                    "coordinates": {
+                        "latitude": 47.1124025,
+                        "longitude": 7.1937804
+                    }
+                },
+                {
+                    "name": "Nidau",
+                    "uic_ref": "8504369",
+                    "coordinates": {
+                        "latitude": 47.121803,
+                        "longitude": 7.24334
+                    }
+                },
+                {
+                    "name": "Twann",
+                    "uic_ref": "8504374",
+                    "coordinates": {
+                        "latitude": 47.093407,
+                        "longitude": 7.156989
+                    }
+                },
+                {
+                    "name": "Ligerz",
+                    "uic_ref": "8504375",
+                    "coordinates": {
+                        "latitude": 47.08335,
+                        "longitude": 7.135459
+                    }
+                },
+                {
+                    "name": "La Neuveville",
+                    "uic_ref": "8504377",
+                    "coordinates": {
+                        "latitude": 47.061382,
+                        "longitude": 7.093487
+                    }
+                },
+                {
+                    "name": "Erlach",
+                    "uic_ref": "8504378",
+                    "coordinates": {
+                        "latitude": 47.049278,
+                        "longitude": 7.097434
+                    }
+                },
+                {
+                    "name": "Engelberg-Wingreis ",
+                    "uic_ref": "Engelberg-Wingreis",
+                    "coordinates": {
+                        "latitude": 47.102154,
+                        "longitude": 7.177546
+                    }
+                },
+                {
+                    "name": "Le Landeron débarcadère",
+                    "uic_ref": "8504565",
+                    "coordinates": {
+                        "latitude": 47.051218,
+                        "longitude": 7.076193
+                    }
+                },
+                {
+                    "name": "Thielle-Wavre",
+                    "uic_ref": "8504567",
+                    "coordinates": {
+                        "latitude": 47.019681,
+                        "longitude": 7.03308
+                    }
+                },
+                {
+                    "name": "St. Petersinsel Nord",
+                    "uic_ref": "8504376",
+                    "coordinates": {
+                        "latitude": 47.068035,
+                        "longitude": 7.136901
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Neuenburgersee",
+            "operators": [
+                "LNM"
+            ],
+            "stations": [
+                {
+                    "name": "Neuchâtel",
+                    "uic_ref": "8504550",
+                    "coordinates": {
+                        "latitude": 46.990968,
+                        "longitude": 6.933335
+                    }
+                },
+                {
+                    "name": "Saint-Blaise",
+                    "uic_ref": "8504560",
+                    "coordinates": {
+                        "latitude": 47.010128,
+                        "longitude": 6.982825
+                    }
+                },
+                {
+                    "name": "Cudrefin",
+                    "uic_ref": "8504561",
+                    "coordinates": {
+                        "latitude": 46.959272,
+                        "longitude": 7.013987
+                    }
+                },
+                {
+                    "name": "Portalban",
+                    "uic_ref": "8504562",
+                    "coordinates": {
+                        "latitude": 46.925747,
+                        "longitude": 6.953026
+                    }
+                },
+                {
+                    "name": "Chevroux",
+                    "uic_ref": "8504563",
+                    "coordinates": {
+                        "latitude": 46.89974,
+                        "longitude": 6.896658
+                    }
+                },
+                {
+                    "name": "Estavayer-le-Lac",
+                    "uic_ref": "8504564",
+                    "coordinates": {
+                        "latitude": 46.852213,
+                        "longitude": 6.838354
+                    }
+                },
+                {
+                    "name": "Gorgier - Chez-le-Bart",
+                    "uic_ref": "8504554",
+                    "coordinates": {
+                        "latitude": 46.899971,
+                        "longitude": 6.787385
+                    }
+                },
+                {
+                    "name": "Yverdon-les-Bains",
+                    "uic_ref": "8504558",
+                    "coordinates": {
+                        "latitude": 46.787126,
+                        "longitude": 6.640677
+                    }
+                },
+                {
+                    "name": "Grandson",
+                    "uic_ref": "8504557",
+                    "coordinates": {
+                        "latitude": 46.805988,
+                        "longitude": 6.642887
+                    }
+                },
+                {
+                    "name": "Concise (bateau)",
+                    "uic_ref": "8504556",
+                    "coordinates": {
+                        "latitude": 46.847613,
+                        "longitude": 6.720639
+                    }
+                },
+                {
+                    "name": "Vaumarcus débarcadère",
+                    "uic_ref": "8504243",
+                    "coordinates": {
+                        "latitude": 46.877482,
+                        "longitude": 6.761053
+                    }
+                },
+                {
+                    "name": "St-Aubin NE (bateau)",
+                    "uic_ref": "8504555",
+                    "coordinates": {
+                        "latitude": 46.889789,
+                        "longitude": 6.774977
+                    }
+                },
+                {
+                    "name": "Bevaix (bateau)",
+                    "uic_ref": "8504559",
+                    "coordinates": {
+                        "latitude": 46.922132,
+                        "longitude": 6.822343
+                    }
+                },
+                {
+                    "name": "Cortaillod (bateau)",
+                    "uic_ref": "8530793",
+                    "coordinates": {
+                        "latitude": 46.938823,
+                        "longitude": 6.854158
+                    }
+                },
+                {
+                    "name": "Auvernier (bateau)",
+                    "uic_ref": "8504552",
+                    "coordinates": {
+                        "latitude": 46.973844,
+                        "longitude": 6.881559
+                    }
+                },
+                {
+                    "name": "Neuchâtel-Serrières (bateau)",
+                    "uic_ref": "8504551",
+                    "coordinates": {
+                        "latitude": 46.980175,
+                        "longitude": 6.903824
+                    }
+                },
+                {
+                    "name": "Hauterive NE débarcadère",
+                    "uic_ref": "8504808",
+                    "coordinates": {
+                        "latitude": 47.005689,
+                        "longitude": 6.970383
+                    }
+                },
+                {
+                    "name": "La Sauge (bateau)",
+                    "uic_ref": "8504571",
+                    "coordinates": {
+                        "latitude": 46.975749,
+                        "longitude": 7.054032
+                    }
+                },
+                {
+                    "name": "Yverdon-les-Bains",
+                    "uic_ref": "8504558",
+                    "coordinates": {
+                        "latitude": 46.787126,
+                        "longitude": 6.640677
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Murtensee",
+            "operators": [
+                "LNM"
+            ],
+            "stations": [
+                {
+                    "name": "Murten/Morat (Schiff/bateau)",
+                    "uic_ref": "8504577",
+                    "coordinates": {
+                        "latitude": 46.930641,
+                        "longitude": 7.116649
+                    }
+                },
+                {
+                    "name": "Praz (Vully)",
+                    "uic_ref": "8504573",
+                    "coordinates": {
+                        "latitude": 46.951661,
+                        "longitude": 7.097279
+                    }
+                },
+                {
+                    "name": "Vallamand",
+                    "uic_ref": "8504575",
+                    "coordinates": {
+                        "latitude": 46.924455,
+                        "longitude": 7.037475
+                    }
+                },
+                {
+                    "name": "Faoug débarcadère",
+                    "uic_ref": "8530821",
+                    "coordinates": {
+                        "latitude": 46.91013,
+                        "longitude": 7.076882
+                    }
+                },
+                {
+                    "name": "Môtier",
+                    "uic_ref": "8504574",
+                    "coordinates": {
+                        "latitude": 46.946854,
+                        "longitude": 7.084069
+                    }
+                },
+                {
+                    "name": "Trois-Lacs (camping)",
+                    "uic_ref": "8504499",
+                    "coordinates": {
+                        "latitude": 46.975684,
+                        "longitude": 7.093223
+                    }
+                },
+                {
+                    "name": "Sugiez (bateau)",
+                    "uic_ref": "8504572",
+                    "coordinates": {
+                        "latitude": 46.964151,
+                        "longitude": 7.114162
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Aare",
+            "operators": [
+                "BSG"
+            ],
+            "stations": [
+                {
+                    "name": "Solothurn (Schiff)",
+                    "uic_ref": "8504379",
+                    "coordinates": {
+                        "latitude": 47.20353,
+                        "longitude": 7.534086
+                    }
+                },
+                {
+                    "name": "Altreu",
+                    "uic_ref": "8504365",
+                    "coordinates": {
+                        "latitude": 47.190383,
+                        "longitude": 7.44889
+                    }
+                },
+                {
+                    "name": "Grenchen (Schiff)",
+                    "uic_ref": "8504363",
+                    "coordinates": {
+                        "latitude": 47.172915,
+                        "longitude": 7.422532
+                    }
+                },
+                {
+                    "name": "Büren (Schiff)",
+                    "uic_ref": "8504366",
+                    "coordinates": {
+                        "latitude": 47.140229,
+                        "longitude": 7.374043
+                    }
+                },
+                {
+                    "name": "Brügg (Schiff)",
+                    "uic_ref": "8504368",
+                    "coordinates": {
+                        "latitude": 47.122221,
+                        "longitude": 7.281331
+                    }
+                },
+                {
+                    "name": "Port",
+                    "uic_ref": "8504364",
+                    "coordinates": {
+                        "latitude": 47.118335,
+                        "longitude": 7.256609
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Zugersee",
+            "operators": [
+                "SGZ"
+            ],
+            "stations": [
+                {
+                    "name": "Zug Bahnhofsteg (See)",
+                    "uic_ref": "8502251",
+                    "coordinates": {
+                        "latitude": 47.170093,
+                        "longitude": 8.513338
+                    }
+                },
+                {
+                    "name": "Zug Landsgemeindeplatz (See)",
+                    "uic_ref": "8502246",
+                    "coordinates": {
+                        "latitude": 47.1674404,
+                        "longitude": 8.5135278
+                    }
+                },
+                {
+                    "name": "Oberwil bei Zug (See)",
+                    "uic_ref": "8502252",
+                    "coordinates": {
+                        "latitude": 47.149005,
+                        "longitude": 8.506797
+                    }
+                },
+                {
+                    "name": "Lotenbach (See)",
+                    "uic_ref": "8502255",
+                    "coordinates": {
+                        "latitude": 47.1144781,
+                        "longitude": 8.5000958
+                    }
+                },
+                {
+                    "name": "Walchwil (See)",
+                    "uic_ref": "8502258",
+                    "coordinates": {
+                        "latitude": 47.099674,
+                        "longitude": 8.512493
+                    }
+                },
+                {
+                    "name": "Arth am See (Schiff)",
+                    "uic_ref": "8505060",
+                    "coordinates": {
+                        "latitude": 47.064704,
+                        "longitude": 8.522324
+                    }
+                },
+                {
+                    "name": "Immensee (See)",
+                    "uic_ref": "8502257",
+                    "coordinates": {
+                        "latitude": 47.096526,
+                        "longitude": 8.464111
+                    }
+                },
+                {
+                    "name": "Risch (See)",
+                    "uic_ref": "8502254",
+                    "coordinates": {
+                        "latitude": 47.133824,
+                        "longitude": 8.467976
+                    }
+                },
+                {
+                    "name": "Buonas (See)",
+                    "uic_ref": "8502253",
+                    "coordinates": {
+                        "latitude": 47.14222,
+                        "longitude": 8.458526
+                    }
+                },
+                {
+                    "name": "Cham (See)",
+                    "uic_ref": "8502250",
+                    "coordinates": {
+                        "latitude": 47.178662,
+                        "longitude": 8.463469
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Walensee",
+            "operators": [
+                "Walensee Schifffahrt"
+            ],
+            "stations": [
+                {
+                    "name": "Walenstadt (See)",
+                    "uic_ref": "8530665",
+                    "coordinates": {
+                        "latitude": 47.127716,
+                        "longitude": 9.30183
+                    }
+                },
+                {
+                    "name": "Mols (See)",
+                    "uic_ref": "8530664",
+                    "coordinates": {
+                        "latitude": 47.112928,
+                        "longitude": 9.278146
+                    }
+                },
+                {
+                    "name": "Unterterzen (See)",
+                    "uic_ref": "8530663",
+                    "coordinates": {
+                        "latitude": 47.114482,
+                        "longitude": 9.253448
+                    }
+                },
+                {
+                    "name": "Murg Ost (See)",
+                    "uic_ref": "8530856",
+                    "coordinates": {
+                        "latitude": 47.1147715,
+                        "longitude": 9.2179417
+                    }
+                },
+                {
+                    "name": "Murg West (See)",
+                    "uic_ref": "8530666",
+                    "coordinates": {
+                        "latitude": 47.113225,
+                        "longitude": 9.211165
+                    }
+                },
+                {
+                    "name": "Mühlehorn (See)",
+                    "uic_ref": "8530660",
+                    "coordinates": {
+                        "latitude": 47.118295,
+                        "longitude": 9.174309
+                    }
+                },
+                {
+                    "name": "Weesen (See)",
+                    "uic_ref": "8530658",
+                    "coordinates": {
+                        "latitude": 47.134689,
+                        "longitude": 9.099281
+                    }
+                },
+                {
+                    "name": "Betlis",
+                    "uic_ref": "8530659",
+                    "coordinates": {
+                        "latitude": 47.134401,
+                        "longitude": 9.146023
+                    }
+                },
+                {
+                    "name": "Quinten",
+                    "uic_ref": "8530661",
+                    "coordinates": {
+                        "latitude": 47.128904,
+                        "longitude": 9.216008
+                    }
+                },
+                {
+                    "name": "Quinten Au",
+                    "uic_ref": "8530662",
+                    "coordinates": {
+                        "latitude": 47.129488,
+                        "longitude": 9.229435
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Hallwilersee",
+            "operators": [
+                "SGH"
+            ],
+            "stations": [
+                {
+                    "name": "Seengen (See)",
+                    "uic_ref": "8530627",
+                    "coordinates": {
+                        "latitude": 47.319194,
+                        "longitude": 8.202674
+                    }
+                },
+                {
+                    "name": "Meisterschwanden Delphin",
+                    "uic_ref": "8530625",
+                    "coordinates": {
+                        "latitude": 47.296175,
+                        "longitude": 8.220353
+                    }
+                },
+                {
+                    "name": "Meisterschwanden Seerose",
+                    "uic_ref": "8530626",
+                    "coordinates": {
+                        "latitude": 47.284108,
+                        "longitude": 8.224948
+                    }
+                },
+                {
+                    "name": "Aesch LU (See)",
+                    "uic_ref": "8530630",
+                    "coordinates": {
+                        "latitude": 47.258411,
+                        "longitude": 8.229921
+                    }
+                },
+                {
+                    "name": "Mosen (See)",
+                    "uic_ref": "8530631",
+                    "coordinates": {
+                        "latitude": 47.245812,
+                        "longitude": 8.224213
+                    }
+                },
+                {
+                    "name": "Beinwil am See (See)",
+                    "uic_ref": "8530629",
+                    "coordinates": {
+                        "latitude": 47.269322,
+                        "longitude": 8.211462
+                    }
+                },
+                {
+                    "name": "Birrwil (See)",
+                    "uic_ref": "8530628",
+                    "coordinates": {
+                        "latitude": 47.290904,
+                        "longitude": 8.202877
+                    }
+                },
+                {
+                    "name": "Boniswil (See)",
+                    "uic_ref": "8530632",
+                    "coordinates": {
+                        "latitude": 47.304506,
+                        "longitude": 8.198523
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Aegerisee",
+            "operators": [
+                ""
+            ],
+            "stations": [
+                {
+                    "name": "Unterägeri (See)",
+                    "uic_ref": "8530742",
+                    "coordinates": {
+                        "latitude": 47.138044,
+                        "longitude": 8.58933
+                    }
+                },
+                {
+                    "name": "Oberägeri (See)",
+                    "uic_ref": "8530743",
+                    "coordinates": {
+                        "latitude": 47.133554,
+                        "longitude": 8.608124
+                    }
+                },
+                {
+                    "name": "Oberägeri Ländli (See)",
+                    "uic_ref": "8530857",
+                    "coordinates": {
+                        "latitude": 47.129543,
+                        "longitude": 8.62997
+                    }
+                },
+                {
+                    "name": "Eierhals (See)",
+                    "uic_ref": "8530633",
+                    "coordinates": {
+                        "latitude": 47.116142,
+                        "longitude": 8.640873
+                    }
+                },
+                {
+                    "name": "Morgarten Denkmal (See)",
+                    "uic_ref": "8530634",
+                    "coordinates": {
+                        "latitude": 47.106161,
+                        "longitude": 8.641295
+                    }
+                },
+                {
+                    "name": "Morgarten Hotel (See)",
+                    "uic_ref": "8530635",
+                    "coordinates": {
+                        "latitude": 47.103791,
+                        "longitude": 8.640029
+                    }
+                },
+                {
+                    "name": "Naas (See)",
+                    "uic_ref": "8530636",
+                    "coordinates": {
+                        "latitude": 47.114356,
+                        "longitude": 8.621396
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Lac de Joux",
+            "operators": [
+                ""
+            ],
+            "stations": [
+                {
+                    "name": "Le Pont (lac)",
+                    "uic_ref": "8530621",
+                    "coordinates": {
+                        "latitude": 46.667623,
+                        "longitude": 6.325058
+                    }
+                },
+                {
+                    "name": "Les Bioux (lac)",
+                    "uic_ref": "8530623",
+                    "coordinates": {
+                        "latitude": 46.624151,
+                        "longitude": 6.272833
+                    }
+                },
+                {
+                    "name": "Le Rocheray (lac",
+                    "uic_ref": "8530622",
+                    "coordinates": {
+                        "latitude": 46.622817,
+                        "longitude": 6.251721
+                    }
+                },
+                {
+                    "name": "Le Lieu Roche Fendue (lac)",
+                    "uic_ref": "8530633",
+                    "coordinates": {
+                        "latitude": 47.116142,
+                        "longitude": 8.640873
+                    }
+                },
+                {
+                    "name": "Morgarten Denkmal (See)",
+                    "uic_ref": "8530634",
+                    "coordinates": {
+                        "latitude": 47.106161,
+                        "longitude": 8.641295
+                    }
+                },
+                {
+                    "name": "Morgarten Hotel (See)",
+                    "uic_ref": "8530635",
+                    "coordinates": {
+                        "latitude": 47.103791,
+                        "longitude": 8.640029
+                    }
+                },
+                {
+                    "name": "Naas (See)",
+                    "uic_ref": "8530636",
+                    "coordinates": {
+                        "latitude": 47.114356,
+                        "longitude": 8.621396
+                    }
+                }
+            ]
+        }
+    ]
+}

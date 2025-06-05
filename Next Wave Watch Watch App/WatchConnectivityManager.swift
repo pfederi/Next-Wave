@@ -5,6 +5,7 @@ import WidgetKit
 extension Notification.Name {
     static let favoritesUpdated = Notification.Name("favoritesUpdated")
     static let forceWidgetUpdate = Notification.Name("forceWidgetUpdate")
+    static let widgetSettingsUpdated = Notification.Name("widgetSettingsUpdated")
 }
 
 class WatchConnectivityManager: NSObject, ObservableObject {
@@ -52,19 +53,45 @@ extension WatchConnectivityManager: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         logger.info("📱 Received immediate message: \(message)")
         
-        if let action = message["action"] as? String, action == "forceWidgetUpdate" {
-            logger.info("📱 Received force widget update message")
-            
-            DispatchQueue.main.async {
-                // Force immediate widget update
-                WidgetCenter.shared.reloadAllTimelines()
-                self.logger.info("📱 Forced widget update from iOS message")
+        if let action = message["action"] as? String {
+            switch action {
+            case "forceWidgetUpdate":
+                logger.info("📱 Received force widget update message")
                 
-                // Notify components about forced update
-                NotificationCenter.default.post(name: .forceWidgetUpdate, object: nil)
+                DispatchQueue.main.async {
+                    // Force immediate widget update
+                    WidgetCenter.shared.reloadAllTimelines()
+                    self.logger.info("📱 Forced widget update from iOS message")
+                    
+                    // Notify components about forced update
+                    NotificationCenter.default.post(name: .forceWidgetUpdate, object: nil)
+                    
+                    // Reply to acknowledge receipt
+                    replyHandler(["status": "updated", "timestamp": Date().timeIntervalSince1970])
+                }
                 
-                // Reply to acknowledge receipt
-                replyHandler(["status": "updated", "timestamp": Date().timeIntervalSince1970])
+            case "updateWidgetSettings":
+                if let useNearestStation = message["useNearestStation"] as? Bool {
+                    logger.info("📱 Received widget settings update - useNearestStation: \(useNearestStation)")
+                    
+                    DispatchQueue.main.async {
+                        SharedDataManager.shared.saveWidgetSettings(useNearestStation: useNearestStation)
+                        
+                        // Notify that widget settings have been updated
+                        NotificationCenter.default.post(name: .widgetSettingsUpdated, object: nil)
+                        
+                        // Update widgets
+                        WidgetCenter.shared.reloadAllTimelines()
+                        
+                        // Reply to acknowledge receipt
+                        replyHandler(["status": "settings_updated", "useNearestStation": useNearestStation, "timestamp": Date().timeIntervalSince1970])
+                    }
+                }
+                
+
+            default:
+                logger.warning("📱 Unknown action in message: \(action)")
+                replyHandler(["status": "unknown_action", "timestamp": Date().timeIntervalSince1970])
             }
         }
     }
@@ -72,44 +99,98 @@ extension WatchConnectivityManager: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
         logger.info("📱 Received user info: \(userInfo)")
         
-        if let action = userInfo["action"] as? String, action == "forceWidgetUpdate" {
-            logger.info("📱 Received force widget update via user info")
-            
-            DispatchQueue.main.async {
-                // Force immediate widget update
-                WidgetCenter.shared.reloadAllTimelines()
-                self.logger.info("📱 Forced widget update from iOS user info")
+        if let action = userInfo["action"] as? String {
+            switch action {
+            case "forceWidgetUpdate":
+                logger.info("📱 Received force widget update via user info")
                 
-                // Notify components about forced update
-                NotificationCenter.default.post(name: .forceWidgetUpdate, object: nil)
+                DispatchQueue.main.async {
+                    // Force immediate widget update
+                    WidgetCenter.shared.reloadAllTimelines()
+                    self.logger.info("📱 Forced widget update from iOS user info")
+                    
+                    // Notify components about forced update
+                    NotificationCenter.default.post(name: .forceWidgetUpdate, object: nil)
+                }
+                
+            case "updateWidgetSettings":
+                if let useNearestStation = userInfo["useNearestStation"] as? Bool {
+                    logger.info("📱 Received widget settings update via user info - useNearestStation: \(useNearestStation)")
+                    
+                    DispatchQueue.main.async {
+                        SharedDataManager.shared.saveWidgetSettings(useNearestStation: useNearestStation)
+                        
+                        // Notify that widget settings have been updated
+                        NotificationCenter.default.post(name: .widgetSettingsUpdated, object: nil)
+                        
+                        // Update widgets
+                        WidgetCenter.shared.reloadAllTimelines()
+                    }
+                }
+                
+
+            default:
+                logger.warning("📱 Unknown action in user info: \(action)")
             }
         }
     }
     
     private func processApplicationContext(_ context: [String: Any]) {
-        guard let favoritesData = context["favoriteStations"] as? Data else {
+        var hasUpdates = false
+        
+        // Process favorites
+        if let favoritesData = context["favoriteStations"] as? Data {
+            do {
+                let favorites = try JSONDecoder().decode([FavoriteStation].self, from: favoritesData)
+                logger.info("📱 Received \(favorites.count) favorites from iOS")
+                    
+                DispatchQueue.main.async {
+                    SharedDataManager.shared.saveFavoriteStations(favorites)
+                    self.logger.info("📱 Successfully saved favorites to Watch SharedDataManager")
+                    
+                    // Notify that favorites have been updated
+                    NotificationCenter.default.post(name: .favoritesUpdated, object: nil)
+                }
+                hasUpdates = true
+            } catch {
+                logger.error("📱 Failed to decode favorites: \(error.localizedDescription)")
+            }
+        } else {
             logger.debug("📱 No favorites data in application context")
-            return
         }
         
-        do {
-            let favorites = try JSONDecoder().decode([FavoriteStation].self, from: favoritesData)
-            logger.info("📱 Received \(favorites.count) favorites from iOS")
+        // Process widget settings
+        if let widgetSettingsData = context["widgetSettings"] as? Data {
+            do {
+                let widgetSettings = try JSONDecoder().decode(SharedDataManager.WidgetSettings.self, from: widgetSettingsData)
+                logger.info("📱 Received widget settings from iOS - useNearestStation: \(widgetSettings.useNearestStation)")
                 
-            // Save to SharedDataManager
-            DispatchQueue.main.async {
-                SharedDataManager.shared.saveFavoriteStations(favorites)
-                self.logger.info("📱 Successfully saved favorites to Watch SharedDataManager")
-                
-                // Notify that favorites have been updated
-                NotificationCenter.default.post(name: .favoritesUpdated, object: nil)
-                
-                // Immediately update all widgets
-                WidgetCenter.shared.reloadAllTimelines()
-                self.logger.info("📱 Triggered widget updates for new favorites")
-            }
+                DispatchQueue.main.async {
+                    SharedDataManager.shared.saveWidgetSettings(useNearestStation: widgetSettings.useNearestStation)
+                    self.logger.info("📱 Successfully saved widget settings to Watch SharedDataManager")
+                    
+                    // Notify that widget settings have been updated
+                    NotificationCenter.default.post(name: .widgetSettingsUpdated, object: nil)
+                }
+                hasUpdates = true
             } catch {
-            logger.error("📱 Failed to decode favorites: \(error.localizedDescription)")
+                logger.error("📱 Failed to decode widget settings: \(error.localizedDescription)")
+            }
+        } else {
+            logger.debug("📱 No widget settings data in application context")
+        }
+        
+
+        
+        // Update widgets if we had any updates
+        if hasUpdates {
+            DispatchQueue.main.async {
+                WidgetCenter.shared.reloadAllTimelines()
+                self.logger.info("📱 Triggered widget updates for new data")
+                
+                // Notify view model about updates
+                NotificationCenter.default.post(name: NSNotification.Name("ApplicationContextUpdated"), object: nil)
+            }
         }
     }
 } 

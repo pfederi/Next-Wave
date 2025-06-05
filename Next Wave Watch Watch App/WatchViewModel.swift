@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import WidgetKit
+import Combine
 
 @MainActor
 class WatchViewModel: ObservableObject {
@@ -10,28 +11,58 @@ class WatchViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: Error?
     @Published var refreshTrigger = Date() // Force UI refresh every 30 seconds
+    @Published var nearestStation: FavoriteStation? = nil
+    @Published var useNearestStationForWidget: Bool = false
     
     private let sharedDataManager = SharedDataManager.shared
     private let transportAPI = TransportAPI()
     private let logger = WatchLogger.shared
+    private let locationManager = WatchLocationManager()
     private var timer: Timer?
     private var uiRefreshTimer: Timer?
     private var favoritesObserver: NSObjectProtocol?
     private var connectivityObserver: NSObjectProtocol?
     private var forceUpdateObserver: NSObjectProtocol?
+    private var widgetSettingsObserver: NSObjectProtocol?
+    private var contextUpdateObserver: NSObjectProtocol?
+    private var cancellables = Set<AnyCancellable>()
     
     init() {
         logger.info("WatchViewModel initialized")
         setupFavoritesObserver()
         setupConnectivityObserver()
         setupForceUpdateObserver()
+        setupWidgetSettingsObserver()
+        setupLocationObserver()
+        loadWidgetSettings()
+        startLocationServices()
         startPeriodicUpdates()
         startUIRefreshTimer()
+        
+        // Debug: Listen for any application context changes
+        contextUpdateObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name("ApplicationContextUpdated"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.loadWidgetSettings()
+            }
+        }
     }
     
     deinit {
         timer?.invalidate()
         uiRefreshTimer?.invalidate()
+        cancellables.removeAll()
+        
+        // Stop location updates directly without Task
+        let localLocationManager = locationManager
+        DispatchQueue.main.async {
+            localLocationManager.stopLocationUpdates()
+        }
+        
         if let observer = favoritesObserver {
             NotificationCenter.default.removeObserver(observer)
         }
@@ -39,6 +70,12 @@ class WatchViewModel: ObservableObject {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = forceUpdateObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = widgetSettingsObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        if let observer = contextUpdateObserver {
             NotificationCenter.default.removeObserver(observer)
         }
     }
@@ -104,6 +141,24 @@ class WatchViewModel: ObservableObject {
         }
     }
     
+    private func setupWidgetSettingsObserver() {
+        widgetSettingsObserver = NotificationCenter.default.addObserver(
+            forName: .widgetSettingsUpdated,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                self.logger.info("Widget settings updated via WatchConnectivity, reloading")
+                self.loadWidgetSettings()
+                
+                // Update widgets immediately
+                WidgetCenter.shared.reloadAllTimelines()
+                self.logger.info("Triggered widget update from widget settings change")
+            }
+        }
+    }
+    
     private func startPeriodicUpdates() {
         logger.info("Starting periodic updates")
         // Initial update
@@ -121,6 +176,7 @@ class WatchViewModel: ObservableObject {
         
         // Timer to force UI refresh every 30 seconds to update minute counters
         uiRefreshTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 // Force UI refresh by updating refresh trigger
@@ -129,6 +185,73 @@ class WatchViewModel: ObservableObject {
             }
         }
         logger.debug("UI refresh timer scheduled for every 30 seconds")
+    }
+    
+    private func setupLocationObserver() {
+        // Observe location manager's nearest station updates
+        locationManager.$nearestStation
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newNearestStation in
+                guard let self = self else { return }
+                if let station = newNearestStation {
+                    self.nearestStation = station
+                    self.logger.info("Location manager found new nearest station: \(station.name)")
+                    print("🔧 WatchViewModel: Location manager found new nearest station: \(station.name)")
+                    
+                    // Update widgets when nearest station changes
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func startLocationServices() {
+        logger.info("Starting location services for nearest station detection")
+        print("🔧 WatchViewModel: Starting location services")
+        
+        // Start location updates if needed
+        if useNearestStationForWidget {
+            locationManager.startLocationUpdates()
+        }
+    }
+    
+    private func loadWidgetSettings() {
+        let settings = sharedDataManager.loadWidgetSettings()
+        let previousUseNearestStation = useNearestStationForWidget
+        useNearestStationForWidget = settings.useNearestStation
+        
+        // Update nearest station from location manager if available
+        if let locationNearestStation = locationManager.nearestStation {
+            nearestStation = locationNearestStation
+        } else {
+            // Fallback to saved nearest station
+            nearestStation = sharedDataManager.loadNearestStation()
+        }
+        
+        logger.info("Widget settings loaded - useNearestStation: \(useNearestStationForWidget)")
+        print("🔧 WatchViewModel: Widget settings loaded - useNearestStation: \(useNearestStationForWidget)")
+        
+        // Start/stop location updates based on settings change
+        if useNearestStationForWidget != previousUseNearestStation {
+            if useNearestStationForWidget {
+                logger.info("Starting location updates for nearest station")
+                locationManager.startLocationUpdates()
+            } else {
+                logger.info("Stopping location updates - nearest station disabled")
+                locationManager.stopLocationUpdates()
+            }
+        }
+        
+        if let nearest = nearestStation {
+            logger.info("Nearest station: \(nearest.name)")
+            print("🔧 WatchViewModel: Nearest station: \(nearest.name)")
+        } else {
+            print("🔧 WatchViewModel: No nearest station found")
+            // If we need nearest station but don't have one, request location
+            if useNearestStationForWidget {
+                locationManager.requestLocation()
+            }
+        }
     }
     
     private func scheduleNextUpdate() {
@@ -203,14 +326,31 @@ class WatchViewModel: ObservableObject {
         do {
             // Then fetch fresh data from API
             logger.debug("Fetching stations from API")
-            let stations = try await transportAPI.fetchStations()
-            logger.info("Found \(stations.count) favorite stations")
+            let favoriteStations = try await transportAPI.fetchStations()
+            logger.info("Found \(favoriteStations.count) favorite stations")
+            
+            // Add nearest station if it's not already in favorites and if we use nearest station
+            var allStationsToFetch = favoriteStations
+            if useNearestStationForWidget, 
+               let nearest = nearestStation,
+               !favoriteStations.contains(where: { $0.name == nearest.name }) {
+                // Create a station object for the nearest station
+                let nearestStationForAPI = Station(
+                    id: nearest.id,
+                    name: nearest.name,
+                    latitude: nearest.latitude,
+                    longitude: nearest.longitude,
+                    uic_ref: nearest.uic_ref
+                )
+                allStationsToFetch.append(nearestStationForAPI)
+                logger.info("Added nearest station '\(nearest.name)' to departure fetch list")
+            }
             
             var updatedDepartures: [DepartureInfo] = []
             let today = Date()
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) ?? today
             
-            for station in stations {
+            for station in allStationsToFetch {
                 logger.debug("Fetching journeys for station: \(station.name)")
                 
                 // Lade heutige Abfahrten

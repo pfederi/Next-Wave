@@ -28,6 +28,11 @@ struct SettingsView: View {
                 
                 Divider()
                 
+                // Widget section
+                WidgetSettingsSection(appSettings: appSettings)
+                
+                Divider()
+                
                 // Notification section
                 NotificationSettingsSection(
                     scheduleViewModel: scheduleViewModel,
@@ -54,6 +59,39 @@ struct SettingsView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Settings")
+    }
+}
+
+// MARK: - Widget Settings Section
+struct WidgetSettingsSection: View {
+    @ObservedObject var appSettings: AppSettings
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Watch Settings")
+                .font(.headline)
+            
+            Toggle(isOn: $appSettings.useNearestStationForWidget) {
+                HStack {
+                    Image(systemName: "location.circle.fill")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Use Nearest Station")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Show nearest station in widget and on top of favorites in Watch App")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                }
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+        }
+        .foregroundColor(Color("text-color"))
     }
 }
 

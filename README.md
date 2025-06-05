@@ -15,8 +15,10 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - 🔔 Smart notifications 3,5,10 or 15 minutes before waves
 - 📍 Easy spot selection on Swiss lakes
 - 🆕 Store up to 5 favorite stations
-- 🆕 Nearby station is displayed
-- 🆕 New Analytics View with session recommendations, wave timeline, best session detection and wave frequency analysis
+- 🆕 Smart nearest station detection
+- ⌚️ Apple Watch app with complications and widgets
+- 🎯 Apple Watch app with two usage modes: Favorite stations OR automatic nearest station
+- 🆕 Analytics View with session recommendations, wave timeline, best session detection and wave frequency analysis
 - 🆕 Daylight Integration with sunrise, sunset, twilight phase visualization, smart session planning based on daylight and beautiful gradient visualization
 - 🎯️ Interactive map with OpenStreetMap integration
 - 🎯 Precise wave timing information
@@ -51,12 +53,33 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 The app requests location access to:
 - Show your position on the map
 - Enable the location tracking button
-- Show nearest station
+- Find the nearest station from all available ferry stations
 
 You can use the app without granting location access. In this case:
 - Your position won't be shown on the map
 - The location tracking button will be disabled
-- The nearest station will not be shown
+- The nearest station feature will not work (you can still use favorite stations)
+
+## Usage Modes
+
+Next Wave offers two flexible ways to get departure information:
+
+### 1. Favorite Stations Mode (Default)
+- Add up to 5 frequently used stations as favorites
+- Get departure times for all your favorite stations
+- Perfect for regular commuters with fixed routes
+
+### 2. Nearest Station Mode
+- Enable "Use nearest station for Widget" in app settings
+- Automatically shows departures for the station closest to your current location
+- Calculates nearest station from ALL available ferry stations (not just favorites)
+- Perfect for travelers and explorers discovering new spots
+- Works even if the nearest station is not in your favorites
+
+### Apple Watch & Widget Support
+- **Watch App**: Shows departures for favorites or nearest station
+- **Smart Fallback**: If nearest station has no departures, automatically falls back to favorites
+- **Helpful Messages**: Clear instructions when no favorites are set or nearest station is disabled
 
 ## Support
 
@@ -116,6 +139,21 @@ You can check whether the station is available in the API via https://transport.
 The link above is for Switzerland. For other countries, you have to find another api to find departure times.
 
 ### Technical Details
+
+### Recent Technical Improvements
+
+#### Smart Nearest Station Algorithm
+- **Advanced Location Processing**: Uses CoreLocation to find the geographically closest ferry station
+- **Comprehensive Station Database**: Searches through ALL available stations across multiple Swiss lakes
+- **Intelligent Departure Loading**: Automatically fetches departure data for nearest station even if not in favorites
+- **Fallback System**: Gracefully falls back to favorite stations if nearest station has no departures
+- **Real-time Synchronization**: Coordinates between iOS app, Apple Watch, and widgets via shared data containers
+
+#### Cross-Platform Data Synchronization
+- **App Groups**: Seamless data sharing between main app, Watch app, and widgets
+- **WatchConnectivity**: Real-time synchronization of favorites and settings between iPhone and Apple Watch
+- **Smart Caching**: Optimized caching system to minimize API calls while ensuring fresh data
+- **Background Updates**: Intelligent background refresh with adaptive timing based on next departure
 
 ### Ship Data and Wave Calculation
 

@@ -18,6 +18,14 @@ struct FavoriteStation: Codable {
         case id, name, latitude, longitude, uic_ref
     }
     
+    init(id: String, name: String, latitude: Double?, longitude: Double?, uic_ref: String?) {
+        self.id = id
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+        self.uic_ref = uic_ref
+    }
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -44,6 +52,8 @@ class SharedDataManager {
     private let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
     private let favoritesKey = "favoriteStations"
     private let departuresKey = "nextDepartures"
+    private let nearestStationKey = "nearestStation"
+    private let widgetSettingsKey = "widgetSettings"
     private var notificationToken: NSObjectProtocol?
     
     private init() {
@@ -161,5 +171,100 @@ class SharedDataManager {
         if let keys = userDefaults?.dictionaryRepresentation().keys {
             logger.debug("App Group UserDefaults Keys: \(Array(keys))")
         }
+    }
+    
+    // MARK: - Nearest Station
+    func saveNearestStation(_ station: FavoriteStation?) {
+        if let station = station,
+           let encoded = try? JSONEncoder().encode(station) {
+            userDefaults?.set(encoded, forKey: nearestStationKey)
+            userDefaults?.synchronize()
+            logger.debug("Saved nearest station: \(station.name)")
+        } else {
+            userDefaults?.removeObject(forKey: nearestStationKey)
+            userDefaults?.synchronize()
+            logger.debug("Cleared nearest station")
+        }
+    }
+    
+    func loadNearestStation() -> FavoriteStation? {
+        guard let data = userDefaults?.data(forKey: nearestStationKey),
+              let station = try? JSONDecoder().decode(FavoriteStation.self, from: data) else {
+            return nil
+        }
+        return station
+    }
+    
+    // MARK: - Widget Settings
+    struct WidgetSettings: Codable {
+        let useNearestStation: Bool
+    }
+    
+    func saveWidgetSettings(useNearestStation: Bool) {
+        let settings = WidgetSettings(useNearestStation: useNearestStation)
+        if let encoded = try? JSONEncoder().encode(settings) {
+            userDefaults?.set(encoded, forKey: widgetSettingsKey)
+            userDefaults?.synchronize()
+            logger.debug("Saved widget settings - useNearestStation: \(useNearestStation)")
+        }
+    }
+    
+    func loadWidgetSettings() -> WidgetSettings {
+        guard let data = userDefaults?.data(forKey: widgetSettingsKey),
+              let settings = try? JSONDecoder().decode(WidgetSettings.self, from: data) else {
+            return WidgetSettings(useNearestStation: false) // Default to favorites
+        }
+        return settings
+    }
+    
+    // MARK: - Widget Logic  
+    func getNextDepartureForWidget() -> DepartureInfo? {
+        let settings = loadWidgetSettings()
+        
+        if settings.useNearestStation {
+            // Try nearest station first
+            if let nearestStation = loadNearestStation() {
+                let allDepartures = loadNextDepartures()
+                let now = Date()
+                
+                let nextDeparture = allDepartures
+                    .filter { $0.stationName == nearestStation.name }
+                    .filter { $0.nextDeparture > now }
+                    .sorted { $0.nextDeparture < $1.nextDeparture }
+                    .first
+                    
+                if let departure = nextDeparture {
+                    logger.debug("Found next departure for nearest station: \(nearestStation.name)")
+                    return departure
+                } else {
+                    logger.debug("No departures found for nearest station: \(nearestStation.name)")
+                }
+            } else {
+                logger.debug("No nearest station available")
+            }
+            
+            // Fallback to first favorite if no nearest station departure found
+            return getNextDepartureForFirstFavorite()
+        } else {
+            // Use favorites
+            return getNextDepartureForFirstFavorite()
+        }
+    }
+    
+    func getNextDepartureForFirstFavorite() -> DepartureInfo? {
+        let favoriteStations = loadFavoriteStations()
+        guard let firstStation = favoriteStations.first else { return nil }
+        
+        let allDepartures = loadNextDepartures()
+        let now = Date()
+        
+        // Find next departure for the first favorite station
+        let nextDeparture = allDepartures
+            .filter { $0.stationName == firstStation.name }
+            .filter { $0.nextDeparture > now }
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+            .first
+            
+        return nextDeparture
     }
 } 

@@ -11,7 +11,6 @@
 		8A5C5B012DF0CFD500569B58 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8A5C5B0A2DF0CFD600569B58 /* NextWaveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8A5C5AFF2DF0CFD500569B58 /* NextWaveWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AAE38CB2DEF48870053668D /* Next Wave Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		8AD902EE2D135753004AAC0E /* jack_sparrow.gif in Resources */ = {isa = PBXBuildFile; fileRef = 8AD902ED2D135753004AAC0E /* jack_sparrow.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +78,6 @@
 		8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Next Wave Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8AD902ED2D135753004AAC0E /* jack_sparrow.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = jack_sparrow.gif; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -183,7 +181,6 @@
 			isa = PBXGroup;
 			children = (
 				8A5C5B162DF0D13100569B58 /* NextWaveWidgetExtension.entitlements */,
-				8AD902ED2D135753004AAC0E /* jack_sparrow.gif */,
 				8A225F332D0ABC6F008BA92B /* Next Wave */,
 				8A225F442D0ABC70008BA92B /* Next WaveTests */,
 				8A225F4E2D0ABC70008BA92B /* Next WaveUITests */,
@@ -393,7 +390,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AD902EE2D135753004AAC0E /* jack_sparrow.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

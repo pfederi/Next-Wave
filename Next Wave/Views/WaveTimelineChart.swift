@@ -317,9 +317,9 @@ struct WaveTimelineChart: View {
             if let firstWave = waves.first {
                 do {
                     sunTimes = try await SunTimeService.shared.getSunTimes(date: firstWave.time)
-                } catch {
-                    print("Error fetching sun times: \(error)")
-                }
+                            } catch {
+                // Silently handle error
+            }
             }
         }
     }

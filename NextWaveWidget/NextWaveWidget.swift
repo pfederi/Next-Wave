@@ -26,16 +26,9 @@ struct Provider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
         var entries: [SimpleEntry] = []
 
-        // Debug: Show what we have in UserDefaults
-        let favoriteStations = SharedDataManager.shared.loadFavoriteStations()
-        print("Widget: Found \(favoriteStations.count) favorite stations: \(favoriteStations.map { $0.name })")
-        
-        // Load the next departure from the first favorite station
-        if let nextDeparture = SharedDataManager.shared.getNextDepartureForFirstFavorite() {
-            print("Widget: Found next departure for station \(nextDeparture.stationName) at \(nextDeparture.nextDeparture)")
-            
+        // Load the next departure based on widget settings (nearest station or favorite)
+        if let nextDeparture = SharedDataManager.shared.getNextDepartureForWidget() {
             let now = Date()
-            let minutesUntilDeparture = Int(nextDeparture.nextDeparture.timeIntervalSince(now) / 60)
             
             // Simple approach: Create entries every minute for the next hour
             // This forces the widget to update every minute
@@ -45,15 +38,11 @@ struct Provider: TimelineProvider {
                 entries.append(entry)
             }
             
-            print("Widget: Created 61 timeline entries for guaranteed minute updates")
-            print("Widget: Departure in \(minutesUntilDeparture) minutes")
-            
             // Use .atEnd to force more frequent reloads
             let timeline = Timeline(entries: entries, policy: .atEnd)
             completion(timeline)
             
         } else {
-            print("Widget: No departure found for first favorite station")
             
             let now = Date()
             // Even without departures, create entries to keep widget responsive
@@ -83,6 +72,13 @@ struct NextWaveWidgetEntryView: View {
         // Always calculate from current time, not entry.date
         let timeInterval = departure.nextDeparture.timeIntervalSince(Date())
         return max(0, Int(timeInterval / 60))
+    }
+    
+    private var isNearestStation: Bool {
+        guard let departure = entry.departure else { return false }
+        let widgetSettings = SharedDataManager.shared.loadWidgetSettings()
+        let nearestStation = SharedDataManager.shared.loadNearestStation()
+        return widgetSettings.useNearestStation && nearestStation?.name == departure.stationName
     }
     
     private var departureTimeText: String {
@@ -155,9 +151,16 @@ struct NextWaveWidgetEntryView: View {
                                    departureTimeText.starts(with: "tmrw") ? .purple : .cyan)
                     .multilineTextAlignment(.trailing)
             case .accessoryInline:
-                Text("\(departure.stationName) → \(departure.direction) \(departureTimeText)")
-                    .font(.system(.caption, design: .rounded))
-                    .multilineTextAlignment(.trailing)
+                HStack(spacing: 2) {
+                    if isNearestStation {
+                        Image(systemName: "location.fill")
+                            .font(.system(.caption2, weight: .medium))
+                            .foregroundColor(.green)
+                    }
+                    Text("\(departure.stationName) → \(departure.direction) \(departureTimeText)")
+                        .font(.system(.caption, design: .rounded))
+                }
+                .multilineTextAlignment(.trailing)
             case .accessoryRectangular:
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 4) {
@@ -167,6 +170,12 @@ struct NextWaveWidgetEntryView: View {
                         Text(departure.stationName)
                             .font(.headline)
                             .foregroundColor(.primary)
+                        if isNearestStation {
+                            Spacer()
+                            Image(systemName: "location.circle.fill")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                        }
                     }
                     Text("→ \(departure.direction)")
                         .font(.subheadline)
@@ -209,7 +218,7 @@ struct NextWaveWidgetEntryView: View {
                         .font(.caption)
                         .multilineTextAlignment(.trailing)
                 } else {
-                    Text("Add favorites in iOS app")
+                    Text("Add favorites or enable nearest station")
                         .font(.caption)
                         .multilineTextAlignment(.trailing)
                 }
@@ -236,10 +245,15 @@ struct NextWaveWidgetEntryView: View {
                             Text("NextWave")
                                 .font(.headline)
                         }
-                        Text("No favorites set")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.leading)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("No favorites set")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("Add favorites or enable nearest station")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                        .multilineTextAlignment(.leading)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

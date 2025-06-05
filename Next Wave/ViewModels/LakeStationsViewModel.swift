@@ -66,16 +66,13 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
               let nextMidnight = calendar.date(bySettingHour: 0, minute: 0, second: 1, of: tomorrow) else {
-            print("Failed to calculate next midnight")
             return
         }
         
         let timeInterval = nextMidnight.timeIntervalSince(now)
-        print("Scheduling midnight refresh in \(timeInterval) seconds")
         
         DispatchQueue.main.async { [weak self] in
             self?.midnightTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-                print("Midnight refresh triggered")
                 Task { @MainActor [weak self] in
                     guard let self = self else { return }
                     self.selectedDate = Date()
@@ -236,7 +233,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                 return nextDeparture
             }
         } catch {
-            print("Error fetching next departure: \(error)")
+            // Silently handle error
         }
         
         return nil
@@ -265,7 +262,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             
             return !journeys.isEmpty
         } catch {
-            print("Error checking tomorrow's departures: \(error)")
+            // Silently handle error
         }
         
         return false
@@ -314,7 +311,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                     return nextDeparture
                 }
             } catch {
-                print("Error fetching next departure: \(error)")
+                // Silently handle error
             }
             
             return nil
@@ -349,6 +346,16 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         if let station = nearestStation {
             self.nearestStation = (station: station, distance: shortestDistance)
+            
+            // Share nearest station with Widget/Watch
+            let nearestFavoriteStation = FavoriteStation(
+                id: station.id,
+                name: station.name,
+                latitude: station.coordinates?.latitude,
+                longitude: station.coordinates?.longitude,
+                uic_ref: station.uic_ref
+            )
+            SharedDataManager.shared.saveNearestStation(nearestFavoriteStation)
         }
     }
     

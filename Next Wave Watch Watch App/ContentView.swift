@@ -28,10 +28,113 @@ struct ContentView: View {
                         .foregroundColor(.cyan)
                 }
                 
-                // Check if there are any favorite stations
+                // Check if there are any favorite stations or nearest station
                 let hasAnyFavorites = !viewModel.departuresByStation.isEmpty
+                let hasNearestStation = viewModel.nearestStation != nil && viewModel.useNearestStationForWidget
                 
-                if !hasAnyFavorites && !viewModel.isLoading {
+                // Show nearest station section if enabled and available
+                if hasNearestStation, let nearestStation = viewModel.nearestStation {
+                    let nearestDepartures = viewModel.departuresByStation[nearestStation.name] ?? []
+                    let now = Date()
+                    let nextNearestDepartures = nearestDepartures
+                        .filter { $0.nextDeparture > now }
+                        .sorted(by: { $0.nextDeparture < $1.nextDeparture })
+                        .prefix(3)
+                    
+                    if !nextNearestDepartures.isEmpty {
+                        Section(header: 
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Image(systemName: "location.fill")
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [.green, .mint],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .font(.caption)
+                                    
+                                    Text("Nearest Station")
+                                        .font(.caption)
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [.green, .mint],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                }
+                                
+                                Text(nearestStation.name)
+                                    .font(.headline)
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [.green, .mint],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                            }
+                            .padding(.bottom, 4)
+                        ) {
+                            ForEach(Array(nextNearestDepartures.enumerated()), id: \.element.nextDeparture) { index, departure in
+                                DepartureRow(departure: departure, isNext: index == 0)
+                                    .listRowBackground(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Color(red: 0.1, green: 0.2, blue: 0.1).opacity(0.6))
+                                    )
+                            }
+                        }
+                    } else if !viewModel.isLoading {
+                        Section(header: 
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack {
+                                    Image(systemName: "location.fill")
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [.green, .mint],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .font(.caption)
+                                    
+                                    Text("Nearest Station")
+                                        .font(.caption)
+                                        .foregroundStyle(
+                                            LinearGradient(
+                                                colors: [.green, .mint],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                }
+                                
+                                Text(nearestStation.name)
+                                    .font(.headline)
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [.green, .mint],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                            }
+                            .padding(.bottom, 4)
+                        ) {
+                            Text("No departures found for nearest station")
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .listRowBackground(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(red: 0.1, green: 0.2, blue: 0.1).opacity(0.6))
+                                )
+                        }
+                    }
+                }
+                
+                if !hasAnyFavorites && !viewModel.isLoading && !hasNearestStation {
                     VStack(alignment: .center, spacing: 12) {
                         Image(systemName: "heart.fill")
                             .font(.largeTitle)
@@ -48,11 +151,23 @@ struct ContentView: View {
                             .foregroundColor(.primary)
                             .multilineTextAlignment(.center)
                         
-                        Text("Add favorite stations in the iOS app to see departures here")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                        VStack(spacing: 8) {
+                            Text("Add favorite stations in the iOS app")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Text("OR")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fontWeight(.bold)
+                            
+                            Text("Enable 'Use nearest station' in iOS app settings")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.horizontal)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 20)
@@ -105,7 +220,7 @@ struct ContentView: View {
                     }
                 }
                 
-                if viewModel.departures.isEmpty && !viewModel.isLoading && hasAnyFavorites {
+                if viewModel.departures.isEmpty && !viewModel.isLoading && hasAnyFavorites && !hasNearestStation {
                     Text("No departures found")
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)

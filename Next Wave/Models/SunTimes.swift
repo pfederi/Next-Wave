@@ -44,7 +44,7 @@ class SunTimeService {
                     throw URLError(.badURL)
                 }
                 
-                print("Fetching sun times (attempt \(attempt)/\(maxRetries)): \(urlString)")
+        
                 
                 // Configure URLSession with timeout
                 let config = URLSessionConfiguration.default
@@ -61,10 +61,6 @@ class SunTimeService {
                 }
                 
                 guard httpResponse.statusCode == 200 else {
-                    print("HTTP Error: \(httpResponse.statusCode)")
-                    if let responseString = String(data: data, encoding: .utf8) {
-                        print("Response: \(responseString)")
-                    }
                     throw URLError(.badServerResponse)
                 }
                 
@@ -90,7 +86,6 @@ class SunTimeService {
                 
             } catch {
                 lastError = error
-                print("Error fetching sun times (attempt \(attempt)/\(maxRetries)): \(error)")
                 
                 if attempt < maxRetries {
                     // Wait before retrying (exponential backoff)

@@ -198,23 +198,17 @@ class WeatherAPI {
         ]
         
         guard let url = components?.url else {
-            print("Failed to construct URL with components: \(String(describing: components))")
             throw URLError(.badURL)
         }
-        
-        print("Making OpenWeather API request to: \(url.absoluteString)")
         
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             
             guard let httpResponse = response as? HTTPURLResponse else {
-                print("Invalid response type")
                 throw URLError(.badServerResponse)
             }
             
             if httpResponse.statusCode != 200 {
-                let responseString = String(data: data, encoding: .utf8) ?? "No response body"
-                print("Server returned status code \(httpResponse.statusCode): \(responseString)")
                 throw URLError(.badServerResponse)
             }
             
@@ -318,7 +312,6 @@ class WeatherAPI {
             
             return (currentWeatherInfo, tomorrowWeatherInfo)
         } catch {
-            print("Network error: \(error)")
             throw error
         }
     }

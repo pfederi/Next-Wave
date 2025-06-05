@@ -175,7 +175,6 @@ class ScheduleViewModel: ObservableObject {
                     )
                     return weather
                 } catch {
-                    print("Error loading weather for wave: \(error)")
                     return nil
                 }
             }
@@ -245,7 +244,6 @@ class ScheduleViewModel: ObservableObject {
                     .map { $0.identifier }
                 
                 if !expiredIds.isEmpty {
-                    print("Removing \(expiredIds.count) expired notifications")
                     UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: expiredIds)
                 }
             }
@@ -292,18 +290,11 @@ class ScheduleViewModel: ObservableObject {
                                           content: content,
                                           trigger: trigger)
         
-        print("Scheduling notification for: \(triggerDate)")
-        
-        UNUserNotificationCenter.current().add(request) { [weak self] error in
-            if let error = error {
-                print("Notification error: \(error.localizedDescription)")
-            } else {
-                DispatchQueue.main.async {
-                    self?.notifiedJourneys.insert(wave.id)
-                    self?.saveNotifications()
-                    self?.objectWillChange.send()
-                    print("Notification scheduled successfully")
-                }
+        UNUserNotificationCenter.current().add(request) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.notifiedJourneys.insert(wave.id)
+                self?.saveNotifications()
+                self?.objectWillChange.send()
             }
         }
     }
@@ -366,7 +357,6 @@ class ScheduleViewModel: ObservableObject {
                     if let shipName = await VesselAPI.shared.findShipName(for: routeNumber, date: selectedDate) {
                         // Update cache directly on main actor
                         self.shipNamesCache[routeNumber] = shipName
-                        print("Caching ship name: \(shipName) for route: \(routeNumber)")
                     }
                 }
             }

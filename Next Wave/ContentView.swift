@@ -11,7 +11,7 @@ struct ContentView: View {
     @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @State private var showingLocationPicker = false
     @State private var showingInfoView = false
-    @State private var showingPirate = false
+
     @State private var selectedDate = Date() {
         didSet {
             viewModel.selectedDate = selectedDate
@@ -40,9 +40,6 @@ struct ContentView: View {
                                         .font(.title2)
                                         .foregroundColor(Color("text-color"))
                                         .padding(.top, 32)
-                                        .overlay {
-                                            EasterEggView(isShowing: $showingPirate)
-                                        }
                                     Text("Select a station to catch some waves!")
                                         .font(.body)
                                         .foregroundColor(Color("text-color"))
@@ -150,8 +147,6 @@ struct ContentView: View {
                 .toolbarBackground(.visible, for: .navigationBar)
                 .navigationBarTitleDisplayMode(.inline)
             }
-            
-            EasterEggView(isShowing: $showingPirate, isOverlay: true)
         }
         .onReceive(viewModel.$selectedDate) { newDate in
             if selectedDate != newDate {

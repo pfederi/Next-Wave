@@ -29,9 +29,9 @@ class BackgroundTaskManager {
         
         do {
             try BGTaskScheduler.shared.submit(request)
-            print("Background task scheduled for midnight")
+            // Background task scheduled for midnight
         } catch {
-            print("Could not schedule background task: \(error)")
+            // Could not schedule background task
         }
     }
     

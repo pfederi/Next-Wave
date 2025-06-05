@@ -44,6 +44,16 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var useNearestStationForWidget: Bool {
+        didSet {
+            UserDefaults.standard.set(useNearestStationForWidget, forKey: "useNearestStationForWidget")
+            // Update the shared data for Watch/Widget when this changes
+            SharedDataManager.shared.saveWidgetSettings(useNearestStation: useNearestStationForWidget)
+            // Send to Watch via WatchConnectivity
+            WatchConnectivityManager.shared.updateWidgetSettings(useNearestStationForWidget)
+        }
+    }
+    
     var isDarkMode: Bool {
         switch theme {
         case .light:
@@ -79,6 +89,9 @@ class AppSettings: ObservableObject {
         
         // Initialize showWeatherInfo with default value true
         self.showWeatherInfo = UserDefaults.standard.bool(forKey: "showWeatherInfo", defaultValue: true)
+        
+        // Initialize useNearestStationForWidget with default value false (favorites first)
+        self.useNearestStationForWidget = UserDefaults.standard.bool(forKey: "useNearestStationForWidget", defaultValue: false)
     }
 }
 

@@ -267,24 +267,20 @@ struct FavoriteStationTileView: View, Equatable {
     private func loadWeather() async {
         isLoadingWeather = true
         
-        print("Loading weather for station: \(station.name)")
-        print("Station coordinates: lat=\(station.latitude ?? 0), lon=\(station.longitude ?? 0)")
-        print("Station UIC ref: \(station.uic_ref ?? "none")")
+
         
         // Versuche, die Koordinaten direkt aus der FavoriteStation zu verwenden
         if let latitude = station.latitude, let longitude = station.longitude {
-            print("Using direct coordinates: \(latitude), \(longitude)")
+
             let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             await fetchWeather(for: location)
         } 
         // Wenn keine direkten Koordinaten verfügbar sind, versuche die Station anhand der UIC-Referenz zu finden
         else if let uicRef = station.uic_ref {
-            print("Searching for station with UIC ref: \(uicRef)")
             // Suche in allen Lakes nach einer Station mit der gleichen UIC-Referenz
             for lake in viewModel.lakes {
                 if let matchingStation = lake.stations.first(where: { $0.uic_ref == uicRef }) {
                     if let coordinates = matchingStation.coordinates {
-                        print("Found matching station with coordinates: \(coordinates.latitude), \(coordinates.longitude)")
                         let location = CLLocationCoordinate2D(
                             latitude: coordinates.latitude,
                             longitude: coordinates.longitude
@@ -294,15 +290,12 @@ struct FavoriteStationTileView: View, Equatable {
                     }
                 }
             }
-            print("No coordinates found for station with UIC ref: \(uicRef)")
             weatherError = "No coordinates found for station"
         } else {
-            print("Searching for station by name: \(station.name)")
             // Versuche, die Station anhand des Namens zu finden
             for lake in viewModel.lakes {
                 if let matchingStation = lake.stations.first(where: { $0.name == station.name }) {
                     if let coordinates = matchingStation.coordinates {
-                        print("Found matching station with coordinates: \(coordinates.latitude), \(coordinates.longitude)")
                         let location = CLLocationCoordinate2D(
                             latitude: coordinates.latitude,
                             longitude: coordinates.longitude
@@ -312,7 +305,6 @@ struct FavoriteStationTileView: View, Equatable {
                     }
                 }
             }
-            print("No coordinates available for station: \(station.name)")
             weatherError = "No coordinates available"
         }
         
@@ -343,7 +335,6 @@ struct FavoriteStationTileView: View, Equatable {
             weatherError = nil
         } catch {
             weatherError = "Failed to load weather"
-            print("Weather error: \(error)")
         }
         
         isLoadingWeather = false

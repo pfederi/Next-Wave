@@ -296,10 +296,9 @@ struct NearestStationTileView: View {
                 }
                 
                 weatherError = nil
-            } catch {
-                weatherError = "Failed to load weather"
-                print("Weather error: \(error)")
-            }
+                    } catch {
+            weatherError = "Failed to load weather"
+        }
         } else {
             weatherError = "No coordinates available"
         }

@@ -16,7 +16,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8A69AD682DA405B200A5D477"
+               BlueprintIdentifier = "8A5C5AFE2DF0CFD500569B58"
                BuildableName = "NextWaveWidgetExtension.appex"
                BlueprintName = "NextWaveWidgetExtension"
                ReferencedContainer = "container:NextWave.xcodeproj">
@@ -59,7 +59,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "8A69AD682DA405B200A5D477"
+            BlueprintIdentifier = "8A5C5AFE2DF0CFD500569B58"
             BuildableName = "NextWaveWidgetExtension.appex"
             BlueprintName = "NextWaveWidgetExtension"
             ReferencedContainer = "container:NextWave.xcodeproj">

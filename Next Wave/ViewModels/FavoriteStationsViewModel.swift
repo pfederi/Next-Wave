@@ -85,6 +85,9 @@ class FavoriteStationsViewModel: ObservableObject {
         // Save data for widget
         SharedDataManager.shared.saveNextDepartures(departureInfos)
         
+        // Send favorites to Watch
+        WatchConnectivityManager.shared.updateFavorites(favoritesManager.favorites)
+        
         // Reload widget
         WidgetCenter.shared.reloadAllTimelines()
     }

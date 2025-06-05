@@ -6,12 +6,29 @@
 	<array>
 		<string>com.nextwave.midnight</string>
 	</array>
+	<key>CFBundleDisplayName</key>
+	<string>NextWave</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>nextwave</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>com.federi.Next-Wave</string>
+		</dict>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>CFBundleDisplayName</key>
-	<string>NextWave</string>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.federi.Next-Wave</string>
+	</array>
 </dict>
 </plist>

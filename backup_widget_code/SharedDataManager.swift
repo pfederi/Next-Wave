@@ -9,12 +9,6 @@ class SharedDataManager {
     
     private init() {}
     
-    func saveNextDepartures(_ departures: [DepartureInfo]) {
-        if let encoded = try? JSONEncoder().encode(departures) {
-            userDefaults?.set(encoded, forKey: nextDeparturesKey)
-        }
-    }
-    
     func loadNextDepartures() -> [DepartureInfo] {
         guard let data = userDefaults?.data(forKey: nextDeparturesKey),
               let departures = try? JSONDecoder().decode([DepartureInfo].self, from: data) else {
@@ -23,18 +17,12 @@ class SharedDataManager {
         return departures
     }
     
-    func loadFavoriteStations() -> [FavoriteStation] {
+    func loadFavoriteStations() -> [Station] {
         guard let data = userDefaults?.data(forKey: favoriteStationsKey),
-              let stations = try? JSONDecoder().decode([FavoriteStation].self, from: data) else {
+              let stations = try? JSONDecoder().decode([Station].self, from: data) else {
             return []
         }
         return stations
-    }
-    
-    func saveFavoriteStations(_ stations: [FavoriteStation]) {
-        if let encoded = try? JSONEncoder().encode(stations) {
-            userDefaults?.set(encoded, forKey: favoriteStationsKey)
-        }
     }
     
     func getNextDepartureForFirstFavorite() -> DepartureInfo? {
@@ -55,10 +43,7 @@ class SharedDataManager {
     }
 }
 
-struct FavoriteStation: Codable {
+struct Station: Codable {
     let id: String
     let name: String
-    let latitude: Double?
-    let longitude: Double?
-    let uic_ref: String?
 } 

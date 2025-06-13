@@ -2,127 +2,144 @@ import SwiftUI
 import WidgetKit
 import Foundation
 
-extension UserDefaults {
-    func bool(forKey key: String, defaultValue: Bool) -> Bool {
-        if object(forKey: key) == nil {
-            return defaultValue
-        }
-        return bool(forKey: key)
-    }
-}
-
-class AppSettings: ObservableObject {
-    enum Theme: String, Codable {
-        case light, dark, system
-    }
+struct WidgetSettingsView: View {
+    @State private var useNearestStation: Bool = false
+    @Environment(\.presentationMode) var presentationMode
     
-    @Published var theme: Theme {
-        didSet {
-            UserDefaults.standard.set(theme.rawValue, forKey: "theme")
-        }
-    }
-    
-    @Published var lastLocationPickerMode: LocationPickerMode {
-        didSet {
-            UserDefaults.standard.set(lastLocationPickerMode.rawValue, forKey: "lastLocationPickerMode")
-        }
-    }
-    
-    @Published var lastMapRegion: MapRegion {
-        didSet {
-            UserDefaults.standard.set(try? JSONEncoder().encode(lastMapRegion), forKey: "lastMapRegion")
-        }
-    }
-    
-    @Published var showNearestStation: Bool {
-        didSet {
-            UserDefaults.standard.set(showNearestStation, forKey: "showNearestStation")
-        }
-    }
-    
-    @Published var showWeatherInfo: Bool {
-        didSet {
-            UserDefaults.standard.set(showWeatherInfo, forKey: "showWeatherInfo")
-        }
-    }
-    
-    @Published var useNearestStationForWidget: Bool {
-        didSet {
-            UserDefaults.standard.set(useNearestStationForWidget, forKey: "useNearestStationForWidget")
-            // Update the shared data for Watch/Widget when this changes
-            SharedDataManager.shared.saveWidgetSettings(useNearestStation: useNearestStationForWidget)
-            // Send to Watch via WatchConnectivity
-            WatchConnectivityManager.shared.updateWidgetSettings(useNearestStationForWidget)
-            
-            // Load departure data for the new widget configuration
-            Task {
-                await loadDepartureDataForNewWidgetSettings()
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Widget Display Mode")) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        // First Favorite Option
+                        HStack {
+                            Button(action: {
+                                useNearestStation = false
+                                saveSettings()
+                            }) {
+                                HStack {
+                                    Image(systemName: useNearestStation ? "circle" : "checkmark.circle.fill")
+                                        .foregroundColor(useNearestStation ? .gray : .blue)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("First Favorite")
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                        
+                                        Text("Shows your first favorite from the list")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "heart.fill")
+                                        .foregroundColor(.red)
+                                        .font(.title2)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider()
+                        
+                        // Nearest Station Option
+                        HStack {
+                            Button(action: {
+                                useNearestStation = true
+                                saveSettings()
+                            }) {
+                                HStack {
+                                    Image(systemName: useNearestStation ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(useNearestStation ? .blue : .gray)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("Nearest Station")
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                        
+                                        Text("Shows the nearest station based on your location")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "location.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.title2)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
                 
-                // Small delay to ensure data is fully saved before widget reload
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
-                
-                // Force widget reload with new data
-                await MainActor.run {
-                    WidgetCenter.shared.reloadAllTimelines()
-                    print("📱 AppSettings: Final widget reload triggered")
+                Section(footer: Text("This setting determines which station is displayed in your widgets. Changes will be applied on the next widget update.")) {
+                    EmptyView()
                 }
             }
-        }
-    }
-    
-    var isDarkMode: Bool {
-        switch theme {
-        case .light:
-            return false
-        case .dark:
-            return true
-        case .system:
-            return UITraitCollection.current.userInterfaceStyle == .dark
-        }
-    }
-    
-    init() {
-        let savedTheme = UserDefaults.standard.string(forKey: "theme") ?? Theme.system.rawValue
-        self.theme = Theme(rawValue: savedTheme) ?? .system
-        
-        let savedMode = UserDefaults.standard.string(forKey: "lastLocationPickerMode") ?? LocationPickerMode.list.rawValue
-        self.lastLocationPickerMode = LocationPickerMode(rawValue: savedMode) ?? .list
-        
-        if let savedRegionData = UserDefaults.standard.data(forKey: "lastMapRegion"),
-           let savedRegion = try? JSONDecoder().decode(MapRegion.self, from: savedRegionData) {
-            self.lastMapRegion = savedRegion
-        } else {
-            self.lastMapRegion = MapRegion(
-                latitude: 47.3769,
-                longitude: 8.5417,
-                latitudeDelta: 3,
-                longitudeDelta: 3
+            .navigationTitle("Widget Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                },
+                trailing: Button("Done") {
+                    presentationMode.wrappedValue.dismiss()
+                }
             )
         }
+        .onAppear {
+            loadSettings()
+        }
+    }
+    
+    private func loadSettings() {
+        let settings = SharedDataManager.shared.loadWidgetSettings()
+        useNearestStation = settings.useNearestStation
+    }
+    
+    private func saveSettings() {
+        SharedDataManager.shared.saveWidgetSettings(useNearestStation: useNearestStation)
         
-        // Initialize showNearestStation with default value true
-        self.showNearestStation = UserDefaults.standard.bool(forKey: "showNearestStation", defaultValue: true)
+        // Send to Watch via WatchConnectivity
+        WatchConnectivityManager.shared.updateWidgetSettings(useNearestStation)
         
-        // Initialize showWeatherInfo with default value true
-        self.showWeatherInfo = UserDefaults.standard.bool(forKey: "showWeatherInfo", defaultValue: true)
+        // Load departure data for the new widget configuration
+        Task {
+            await loadDepartureDataForNewWidgetSettings()
+            
+                    // Small delay to ensure data is fully saved before widget reload
+        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+            
+            // Force widget reload with new data
+            await MainActor.run {
+                WidgetCenter.shared.reloadAllTimelines()
+                print("📱 WidgetSettingsView: Final widget reload triggered")
+            }
+        }
         
-        // Initialize useNearestStationForWidget with default value false (favorites first)
-        self.useNearestStationForWidget = UserDefaults.standard.bool(forKey: "useNearestStationForWidget", defaultValue: false)
+        // Haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
     }
     
     private func loadDepartureDataForNewWidgetSettings() async {
-        print("📱 AppSettings: Loading departure data for new widget settings...")
+        print("📱 Loading departure data for new widget settings...")
         
         let favorites = FavoriteStationsManager.shared.favorites
         var stationsToLoad: [FavoriteStation] = []
         
-        if useNearestStationForWidget {
+        if useNearestStation {
             // If switching to nearest station, make sure we have nearest station data
             if let nearestStation = SharedDataManager.shared.loadNearestStation() {
                 stationsToLoad.append(nearestStation)
-                print("📱 AppSettings: Loading data for nearest station: \(nearestStation.name)")
+                print("📱 Loading data for nearest station: \(nearestStation.name)")
             } else {
-                print("📱 AppSettings: No nearest station available, falling back to first favorite")
+                print("📱 No nearest station available, falling back to first favorite")
                 if let firstFavorite = favorites.first {
                     stationsToLoad.append(firstFavorite)
                 }
@@ -131,7 +148,7 @@ class AppSettings: ObservableObject {
             // If switching to favorites, use first favorite
             if let firstFavorite = favorites.first {
                 stationsToLoad.append(firstFavorite)
-                print("📱 AppSettings: Loading data for first favorite: \(firstFavorite.name)")
+                print("📱 Loading data for first favorite: \(firstFavorite.name)")
             }
         }
         
@@ -141,7 +158,7 @@ class AppSettings: ObservableObject {
         for station in stationsToLoad {
             do {
                 guard let uicRef = station.uic_ref else { 
-                    print("📱 AppSettings: No UIC reference for station: \(station.name)")
+                    print("📱 No UIC reference for station: \(station.name)")
                     continue 
                 }
                 
@@ -187,11 +204,11 @@ class AppSettings: ObservableObject {
                     ))
                 }
                 
-                print("📱 AppSettings: Found \(todayDepartures.count) future departures today for \(station.name)")
+                print("📱 Found \(todayDepartures.count) future departures today for \(station.name)")
                 
                 // If less than 3 future departures today, also load tomorrow
                 if todayDepartures.count < 3 {
-                    print("📱 AppSettings: Loading tomorrow's departures for \(station.name) (only \(todayDepartures.count) today)")
+                    print("📱 Loading tomorrow's departures for \(station.name) (only \(todayDepartures.count) today)")
                     
                     do {
                         let tomorrowJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: tomorrow)
@@ -242,37 +259,31 @@ class AppSettings: ObservableObject {
                             ))
                         }
                         
-                        print("📱 AppSettings: Added \(tomorrowJourneys.count) departures from tomorrow for \(station.name)")
+                        print("📱 Added \(tomorrowJourneys.count) departures from tomorrow for \(station.name)")
                     } catch {
-                        print("📱 AppSettings: Error loading tomorrow's departures for \(station.name): \(error)")
+                        print("📱 Error loading tomorrow's departures for \(station.name): \(error)")
                     }
                 }
                 
                 departureInfos.append(contentsOf: todayDepartures)
-                print("📱 AppSettings: Total loaded \(todayDepartures.count) departures for \(station.name)")
+                print("📱 Total loaded \(todayDepartures.count) departures for \(station.name)")
             } catch {
-                print("📱 AppSettings: Error loading departures for \(station.name): \(error)")
+                print("📱 Error loading departures for \(station.name): \(error)")
             }
         }
         
         // Save to SharedDataManager for widgets
         SharedDataManager.shared.saveNextDepartures(departureInfos)
-        print("📱 AppSettings: Saved \(departureInfos.count) total departures for widgets")
+        print("📱 Saved \(departureInfos.count) total departures for widgets")
         
         // Force widget update with new data
         WidgetCenter.shared.reloadAllTimelines()
-        print("📱 AppSettings: Triggered widget update with new departure data")
+        print("📱 Triggered widget update with new departure data")
     }
 }
 
-enum LocationPickerMode: String {
-    case list
-    case map
-}
-
-struct MapRegion: Codable {
-    let latitude: Double
-    let longitude: Double
-    let latitudeDelta: Double
-    let longitudeDelta: Double
+struct WidgetSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        WidgetSettingsView()
+    }
 } 

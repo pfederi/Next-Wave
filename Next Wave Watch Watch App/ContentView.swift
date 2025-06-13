@@ -170,38 +170,38 @@ struct ContentView: View {
                             }
                             .padding(.horizontal)
                         } else {
-                            Image(systemName: "heart.fill")
-                                .font(.largeTitle)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        colors: [.pink, .purple],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
+                        Image(systemName: "heart.fill")
+                            .font(.largeTitle)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.pink, .purple],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
                                 )
-                            
-                            Text("No Favorites Set")
-                                .font(.headline)
-                                .foregroundColor(.primary)
+                            )
+                        
+                        Text("No Favorites Set")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+                        
+                        VStack(spacing: 8) {
+                            Text("Add favorite stations in the iOS app")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                             
-                            VStack(spacing: 8) {
-                                Text("Add favorite stations in the iOS app")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                                
-                                Text("OR")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .fontWeight(.bold)
-                                
-                                Text("Enable 'Use nearest station' in iOS app settings")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                            }
-                            .padding(.horizontal)
+                            Text("OR")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .fontWeight(.bold)
+                            
+                            Text("Enable 'Use nearest station' in iOS app settings")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding(.horizontal)
                         }
                     }
                     .frame(maxWidth: .infinity)

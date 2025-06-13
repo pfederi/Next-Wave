@@ -39,7 +39,7 @@ class StationManager {
                     )
                 }
             }
-            
+        
             logger.info("🗄️ Loaded \(allStations.count) ferry stations from JSON with coordinates")
             
         } catch {

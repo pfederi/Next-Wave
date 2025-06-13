@@ -382,6 +382,7 @@ class WatchViewModel: ObservableObject {
             
             var updatedDepartures: [DepartureInfo] = []
             let today = Date()
+            let now = today
             let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) ?? today
             
             for station in allStationsToFetch {
@@ -395,14 +396,19 @@ class WatchViewModel: ObservableObject {
                         if let departure = journey.stop.departure {
                             logger.debug("Raw departure string: '\(departure)'")
                             if let departureDate = AppDateFormatter.parseFullTime(departure) {
-                                logger.debug("Successfully parsed date: \(departureDate)")
-                            let departureInfo = DepartureInfo(
-                                stationName: station.name,
-                                nextDeparture: departureDate,
-                                routeName: journey.fullName,
-                                    direction: journey.bestDirection
-                                )
-                                todayDepartures.append(departureInfo)
+                                // Only add future departures
+                                if departureDate > now {
+                                    logger.debug("Successfully parsed future date: \(departureDate)")
+                                    let departureInfo = DepartureInfo(
+                                        stationName: station.name,
+                                        nextDeparture: departureDate,
+                                        routeName: journey.fullName,
+                                        direction: journey.bestDirection
+                                    )
+                                    todayDepartures.append(departureInfo)
+                                } else {
+                                    logger.debug("Skipping past departure: \(departureDate)")
+                                }
                             } else {
                                 logger.warning("Failed to parse departure: '\(departure)'")
                             }
@@ -412,12 +418,12 @@ class WatchViewModel: ObservableObject {
                     }
                 }
                 
-                // Prüfe, ob es heute noch genug zukünftige Abfahrten gibt
-                let futureTodayDepartures = todayDepartures.filter { $0.nextDeparture > today }
+                logger.debug("Found \(todayDepartures.count) future departures today for \(station.name)")
                 
-                if futureTodayDepartures.count < 3 {
+                // Prüfe, ob es heute noch genug zukünftige Abfahrten gibt
+                if todayDepartures.count < 3 {
                     // Weniger als 3 zukünftige Abfahrten heute -> lade morgen hinzu
-                    logger.debug("Only \(futureTodayDepartures.count) future departures today for \(station.name), loading tomorrow")
+                    logger.debug("Only \(todayDepartures.count) future departures today for \(station.name), loading tomorrow")
                     if let tomorrowJourneys = try? await transportAPI.fetchJourneys(for: station.id, date: tomorrow) {
                         logger.debug("Found \(tomorrowJourneys.count) journeys for \(station.name) tomorrow")
                         for journey in tomorrowJourneys {
@@ -444,23 +450,25 @@ class WatchViewModel: ObservableObject {
                                             nextDeparture: tomorrowDepartureDate,
                                             routeName: journey.fullName,
                                             direction: journey.bestDirection
-                            )
-                            updatedDepartures.append(departureInfo)
+                                        )
+                                        todayDepartures.append(departureInfo)
                                     } else {
                                         logger.error("Failed to create tomorrow departure date")
-                    }
-                } else {
+                                    }
+                                } else {
                                     logger.warning("Failed to parse tomorrow departure: '\(departure)'")
                                 }
                             } else {
                                 logger.warning("No departure time for tomorrow journey: \(journey)")
-                }
+                            }
                         }
+                        logger.debug("Added \(tomorrowJourneys.count) tomorrow journeys for \(station.name)")
                     }
                 }
                 
-                // Füge alle heutigen Abfahrten hinzu (egal ob es morgige gibt oder nicht)
+                // Füge alle zukünftigen Abfahrten hinzu (heute + evtl. morgen)
                 updatedDepartures.append(contentsOf: todayDepartures)
+                logger.debug("Total added \(todayDepartures.count) departures for \(station.name)")
             }
             
             // Update the UI and cache

@@ -52,6 +52,7 @@ class BackgroundTaskManager {
 struct NextWaveApp: App {
     @StateObject private var appSettings: AppSettings
     @StateObject private var viewModel: ScheduleViewModel
+    @StateObject private var lakeStationsViewModel = LakeStationsViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var systemColorScheme
     
@@ -80,6 +81,7 @@ struct NextWaveApp: App {
             ContentView()
                 .environmentObject(viewModel)
                 .environmentObject(appSettings)
+                .environmentObject(lakeStationsViewModel)
                 .preferredColorScheme(appSettings.theme == .system ? nil : (appSettings.isDarkMode ? .dark : .light))
                 .onChange(of: scenePhase) { oldPhase, newPhase in
                     if newPhase == .active {
@@ -90,6 +92,44 @@ struct NextWaveApp: App {
                         }
                     }
                 }
+                .onOpenURL { url in
+                    handleDeepLink(url)
+                }
+        }
+    }
+    
+    private func handleDeepLink(_ url: URL) {
+        print("🔗 Deep link received: \(url)")
+        
+        guard url.scheme == "nextwave" else {
+            print("🔗 Invalid scheme: \(url.scheme ?? "nil")")
+            return
+        }
+        
+        if url.host == "station" {
+            // Parse station name from query parameters
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            if let stationName = components?.queryItems?.first(where: { $0.name == "name" })?.value {
+                print("🔗 Opening station: \(stationName)")
+                
+                // Find the station by name and select it
+                Task { @MainActor in
+                    await lakeStationsViewModel.loadLakes()
+                    
+                    // Search for the station across all lakes
+                    for lake in lakeStationsViewModel.lakes {
+                        if let station = lake.stations.first(where: { $0.name == stationName }) {
+                            print("🔗 Found station: \(station.name) with ID: \(station.id)")
+                            lakeStationsViewModel.selectStation(station)
+                            return
+                        }
+                    }
+                    
+                    print("🔗 Station not found: \(stationName)")
+                }
+            }
+        } else {
+            print("🔗 Unknown deep link host: \(url.host ?? "nil")")
         }
     }
     

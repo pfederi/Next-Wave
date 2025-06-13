@@ -29,7 +29,7 @@ class TransportAPI {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: date)
         
-        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=50&date=\(dateString)"
+        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=100&date=\(dateString)"
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
         }

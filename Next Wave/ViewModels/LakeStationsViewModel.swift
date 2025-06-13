@@ -42,7 +42,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     init(scheduleViewModel: ScheduleViewModel? = nil) {
         self.scheduleViewModel = scheduleViewModel
-        loadLakes()
+        Task {
+            await loadLakes()
+        }
         scheduleMidnightRefresh()
         
         // Setup location updates
@@ -86,7 +88,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func loadLakes() {
+    func loadLakes() async {
         guard let url = Bundle.main.url(forResource: "stations", withExtension: "json"),
               let data = try? Data(contentsOf: url) else {
             return

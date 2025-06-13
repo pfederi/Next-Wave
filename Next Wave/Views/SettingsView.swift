@@ -33,6 +33,11 @@ struct SettingsView: View {
                 
                 Divider()
                 
+                // iPhone Widget section
+                iPhoneWidgetSettingsSection()
+                
+                Divider()
+                
                 // Notification section
                 NotificationSettingsSection(
                     scheduleViewModel: scheduleViewModel,
@@ -59,6 +64,51 @@ struct SettingsView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Settings")
+    }
+}
+
+// MARK: - iPhone Widget Settings Section
+struct iPhoneWidgetSettingsSection: View {
+    @State private var showingWidgetSettings = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("iPhone Widget Settings")
+                .font(.headline)
+            
+            Button(action: {
+                showingWidgetSettings = true
+            }) {
+                HStack {
+                    Image(systemName: "widget.small")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Widget Display Mode")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Choose between nearest station or first favorite")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(Color("text-color").opacity(0.5))
+                        .font(.system(size: 14))
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .sheet(isPresented: $showingWidgetSettings) {
+                WidgetSettingsView()
+            }
+        }
+        .foregroundColor(Color("text-color"))
     }
 }
 

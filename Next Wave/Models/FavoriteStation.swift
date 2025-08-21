@@ -1,5 +1,6 @@
 import Foundation
 import WidgetKit
+import UIKit
 
 struct FavoriteStation: Codable, Identifiable {
     let id: String // station id
@@ -25,6 +26,22 @@ class FavoriteStationsManager: ObservableObject {
         // Load departure data when app starts
         Task { @MainActor in
             await loadDepartureDataForWidgets()
+        }
+        
+        // Setup background refresh notifications
+        setupBackgroundRefresh()
+    }
+    
+    private func setupBackgroundRefresh() {
+        // Listen for app going to background to refresh widget data
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task {
+                await self?.loadDepartureDataForWidgets()
+            }
         }
     }
     
@@ -151,32 +168,100 @@ class FavoriteStationsManager: ObservableObject {
         saveFavorites()
     }
     
+    // Public method to refresh widget data
+    func refreshWidgetData() async {
+        await loadDepartureDataForWidgets()
+    }
+    
     // Load departure data for widgets
     private func loadDepartureDataForWidgets() async {
-        print("🔍 Loading departure data for widgets...")
+        print("🔍 Loading real departure data for widgets...")
         
-        // For now, create placeholder departure data
-        // The real departure loading will happen when the user opens the app
+        guard !favorites.isEmpty else {
+            print("🔍 No favorites to load departure data for")
+            return
+        }
+        
+        let transportAPI = TransportAPI()
         var departureInfos: [DepartureInfo] = []
         
         for favorite in favorites {
-            // Create a placeholder departure that indicates data needs to be loaded
-            let placeholderDeparture = DepartureInfo(
-                stationName: favorite.name,
-                nextDeparture: Date().addingTimeInterval(3600), // 1 hour from now
-                routeName: "Open App",
-                direction: "to load departure times"
-            )
-            departureInfos.append(placeholderDeparture)
-            print("🔍 Created placeholder for \(favorite.name)")
+            print("🔍 Loading departure data for \(favorite.name)...")
+            
+            // Try to get real departure data
+            if let uicRef = favorite.uic_ref {
+                do {
+                    let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: Date())
+                    
+                    // Find next 5 departures for widget support
+                    let now = Date()
+                    let nextJourneys = journeys
+                        .compactMap({ journey -> (Date, Journey)? in
+                            guard let departureStr = journey.stop.departure,
+                                  let departureDate = AppDateFormatter.parseFullTime(departureStr) else { 
+                                return nil 
+                            }
+                            return (departureDate, journey)
+                        })
+                        .filter({ $0.0 > now })
+                        .sorted(by: { $0.0 < $1.0 })
+                        .prefix(5) // Take next 5 departures for multiple widget support
+                    
+                    if !nextJourneys.isEmpty {
+                        // Create departure info for each departure
+                        for nextJourney in nextJourneys {
+                            let departureInfo = DepartureInfo(
+                                stationName: favorite.name,
+                                nextDeparture: nextJourney.0,
+                                routeName: nextJourney.1.name ?? "Boat",
+                                direction: nextJourney.1.to ?? "Next Station"
+                            )
+                            departureInfos.append(departureInfo)
+                        }
+                        print("🔍 ✅ Found \(nextJourneys.count) departures for \(favorite.name)")
+                    } else {
+                        // No upcoming departures found - create placeholder
+                        let placeholderDeparture = DepartureInfo(
+                            stationName: favorite.name,
+                            nextDeparture: Date().addingTimeInterval(3600), // 1 hour from now
+                            routeName: "No Departures",
+                            direction: "Check schedule"
+                        )
+                        departureInfos.append(placeholderDeparture)
+                        print("🔍 ⚠️ No upcoming departures for \(favorite.name), created placeholder")
+                    }
+                } catch {
+                    print("🔍 ❌ Failed to load departure data for \(favorite.name): \(error)")
+                    
+                    // Create error placeholder
+                    let errorDeparture = DepartureInfo(
+                        stationName: favorite.name,
+                        nextDeparture: Date().addingTimeInterval(3600), // 1 hour from now
+                        routeName: "Open App",
+                        direction: "to load departures"
+                    )
+                    departureInfos.append(errorDeparture)
+                }
+            } else {
+                print("🔍 ⚠️ No UIC reference for \(favorite.name), creating placeholder")
+                
+                // Create placeholder for stations without UIC reference
+                let placeholderDeparture = DepartureInfo(
+                    stationName: favorite.name,
+                    nextDeparture: Date().addingTimeInterval(3600), // 1 hour from now
+                    routeName: "Open App",
+                    direction: "to load departures"
+                )
+                departureInfos.append(placeholderDeparture)
+            }
         }
         
-        // Save placeholder data for widgets
+        // Save real/placeholder data for widgets
         SharedDataManager.shared.saveNextDepartures(departureInfos)
-        print("🔍 Saved \(departureInfos.count) placeholder departures for widgets")
+        print("🔍 Saved \(departureInfos.count) departure entries for widgets")
         
         // Trigger widget reload
         WidgetCenter.shared.reloadAllTimelines()
-        print("🔍 Triggered widget reload after creating placeholders")
+        print("🔍 Triggered widget reload after loading departure data")
     }
 } 

@@ -191,6 +191,12 @@ struct iPhoneProvider: TimelineProvider {
             widgetLogger.info("🔍 Created hint timeline for: \(hintDeparture.stationName)")
             
         } else if let nextDeparture = nextDeparture {
+            // Check if this is a "loading" placeholder (routeName contains "Open App")
+            let isLoadingPlaceholder = nextDeparture.routeName.contains("Open App") || nextDeparture.direction.contains("to load")
+            if isLoadingPlaceholder {
+                NSLog("🔍 Found loading placeholder for: %@", nextDeparture.stationName)
+                widgetLogger.info("🔍 Found loading placeholder for: \(nextDeparture.stationName)")
+            }
             NSLog("🔍 Creating timeline with departure for: %@", nextDeparture.stationName)
             widgetLogger.info("🔍 Creating timeline with departure for: \(nextDeparture.stationName)")
             

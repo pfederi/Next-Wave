@@ -174,50 +174,107 @@ class FavoriteStationsManager: ObservableObject {
     }
     
     // Load departure data for widgets
-    private func loadDepartureDataForWidgets() async {
+    func loadDepartureDataForWidgets() async {
         print("🔍 Loading real departure data for widgets...")
         
-        guard !favorites.isEmpty else {
-            print("🔍 No favorites to load departure data for")
+        var stationsToLoad = favorites
+        
+        // Add nearest station if widget is configured to use it and it's not already in favorites
+        let widgetSettings = SharedDataManager.shared.loadWidgetSettings()
+        if widgetSettings.useNearestStation,
+           let nearestStation = SharedDataManager.shared.loadNearestStation(),
+           !favorites.contains(where: { $0.name == nearestStation.name }) {
+            stationsToLoad.append(nearestStation)
+            print("🔍 Added nearest station '\(nearestStation.name)' to widget data loading")
+        }
+        
+        guard !stationsToLoad.isEmpty else {
+            print("🔍 No stations to load departure data for")
             return
         }
         
         let transportAPI = TransportAPI()
         var departureInfos: [DepartureInfo] = []
         
-        for favorite in favorites {
+        for favorite in stationsToLoad {
             print("🔍 Loading departure data for \(favorite.name)...")
             
-            // Try to get real departure data
-            if let uicRef = favorite.uic_ref {
-                do {
-                    let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: Date())
+                         // Try to get real departure data
+             if let uicRef = favorite.uic_ref {
+                 do {
+                     let now = Date()
+                     let calendar = Calendar.current
+                     
+                     // Load today's departures
+                     let todayJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: now)
+                     print("🔍 API returned \(todayJourneys.count) journeys for today for \(favorite.name)")
+                     
+                     // Get today's future departures
+                     let todayDepartures = todayJourneys
+                         .compactMap({ journey -> (Date, Journey)? in
+                             guard let departureStr = journey.stop.departure,
+                                   let departureDate = AppDateFormatter.parseFullTime(departureStr) else { 
+                                 return nil 
+                             }
+                             return (departureDate, journey)
+                         })
+                         .filter({ $0.0 > now })
+                         .sorted(by: { $0.0 < $1.0 })
+                     
+                     var allDepartures = Array(todayDepartures)
+                     print("🔍 \(favorite.name): \(todayDepartures.count) valid future departures today")
+                     
+                     // If we have less than 5 departures for today, load tomorrow's as well
+                     if allDepartures.count < 5 {
+                         print("🔍 Only \(allDepartures.count) departures today for \(favorite.name), loading tomorrow's as well")
+                         
+                         let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+                         let tomorrowJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow)
+                         print("🔍 API returned \(tomorrowJourneys.count) journeys for tomorrow for \(favorite.name)")
+                         
+                         let tomorrowDepartures = tomorrowJourneys
+                             .compactMap({ journey -> (Date, Journey)? in
+                                 guard let departureStr = journey.stop.departure,
+                                       let departureDate = AppDateFormatter.parseFullTime(departureStr) else { 
+                                     return nil 
+                                 }
+                                 return (departureDate, journey)
+                             })
+                             .sorted(by: { $0.0 < $1.0 })
+                         
+                         // Add tomorrow's departures to fill up to 5 total
+                         let remainingSlots = 5 - allDepartures.count
+                         allDepartures.append(contentsOf: Array(tomorrowDepartures.prefix(remainingSlots)))
+                         
+                         print("🔍 Added \(min(remainingSlots, tomorrowDepartures.count)) departures from tomorrow")
+                     }
+                     
+                     let nextJourneys = allDepartures.prefix(5) // Take next 5 departures total
+                     print("🔍 Station \(favorite.name): Using \(nextJourneys.count) departures from total \(allDepartures.count) available")
                     
-                    // Find next 5 departures for widget support
-                    let now = Date()
-                    let nextJourneys = journeys
-                        .compactMap({ journey -> (Date, Journey)? in
-                            guard let departureStr = journey.stop.departure,
-                                  let departureDate = AppDateFormatter.parseFullTime(departureStr) else { 
-                                return nil 
-                            }
-                            return (departureDate, journey)
-                        })
-                        .filter({ $0.0 > now })
-                        .sorted(by: { $0.0 < $1.0 })
-                        .prefix(5) // Take next 5 departures for multiple widget support
-                    
-                    if !nextJourneys.isEmpty {
-                        // Create departure info for each departure
-                        for nextJourney in nextJourneys {
-                            let departureInfo = DepartureInfo(
-                                stationName: favorite.name,
-                                nextDeparture: nextJourney.0,
-                                routeName: nextJourney.1.name ?? "Boat",
-                                direction: nextJourney.1.to ?? "Next Station"
-                            )
-                            departureInfos.append(departureInfo)
-                        }
+                                         if !nextJourneys.isEmpty {
+                         // Create departure info for each departure
+                         for nextJourney in nextJourneys {
+                             let journey = nextJourney.1
+                             
+                             // Better direction logic using passList
+                             let direction: String
+                             if let passList = journey.passList,
+                                passList.count > 1,
+                                let nextStation = passList.dropFirst().first {
+                                 direction = nextStation.station.name ?? journey.to ?? "Next Station"
+                             } else {
+                                 direction = journey.to ?? "Next Station"
+                             }
+                             
+                             let departureInfo = DepartureInfo(
+                                 stationName: favorite.name,
+                                 nextDeparture: nextJourney.0,
+                                 routeName: journey.name ?? "Boat",
+                                 direction: direction
+                             )
+                             departureInfos.append(departureInfo)
+                         }
                         print("🔍 ✅ Found \(nextJourneys.count) departures for \(favorite.name)")
                     } else {
                         // No upcoming departures found - create placeholder

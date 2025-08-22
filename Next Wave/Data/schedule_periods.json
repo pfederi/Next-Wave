@@ -1,0 +1,80 @@
+{
+  "lakes": [
+    {
+      "name": "Zürichsee",
+      "operator": "ZSG",
+      "schedule_periods": [
+        {
+          "name": "Frühlingsfahrplan",
+          "type": "spring",
+          "start_date": "2025-04-06", 
+          "end_date": "2025-04-30",
+          "description": "Frühling - Aufbau des Angebots"
+        },
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2025-05-01",
+          "end_date": "2025-09-30",
+          "description": "Hochsaison mit allen Rundfahrten"
+        },
+        {
+          "name": "Herbstfahrplan", 
+          "type": "autumn",
+          "start_date": "2025-10-01",
+          "end_date": "2025-10-19",
+          "description": "Herbst - Reduziertes Angebot"
+        },
+        {
+          "name": "Winterfahrplan",
+          "type": "winter", 
+          "start_date": "2025-10-20",
+          "end_date": "2026-04-05",
+          "description": "Eingeschränkter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Vierwaldstättersee",
+      "operator": "SGV",
+      "schedule_periods": [
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2024-05-01",
+          "end_date": "2024-10-31", 
+          "description": "Vollbetrieb"
+        },
+        {
+          "name": "Winterfahrplan",
+          "type": "winter",
+          "start_date": "2024-11-01",
+          "end_date": "2025-04-30",
+          "description": "Reduzierter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Bodensee",
+      "operator": "SBS",
+      "schedule_periods": [
+        {
+          "name": "Sommerfahrplan", 
+          "type": "summer",
+          "start_date": "2024-04-01",
+          "end_date": "2024-10-31",
+          "description": "Vollbetrieb"
+        },
+        {
+          "name": "Winterfahrplan",
+          "type": "winter", 
+          "start_date": "2024-11-01",
+          "end_date": "2025-03-31",
+          "description": "Winterpause"
+        }
+      ]
+    }
+  ],
+  "last_updated": "2025-01-21",
+  "notes": "Diese Daten müssen jährlich aktualisiert werden. Die genauen Daten können von Jahr zu Jahr variieren."
+}

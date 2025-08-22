@@ -15,6 +15,63 @@ import Foundation
 // Create a specific logger for the widget
 private let widgetLogger = Logger(subsystem: "com.federi.Next-Wave.NextWaveWidget", category: "iPhoneWidget")
 
+// Smart update timing for widgets
+private func calculateNextUpdate(from now: Date) -> Date {
+    let calendar = Calendar.current
+    let hour = calendar.component(.hour, from: now)
+    
+    // If it's after 17:00, schedule an update for tomorrow at 7:00 to load next day's data
+    if hour >= 17 {
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        let tomorrowMorning = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: tomorrow) ?? tomorrow
+        widgetLogger.info("🕰️ Scheduling next update for tomorrow 7:00 to load fresh data")
+        return tomorrowMorning
+    }
+    
+    // During the day, update every 15 minutes to keep data fresh
+    let nextUpdate = now.addingTimeInterval(15 * 60) // 15 minutes
+    widgetLogger.info("🕰️ Scheduling next update in 15 minutes")
+    return nextUpdate
+}
+
+// Check if we should trigger a data refresh request
+private func shouldRequestDataRefresh(from now: Date) -> Bool {
+    let calendar = Calendar.current
+    let hour = calendar.component(.hour, from: now)
+    let minute = calendar.component(.minute, from: now)
+    
+    // Trigger refresh at 17:00 to load next day's data
+    if hour == 17 && minute < 15 {
+        widgetLogger.info("🔄 Should request data refresh for next day")
+        return true
+    }
+    
+    // Also trigger refresh in the morning to ensure fresh data
+    if hour == 7 && minute < 15 {
+        widgetLogger.info("🔄 Should request morning data refresh")
+        return true
+    }
+    
+    return false
+}
+
+// Trigger background data refresh by setting a flag for the main app
+private func triggerBackgroundDataRefresh() {
+    let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
+    
+    // Set a flag indicating that fresh data is needed
+    userDefaults?.set(Date(), forKey: "widget_requested_refresh")
+    userDefaults?.set(true, forKey: "widget_needs_fresh_data")
+    
+    widgetLogger.info("🔄 Triggered background data refresh request")
+    
+    // Additionally, we can try to wake up the main app if possible
+    if let appURL = URL(string: "nextwave://refresh-data") {
+        // This won't work from widget context, but the flag above will help
+        widgetLogger.info("🔄 Set refresh URL request")
+    }
+}
+
 // MARK: - Widget Background Modifier
 extension View {
     func widgetBackground<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -69,8 +126,8 @@ struct iPhoneProvider: TimelineProvider {
             NSLog("🔍 Creating timeline with %d entries", entries.count)
             widgetLogger.info("🔍 Creating timeline with \(entries.count) entries")
             
-            // Use .after policy to ensure regular updates, but allow manual reloads
-            let nextUpdate = Date().addingTimeInterval(300) // 5 minutes
+            // Use smart update timing
+            let nextUpdate = calculateNextUpdate(from: now)
             let timeline = Timeline(entries: entries, policy: .after(nextUpdate))
             completion(timeline)
         }
@@ -79,6 +136,11 @@ struct iPhoneProvider: TimelineProvider {
         let timestamp = Date()
         NSLog("🔍 iPhone Widget getTimeline called at %@", timestamp.description)
         widgetLogger.info("🔍 iPhone Widget getTimeline called at \(timestamp)")
+        
+        // Check if we should trigger a background refresh to load new data
+        if shouldRequestDataRefresh(from: now) {
+            triggerBackgroundDataRefresh()
+        }
         
         // Test UserDefaults access
         let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
@@ -283,14 +345,19 @@ struct iPhoneMultipleProvider: TimelineProvider {
             NSLog("🔍 Creating multiple departures timeline with %d entries", entries.count)
             widgetLogger.info("🔍 Creating multiple departures timeline with \(entries.count) entries")
             
-            // Use .after policy to ensure regular updates, but allow manual reloads
-            let nextUpdate = Date().addingTimeInterval(300) // 5 minutes
+            // Use smart update timing
+            let nextUpdate = calculateNextUpdate(from: now)
             let timeline = Timeline(entries: entries, policy: .after(nextUpdate))
             completion(timeline)
         }
         
         NSLog("🔍 iPhone Multiple Widget getTimeline called at %@", now.description)
         widgetLogger.info("🔍 iPhone Multiple Widget getTimeline called at \(now)")
+        
+        // Check if we should trigger a background refresh to load new data
+        if shouldRequestDataRefresh(from: now) {
+            triggerBackgroundDataRefresh()
+        }
         
         // Get display mode and station info
         let settings = SharedDataManager.shared.loadWidgetSettings()
@@ -1076,22 +1143,14 @@ struct iPhoneMultipleWidgetEntryView: View {
     
     private func formatDepartureTime(_ date: Date) -> String {
         let now = Date()
-        let calendar = Calendar.current
+        let minutesUntil = Int(date.timeIntervalSince(now) / 60)
         
         // Check if departure is in the next few minutes (show "now" for immediate departures)
-        let minutesUntil = Int(date.timeIntervalSince(now) / 60)
         if minutesUntil <= 0 {
             return "now"
         }
         
-        // Check if departure is tomorrow
-        if !calendar.isDate(date, inSameDayAs: now) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
-            return "tmrw \(formatter.string(from: date))"
-        }
-        
-        // Same day - show "at HH:MM"
+        // Always show just the time - the smart logic already handles multi-day scenarios
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return "at \(formatter.string(from: date))"
@@ -1126,9 +1185,15 @@ struct NextWaveiPhoneWidget: Widget {
             return URL(string: "nextwave://")
         }
         
-        // Create deep link with station name
+        // Create deep link with station name and date
         let stationName = departure.stationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        return URL(string: "nextwave://station?name=\(stationName)")
+        
+        // Format date as YYYY-MM-DD for deep link
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateString = formatter.string(from: departure.nextDeparture)
+        
+        return URL(string: "nextwave://station?name=\(stationName)&date=\(dateString)")
     }
 }
 
@@ -1153,9 +1218,15 @@ struct NextWaveiPhoneMultipleWidget: Widget {
             return URL(string: "nextwave://")
         }
         
-        // Create deep link with station name
+        // Create deep link with station name and date
         let stationName = departure.stationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        return URL(string: "nextwave://station?name=\(stationName)")
+        
+        // Format date as YYYY-MM-DD for deep link
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateString = formatter.string(from: departure.nextDeparture)
+        
+        return URL(string: "nextwave://station?name=\(stationName)&date=\(dateString)")
     }
 }
 

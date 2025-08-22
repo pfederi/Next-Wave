@@ -144,14 +144,12 @@ class SharedDataManager {
         let allDepartures = loadNextDepartures()
         let now = Date()
         
-        // Find next departure for the first favorite station
-        let nextDeparture = allDepartures
-            .filter { $0.stationName == firstStation.name }
-            .filter { $0.nextDeparture > now }
-            .sorted { $0.nextDeparture < $1.nextDeparture }
-            .first
-            
-        return nextDeparture
+        return getSmartDepartures(
+            from: allDepartures,
+            stationName: firstStation.name,
+            now: now,
+            count: 1
+        ).first
     }
     
     // MARK: - Nearest Station
@@ -202,11 +200,12 @@ class SharedDataManager {
                 let allDepartures = loadNextDepartures()
                 let now = Date()
                 
-                let nextDeparture = allDepartures
-                    .filter { $0.stationName == nearestStation.name }
-                    .filter { $0.nextDeparture > now }
-                    .sorted { $0.nextDeparture < $1.nextDeparture }
-                    .first
+                let nextDeparture = getSmartDepartures(
+                    from: allDepartures,
+                    stationName: nearestStation.name,
+                    now: now,
+                    count: 1
+                ).first
                     
                 if let departure = nextDeparture {
                     return departure
@@ -240,14 +239,15 @@ class SharedDataManager {
         if settings.useNearestStation {
             // Try nearest station first
             if let nearestStation = loadNearestStation() {
-                let departures = allDepartures
-                    .filter { $0.stationName == nearestStation.name }
-                    .filter { $0.nextDeparture > now }
-                    .sorted { $0.nextDeparture < $1.nextDeparture }
-                    .prefix(count)
+                let departures = getSmartDepartures(
+                    from: allDepartures,
+                    stationName: nearestStation.name,
+                    now: now,
+                    count: count
+                )
                     
                 if !departures.isEmpty {
-                    return Array(departures)
+                    return departures
                 }
             }
             
@@ -255,24 +255,102 @@ class SharedDataManager {
             let favoriteStations = loadFavoriteStations()
             guard let firstStation = favoriteStations.first else { return [] }
             
-            return allDepartures
-                .filter { $0.stationName == firstStation.name }
-                .filter { $0.nextDeparture > now }
-                .sorted { $0.nextDeparture < $1.nextDeparture }
-                .prefix(count)
-                .map { $0 }
+            return getSmartDepartures(
+                from: allDepartures,
+                stationName: firstStation.name,
+                now: now,
+                count: count
+            )
         } else {
             // Use favorites
             let favoriteStations = loadFavoriteStations()
             guard let firstStation = favoriteStations.first else { return [] }
             
-            return allDepartures
-                .filter { $0.stationName == firstStation.name }
-                .filter { $0.nextDeparture > now }
+            return getSmartDepartures(
+                from: allDepartures,
+                stationName: firstStation.name,
+                now: now,
+                count: count
+            )
+        }
+    }
+    
+    // Smart departure filtering with proactive data loading and multi-day support
+    private func getSmartDepartures(from allDepartures: [DepartureInfo], stationName: String, now: Date, count: Int) -> [DepartureInfo] {
+        let calendar = Calendar.current
+        
+        // Get today's future departures for this station
+        let todayDepartures = allDepartures
+            .filter { $0.stationName == stationName }
+            .filter { $0.nextDeparture > now }
+            .filter { calendar.isDate($0.nextDeparture, inSameDayAs: now) }
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+        
+        var smartDepartures = Array(todayDepartures)
+        
+        // If we need more departures to fill the widget, add tomorrow's departures
+        if smartDepartures.count < count {
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+            let tomorrowDepartures = allDepartures
+                .filter { $0.stationName == stationName }
+                .filter { calendar.isDate($0.nextDeparture, inSameDayAs: tomorrow) }
+                .sorted { $0.nextDeparture < $1.nextDeparture }
+            
+            // Add tomorrow's departures to fill up to the requested count
+            let remainingSlots = count - smartDepartures.count
+            smartDepartures.append(contentsOf: Array(tomorrowDepartures.prefix(remainingSlots)))
+            
+            sharedDataLogger.info("🔍 Widget: Combined \(todayDepartures.count) today + \(min(remainingSlots, tomorrowDepartures.count)) tomorrow departures for \(stationName)")
+        }
+        
+        // Return the combined departures if we have any
+        if !smartDepartures.isEmpty {
+            let result = Array(smartDepartures.prefix(count))
+            sharedDataLogger.info("🔍 Widget: Returning \(result.count) of requested \(count) departures for \(stationName)")
+            return result
+        }
+        
+        // Fallback: If no departures today and after 17:00, try tomorrow only
+        let hour = calendar.component(.hour, from: now)
+        if hour >= 17 {
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+            let tomorrowDepartures = allDepartures
+                .filter { $0.stationName == stationName }
+                .filter { calendar.isDate($0.nextDeparture, inSameDayAs: tomorrow) }
                 .sorted { $0.nextDeparture < $1.nextDeparture }
                 .prefix(count)
-                .map { $0 }
+            
+            if !tomorrowDepartures.isEmpty {
+                sharedDataLogger.info("🔍 Widget: Using tomorrow's departures only (after 17:00)")
+                return Array(tomorrowDepartures)
+            }
         }
+        
+        // Try any future departures from any day
+        let futureDepartures = allDepartures
+            .filter { $0.stationName == stationName }
+            .filter { $0.nextDeparture > now }
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+            .prefix(count)
+        
+        if !futureDepartures.isEmpty {
+            sharedDataLogger.info("🔍 Widget: Using any future departures")
+            return Array(futureDepartures)
+        }
+        
+        // If still no departures, show a helpful message encouraging app usage
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        let tomorrowMorning = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: tomorrow) ?? tomorrow
+        
+        let placeholderDeparture = DepartureInfo(
+            stationName: stationName,
+            nextDeparture: tomorrowMorning,
+            routeName: "Open App",
+            direction: "for fresh departure times"
+        )
+        
+        sharedDataLogger.info("🔍 Widget: No departures found, using placeholder")
+        return [placeholderDeparture]
     }
 }
 

@@ -6,12 +6,22 @@ class BackgroundTaskManager {
     static let shared = BackgroundTaskManager()
     
     func registerBackgroundTasks() {
+        // Register midnight task
         BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.nextwave.midnight", using: nil) { task in
             if let task = task as? BGProcessingTask {
-                self.handleBackgroundTask(task)
+                self.handleMidnightTask(task)
             }
         }
+        
+        // Register evening widget refresh task
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.nextwave.widget-refresh", using: nil) { task in
+            if let task = task as? BGProcessingTask {
+                self.handleWidgetRefreshTask(task)
+            }
+        }
+        
         scheduleMidnightTask()
+        scheduleWidgetRefreshTask()
     }
     
     private func scheduleMidnightTask() {
@@ -35,7 +45,7 @@ class BackgroundTaskManager {
         }
     }
     
-    private func handleBackgroundTask(_ task: BGProcessingTask) {
+    private func handleMidnightTask(_ task: BGProcessingTask) {
         task.expirationHandler = {
             task.setTaskCompleted(success: false)
         }
@@ -45,6 +55,74 @@ class BackgroundTaskManager {
         scheduleMidnightTask()
         
         task.setTaskCompleted(success: true)
+    }
+    
+    private func handleWidgetRefreshTask(_ task: BGProcessingTask) {
+        task.expirationHandler = {
+            task.setTaskCompleted(success: false)
+        }
+        
+        // Load fresh departure data for widgets
+        Task {
+            await refreshWidgetData()
+            task.setTaskCompleted(success: true)
+        }
+        
+        // Schedule next widget refresh
+        scheduleWidgetRefreshTask()
+    }
+    
+    private func scheduleWidgetRefreshTask() {
+        let request = BGProcessingTaskRequest(identifier: "com.nextwave.widget-refresh")
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Schedule for 17:00 today, or 17:00 tomorrow if it's already past 17:00
+        let hour = calendar.component(.hour, from: now)
+        let targetTime: Date
+        
+        if hour < 17 {
+            // Schedule for 17:00 today
+            targetTime = calendar.date(bySettingHour: 17, minute: 0, second: 0, of: now) ?? now
+        } else {
+            // Schedule for 17:00 tomorrow
+            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+            targetTime = calendar.date(bySettingHour: 17, minute: 0, second: 0, of: tomorrow) ?? tomorrow
+        }
+        
+        request.earliestBeginDate = targetTime
+        request.requiresNetworkConnectivity = true
+        request.requiresExternalPower = false
+        
+        do {
+            try BGTaskScheduler.shared.submit(request)
+            print("📱 Scheduled widget refresh task for \(targetTime)")
+        } catch {
+            print("📱 Could not schedule widget refresh task: \(error)")
+        }
+    }
+    
+    @MainActor
+    private func refreshWidgetData() async {
+        print("🔄 Background widget data refresh started")
+        
+        // Check if widget requested refresh
+        let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
+        let widgetNeedsRefresh = userDefaults?.bool(forKey: "widget_needs_fresh_data") ?? false
+        
+        if widgetNeedsRefresh {
+            print("🔄 Widget requested fresh data - loading for next day")
+            
+            // Load fresh departure data
+            await FavoriteStationsManager.shared.loadDepartureDataForWidgets()
+            
+            // Clear the refresh flag
+            userDefaults?.set(false, forKey: "widget_needs_fresh_data")
+            userDefaults?.removeObject(forKey: "widget_requested_refresh")
+            
+            print("🔄 Widget data refresh completed")
+        }
     }
 }
 
@@ -107,26 +185,47 @@ struct NextWaveApp: App {
         }
         
         if url.host == "station" {
-            // Parse station name from query parameters
+            // Parse station name and date from query parameters
             let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            if let stationName = components?.queryItems?.first(where: { $0.name == "name" })?.value {
-                print("🔗 Opening station: \(stationName)")
+            guard let stationName = components?.queryItems?.first(where: { $0.name == "name" })?.value else {
+                print("🔗 No station name in deep link")
+                return
+            }
+            
+            // Parse optional date parameter (ISO format: YYYY-MM-DD)
+            var targetDate: Date? = nil
+            if let dateString = components?.queryItems?.first(where: { $0.name == "date" })?.value {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                targetDate = formatter.date(from: dateString)
+                print("🔗 Deep link date parameter: \(dateString) -> \(targetDate?.description ?? "invalid")")
+            }
+            
+            print("🔗 Opening station: \(stationName)" + (targetDate != nil ? " on \(targetDate!)" : ""))
+            
+            // Find the station by name and select it
+            Task { @MainActor in
+                await lakeStationsViewModel.loadLakes()
                 
-                // Find the station by name and select it
-                Task { @MainActor in
-                    await lakeStationsViewModel.loadLakes()
-                    
-                    // Search for the station across all lakes
-                    for lake in lakeStationsViewModel.lakes {
-                        if let station = lake.stations.first(where: { $0.name == stationName }) {
-                            print("🔗 Found station: \(station.name) with ID: \(station.id)")
-                            lakeStationsViewModel.selectStation(station)
-                            return
+                // Search for the station across all lakes
+                for lake in lakeStationsViewModel.lakes {
+                    if let station = lake.stations.first(where: { $0.name == stationName }) {
+                        print("🔗 Found station: \(station.name) with ID: \(station.id)")
+                        
+                        // Set the target date if provided
+                        if let targetDate = targetDate {
+                            print("🔗 Setting date to: \(targetDate)")
+                            lakeStationsViewModel.selectedDate = targetDate
+                            viewModel.selectedDate = targetDate
                         }
+                        
+                        // Select the station (this will trigger departure loading)
+                        lakeStationsViewModel.selectStation(station)
+                        return
                     }
-                    
-                    print("🔗 Station not found: \(stationName)")
                 }
+                
+                print("🔗 Station not found: \(stationName)")
             }
         } else {
             print("🔗 Unknown deep link host: \(url.host ?? "nil")")

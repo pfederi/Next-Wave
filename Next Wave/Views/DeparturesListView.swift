@@ -89,6 +89,11 @@ struct DeparturesListView: View {
                     }
                 }
             }
+            
+            // Fixed footer with schedule information
+            if let station = selectedStation {
+                ScheduleFooterView(stationName: station.name)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

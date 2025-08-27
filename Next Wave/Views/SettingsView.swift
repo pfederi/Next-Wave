@@ -351,12 +351,28 @@ struct InformationSection: View {
 
 struct SafetySection: View {
     let openURL: OpenURLAction
+    @State private var showingNavigationRules = false
     
     var body: some View {
         DisclosureGroup("Safety First") {
             VStack(alignment: .leading, spacing: 8) {
-                SafetyRuleView(rule: "Keep a safe distance from the ship")
-                SafetyRuleView(rule: "Don't ride directly behind the boat")
+                Button(action: {
+                    showingNavigationRules = true
+                }) {
+                    HStack {
+                        Image(systemName: "info.circle")
+                            .foregroundColor(.accentColor)
+                        Text("Wakethieving Rules & Safety Guidelines")
+                            .foregroundColor(.accentColor)
+                            .underline(true, color: .accentColor)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.accentColor)
+                            .font(.caption)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                
                 SafetyRuleView(rule: "Be respectful to other water users")
                 SafetyRuleView(rule: "Follow local regulations")
                 
@@ -378,6 +394,12 @@ struct SafetySection: View {
             .padding(.vertical, 8)
         }
         .tint(Color("text-color"))
+        .sheet(isPresented: $showingNavigationRules) {
+            NavigationRulesModal(
+                isPresented: $showingNavigationRules,
+                isFirstLaunch: false
+            )
+        }
     }
 }
 

@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var showingLocationPicker = false
     @State private var showingInfoView = false
     @State private var showingWidgetSettings = false
+    @State private var showingNavigationRules = false
 
     @State private var selectedDate = Date() {
         didSet {
@@ -113,6 +114,12 @@ struct ContentView: View {
                 .sheet(isPresented: $showingLocationPicker) {
                     LocationPickerView(viewModel: viewModel)
                 }
+                .sheet(isPresented: $showingNavigationRules) {
+                    NavigationRulesModal(
+                        isPresented: $showingNavigationRules,
+                        isFirstLaunch: !UserDefaults.standard.bool(forKey: "hasShownNavigationRules")
+                    )
+                }
                 .toolbar {
                     if viewModel.selectedStation != nil {
                         ToolbarItem(placement: .navigationBarLeading) {
@@ -134,9 +141,18 @@ struct ContentView: View {
                     }
                     if viewModel.selectedStation == nil {
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            NavigationLink(destination: SettingsView()) {
-                                Image(systemName: "gearshape")
-                                    .foregroundColor(.accentColor)
+                            HStack(spacing: 16) {
+                                Button(action: {
+                                    showingNavigationRules = true
+                                }) {
+                                    Image(systemName: "exclamationmark.shield.fill")
+                                        .foregroundColor(.orange)
+                                }
+                                
+                                NavigationLink(destination: SettingsView()) {
+                                    Image(systemName: "gearshape")
+                                        .foregroundColor(.accentColor)
+                                }
                             }
                         }
                     }
@@ -155,10 +171,22 @@ struct ContentView: View {
         .onAppear {
             viewModel.setScheduleViewModel(scheduleViewModel)
             
+            // Check if this is the first launch and show navigation rules
+            let hasShownNavigationRules = UserDefaults.standard.bool(forKey: "hasShownNavigationRules")
+            if !hasShownNavigationRules {
+                // Small delay to ensure the view is fully loaded
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showingNavigationRules = true
+                }
+            }
+            
             // Load departure data for widgets when app starts
             Task {
                 await loadDepartureDataForWidgets()
             }
+            
+            // Check if widget requested a refresh and handle it
+            checkForWidgetRefreshRequests()
         }
     }
     
@@ -177,9 +205,44 @@ struct ContentView: View {
         return "\(weekday), \(date)"
     }
     
-    // Load real departure data for widgets (next 5 departures per station)
+    // Check if widgets have requested a data refresh
+    private func checkForWidgetRefreshRequests() {
+        let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
+        let widgetNeedsRefresh = userDefaults?.bool(forKey: "widget_needs_fresh_data") ?? false
+        let lastWidgetRequest = userDefaults?.object(forKey: "widget_requested_refresh") as? Date
+        
+        if widgetNeedsRefresh {
+            print("📱 Widget requested data refresh - loading fresh departure data")
+            
+            // Clear the flags first
+            userDefaults?.set(false, forKey: "widget_needs_fresh_data")
+            userDefaults?.removeObject(forKey: "widget_requested_refresh")
+            
+            // Load fresh data
+            Task {
+                await loadDepartureDataForWidgets()
+            }
+        } else if let requestTime = lastWidgetRequest {
+            let timeSinceRequest = Date().timeIntervalSince(requestTime)
+            
+            // If request was made within the last 30 minutes, honor it
+            if timeSinceRequest <= 30 * 60 {
+                print("📱 Recent widget refresh request (\(Int(timeSinceRequest/60)) min ago) - loading fresh data")
+                
+                // Clear the flag
+                userDefaults?.removeObject(forKey: "widget_requested_refresh")
+                
+                // Load fresh data
+                Task {
+                    await loadDepartureDataForWidgets()
+                }
+            }
+        }
+    }
+    
+    // Load real departure data for widgets (up to 25 departures per station for full day coverage)
     private func loadDepartureDataForWidgets() async {
-        print("📱 Loading departure data for widgets (next 5 departures per station)...")
+        print("📱 Loading departure data for widgets (up to 25 departures per station for full day coverage)...")
         
         let favorites = favoritesManager.favorites
         var stationsToLoad = favorites
@@ -228,9 +291,13 @@ struct ContentView: View {
                 
                 var allJourneys = Array(todayFutureJourneys)
                 
-                // If less than 5 future departures today, also load tomorrow
-                if todayFutureJourneys.count < 5 {
-                    print("📱 Loading tomorrow's departures for \(favorite.name) (only \(todayFutureJourneys.count) today)")
+                // Define constants at the top
+                let maxDeparturesPerStation = 25 // Increased from 5 to support widget transitions
+                let minDeparturesBeforeLoadingNextDay = 15 // Load tomorrow if less than 15 today
+                
+                // If less than desired departures today, also load tomorrow and possibly day after
+                if todayFutureJourneys.count < minDeparturesBeforeLoadingNextDay {
+                    print("📱 Loading tomorrow's departures for \(favorite.name) (only \(todayFutureJourneys.count) today, want \(minDeparturesBeforeLoadingNextDay)+)")
                     
                     do {
                         let tomorrowJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: tomorrow)
@@ -258,14 +325,51 @@ struct ContentView: View {
                         
                         allJourneys.append(contentsOf: tomorrowFutureJourneys)
                         print("📱 Added \(tomorrowFutureJourneys.count) departures from tomorrow for \(favorite.name)")
+                        
+                        // If we still don't have enough departures, load day after tomorrow
+                        if allJourneys.count < maxDeparturesPerStation {
+                            print("📱 Still need more departures for \(favorite.name) (\(allJourneys.count)/\(maxDeparturesPerStation)), loading day after tomorrow")
+                            
+                            do {
+                                let dayAfterTomorrow = Calendar.current.date(byAdding: .day, value: 2, to: today) ?? tomorrow
+                                let dayAfterJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: dayAfterTomorrow)
+                                
+                                let dayAfterFutureJourneys = dayAfterJourneys.compactMap { journey -> (Journey, Date)? in
+                                    guard let departureStr = journey.stop.departure else { return nil }
+                                    guard let departureTime = AppDateFormatter.parseFullTime(departureStr) else { return nil }
+                                    
+                                    // Adjust date to day after tomorrow
+                                    let calendar = Calendar.current
+                                    let dayAfterComponents = calendar.dateComponents([.year, .month, .day], from: dayAfterTomorrow)
+                                    let timeComponents = calendar.dateComponents([.hour, .minute], from: departureTime)
+                                    
+                                    var fullComponents = DateComponents()
+                                    fullComponents.year = dayAfterComponents.year
+                                    fullComponents.month = dayAfterComponents.month
+                                    fullComponents.day = dayAfterComponents.day
+                                    fullComponents.hour = timeComponents.hour
+                                    fullComponents.minute = timeComponents.minute
+                                    
+                                    guard let dayAfterDepartureDate = calendar.date(from: fullComponents) else { return nil }
+                                    return (journey, dayAfterDepartureDate)
+                                }
+                                .sorted { $0.1 < $1.1 } // Sort by departure time
+                                
+                                allJourneys.append(contentsOf: dayAfterFutureJourneys)
+                                print("📱 Added \(dayAfterFutureJourneys.count) departures from day after tomorrow for \(favorite.name)")
+                            } catch {
+                                print("📱 Error loading day after tomorrow's departures for \(favorite.name): \(error)")
+                            }
+                        }
                     } catch {
                         print("📱 Error loading tomorrow's departures for \(favorite.name): \(error)")
                     }
                 }
                 
-                // Take only the next 5 departures total (today + tomorrow)
-                let nextJourneys = Array(allJourneys.prefix(5))
-                print("📱 Total future departures for \(favorite.name): \(nextJourneys.count)")
+                // Take many more departures for robust widget support (up to 25 per station for full day coverage)
+                // This ensures widgets have enough data for seamless transitions throughout the day
+                let nextJourneys = Array(allJourneys.prefix(maxDeparturesPerStation))
+                print("📱 Total future departures for \(favorite.name): \(nextJourneys.count) (max: \(maxDeparturesPerStation))")
                 
                 for (journey, departureTime) in nextJourneys {
                     // Get next station from passList (like in the app)
@@ -288,7 +392,7 @@ struct ContentView: View {
                     print("📱 Loaded departure for \(favorite.name) → \(nextStation): \(departureTime)")
                 }
                 
-                print("📱 Total loaded \(nextJourneys.count) departures for \(favorite.name)")
+                print("📱 Final: Loaded \(nextJourneys.count) departures for \(favorite.name) (from \(allJourneys.count) available across multiple days)")
             } catch {
                 print("📱 Error loading journey details for \(favorite.name): \(error)")
             }

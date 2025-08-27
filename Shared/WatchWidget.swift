@@ -98,12 +98,8 @@ struct WatchWidgetEntryView: View {
             return "now"
         }
         
-        if !calendar.isDate(departure.nextDeparture, inSameDayAs: now) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
-            return "tmrw \(formatter.string(from: departure.nextDeparture))"
-        }
-        
+        // Always show "at HH:MM" regardless of day - simpler and clearer
+        // This avoids issues with TMRW not updating after midnight
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return "at \(formatter.string(from: departure.nextDeparture))"
@@ -118,21 +114,11 @@ struct WatchWidgetEntryView: View {
                         Text("now")
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .foregroundColor(.green)
-                    } else if departureTimeText.starts(with: "tmrw") {
-                        let timeOnly = String(departureTimeText.dropFirst(5))
-                        Text("tmrw")
-                            .font(.system(.caption, design: .rounded, weight: .medium))
-                            .foregroundColor(.purple)
+                    } else {
+                        // All other times (at HH:MM format)
+                        let timeOnly = departureTimeText.replacingOccurrences(of: "at ", with: "")
                         Text(timeOnly)
                             .font(.system(.title3, design: .rounded, weight: .bold))
-                            .foregroundColor(.purple)
-                    } else {
-                        let timeOnly = String(departureTimeText.dropFirst(3))
-                        Image(systemName: "ferry.fill")
-                            .font(.system(.caption2, weight: .medium))
-                            .foregroundColor(.cyan)
-                        Text(timeOnly)
-                            .font(.system(.caption, design: .rounded, weight: .bold))
                             .foregroundColor(.cyan)
                     }
                 }
@@ -157,8 +143,7 @@ struct WatchWidgetEntryView: View {
                         .foregroundColor(.secondary)
                     Text(departureTimeText)
                         .font(.subheadline)
-                        .foregroundColor(departureTimeText == "now" ? .green : 
-                                       departureTimeText.starts(with: "tmrw") ? .purple : .cyan)
+                        .foregroundColor(departureTimeText == "now" ? .green : .cyan)
                         .fontWeight(.bold)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

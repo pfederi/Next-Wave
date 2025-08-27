@@ -109,19 +109,23 @@ class BackgroundTaskManager {
         
         // Check if widget requested refresh
         let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
-        let widgetNeedsRefresh = userDefaults?.bool(forKey: "widget_needs_fresh_data") ?? false
+        _ = userDefaults?.bool(forKey: "widget_needs_fresh_data") ?? false
         
-        if widgetNeedsRefresh {
-            print("🔄 Widget requested fresh data - loading for next day")
+        // Always try to refresh widget data in background, not just when requested
+        let favorites = FavoriteStationsManager.shared.favorites
+        if !favorites.isEmpty {
+            print("🔄 Loading fresh departure data for \(favorites.count) favorite stations")
             
             // Load fresh departure data
             await FavoriteStationsManager.shared.loadDepartureDataForWidgets()
             
-            // Clear the refresh flag
+            // Clear any refresh flags
             userDefaults?.set(false, forKey: "widget_needs_fresh_data")
             userDefaults?.removeObject(forKey: "widget_requested_refresh")
             
-            print("🔄 Widget data refresh completed")
+            print("🔄 Background widget data refresh completed")
+        } else {
+            print("🔄 No favorite stations - skipping background refresh")
         }
     }
 }
@@ -161,18 +165,51 @@ struct NextWaveApp: App {
                 .environmentObject(appSettings)
                 .environmentObject(lakeStationsViewModel)
                 .preferredColorScheme(appSettings.theme == .system ? nil : (appSettings.isDarkMode ? .dark : .light))
+                .task {
+                    // Load widget data when app first launches
+                    await loadWidgetDataOnAppStart()
+                }
                 .onChange(of: scenePhase) { oldPhase, newPhase in
                     if newPhase == .active {
                         Task {
                             await MainActor.run {
                                 viewModel.appWillEnterForeground()
                             }
+                            
+                            // Load widget data every time app becomes active
+                            await loadWidgetDataOnAppStart()
                         }
                     }
                 }
                 .onOpenURL { url in
                     handleDeepLink(url)
                 }
+        }
+    }
+    
+    @MainActor
+    private func loadWidgetDataOnAppStart() async {
+        print("🚀 App became active - loading widget data...")
+        
+        // Check if we have favorite stations
+        let favorites = FavoriteStationsManager.shared.favorites
+        if favorites.isEmpty {
+            print("🚀 No favorite stations - skipping widget data load")
+            return
+        }
+        
+        // Check when data was last refreshed
+        let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
+        let lastRefresh = userDefaults?.object(forKey: "last_data_refresh") as? Date
+        let timeAgo = abs(lastRefresh?.timeIntervalSinceNow ?? 86400) // Default to 24h ago
+        
+        // Load widget data if it's old (> 30 minutes) or doesn't exist
+        if timeAgo > 1800 { // 30 minutes
+            print("🚀 Widget data is \(Int(timeAgo/60)) minutes old - refreshing...")
+            await FavoriteStationsManager.shared.loadDepartureDataForWidgets()
+            print("🚀 Widget data refresh completed")
+        } else {
+            print("🚀 Widget data is fresh (\(Int(timeAgo/60)) minutes old) - skipping refresh")
         }
     }
     

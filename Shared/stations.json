@@ -2100,9 +2100,9 @@
             ]
         },
         {
-            "name": "Aegerisee",
+            "name": "Ägerisee",
             "operators": [
-                ""
+                "ASG"
             ],
             "stations": [
                 {
@@ -2131,70 +2131,6 @@
                 },
                 {
                     "name": "Eierhals (See)",
-                    "uic_ref": "8530633",
-                    "coordinates": {
-                        "latitude": 47.116142,
-                        "longitude": 8.640873
-                    }
-                },
-                {
-                    "name": "Morgarten Denkmal (See)",
-                    "uic_ref": "8530634",
-                    "coordinates": {
-                        "latitude": 47.106161,
-                        "longitude": 8.641295
-                    }
-                },
-                {
-                    "name": "Morgarten Hotel (See)",
-                    "uic_ref": "8530635",
-                    "coordinates": {
-                        "latitude": 47.103791,
-                        "longitude": 8.640029
-                    }
-                },
-                {
-                    "name": "Naas (See)",
-                    "uic_ref": "8530636",
-                    "coordinates": {
-                        "latitude": 47.114356,
-                        "longitude": 8.621396
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Lac de Joux",
-            "operators": [
-                ""
-            ],
-            "stations": [
-                {
-                    "name": "Le Pont (lac)",
-                    "uic_ref": "8530621",
-                    "coordinates": {
-                        "latitude": 46.667623,
-                        "longitude": 6.325058
-                    }
-                },
-                {
-                    "name": "Les Bioux (lac)",
-                    "uic_ref": "8530623",
-                    "coordinates": {
-                        "latitude": 46.624151,
-                        "longitude": 6.272833
-                    }
-                },
-                {
-                    "name": "Le Rocheray (lac",
-                    "uic_ref": "8530622",
-                    "coordinates": {
-                        "latitude": 46.622817,
-                        "longitude": 6.251721
-                    }
-                },
-                {
-                    "name": "Le Lieu Roche Fendue (lac)",
                     "uic_ref": "8530633",
                     "coordinates": {
                         "latitude": 47.116142,

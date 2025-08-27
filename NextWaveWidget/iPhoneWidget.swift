@@ -15,10 +15,58 @@ import Foundation
 // Create a specific logger for the widget
 private let widgetLogger = Logger(subsystem: "com.federi.Next-Wave.NextWaveWidget", category: "iPhoneWidget")
 
-// Smart update timing for widgets
-private func calculateNextUpdate(from now: Date) -> Date {
+// Generate informative messages based on data age
+private func getInformativeMessage(timeAgo: TimeInterval) -> (routeName: String, direction: String) {
+    let _ = timeAgo / 3600
+    let days = timeAgo / 86400
+    
+    if timeAgo < 1800 { // Less than 30 minutes
+        return ("Refreshing...", "Tap to open app")
+    } else if timeAgo < 3600 { // Less than 1 hour
+        return ("Data Loading", "Open app to refresh")
+    } else if timeAgo < 7200 { // Less than 2 hours
+        return ("Open App", "to load fresh times")
+    } else if timeAgo < 21600 { // Less than 6 hours
+        return ("Open App", "for current schedules")
+    } else if days < 1 {
+        return ("Open App", "data from today")
+    } else if days < 2 {
+        return ("Open App", "data from yesterday")
+    } else {
+        return ("Open App", "to update schedules")
+    }
+}
+
+// Smart update timing for widgets based on departure times and current time
+private func calculateNextUpdate(from now: Date, nextDeparture: Date? = nil) -> Date {
     let calendar = Calendar.current
     let hour = calendar.component(.hour, from: now)
+    
+    // If we have a next departure, calculate based on that
+    if let nextDeparture = nextDeparture {
+        let timeToDeparture = nextDeparture.timeIntervalSince(now)
+        
+        // If departure is in the past or within 1 minute, refresh immediately
+        if timeToDeparture <= 60 {
+            let immediateUpdate = now.addingTimeInterval(15) // 15 seconds for faster updates
+            widgetLogger.info("🕰️ Departure time passed or very soon, refreshing in 15 seconds")
+            return immediateUpdate
+        }
+        
+        // If departure is within 30 minutes, refresh every 1 minute for real-time updates
+        if timeToDeparture <= 30 * 60 {
+            let nextUpdate = now.addingTimeInterval(1 * 60) // 1 minute
+            widgetLogger.info("🕰️ Departure within 30 minutes, refreshing every 1 minute")
+            return nextUpdate
+        }
+        
+        // If departure is within 2 hours, refresh every 10 minutes
+        if timeToDeparture <= 2 * 60 * 60 {
+            let nextUpdate = now.addingTimeInterval(10 * 60) // 10 minutes
+            widgetLogger.info("🕰️ Departure within 2 hours, refreshing every 10 minutes")
+            return nextUpdate
+        }
+    }
     
     // If it's after 17:00, schedule an update for tomorrow at 7:00 to load next day's data
     if hour >= 17 {
@@ -30,15 +78,49 @@ private func calculateNextUpdate(from now: Date) -> Date {
     
     // During the day, update every 15 minutes to keep data fresh
     let nextUpdate = now.addingTimeInterval(15 * 60) // 15 minutes
-    widgetLogger.info("🕰️ Scheduling next update in 15 minutes")
+    widgetLogger.info("🕰️ No specific departure time, refreshing every 15 minutes")
     return nextUpdate
 }
 
 // Check if we should trigger a data refresh request
-private func shouldRequestDataRefresh(from now: Date) -> Bool {
+private func shouldRequestDataRefresh(from now: Date, allDepartures: [DepartureInfo] = []) -> Bool {
     let calendar = Calendar.current
     let hour = calendar.component(.hour, from: now)
     let minute = calendar.component(.minute, from: now)
+    
+    // Check if any departure times are stale (in the past)
+    let staleDepartures = allDepartures.filter { $0.nextDeparture <= now }
+    if !staleDepartures.isEmpty {
+        widgetLogger.info("🔄 Found \(staleDepartures.count) stale departures, requesting refresh")
+        return true
+    }
+    
+    // Check if the next departure is very soon (within 5 minutes) and we need fresh data
+    let soonDepartures = allDepartures.filter { 
+        let timeToDeparture = $0.nextDeparture.timeIntervalSince(now)
+        return timeToDeparture > 0 && timeToDeparture <= 5 * 60 // Increased to 5 minutes
+    }
+    if !soonDepartures.isEmpty {
+        widgetLogger.info("🔄 Next departure within 5 minutes, requesting fresh data")
+        return true
+    }
+    
+    // Additional check: if no future departures exist for any station, refresh needed
+    let futureDepartures = allDepartures.filter { $0.nextDeparture > now }
+    if futureDepartures.isEmpty && !allDepartures.isEmpty {
+        widgetLogger.info("🔄 No future departures found but have data, requesting refresh")
+        return true
+    }
+    
+    // More aggressive check: if we have very few future departures left (less than 3)
+    // and the last departure is within the next 2 hours, request refresh to load more
+    if futureDepartures.count < 3 && futureDepartures.count > 0 {
+        if let lastDeparture = futureDepartures.last,
+           lastDeparture.nextDeparture.timeIntervalSince(now) <= 2 * 60 * 60 { // Within 2 hours
+            widgetLogger.info("🔄 Only \(futureDepartures.count) departures remaining and last one is within 2h, requesting refresh for more data")
+            return true
+        }
+    }
     
     // Trigger refresh at 17:00 to load next day's data
     if hour == 17 && minute < 15 {
@@ -66,7 +148,7 @@ private func triggerBackgroundDataRefresh() {
     widgetLogger.info("🔄 Triggered background data refresh request")
     
     // Additionally, we can try to wake up the main app if possible
-    if let appURL = URL(string: "nextwave://refresh-data") {
+    if URL(string: "nextwave://refresh-data") != nil {
         // This won't work from widget context, but the flag above will help
         widgetLogger.info("🔄 Set refresh URL request")
     }
@@ -126,8 +208,9 @@ struct iPhoneProvider: TimelineProvider {
             NSLog("🔍 Creating timeline with %d entries", entries.count)
             widgetLogger.info("🔍 Creating timeline with \(entries.count) entries")
             
-            // Use smart update timing
-            let nextUpdate = calculateNextUpdate(from: now)
+            // Use smart update timing based on the next departure
+            let nextDeparture = entries.first?.departure?.nextDeparture
+            let nextUpdate = calculateNextUpdate(from: now, nextDeparture: nextDeparture)
             let timeline = Timeline(entries: entries, policy: .after(nextUpdate))
             completion(timeline)
         }
@@ -138,7 +221,8 @@ struct iPhoneProvider: TimelineProvider {
         widgetLogger.info("🔍 iPhone Widget getTimeline called at \(timestamp)")
         
         // Check if we should trigger a background refresh to load new data
-        if shouldRequestDataRefresh(from: now) {
+        let allDepartures = SharedDataManager.shared.loadNextDepartures()
+        if shouldRequestDataRefresh(from: now, allDepartures: allDepartures) {
             triggerBackgroundDataRefresh()
         }
         
@@ -220,8 +304,7 @@ struct iPhoneProvider: TimelineProvider {
         NSLog("🔍 Display mode: %@, getNextDepartureForWidget returned: %@", displayMode.displayName, departureInfo)
         widgetLogger.info("🔍 Display mode: \(displayMode.displayName), getNextDepartureForWidget returned: \(departureInfo)")
 
-        // Check if we have any departure data at all
-        let allDepartures = SharedDataManager.shared.loadNextDepartures()
+        // Check if we have any departure data at all (using the allDepartures from above)
         NSLog("🔍 Total departures in cache: %d", allDepartures.count)
         widgetLogger.info("🔍 Total departures in cache: \(allDepartures.count)")
         
@@ -230,11 +313,16 @@ struct iPhoneProvider: TimelineProvider {
             widgetLogger.info("🔍 No departure data found but have favorites - showing hint to open app")
             
             // Create a helpful hint departure to show that we have favorites but need app to load data
+            let lastRefresh = UserDefaults(suiteName: "group.com.federi.Next-Wave")?.object(forKey: "last_data_refresh") as? Date
+            let timeAgo = lastRefresh?.timeIntervalSinceNow ?? -86400 // Default to 24h ago
+            
+            let (routeName, direction) = getInformativeMessage(timeAgo: abs(timeAgo))
+            
             let hintDeparture = DepartureInfo(
                 stationName: favoriteStations[0].name,
-                nextDeparture: Date().addingTimeInterval(900), // 15 minutes from now
-                routeName: "Open App",
-                direction: "to load departure times"
+                nextDeparture: Date().addingTimeInterval(300), // 5 minutes from now (shorter)
+                routeName: routeName,
+                direction: direction
             )
             
             // Create entries with hint
@@ -252,15 +340,9 @@ struct iPhoneProvider: TimelineProvider {
             NSLog("🔍 Created hint timeline for: %@", hintDeparture.stationName)
             widgetLogger.info("🔍 Created hint timeline for: \(hintDeparture.stationName)")
             
-        } else if let nextDeparture = nextDeparture {
-            // Check if this is a "loading" placeholder (routeName contains "Open App")
-            let isLoadingPlaceholder = nextDeparture.routeName.contains("Open App") || nextDeparture.direction.contains("to load")
-            if isLoadingPlaceholder {
-                NSLog("🔍 Found loading placeholder for: %@", nextDeparture.stationName)
-                widgetLogger.info("🔍 Found loading placeholder for: \(nextDeparture.stationName)")
-            }
-            NSLog("🔍 Creating timeline with departure for: %@", nextDeparture.stationName)
-            widgetLogger.info("🔍 Creating timeline with departure for: \(nextDeparture.stationName)")
+        } else if !allDepartures.isEmpty {
+            NSLog("🔍 Creating dynamic single departure timeline")
+            widgetLogger.info("🔍 Creating dynamic single departure timeline")
             
             // Get station name based on display mode
             let stationName: String?
@@ -270,16 +352,66 @@ struct iPhoneProvider: TimelineProvider {
                 stationName = favoriteStations.first?.name
             }
             
-            // Create entries every minute for the next hour
-            for i in 0..<61 { // 61 entries = next 60 minutes
-                let entryDate = now.addingTimeInterval(TimeInterval(i * 60))
-                let entry = SimpleEntry(
-                    date: entryDate, 
-                    departure: nextDeparture,
-                    displayMode: displayMode,
-                    stationName: stationName
-                )
-                entries.append(entry)
+            // Get target station name for filtering
+            let targetStationName = stationName ?? ""
+            
+            // Filter departures for the target station and future times only
+            let stationDepartures = allDepartures
+                .filter { $0.stationName == targetStationName }
+                .filter { $0.nextDeparture > now }
+                .sorted { $0.nextDeparture < $1.nextDeparture }
+            
+            NSLog("🔍 Found %d future departures for station: %@", stationDepartures.count, targetStationName)
+            widgetLogger.info("🔍 Found \(stationDepartures.count) future departures for station: \(targetStationName)")
+            
+            if !stationDepartures.isEmpty {
+                // Create timeline entries that automatically show the CURRENT next departure at each time
+                // Ensure frequent updates when departures are imminent
+                let totalMinutes = 120 // 2 hours of timeline entries
+                let intervalMinutes = 1 // 1-minute intervals for more responsive updates
+                
+                for i in 0..<totalMinutes {
+                    let entryDate = now.addingTimeInterval(TimeInterval(i * intervalMinutes * 60))
+                    
+                    // Find the next departure that's still in the future at this timeline entry time
+                    // This ensures the widget always shows the CURRENT next departure
+                    let nextDepartureAtTime = stationDepartures.first { departure in
+                        departure.nextDeparture > entryDate
+                    }
+                    
+                    let entry = SimpleEntry(
+                        date: entryDate, 
+                        departure: nextDepartureAtTime, // This dynamically updates to show current next departure
+                        displayMode: displayMode,
+                        stationName: stationName
+                    )
+                    entries.append(entry)
+                    
+                    // Log first few for debugging
+                    if i < 5 && nextDepartureAtTime != nil {
+                        let departureTime = nextDepartureAtTime!.nextDeparture
+                        let timeUntilDeparture = Int(departureTime.timeIntervalSince(entryDate) / 60)
+                        NSLog("🔍 Entry %d at %@ shows departure in %d min (%@)", i, entryDate.description, timeUntilDeparture, nextDepartureAtTime!.routeName)
+                    }
+                }
+                
+                NSLog("🔍 Created dynamic timeline with %d entries (1-min intervals)", entries.count)
+                widgetLogger.info("🔍 Created dynamic timeline with \(entries.count) entries (1-min intervals)")
+            } else {
+                // Fallback to static entry if no departures for this station
+                NSLog("🔍 No departures for station %@, using fallback", targetStationName)
+                widgetLogger.warning("🔍 No departures for station \(targetStationName), using fallback")
+                
+                for i in 0..<30 {
+                    let entryDate = now.addingTimeInterval(TimeInterval(i * 60))
+                    let entry = SimpleEntry(
+                        date: entryDate, 
+                        departure: nil,
+                        displayMode: displayMode,
+                        stationName: stationName
+                    )
+                    entries.append(entry)
+                }
             }
             
         } else {
@@ -345,8 +477,9 @@ struct iPhoneMultipleProvider: TimelineProvider {
             NSLog("🔍 Creating multiple departures timeline with %d entries", entries.count)
             widgetLogger.info("🔍 Creating multiple departures timeline with \(entries.count) entries")
             
-            // Use smart update timing
-            let nextUpdate = calculateNextUpdate(from: now)
+            // Use smart update timing based on the next departure
+            let nextDeparture = entries.first?.departure?.nextDeparture
+            let nextUpdate = calculateNextUpdate(from: now, nextDeparture: nextDeparture)
             let timeline = Timeline(entries: entries, policy: .after(nextUpdate))
             completion(timeline)
         }
@@ -355,7 +488,8 @@ struct iPhoneMultipleProvider: TimelineProvider {
         widgetLogger.info("🔍 iPhone Multiple Widget getTimeline called at \(now)")
         
         // Check if we should trigger a background refresh to load new data
-        if shouldRequestDataRefresh(from: now) {
+        let allDepartures = SharedDataManager.shared.loadNextDepartures()
+        if shouldRequestDataRefresh(from: now, allDepartures: allDepartures) {
             triggerBackgroundDataRefresh()
         }
         
@@ -371,36 +505,127 @@ struct iPhoneMultipleProvider: TimelineProvider {
             stationName = SharedDataManager.shared.loadFavoriteStations().first?.name
         }
         
-        // Get next departures (3 for medium, 5 for large)
-        let nextDepartures = SharedDataManager.shared.getNext5DeparturesForWidget()
-        NSLog("🔍 Display mode: %@, Found %d departures for multiple widget", displayMode.displayName, nextDepartures.count)
-        widgetLogger.info("🔍 Display mode: \(displayMode.displayName), Found \(nextDepartures.count) departures for multiple widget")
+        // Get target station name for dynamic filtering
+        let targetStationName = stationName ?? ""
         
-        if !nextDepartures.isEmpty {
-            NSLog("🔍 Creating timeline with %d departures for: %@", nextDepartures.count, nextDepartures[0].stationName)
-            widgetLogger.info("🔍 Creating timeline with \(nextDepartures.count) departures for: \(nextDepartures[0].stationName)")
+        NSLog("🔍 Display mode: %@, Total departures loaded: %d", displayMode.displayName, allDepartures.count)
+        widgetLogger.info("🔍 Display mode: \(displayMode.displayName), Total departures loaded: \(allDepartures.count)")
+        
+        // Log all stations with departures for debugging
+        let stationNames = Set(allDepartures.map { $0.stationName })
+        NSLog("🔍 Stations with data: %@", Array(stationNames).sorted().joined(separator: ", "))
+        widgetLogger.info("🔍 Stations with data: \(Array(stationNames).sorted())")
+        
+        // Filter departures for the target station
+        let stationDepartures = allDepartures
+            .filter { $0.stationName == targetStationName }
+            .filter { $0.nextDeparture > now }
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+        
+        NSLog("🔍 Found %d future departures for station: %@", stationDepartures.count, targetStationName)
+        widgetLogger.info("🔍 Found \(stationDepartures.count) future departures for station: \(targetStationName)")
+        
+        // Log first few departures from original data
+        for (index, departure) in stationDepartures.prefix(3).enumerated() {
+            let minutesFromNow = Int(departure.nextDeparture.timeIntervalSince(now) / 60)
+            NSLog("🔍   Original %d: %@ → %@ in %d min", index + 1, departure.routeName, departure.direction, minutesFromNow)
+        }
+        
+        if !stationDepartures.isEmpty {
+            NSLog("🔍 Creating dynamic multiple departures timeline for: %@", targetStationName)
+            widgetLogger.info("🔍 Creating dynamic multiple departures timeline for: \(targetStationName)")
             
-            // Create entries every 5 minutes for the next hour
-            for i in 0..<13 { // 13 entries = next 60 minutes (every 5 minutes)
-                let entryDate = now.addingTimeInterval(TimeInterval(i * 5 * 60))
+            // Create timeline entries that automatically show the next 3-5 departures at each time
+            // Use 1-minute intervals for responsive updates, especially when departures are imminent
+            let totalMinutes = 120 // 2 hours of timeline entries
+            let intervalMinutes = 1 // 1-minute intervals for responsive updates
+            
+            // Pre-load ALL available departures for seamless transitions
+            // Get many departures to ensure seamless transitions throughout the day
+            let seamlessDepartures = SharedDataManager.shared.getSeamlessDeparturesForMultipleWidget()
+            
+            // Combine with current station departures and remove duplicates
+            let combinedDepartures = (stationDepartures + seamlessDepartures)
+                .filter { $0.nextDeparture > now } // Only future departures
+                .sorted { $0.nextDeparture < $1.nextDeparture }
+            
+            // Remove duplicates based on departure time and route
+            var allAvailableDepartures: [DepartureInfo] = []
+            var seenDepartures: Set<String> = []
+            
+            for departure in combinedDepartures {
+                let key = "\(departure.nextDeparture.timeIntervalSince1970)-\(departure.routeName)-\(departure.direction)"
+                if !seenDepartures.contains(key) {
+                    seenDepartures.insert(key)
+                    allAvailableDepartures.append(departure)
+                }
+            }
+            
+            NSLog("🔍 Total available departures for seamless transition: %d", allAvailableDepartures.count)
+            widgetLogger.info("🔍 Seamless transition prepared with \(allAvailableDepartures.count) departures")
+            
+            // Log the extended departure range for debugging
+            if let first = allAvailableDepartures.first, let last = allAvailableDepartures.last {
+                let firstMinutes = Int(first.nextDeparture.timeIntervalSince(now) / 60)
+                let lastMinutes = Int(last.nextDeparture.timeIntervalSince(now) / 60)
+                let lastHours = lastMinutes / 60
+                NSLog("🔍 Departure range: %d min to %d min (%d hours)", firstMinutes, lastMinutes, lastHours)
+                widgetLogger.info("🔍 Departure range: \(firstMinutes) min to \(lastMinutes) min (\(lastHours) hours)")
+            }
+            
+            for i in 0..<totalMinutes {
+                let entryDate = now.addingTimeInterval(TimeInterval(i * intervalMinutes * 60))
+                
+                // SEAMLESS TRANSITION LOGIC:
+                // Always show exactly 5 departures (or as many as available)
+                // When a departure time passes, the next one immediately takes its place
+                let futureDeparturesAtTime = allAvailableDepartures.filter { departure in
+                    departure.nextDeparture > entryDate
+                }
+                
+                // Always take exactly 5 departures (or all available if less than 5)
+                let displayDepartures = Array(futureDeparturesAtTime.prefix(5))
+                
                 let entry = SimpleEntry(
                     date: entryDate, 
-                    departure: nextDepartures.first,
-                    departures: nextDepartures,
+                    departure: displayDepartures.first, // First of the next departures
+                    departures: displayDepartures, // Exactly 5 departures (or less if not available)
                     displayMode: displayMode,
                     stationName: stationName
                 )
                 entries.append(entry)
+                
+                // Log first few for debugging - show seamless transition
+                if i < 5 {
+                    NSLog("🔍 Seamless Entry %d at %@ shows %d departures", i, entryDate.description, displayDepartures.count)
+                    if let firstDeparture = displayDepartures.first {
+                        let timeUntilFirst = Int(firstDeparture.nextDeparture.timeIntervalSince(entryDate) / 60)
+                        NSLog("🔍   First departure in %d min: %@", timeUntilFirst, firstDeparture.routeName)
+                    }
+                    if displayDepartures.count >= 3, let thirdDeparture = displayDepartures.dropFirst(2).first {
+                        let timeUntilThird = Int(thirdDeparture.nextDeparture.timeIntervalSince(entryDate) / 60)
+                        NSLog("🔍   Third departure in %d min: %@", timeUntilThird, thirdDeparture.routeName)
+                    }
+                    if displayDepartures.count >= 5, let fifthDeparture = displayDepartures.dropFirst(4).first {
+                        let timeUntilFifth = Int(fifthDeparture.nextDeparture.timeIntervalSince(entryDate) / 60)
+                        NSLog("🔍   Fifth departure in %d min: %@", timeUntilFifth, fifthDeparture.routeName)
+                    }
+                }
             }
+            
+            NSLog("🔍 Created dynamic multiple timeline with %d entries", entries.count)
+            widgetLogger.info("🔍 Created dynamic multiple timeline with \(entries.count) entries")
         } else {
             NSLog("🔍 No departures found for multiple widget - creating empty timeline")
             widgetLogger.warning("🔍 No departures found for multiple widget - creating empty timeline")
             // Even without departures, create entries to keep widget responsive
-            for i in 0..<13 {
-                let entryDate = now.addingTimeInterval(TimeInterval(i * 5 * 60))
+            // Use 1-minute intervals for consistency with other timeline entries
+            for i in 0..<60 { // 60 minutes of empty entries
+                let entryDate = now.addingTimeInterval(TimeInterval(i * 60))
                 let entry = SimpleEntry(
                     date: entryDate, 
                     departure: nil,
+                    departures: [], // Empty departures array for multiple widgets
                     displayMode: displayMode,
                     stationName: stationName
                 )
@@ -867,6 +1092,31 @@ struct SystemLargeView: View {
 // MARK: - Empty State Views for iPhone Widgets
 
 struct SystemSmallEmptyView: View {
+    let message: String
+    let subtitle: String
+    
+    init() {
+        _ = SharedDataManager.shared.loadWidgetSettings()
+        let favoriteStations = SharedDataManager.shared.loadFavoriteStations()
+        
+        if favoriteStations.isEmpty {
+            self.message = "Add Favorites"
+            self.subtitle = "in the app"
+        } else {
+            // Check when data was last refreshed
+            let lastRefresh = UserDefaults(suiteName: "group.com.federi.Next-Wave")?.object(forKey: "last_data_refresh") as? Date
+            let timeAgo = abs(lastRefresh?.timeIntervalSinceNow ?? 86400)
+            
+            if timeAgo < 3600 { // Less than 1 hour
+                self.message = "Loading..."
+                self.subtitle = "Tap to refresh"
+            } else {
+                self.message = "Open App"
+                self.subtitle = "for schedules"
+            }
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: "ferry.fill")
@@ -880,10 +1130,10 @@ struct SystemSmallEmptyView: View {
             Spacer()
             
             VStack(spacing: 2) {
-                Text("No Departures")
+                Text(message)
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.8))
-                Text("Add favorites")
+                Text(subtitle)
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.7))
             }
@@ -893,8 +1143,8 @@ struct SystemSmallEmptyView: View {
         .widgetBackground {
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(.systemGray).opacity(0.8),
-                    Color(.systemGray2).opacity(0.6)
+                    Color(.systemBlue).opacity(0.7),
+                    Color(.systemBlue).opacity(0.5)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -904,6 +1154,39 @@ struct SystemSmallEmptyView: View {
 }
 
 struct SystemMediumEmptyView: View {
+    let title: String
+    let subtitle: String
+    let iconName: String
+    
+    init() {
+        let favoriteStations = SharedDataManager.shared.loadFavoriteStations()
+        
+        if favoriteStations.isEmpty {
+            self.title = "No Favorites Set"
+            self.subtitle = "Add favorite stations in the app to see departure times"
+            self.iconName = "heart.slash"
+        } else {
+            // Check data freshness
+            let lastRefresh = UserDefaults(suiteName: "group.com.federi.Next-Wave")?.object(forKey: "last_data_refresh") as? Date
+            let timeAgo = abs(lastRefresh?.timeIntervalSinceNow ?? 86400)
+            let hours = timeAgo / 3600
+            
+            if timeAgo < 1800 { // Less than 30 minutes
+                self.title = "Loading Schedules..."
+                self.subtitle = "Fetching departure times from your favorites"
+                self.iconName = "clock.arrow.circlepath"
+            } else if hours < 6 {
+                self.title = "Open App to Refresh"
+                self.subtitle = "Departure data is \(Int(hours))h old - tap to update"
+                self.iconName = "arrow.clockwise.circle"
+            } else {
+                self.title = "Data Needs Update"
+                self.subtitle = "Open NextWave app to load fresh departure times"
+                self.iconName = "exclamationmark.circle"
+            }
+        }
+    }
+    
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
@@ -916,19 +1199,20 @@ struct SystemMediumEmptyView: View {
                         .foregroundColor(.white)
                 }
                 
-                Text("No Favorites Set")
+                Text(title)
                     .font(.title3)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
                 
-                Text("Add favorite stations in the app")
+                Text(subtitle)
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.9))
+                    .lineLimit(2)
             }
             
             Spacer()
             
-            Image(systemName: "heart.slash")
+            Image(systemName: iconName)
                 .font(.largeTitle)
                 .foregroundColor(.white.opacity(0.6))
         }
@@ -937,8 +1221,8 @@ struct SystemMediumEmptyView: View {
         .widgetBackground {
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(.systemGray).opacity(0.8),
-                    Color(.systemGray2).opacity(0.6)
+                    Color(.systemBlue).opacity(0.7),
+                    Color(.systemIndigo).opacity(0.5)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -948,6 +1232,58 @@ struct SystemMediumEmptyView: View {
 }
 
 struct SystemLargeEmptyView: View {
+    let title: String
+    let subtitle: String
+    let iconName: String
+    let actionText: String
+    
+    init() {
+        let favoriteStations = SharedDataManager.shared.loadFavoriteStations()
+        
+        if favoriteStations.isEmpty {
+            self.title = "No Favorites Set"
+            self.subtitle = "Add favorite ferry stations to see departure times and schedules"
+            self.iconName = "heart.slash.circle"
+            self.actionText = "Open NextWave app and tap the heart icon on stations you use frequently"
+        } else {
+            // Check data freshness for multiple departures widget
+            let allDepartures = SharedDataManager.shared.loadNextDepartures()
+            let lastRefresh = UserDefaults(suiteName: "group.com.federi.Next-Wave")?.object(forKey: "last_data_refresh") as? Date
+            let timeAgo = abs(lastRefresh?.timeIntervalSinceNow ?? 86400)
+            let hours = timeAgo / 3600
+            let days = timeAgo / 86400
+            
+            if allDepartures.isEmpty {
+                if timeAgo < 1800 { // Less than 30 minutes
+                    self.title = "Loading Departure Times"
+                    self.subtitle = "Fetching schedules for your \(favoriteStations.count) favorite stations"
+                    self.iconName = "clock.arrow.circlepath"
+                    self.actionText = "This may take a moment - departure data is being loaded in the background"
+                } else if hours < 2 {
+                    self.title = "Refresh Needed"
+                    self.subtitle = "Departure data is about \(Int(hours)) hour\(hours >= 2 ? "s" : "") old"
+                    self.iconName = "arrow.clockwise.circle"
+                    self.actionText = "Open NextWave app to load fresh schedules and departure times"
+                } else if days < 1 {
+                    self.title = "Data from Today"
+                    self.subtitle = "Schedules are \(Int(hours)) hours old and may be outdated"
+                    self.iconName = "exclamationmark.circle"
+                    self.actionText = "Open app to refresh and see current departure times"
+                } else {
+                    self.title = "Update Required"
+                    self.subtitle = "Departure data is \(Int(days)) day\(days >= 2 ? "s" : "") old"
+                    self.iconName = "wifi.exclamationmark"
+                    self.actionText = "Open NextWave app to download fresh ferry schedules"
+                }
+            } else {
+                self.title = "Schedules Available"
+                self.subtitle = "Multiple departures view ready"
+                self.iconName = "checkmark.circle"
+                self.actionText = "Your favorite stations have current departure information"
+            }
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 16) {
             HStack {
@@ -971,21 +1307,28 @@ struct SystemLargeEmptyView: View {
             Spacer()
             
             VStack(spacing: 16) {
-                Image(systemName: "heart.slash.circle")
+                Image(systemName: iconName)
                     .font(.system(size: 60))
                     .foregroundColor(.white.opacity(0.6))
                 
                 VStack(spacing: 8) {
-                    Text("No Favorites Set")
+                    Text(title)
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                     
-                    Text("Add favorite stations in the NextWave app to see departure times here")
+                    Text(subtitle)
                         .font(.body)
                         .foregroundColor(.white.opacity(0.9))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal)
+                    
+                    Text(actionText)
+                        .font(.footnote)
+                        .foregroundColor(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                        .padding(.top, 4)
                 }
             }
             
@@ -996,8 +1339,8 @@ struct SystemLargeEmptyView: View {
         .widgetBackground {
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color(.systemGray).opacity(0.8),
-                    Color(.systemGray2).opacity(0.6)
+                    Color(.systemBlue).opacity(0.7),
+                    Color(.systemPurple).opacity(0.5)
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -1024,7 +1367,6 @@ struct iPhoneWidgetEntryView: View {
         guard let departure = entry.departure else { return "--:--" }
         
         let now = Date()
-        let calendar = Calendar.current
         
         // Check if departure is in the next few minutes (show "now" for immediate departures)
         let minutesUntil = Int(departure.nextDeparture.timeIntervalSince(now) / 60)
@@ -1032,14 +1374,8 @@ struct iPhoneWidgetEntryView: View {
             return "now"
         }
         
-        // Check if departure is tomorrow
-        if !calendar.isDate(departure.nextDeparture, inSameDayAs: now) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
-            return "tmrw \(formatter.string(from: departure.nextDeparture))"
-        }
-        
-        // Same day - show "at HH:MM"
+        // Always show "at HH:MM" regardless of day - simpler and clearer
+        // This avoids issues with TMRW not updating after midnight
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return "at \(formatter.string(from: departure.nextDeparture))"

@@ -230,6 +230,43 @@ class SharedDataManager {
         return getNextDeparturesForWidget(count: 5)
     }
     
+    // Get extended departures for multiple widgets (up to 8 to ensure widgets stay full)
+    func getExtendedDeparturesForWidget() -> [DepartureInfo] {
+        return getNextDeparturesForWidget(count: 8)
+    }
+    
+    // Get many departures for seamless multiple widget transitions (up to 50 for stations with high frequency)
+    func getSeamlessDeparturesForMultipleWidget() -> [DepartureInfo] {
+        let settings = loadWidgetSettings()
+        let allDepartures = loadNextDepartures()
+        let now = Date()
+        
+        let targetStationName: String?
+        if settings.useNearestStation {
+            targetStationName = loadNearestStation()?.name
+        } else {
+            targetStationName = loadFavoriteStations().first?.name
+        }
+        
+        guard let stationName = targetStationName else { return [] }
+        
+        sharedDataLogger.info("🔍 Getting seamless departures for \(stationName) from \(allDepartures.count) total loaded departures")
+        
+        // Count station departures to determine how many to request
+        let stationDepartureCount = allDepartures.filter { $0.stationName == stationName && $0.nextDeparture > now }.count
+        let requestCount = min(50, max(25, stationDepartureCount)) // Between 25-50 based on availability
+        
+        sharedDataLogger.info("🔍 Station \(stationName) has \(stationDepartureCount) departures, requesting \(requestCount)")
+        
+        // Get extended departures to ensure seamless transitions all day
+        return getSmartDepartures(
+            from: allDepartures,
+            stationName: stationName,
+            now: now,
+            count: requestCount // Dynamic count based on station frequency
+        )
+    }
+    
     // Generic function to get next N departures
     private func getNextDeparturesForWidget(count: Int) -> [DepartureInfo] {
         let settings = loadWidgetSettings()
@@ -279,77 +316,63 @@ class SharedDataManager {
     private func getSmartDepartures(from allDepartures: [DepartureInfo], stationName: String, now: Date, count: Int) -> [DepartureInfo] {
         let calendar = Calendar.current
         
-        // Get today's future departures for this station
-        let todayDepartures = allDepartures
+        // Get ALL future departures for this station (across all loaded days)
+        let allStationDepartures = allDepartures
             .filter { $0.stationName == stationName }
-            .filter { $0.nextDeparture > now }
+            .filter { $0.nextDeparture > now } // Only future departures
+            .sorted { $0.nextDeparture < $1.nextDeparture }
+        
+        sharedDataLogger.info("🔍 Found \(allStationDepartures.count) total future departures for \(stationName)")
+        
+        // Get today's departures for context
+        let todayDepartures = allStationDepartures
             .filter { calendar.isDate($0.nextDeparture, inSameDayAs: now) }
-            .sorted { $0.nextDeparture < $1.nextDeparture }
         
-        var smartDepartures = Array(todayDepartures)
+        sharedDataLogger.info("🔍 Today: \(todayDepartures.count) departures, Total available: \(allStationDepartures.count)")
         
-        // If we need more departures to fill the widget, add tomorrow's departures
-        if smartDepartures.count < count {
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
-            let tomorrowDepartures = allDepartures
-                .filter { $0.stationName == stationName }
-                .filter { calendar.isDate($0.nextDeparture, inSameDayAs: tomorrow) }
-                .sorted { $0.nextDeparture < $1.nextDeparture }
-            
-            // Add tomorrow's departures to fill up to the requested count
-            let remainingSlots = count - smartDepartures.count
-            smartDepartures.append(contentsOf: Array(tomorrowDepartures.prefix(remainingSlots)))
-            
-            sharedDataLogger.info("🔍 Widget: Combined \(todayDepartures.count) today + \(min(remainingSlots, tomorrowDepartures.count)) tomorrow departures for \(stationName)")
+        // Log the next few departures for debugging
+        for (index, departure) in allStationDepartures.prefix(5).enumerated() {
+            let minutesFromNow = Int(departure.nextDeparture.timeIntervalSince(now) / 60)
+            let hoursFromNow = minutesFromNow / 60
+            let displayTime = hoursFromNow > 0 ? "\(hoursFromNow)h \(minutesFromNow % 60)m" : "\(minutesFromNow)m"
+            sharedDataLogger.info("🔍   \(index + 1). \(departure.routeName) → \(departure.direction) in \(displayTime)")
         }
         
-        // Return the combined departures if we have any
+        // Take the requested number of departures from ALL available departures
+        let smartDepartures = Array(allStationDepartures.prefix(count))
+        
+        // Group by days for logging
+        let departuresByDay = Dictionary(grouping: smartDepartures) { departure in
+            calendar.startOfDay(for: departure.nextDeparture)
+        }
+        
+        sharedDataLogger.info("🔍 Returning \(smartDepartures.count) departures across \(departuresByDay.count) days for \(stationName)")
+        for (day, dayDepartures) in departuresByDay.sorted(by: { $0.key < $1.key }) {
+            let dayName = calendar.isDate(day, inSameDayAs: now) ? "today" : 
+                         calendar.isDate(day, inSameDayAs: calendar.date(byAdding: .day, value: 1, to: now) ?? now) ? "tomorrow" : 
+                         "future"
+            sharedDataLogger.info("🔍   \(dayName): \(dayDepartures.count) departures")
+        }
+        
+        // Return the departures we found
         if !smartDepartures.isEmpty {
-            let result = Array(smartDepartures.prefix(count))
-            sharedDataLogger.info("🔍 Widget: Returning \(result.count) of requested \(count) departures for \(stationName)")
-            return result
+            sharedDataLogger.info("🔍 Widget: Returning \(smartDepartures.count) departures for \(stationName)")
+            return smartDepartures
         }
         
-        // Fallback: If no departures today and after 17:00, try tomorrow only
-        let hour = calendar.component(.hour, from: now)
-        if hour >= 17 {
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
-            let tomorrowDepartures = allDepartures
-                .filter { $0.stationName == stationName }
-                .filter { calendar.isDate($0.nextDeparture, inSameDayAs: tomorrow) }
-                .sorted { $0.nextDeparture < $1.nextDeparture }
-                .prefix(count)
-            
-            if !tomorrowDepartures.isEmpty {
-                sharedDataLogger.info("🔍 Widget: Using tomorrow's departures only (after 17:00)")
-                return Array(tomorrowDepartures)
-            }
-        }
+        // If NO departures found at all, create a helpful placeholder
+        sharedDataLogger.info("🔍 Widget: No departures found for \(stationName), creating placeholder")
         
-        // Try any future departures from any day
-        let futureDepartures = allDepartures
-            .filter { $0.stationName == stationName }
-            .filter { $0.nextDeparture > now }
-            .sorted { $0.nextDeparture < $1.nextDeparture }
-            .prefix(count)
-        
-        if !futureDepartures.isEmpty {
-            sharedDataLogger.info("🔍 Widget: Using any future departures")
-            return Array(futureDepartures)
-        }
-        
-        // If still no departures, show a helpful message encouraging app usage
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
-        let tomorrowMorning = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: tomorrow) ?? tomorrow
+        let nextMorning = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        let tomorrowMorning = calendar.date(bySettingHour: 8, minute: 0, second: 0, of: nextMorning) ?? nextMorning
         
         let placeholderDeparture = DepartureInfo(
             stationName: stationName,
             nextDeparture: tomorrowMorning,
             routeName: "Open App",
-            direction: "for fresh departure times"
+            direction: "to load fresh departure times"
         )
         
-        sharedDataLogger.info("🔍 Widget: No departures found, using placeholder")
         return [placeholderDeparture]
     }
 }

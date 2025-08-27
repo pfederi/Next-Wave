@@ -39,18 +39,32 @@
       "operator": "SGV",
       "schedule_periods": [
         {
-          "name": "Sommerfahrplan",
-          "type": "summer",
-          "start_date": "2024-05-01",
-          "end_date": "2024-10-31", 
-          "description": "Vollbetrieb"
+          "name": "Fahrplan Frühling",
+          "type": "spring",
+          "start_date": "2025-04-18",
+          "end_date": "2025-05-22",
+          "description": "Frühjahrs-Aufbau des Angebots"
         },
         {
-          "name": "Winterfahrplan",
+          "name": "Fahrplan Sommer",
+          "type": "summer",
+          "start_date": "2025-05-24",
+          "end_date": "2025-09-07",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Fahrplan Herbst",
+          "type": "autumn",
+          "start_date": "2025-09-08",
+          "end_date": "2025-10-19",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        },
+        {
+          "name": "Fahrplan Winter",
           "type": "winter",
-          "start_date": "2024-11-01",
-          "end_date": "2025-04-30",
-          "description": "Reduzierter Betrieb"
+          "start_date": "2025-10-20",
+          "end_date": "2026-04-17",
+          "description": "Winterfahrplan - eingeschränkter Betrieb"
         }
       ]
     },
@@ -59,22 +73,430 @@
       "operator": "SBS",
       "schedule_periods": [
         {
+          "name": "Frühlingsfahrplan",
+          "type": "spring",
+          "start_date": "2025-04-13",
+          "end_date": "2025-05-28",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
           "name": "Sommerfahrplan", 
           "type": "summer",
-          "start_date": "2024-04-01",
-          "end_date": "2024-10-31",
-          "description": "Vollbetrieb"
+          "start_date": "2025-05-29",
+          "end_date": "2025-10-05",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Herbstfahrplan",
+          "type": "autumn",
+          "start_date": "2025-10-06",
+          "end_date": "2025-10-19",
+          "description": "Herbstfahrplan - reduziertes Angebot"
         },
         {
           "name": "Winterfahrplan",
           "type": "winter", 
-          "start_date": "2024-11-01",
-          "end_date": "2025-03-31",
-          "description": "Winterpause"
+          "start_date": "2025-10-20",
+          "end_date": "2026-04-12",
+          "description": "Winterpause - sehr eingeschränkter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Lac Léman",
+      "operator": "CGN",
+      "schedule_periods": [
+        {
+          "name": "Horaire printemps",
+          "type": "spring",
+          "start_date": "2025-04-18",
+          "end_date": "2025-06-27",
+          "description": "Service de printemps - montée en puissance"
+        },
+        {
+          "name": "Horaire d'été",
+          "type": "summer",
+          "start_date": "2025-06-28",
+          "end_date": "2025-08-31",
+          "description": "Service complet avec toutes les croisières"
+        },
+        {
+          "name": "Horaire d'automne",
+          "type": "autumn",
+          "start_date": "2025-09-01",
+          "end_date": "2025-10-12",
+          "description": "Service d'automne - réduction progressive"
+        },
+        {
+          "name": "Horaire d'hiver",
+          "type": "winter",
+          "start_date": "2025-10-13",
+          "end_date": "2026-04-17",
+          "description": "Service d'hiver très réduit"
+        }
+      ]
+    },
+    {
+      "name": "Thunersee",
+      "operator": "BLS",
+      "schedule_periods": [
+        {
+          "name": "Winterfahrplan Teil 1",
+          "type": "winter",
+          "start_date": "2024-12-15",
+          "end_date": "2025-01-05",
+          "description": "Weihnachts-/Neujahrsbetrieb"
+        },
+        {
+          "name": "Winterfahrplan Teil 2",
+          "type": "winter",
+          "start_date": "2025-01-06",
+          "end_date": "2025-02-28",
+          "description": "Winterpause - stark reduziert"
+        },
+        {
+          "name": "Winterfahrplan Teil 3",
+          "type": "winter",
+          "start_date": "2025-03-01",
+          "end_date": "2025-03-28",
+          "description": "Spätwinter - reduzierter Betrieb"
+        },
+        {
+          "name": "Frühlingsfahrplan",
+          "type": "spring",
+          "start_date": "2025-03-29",
+          "end_date": "2025-05-16",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2025-05-17",
+          "end_date": "2025-10-12",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Herbstfahrplan",
+          "type": "autumn",
+          "start_date": "2025-10-13",
+          "end_date": "2025-12-13",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        }
+      ]
+    },
+    {
+      "name": "Brienzersee",
+      "operator": "BLS",
+      "schedule_periods": [
+        {
+          "name": "Winterfahrplan Teil 1",
+          "type": "winter",
+          "start_date": "2024-12-15",
+          "end_date": "2025-01-05",
+          "description": "Weihnachts-/Neujahrsbetrieb"
+        },
+        {
+          "name": "Winterfahrplan Teil 2",
+          "type": "winter",
+          "start_date": "2025-01-06",
+          "end_date": "2025-02-28",
+          "description": "Winterpause - stark reduziert"
+        },
+        {
+          "name": "Winterfahrplan Teil 3",
+          "type": "winter",
+          "start_date": "2025-03-01",
+          "end_date": "2025-03-28",
+          "description": "Spätwinter - reduzierter Betrieb"
+        },
+        {
+          "name": "Frühlingsfahrplan",
+          "type": "spring",
+          "start_date": "2025-03-29",
+          "end_date": "2025-05-16",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2025-05-17",
+          "end_date": "2025-10-12",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Herbstfahrplan",
+          "type": "autumn",
+          "start_date": "2025-10-13",
+          "end_date": "2025-12-13",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        }
+      ]
+    },
+    {
+      "name": "Lago Maggiore",
+      "operator": "SNL",
+      "schedule_periods": [
+        {
+          "name": "Orario di navigazione",
+          "type": "summer",
+          "start_date": "2025-04-13",
+          "end_date": "2025-10-19",
+          "description": "Unico periodo di servizio - navigazione stagionale"
+        },
+        {
+          "name": "Chiusura invernale",
+          "type": "winter",
+          "start_date": "2025-10-20",
+          "end_date": "2026-04-12",
+          "description": "Servizio sospeso - chiusura invernale completa"
+        }
+      ]
+    },
+    {
+      "name": "Lago di Lugano",
+      "operator": "SNL",
+      "schedule_periods": [
+        {
+          "name": "Orario di navigazione",
+          "type": "summer",
+          "start_date": "2025-04-13",
+          "end_date": "2025-10-19",
+          "description": "Unico periodo di servizio - navigazione stagionale"
+        },
+        {
+          "name": "Chiusura invernale",
+          "type": "winter",
+          "start_date": "2025-10-20",
+          "end_date": "2026-04-12",
+          "description": "Servizio sospeso - chiusura invernale completa"
+        }
+      ]
+    },
+    {
+      "name": "Bielersee",
+      "operator": "BSG",
+      "schedule_periods": [
+        {
+          "name": "Fahrplan Frühling",
+          "type": "spring",
+          "start_date": "2025-04-12",
+          "end_date": "2025-05-02",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
+          "name": "Fahrplan Sommer",
+          "type": "summer",
+          "start_date": "2025-05-03",
+          "end_date": "2025-10-05",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Fahrplan Herbst",
+          "type": "autumn",
+          "start_date": "2025-10-06",
+          "end_date": "2025-10-26",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        },
+        {
+          "name": "Fahrplan Winter Teil 1",
+          "type": "winter",
+          "start_date": "2025-10-27",
+          "end_date": "2025-12-07",
+          "description": "Spätherbst - eingeschränkter Betrieb"
+        },
+        {
+          "name": "Fahrplan Winter Teil 2",
+          "type": "winter",
+          "start_date": "2026-03-01",
+          "end_date": "2026-04-02",
+          "description": "Spätwinter - reduzierter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Neuenburgersee",
+      "operator": "BSG",
+      "schedule_periods": [
+        {
+          "name": "Fahrplan Frühling",
+          "type": "spring",
+          "start_date": "2025-04-12",
+          "end_date": "2025-05-02",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
+          "name": "Fahrplan Sommer",
+          "type": "summer",
+          "start_date": "2025-05-03",
+          "end_date": "2025-10-05",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Fahrplan Herbst",
+          "type": "autumn",
+          "start_date": "2025-10-06",
+          "end_date": "2025-10-26",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        },
+        {
+          "name": "Fahrplan Winter Teil 1",
+          "type": "winter",
+          "start_date": "2025-10-27",
+          "end_date": "2025-12-07",
+          "description": "Spätherbst - eingeschränkter Betrieb"
+        },
+        {
+          "name": "Fahrplan Winter Teil 2",
+          "type": "winter",
+          "start_date": "2026-03-01",
+          "end_date": "2026-04-02",
+          "description": "Spätwinter - reduzierter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Murtensee",
+      "operator": "BSG",
+      "schedule_periods": [
+        {
+          "name": "Fahrplan Frühling",
+          "type": "spring",
+          "start_date": "2025-04-12",
+          "end_date": "2025-05-02",
+          "description": "Frühjahrs-Aufbau des Angebots"
+        },
+        {
+          "name": "Fahrplan Sommer",
+          "type": "summer",
+          "start_date": "2025-05-03",
+          "end_date": "2025-10-05",
+          "description": "Vollbetrieb mit allen Rundfahrten"
+        },
+        {
+          "name": "Fahrplan Herbst",
+          "type": "autumn",
+          "start_date": "2025-10-06",
+          "end_date": "2025-10-26",
+          "description": "Herbstfahrplan - reduziertes Angebot"
+        },
+        {
+          "name": "Fahrplan Winter Teil 1",
+          "type": "winter",
+          "start_date": "2025-10-27",
+          "end_date": "2025-12-07",
+          "description": "Spätherbst - eingeschränkter Betrieb"
+        },
+        {
+          "name": "Fahrplan Winter Teil 2",
+          "type": "winter",
+          "start_date": "2026-03-01",
+          "end_date": "2026-04-02",
+          "description": "Spätwinter - reduzierter Betrieb"
+        }
+      ]
+    },
+    {
+      "name": "Zugersee",
+      "operator": "ZVB",
+      "schedule_periods": [
+        {
+          "name": "Saisonfahrplan",
+          "type": "summer",
+          "start_date": "2025-04-13",
+          "end_date": "2025-11-02",
+          "description": "Saisonbetrieb - einziger Fahrzeitraum"
+        },
+        {
+          "name": "Winterpause",
+          "type": "winter",
+          "start_date": "2025-11-03",
+          "end_date": "2026-04-12",
+          "description": "Betrieb eingestellt - Winterpause"
+        }
+      ]
+    },
+    {
+      "name": "Walensee",
+      "operator": "WSG",
+      "schedule_periods": [
+        {
+          "name": "Saisonfahrplan",
+          "type": "summer",
+          "start_date": "2025-03-30",
+          "end_date": "2025-12-13",
+          "description": "Saisonbetrieb - einziger Fahrzeitraum"
+        },
+        {
+          "name": "Winterpause",
+          "type": "winter",
+          "start_date": "2025-12-14",
+          "end_date": "2026-03-29",
+          "description": "Betrieb eingestellt - Winterpause"
+        }
+      ]
+    },
+    {
+      "name": "Hallwilersee",
+      "operator": "HSG",
+      "schedule_periods": [
+        {
+          "name": "Frühlingsfahrplan",
+          "type": "spring",
+          "start_date": "2025-04-06",
+          "end_date": "2025-04-27",
+          "description": "Frühjahrs-Saisonstart"
+        },
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2025-05-18",
+          "end_date": "2025-09-14",
+          "description": "Hauptsaison mit vollem Angebot"
+        },
+        {
+          "name": "Herbstfahrplan",
+          "type": "autumn",
+          "start_date": "2025-09-21",
+          "end_date": "2025-10-26",
+          "description": "Herbstsaison - reduziertes Angebot"
+        },
+        {
+          "name": "Winterpause",
+          "type": "winter",
+          "start_date": "2025-10-27",
+          "end_date": "2026-04-05",
+          "description": "Betrieb eingestellt - Winterpause"
+        }
+      ]
+    },
+    {
+      "name": "Ägerisee",
+      "operator": "ASG",
+      "schedule_periods": [
+        {
+          "name": "Sommerfahrplan",
+          "type": "summer",
+          "start_date": "2025-05-11",
+          "end_date": "2025-09-14",
+          "description": "Hauptsaison mit vollem Angebot"
+        },
+        {
+          "name": "Herbstfahrplan",
+          "type": "autumn",
+          "start_date": "2025-09-15",
+          "end_date": "2025-10-05",
+          "description": "Herbstsaison - reduziertes Angebot"
+        },
+        {
+          "name": "Winterpause",
+          "type": "winter",
+          "start_date": "2025-10-06",
+          "end_date": "2026-05-10",
+          "description": "Betrieb eingestellt - Winterpause"
         }
       ]
     }
   ],
-  "last_updated": "2025-01-21",
+  "last_updated": "2025-08-27",
   "notes": "Diese Daten müssen jährlich aktualisiert werden. Die genauen Daten können von Jahr zu Jahr variieren."
 }

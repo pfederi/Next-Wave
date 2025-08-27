@@ -306,11 +306,8 @@ struct DepartureRow: View {
     }
     
     private var departureTimeText: String {
-        if isTomorrow {
-            return "tmrw " + AppDateFormatter.formatTime(departure.nextDeparture)
-        } else {
-            return AppDateFormatter.formatTime(departure.nextDeparture)
-        }
+        // Always show time only - simpler and clearer, no TMRW issues
+        return AppDateFormatter.formatTime(departure.nextDeparture)
     }
     
     private var minutesText: String {

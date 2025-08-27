@@ -267,19 +267,14 @@ struct SimpleWatchWidgetView: View {
     
     private func formatTime(_ date: Date) -> String {
         let now = Date()
-        let calendar = Calendar.current
         
         let minutesUntil = Int(date.timeIntervalSince(now) / 60)
         if minutesUntil <= 0 {
             return "now"
         }
         
-        if !calendar.isDate(date, inSameDayAs: now) {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
-            return "tmrw \(formatter.string(from: date))"
-        }
-        
+        // Always show "at HH:MM" regardless of day - simpler and clearer
+        // This avoids issues with TMRW not updating after midnight
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return "at \(formatter.string(from: date))"

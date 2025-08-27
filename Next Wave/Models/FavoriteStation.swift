@@ -23,11 +23,6 @@ class FavoriteStationsManager: ObservableObject {
     private init() {
         loadFavorites()
         
-        // Load departure data when app starts
-        Task { @MainActor in
-            await loadDepartureDataForWidgets()
-        }
-        
         // Setup background refresh notifications
         setupBackgroundRefresh()
     }
@@ -224,9 +219,10 @@ class FavoriteStationsManager: ObservableObject {
                      var allDepartures = Array(todayDepartures)
                      print("🔍 \(favorite.name): \(todayDepartures.count) valid future departures today")
                      
-                     // If we have less than 5 departures for today, load tomorrow's as well
-                     if allDepartures.count < 5 {
-                         print("🔍 Only \(allDepartures.count) departures today for \(favorite.name), loading tomorrow's as well")
+                     // If we have less than desired departures for today, load tomorrow's as well
+                     let minDeparturesBeforeLoadingNextDay = 15 // Load tomorrow if less than 15 today
+                     if allDepartures.count < minDeparturesBeforeLoadingNextDay {
+                         print("🔍 Only \(allDepartures.count) departures today for \(favorite.name), loading tomorrow's as well (want \(minDeparturesBeforeLoadingNextDay)+)")
                          
                          let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
                          let tomorrowJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow)
@@ -242,15 +238,45 @@ class FavoriteStationsManager: ObservableObject {
                              })
                              .sorted(by: { $0.0 < $1.0 })
                          
-                         // Add tomorrow's departures to fill up to 5 total
-                         let remainingSlots = 5 - allDepartures.count
+                         // Add tomorrow's departures to fill up to desired total
+                         let maxDeparturesPerStation = 25 // Match ContentView.swift setting
+                         let remainingSlots = maxDeparturesPerStation - allDepartures.count
                          allDepartures.append(contentsOf: Array(tomorrowDepartures.prefix(remainingSlots)))
                          
                          print("🔍 Added \(min(remainingSlots, tomorrowDepartures.count)) departures from tomorrow")
+                         
+                         // If we still don't have enough departures, load day after tomorrow
+                         if allDepartures.count < maxDeparturesPerStation {
+                             print("🔍 Still need more departures for \(favorite.name) (\(allDepartures.count)/\(maxDeparturesPerStation)), loading day after tomorrow")
+                             
+                             let dayAfterTomorrow = calendar.date(byAdding: .day, value: 2, to: now) ?? now
+                             do {
+                                 let dayAfterJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: dayAfterTomorrow)
+                                 print("🔍 API returned \(dayAfterJourneys.count) journeys for day after tomorrow for \(favorite.name)")
+                                 
+                                 let dayAfterDepartures = dayAfterJourneys
+                                     .compactMap({ journey -> (Date, Journey)? in
+                                         guard let departureStr = journey.stop.departure,
+                                               let departureDate = AppDateFormatter.parseFullTime(departureStr) else { 
+                                             return nil 
+                                         }
+                                         return (departureDate, journey)
+                                     })
+                                     .sorted(by: { $0.0 < $1.0 })
+                                 
+                                 let finalRemainingSlots = maxDeparturesPerStation - allDepartures.count
+                                 allDepartures.append(contentsOf: Array(dayAfterDepartures.prefix(finalRemainingSlots)))
+                                 
+                                 print("🔍 Added \(min(finalRemainingSlots, dayAfterDepartures.count)) departures from day after tomorrow")
+                             } catch {
+                                 print("🔍 Error loading day after tomorrow's departures for \(favorite.name): \(error)")
+                             }
+                         }
                      }
                      
-                     let nextJourneys = allDepartures.prefix(5) // Take next 5 departures total
-                     print("🔍 Station \(favorite.name): Using \(nextJourneys.count) departures from total \(allDepartures.count) available")
+                     let maxDeparturesPerStation = 25 // Match ContentView.swift setting
+                     let nextJourneys = allDepartures.prefix(maxDeparturesPerStation) // Take up to 25 departures total
+                     print("🔍 Station \(favorite.name): Using \(nextJourneys.count) departures from total \(allDepartures.count) available (max: \(maxDeparturesPerStation))")
                     
                                          if !nextJourneys.isEmpty {
                          // Create departure info for each departure
@@ -315,6 +341,11 @@ class FavoriteStationsManager: ObservableObject {
         
         // Save real/placeholder data for widgets
         SharedDataManager.shared.saveNextDepartures(departureInfos)
+        
+        // Save timestamp of data refresh for widget message logic
+        let userDefaults = UserDefaults(suiteName: "group.com.federi.Next-Wave")
+        userDefaults?.set(Date(), forKey: "last_data_refresh")
+        
         print("🔍 Saved \(departureInfos.count) departure entries for widgets")
         
         // Trigger widget reload

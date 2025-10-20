@@ -1,0 +1,28 @@
+# Ignore everything except api/ and config files
+Next Wave/
+Next WaveTests/
+Next WaveUITests/
+NextWave.xcodeproj/
+NextWaveWidget/
+NextWaveWatchWidgetExtension/
+Next Wave Watch Watch App/
+Shared/
+Screenshots/
+scripts/
+soundfiles/
+assets/
+*.png
+*.jpg
+*.wav
+*.xcodeproj
+*.xcworkspace
+*.swift
+*.entitlements
+*.plist
+*.xctestplan
+*.md
+!README.md
+!package.json
+!vercel.json
+!api/
+

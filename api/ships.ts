@@ -77,6 +77,8 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
     const today = getCurrentSwissDate()
     const processedDates: string[] = []
     
+    console.log('Starting to fetch ship data for 3 days...')
+    
     // Fetch data for today and the next 2 days (total 3 days)
     for (let i = 0; i < 3; i++) {
       // Calculate target date properly in Swiss timezone
@@ -92,8 +94,11 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
       // Also keep YYYY-MM-DD format for storage/debugging
       const dateString = `${year}-${month}-${day}`
       
+      console.log(`Fetching day ${i + 1}/3: ${dateStringForAPI} (stored as ${dateString})`)
+      
       try {
         const routes = await fetchDayData(dateStringForAPI)
+        console.log(`Successfully fetched ${routes.length} routes for ${dateStringForAPI}`)
         dailyDeployments.push({
           date: dateString,
           routes: routes
@@ -105,14 +110,19 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
           await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
-        console.error(`Error fetching data for ${dateString}:`, error)
+        console.error(`Error fetching data for ${dateStringForAPI} (${dateString}):`, error)
         // Continue with next day even if one fails
+        // Still add to deployments with empty routes
         dailyDeployments.push({
           date: dateString,
           routes: []
         })
+        // Also add to processedDates to track that we tried
+        processedDates.push(dateString)
       }
     }
+    
+    console.log(`Finished fetching. Processed ${processedDates.length} days:`, processedDates)
 
     const firstDay = processedDates[0] || today.toISOString().split('T')[0]
     const lastDay = processedDates[processedDates.length - 1] || firstDay

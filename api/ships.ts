@@ -83,14 +83,17 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
       const targetDate = new Date(today.getTime())
       targetDate.setDate(today.getDate() + i)
       
-      // Format date as YYYY-MM-DD
+      // Format date as DD.MM.YYYY (required by ZSG website)
       const year = targetDate.getFullYear()
       const month = String(targetDate.getMonth() + 1).padStart(2, '0')
       const day = String(targetDate.getDate()).padStart(2, '0')
+      const dateStringForAPI = `${day}.${month}.${year}`
+      
+      // Also keep YYYY-MM-DD format for storage/debugging
       const dateString = `${year}-${month}-${day}`
       
       try {
-        const routes = await fetchDayData(dateString)
+        const routes = await fetchDayData(dateStringForAPI)
         dailyDeployments.push({
           date: dateString,
           routes: routes

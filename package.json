@@ -9,6 +9,7 @@
   "dependencies": {
     "@sparticuz/chromium": "^119.0.0",
     "@vercel/node": "^3.0.11",
+    "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "puppeteer-core": "^21.6.1"
   },

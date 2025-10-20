@@ -163,9 +163,9 @@ function needsUpdate(lastUpdated: string, cachedData?: CachedData): boolean {
   return false
 }
 
-// Cache key for the current day
+// Cache key for the current day (v2 for 3-day support)
 function getCacheKey(): string {
-  return `vessel-data-${getCurrentSwissDate().toISOString().split('T')[0]}`
+  return `vessel-data-v2-${getCurrentSwissDate().toISOString().split('T')[0]}`
 }
 
 export default async function handler(

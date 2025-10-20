@@ -166,6 +166,12 @@ struct NextWaveApp: App {
                 .environmentObject(lakeStationsViewModel)
                 .preferredColorScheme(appSettings.theme == .system ? nil : (appSettings.isDarkMode ? .dark : .light))
                 .task {
+                    // Preload weather data first (faster, more important for users)
+                    await WeatherAPI.shared.preloadData()
+                    
+                    // Then preload vessel data
+                    await VesselAPI.shared.preloadData()
+                    
                     // Load widget data when app first launches
                     await loadWidgetDataOnAppStart()
                 }

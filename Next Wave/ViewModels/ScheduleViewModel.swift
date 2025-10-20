@@ -63,6 +63,7 @@ class ScheduleViewModel: ObservableObject {
             loadWeatherForWaves()
         }
     }
+    @Published var albisClassFilterActive = false
     
     private let userDefaults = UserDefaults.standard
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
@@ -113,6 +114,36 @@ class ScheduleViewModel: ObservableObject {
     func updateSound(_ newValue: String) {
         DispatchQueue.main.async {
             self.settings = Settings(leadTime: self.settings.leadTime, selectedSound: newValue)
+        }
+    }
+    
+    // Albis-Klasse Schiffe: MS Albis, EMS Uetliberg, EMS Pfannenstiel
+    private let albisClassShips = ["MS Albis", "EMS Uetliberg", "EMS Pfannenstiel"]
+    
+    func toggleAlbisClassFilter() {
+        albisClassFilterActive.toggle()
+        
+        // Different haptic feedback for activate vs deactivate
+        if albisClassFilterActive {
+            // Aktiviert: Stärkeres Feedback
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
+        } else {
+            // Deaktiviert: Leichteres Feedback
+            let generator = UIImpactFeedbackGenerator(style: .light)
+            generator.impactOccurred()
+        }
+    }
+    
+    func getFilteredWaves() -> [WaveEvent] {
+        guard albisClassFilterActive else {
+            return nextWaves
+        }
+        
+        // Nur Wellen von Albis-Klasse Schiffen zeigen
+        return nextWaves.filter { wave in
+            guard let shipName = wave.shipName else { return false }
+            return albisClassShips.contains(shipName)
         }
     }
     
@@ -179,7 +210,18 @@ class ScheduleViewModel: ObservableObject {
                 }
             }
             
-            // 2. Lade dann alle Schiffsnamen parallel
+            // Aktualisiere UI sofort mit Wetterdaten
+            for i in updatedWaves.indices {
+                if let weather = weatherData[i] {
+                    updatedWaves[i].updateWeather(weather)
+                }
+            }
+            
+            if !Task.isCancelled {
+                nextWaves = updatedWaves
+            }
+            
+            // 2. Lade dann alle Schiffsnamen parallel (im Hintergrund)
             let shipNames = await updatedWaves.asyncMap { wave -> String? in
                 guard !Task.isCancelled else { return nil }
                 guard wave.isZurichsee else { return nil }
@@ -209,17 +251,14 @@ class ScheduleViewModel: ObservableObject {
                 return shipName
             }
             
-            // 3. Aktualisiere die Wellen mit beiden Informationen
+            // 3. Aktualisiere die Wellen mit Schiffsnamen
             for i in updatedWaves.indices {
-                if let weather = weatherData[i] {
-                    updatedWaves[i].updateWeather(weather)
-                }
                 if let shipName = shipNames[i] {
                     updatedWaves[i].updateShipName(shipName)
                 }
             }
             
-            // 4. Aktualisiere die UI nur einmal am Ende
+            // 4. Aktualisiere die UI ein zweites Mal mit Schiffsnamen
             if !Task.isCancelled {
                 nextWaves = updatedWaves
             }

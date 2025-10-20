@@ -80,8 +80,8 @@ struct DepartureRowView: View {
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(12)
                     
-                    if wave.isZurichsee && isCurrentDay {
-                        // Schiffsname mit Icon
+                    if wave.isZurichsee && isWithinNext3Days(wave.time) {
+                        // Schiffsname mit Icon (nur für die nächsten 3 Tage)
                         HStack(spacing: 4) {
                             Text(wave.shipName ?? "Loading...")
                                 .fixedSize(horizontal: true, vertical: false)
@@ -172,7 +172,16 @@ private struct RemainingTimeView: View {
     }
 }
 
-private func getWaveIcon(for shipName: String) -> String {
+    private func isWithinNext3Days(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let threeDaysFromNow = calendar.date(byAdding: .day, value: 3, to: today)!
+        let dateDay = calendar.startOfDay(for: date)
+        
+        return dateDay >= today && dateDay < threeDaysFromNow
+    }
+    
+    private func getWaveIcon(for shipName: String) -> String {
     switch shipName {
         case "MS Panta Rhei", "MS Albis":
             return "waves3"

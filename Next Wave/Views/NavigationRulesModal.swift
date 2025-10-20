@@ -287,7 +287,7 @@ struct SafetyEquipmentCard: View {
                 icon: "figure.water.fitness",
                 color: .blue,
                 title: "Life jacket required outside shore zone (300m)",
-                description: "Minimum 75N buoyancy required when leaving 300m shore zone."
+                description: "Minimum 50N buoyancy required when leaving 300m shore zone."
             )
             
             HStack {

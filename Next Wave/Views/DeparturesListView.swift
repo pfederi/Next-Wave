@@ -40,37 +40,57 @@ struct DeparturesListView: View {
                         Spacer()
                     }
                 } else if !departures.isEmpty {
-                    ScrollViewReader { proxy in
-                        List {
-                            if !scheduleViewModel.nextWaves.isEmpty {
-                                ForEach(scheduleViewModel.nextWaves) { wave in
-                                    DepartureRowView(
-                                        wave: wave,
-                                        index: scheduleViewModel.nextWaves.firstIndex(of: wave) ?? 0,
-                                        formattedTime: AppDateFormatter.formatTime(wave.time),
-                                        isPast: wave.time < Date(),
-                                        isCurrentDay: isCurrentDay,
-                                        scheduleViewModel: scheduleViewModel
-                                    )
-                                    .id(wave.id)
+                    VStack(spacing: 0) {
+                        // Fixed filter indicator at the top
+                        if scheduleViewModel.albisClassFilterActive {
+                            HStack {
+                                Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                                    .foregroundColor(.orange)
+                                Text("Albis-Class Filter Active")
+                                    .font(.subheadline)
+                                    .foregroundColor(.orange)
+                                Spacer()
+                                Text("🚢")
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
+                            .background(Color.orange.opacity(0.1))
+                        }
+                        
+                        // Scrollable list
+                        ScrollViewReader { proxy in
+                            List {
+                                if !scheduleViewModel.nextWaves.isEmpty {
+                                    let filteredWaves = scheduleViewModel.getFilteredWaves()
+                                    ForEach(filteredWaves) { wave in
+                                        DepartureRowView(
+                                            wave: wave,
+                                            index: scheduleViewModel.nextWaves.firstIndex(of: wave) ?? 0,
+                                            formattedTime: AppDateFormatter.formatTime(wave.time),
+                                            isPast: wave.time < Date(),
+                                            isCurrentDay: isCurrentDay,
+                                            scheduleViewModel: scheduleViewModel
+                                        )
+                                        .id(wave.id)
+                                    }
                                 }
                             }
-                        }
-                        .listStyle(.plain)
-                        .onAppear {
-                            if let station = viewModel.selectedStation {
-                                scheduleViewModel.updateWaves(from: departures, station: station)
+                            .listStyle(.plain)
+                            .onAppear {
+                                if let station = viewModel.selectedStation {
+                                    scheduleViewModel.updateWaves(from: departures, station: station)
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    scrollToNextWave(proxy: proxy)
+                                }
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                scrollToNextWave(proxy: proxy)
-                            }
-                        }
-                        .onChange(of: viewModel.selectedDate) { oldDate, newDate in
-                            if let station = viewModel.selectedStation {
-                                scheduleViewModel.updateWaves(from: departures, station: station)
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                scrollToNextWave(proxy: proxy)
+                            .onChange(of: viewModel.selectedDate) { oldDate, newDate in
+                                if let station = viewModel.selectedStation {
+                                    scheduleViewModel.updateWaves(from: departures, station: station)
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    scrollToNextWave(proxy: proxy)
+                                }
                             }
                         }
                     }
@@ -135,6 +155,10 @@ struct DeparturesListView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("You can have a maximum of \(FavoriteStation.maxFavorites) favorite spots. Please remove one before adding another.")
+        }
+        .onFlip {
+            // Toggle Albis-Klasse Filter (nur in der Stationview)
+            scheduleViewModel.toggleAlbisClassFilter()
         }
     }
     

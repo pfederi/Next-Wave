@@ -13,6 +13,32 @@ class WeatherAPI {
     
     private init() {}
     
+    // Preload Methode die beim App-Start aufgerufen wird
+    func preloadData() async {
+        print("🌤️ Preloading weather data for favorite stations...")
+        
+        // Lade Wetter für alle Favoriten-Stationen parallel
+        let favorites = FavoriteStationsManager.shared.favorites
+        
+        await withTaskGroup(of: Void.self) { group in
+            for favorite in favorites {
+                guard let lat = favorite.latitude, let lon = favorite.longitude else { continue }
+                
+                group.addTask {
+                    let location = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                    do {
+                        _ = try await self.getWeatherData(for: location, stationId: favorite.id)
+                        print("✅ Weather preloaded for \(favorite.name)")
+                    } catch {
+                        print("⚠️ Failed to preload weather for \(favorite.name): \(error)")
+                    }
+                }
+            }
+        }
+        
+        print("✅ Weather data preload completed")
+    }
+    
     struct WeatherInfo {
         let temperature: Double // in Celsius
         let tempMin: Double // in Celsius

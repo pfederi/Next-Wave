@@ -165,24 +165,6 @@ struct NextWaveWatchComplication: Widget {
     }
 }
 
-// MARK: - Simple Watch Widget
-
-struct SimpleWatchWidget: Widget {
-    let kind: String = "NextWaveWatchWidget"
-    
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: SimpleWatchProvider()) { entry in
-            SimpleWatchWidgetView(entry: entry)
-        }
-        .configurationDisplayName("NextWave")
-        .description("Shows your next boat departure")
-        .supportedFamilies([
-            .accessoryCircular,
-            .accessoryRectangular,
-            .accessoryInline
-        ])
-    }
-}
 
 // MARK: - Widget View
 

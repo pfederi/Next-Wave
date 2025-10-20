@@ -147,6 +147,7 @@ struct ContentView: View {
                                 }) {
                                     Image(systemName: "exclamationmark.shield.fill")
                                         .foregroundColor(.orange)
+                                        .padding(.leading, 8)
                                 }
                                 
                                 NavigationLink(destination: SettingsView()) {

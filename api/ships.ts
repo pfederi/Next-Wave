@@ -144,11 +144,23 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
   }
 }
 
-// Check if data needs to be updated (once per day)
-function needsUpdate(lastUpdated: string): boolean {
+// Check if data needs to be updated (once per day OR if format changed)
+function needsUpdate(lastUpdated: string, cachedData?: CachedData): boolean {
   const lastUpdate = new Date(lastUpdated)
   const now = getCurrentSwissDate()
-  return lastUpdate.toDateString() !== now.toDateString()
+  
+  // Update if it's a different day
+  if (lastUpdate.toDateString() !== now.toDateString()) {
+    return true
+  }
+  
+  // Also update if we don't have 3 days of data (old cache format)
+  if (cachedData && cachedData.dailyDeployments.length < 3) {
+    console.log('Cache has less than 3 days, forcing update')
+    return true
+  }
+  
+  return false
 }
 
 // Cache key for the current day
@@ -174,13 +186,15 @@ export default async function handler(
     let result: CachedData
 
     // If no cached data or needs update, fetch new data
-    if (!cachedData || needsUpdate(cachedData.lastUpdated)) {
+    if (!cachedData || needsUpdate(cachedData.lastUpdated, cachedData)) {
+      console.log('Fetching new data from ZSG website...')
       const newData = await parseZSGWebsite()
       result = {
         dailyDeployments: newData.dailyDeployments,
         lastUpdated: getCurrentSwissDate().toISOString(),
         debug: newData.debug
       }
+      console.log(`Fetched ${result.dailyDeployments.length} days of data`)
 
       // Store new data in cache
       await fetch(`https://${req.headers.host}/_vercel/kv/${cacheKey}`, {

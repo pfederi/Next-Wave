@@ -72,7 +72,7 @@ class ScheduleViewModel: ObservableObject {
     private var currentLoadingTask: Task<Void, Never>?
     private var weatherLoadingTask: Task<Void, Never>?
     
-    private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen
+    private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen (Key: "YYYY-MM-DD_routeNumber")
     
     init(appSettings: AppSettings) {
         self.appSettings = appSettings
@@ -184,8 +184,14 @@ class ScheduleViewModel: ObservableObject {
                 guard !Task.isCancelled else { return nil }
                 guard wave.isZurichsee else { return nil }
                 
+                // Cache-Key mit Datum und Kursnummer erstellen
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let dateString = dateFormatter.string(from: selectedDate)
+                let cacheKey = "\(dateString)_\(wave.routeNumber)"
+                
                 // Prüfe zuerst den Cache
-                if let cachedName = shipNamesCache[wave.routeNumber] {
+                if let cachedName = shipNamesCache[cacheKey] {
                     return cachedName
                 }
                 
@@ -195,9 +201,9 @@ class ScheduleViewModel: ObservableObject {
                     date: selectedDate
                 )
                 
-                // Speichere im Cache
+                // Speichere im Cache mit Datum
                 if let shipName = shipName {
-                    shipNamesCache[wave.routeNumber] = shipName
+                    shipNamesCache[cacheKey] = shipName
                 }
                 
                 return shipName
@@ -348,15 +354,23 @@ class ScheduleViewModel: ObservableObject {
         let selectedDate = self.selectedDate
         
         Task { @MainActor in
+            // Date formatter für Cache-Key
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let dateString = dateFormatter.string(from: selectedDate)
+            
             for journey in departures {
                 let routeNumber = (journey.name ?? "Unknown")
                     .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
                 
+                // Cache-Key mit Datum erstellen
+                let cacheKey = "\(dateString)_\(routeNumber)"
+                
                 // Check if name is already in cache
-                if self.shipNamesCache[routeNumber] == nil {
+                if self.shipNamesCache[cacheKey] == nil {
                     if let shipName = await VesselAPI.shared.findShipName(for: routeNumber, date: selectedDate) {
                         // Update cache directly on main actor
-                        self.shipNamesCache[routeNumber] = shipName
+                        self.shipNamesCache[cacheKey] = shipName
                     }
                 }
             }
@@ -364,7 +378,13 @@ class ScheduleViewModel: ObservableObject {
     }
 
     func getShipName(for routeNumber: String) -> String? {
-        return shipNamesCache[routeNumber]
+        // Erstelle Cache-Key mit aktuellem Datum
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: selectedDate)
+        let cacheKey = "\(dateString)_\(routeNumber)"
+        
+        return shipNamesCache[cacheKey]
     }
     
     private func loadWeatherForWaves() {

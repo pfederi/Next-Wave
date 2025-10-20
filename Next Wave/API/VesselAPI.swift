@@ -30,7 +30,10 @@ struct VesselResponse: Codable {
         }
         
         // Prüfe ob die Daten vom gleichen Tag sind
-        return Calendar.current.isDate(updateDate, inSameDayAs: Date())
+        // Daten sind aktuell wenn sie von heute sind und mindestens 3 Tage abdecken
+        let isToday = Calendar.current.isDate(updateDate, inSameDayAs: Date())
+        let hasEnoughDays = dailyDeployments.count >= 3
+        return isToday && hasEnoughDays
     }
 }
 
@@ -53,10 +56,11 @@ class VesselAPI {
     private init() {}
     
     func fetchShipData() async throws -> VesselResponse {
-        // Prüfe ob wir bereits Daten vom heutigen Tag haben
+        // Prüfe ob wir bereits aktuelle 3-Tages-Daten vom heutigen Tag haben
         if let cached = cachedResponse,
            let lastFetch = lastFetchDate,
-           Calendar.current.isDate(lastFetch, inSameDayAs: Date()) {
+           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           cached.isDataCurrent {
             return cached
         }
         
@@ -74,6 +78,7 @@ class VesselAPI {
         let decoder = JSONDecoder()
         let vesselResponse = try decoder.decode(VesselResponse.self, from: data)
         
+        // Cache die Daten wenn sie aktuell sind (von heute und >= 3 Tage)
         if vesselResponse.isDataCurrent {
             cachedResponse = vesselResponse
             lastFetchDate = Date()
@@ -98,6 +103,7 @@ class VesselAPI {
         do {
             let response = try await fetchShipData()
             
+            // Suche in allen verfügbaren Tagen (jetzt 3 Tage statt nur 1)
             guard let deployment = response.dailyDeployments.first(where: { $0.date == dateString }) else {
                 return nil
             }

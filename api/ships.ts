@@ -75,23 +75,52 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
   try {
     const dailyDeployments: DailyDeployment[] = []
     const today = getCurrentSwissDate()
-    const currentDate = today.toISOString().split('T')[0]
+    const processedDates: string[] = []
     
-    // Only fetch current day
-    const routes = await fetchDayData(currentDate)
-    
-    dailyDeployments.push({
-      date: currentDate,
-      routes: routes
-    })
+    // Fetch data for today and the next 2 days (total 3 days)
+    for (let i = 0; i < 3; i++) {
+      // Calculate target date properly in Swiss timezone
+      const targetDate = new Date(today.getTime())
+      targetDate.setDate(today.getDate() + i)
+      
+      // Format date as YYYY-MM-DD
+      const year = targetDate.getFullYear()
+      const month = String(targetDate.getMonth() + 1).padStart(2, '0')
+      const day = String(targetDate.getDate()).padStart(2, '0')
+      const dateString = `${year}-${month}-${day}`
+      
+      try {
+        const routes = await fetchDayData(dateString)
+        dailyDeployments.push({
+          date: dateString,
+          routes: routes
+        })
+        processedDates.push(dateString)
+        
+        // Small delay between requests to be nice to the server
+        if (i < 2) {
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+      } catch (error) {
+        console.error(`Error fetching data for ${dateString}:`, error)
+        // Continue with next day even if one fails
+        dailyDeployments.push({
+          date: dateString,
+          routes: []
+        })
+      }
+    }
+
+    const firstDay = processedDates[0] || today.toISOString().split('T')[0]
+    const lastDay = processedDates[processedDates.length - 1] || firstDay
 
     return { 
       dailyDeployments,
       debug: {
-        daysProcessed: 1,
-        firstDay: currentDate,
-        lastDay: currentDate,
-        processedDates: [currentDate],
+        daysProcessed: processedDates.length,
+        firstDay: firstDay,
+        lastDay: lastDay,
+        processedDates: processedDates,
         swissTime: today.toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
       }
     }
@@ -152,20 +181,12 @@ export default async function handler(
       result = cachedData
     }
 
-    // Filter to only return today's deployments
-    const todayDeployment = result.dailyDeployments.find(d => d.date === today) || {
-      date: today,
-      routes: []
-    }
-
+    // Return all 3 days of deployments
     return res.status(200).json({
-      dailyDeployments: [todayDeployment],
+      dailyDeployments: result.dailyDeployments,
       lastUpdated: result.lastUpdated,
       debug: {
         ...result.debug,
-        daysProcessed: 1,
-        firstDay: today,
-        lastDay: today,
         currentSwissTime: getCurrentSwissDate().toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
       }
     })

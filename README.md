@@ -121,7 +121,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 ## Technologies & Services
 
 <details>
-<summary><b>Core Technologies</b></summary>
+<summary>Core Technologies</summary>
 
 - **SwiftUI**: Modern declarative UI framework for iOS and watchOS
 - **Swift Concurrency**: Async/await patterns for non-blocking operations
@@ -135,7 +135,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 </details>
 
 <details>
-<summary><b>External APIs & Services</b></summary>
+<summary>External APIs & Services</summary>
 
 #### Transport Data
 - **[transport.opendata.ch](https://transport.opendata.ch)**: Swiss public transport API
@@ -171,7 +171,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 </details>
 
 <details>
-<summary><b>Backend & Deployment</b></summary>
+<summary>Backend & Deployment</summary>
 
 - **[Vercel](https://vercel.com)**: Serverless functions for ship data API
   - TypeScript/Node.js runtime
@@ -188,7 +188,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 </details>
 
 <details>
-<summary><b>Data Storage & Development Tools</b></summary>
+<summary>Data Storage & Development Tools</summary>
 
 #### Data Storage
 - **UserDefaults**: Local settings and preferences
@@ -341,7 +341,7 @@ The link above is for Switzerland. For other countries, you have to find another
 ## Technical Details
 
 <details>
-<summary><b>Recent Technical Improvements</b></summary>
+<summary>Recent Technical Improvements</summary>
 
 ### Device Motion Detection
 - **CoreMotion Integration**: Uses device motion sensors to detect 180° flip gestures
@@ -409,7 +409,7 @@ The link above is for Switzerland. For other countries, you have to find another
 </details>
 
 <details>
-<summary><b>Ship Data and Wave Calculation</b></summary>
+<summary>Ship Data and Wave Calculation</summary>
 
 The app uses various systems for collecting ship data and calculating wave characteristics:
 

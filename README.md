@@ -25,6 +25,14 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - 🔊 Custom sound notifications
 - 🎨 Clean, intuitive interface
 - 📱 Light & Dark Mode
+- 🔄 Device flip gesture to toggle between light and dark mode
+- 🛡️ Integrated safety rules and wakethieving guidelines
+- 📅 Automatic schedule period detection (summer/winter schedules)
+- ⏰ Smart countdown messages for upcoming schedule changes
+- 🚢 Real-time ship name display for Lake Zurich (next 3 days)
+- 🌤️ Real-time weather information with wind speed, temperature, and pressure trends
+- 🔍 Albis-Class ship filter (flip device to activate/deactivate)
+- 💬 Fun "no waves" messages with variety and personality
 
 ## Map Features
 
@@ -34,11 +42,178 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - Automatic map caching for offline use
 - Optimized for both light and dark mode
 
+## Safety Features
+
+- **Integrated Safety Rules**: Built-in wakethieving safety guidelines displayed on first launch
+- **Easy Access**: Safety rules accessible anytime via the orange shield icon in settings
+- **Comprehensive Guidelines**: Complete safety information including:
+  - Safe distance requirements (50-meter rule)
+  - Priority vessel identification (day and night)
+  - Required safety equipment
+  - Emergency procedures
+- **Community Integration**: Direct link to Swiss Pumpfoilers Code of Conduct
+
+## Lake Zurich Ship Names
+
+### Real-Time Ship Identification
+- **Live Ship Data**: Displays the actual ship name for each departure on Lake Zurich
+- **3-Day Forecast**: Shows ship names for departures within the next 3 days
+- **Wave Rating Icons**: Visual indicators showing expected wave quality (1-3 waves) based on ship type
+- **Automatic Updates**: Ship assignments are fetched daily from ZSG (Zürichsee-Schifffahrtsgesellschaft)
+- **Smart Caching**: Efficient caching system to minimize API calls while keeping data fresh
+
+### Ship Information Display
+- Ship names appear directly in the departure list alongside route numbers
+- Wave quality icons help you identify the best sessions
+- Only available for Lake Zurich stations (ZSG network)
+- Seamlessly integrated into the existing departure view
+
+## Weather Integration
+
+### Real-Time Weather Information
+- **OpenWeather API Integration**: Live weather data for all stations
+- **Comprehensive Data**: Temperature, wind speed (in knots), wind direction, and atmospheric pressure
+- **Pressure Trends**: Automatic tracking of pressure changes over 6 hours (rising/falling/stable)
+- **Wind Information**: Current wind speed, maximum wind speed, and wind gusts
+- **Weather Icons**: Visual weather condition indicators with SF Symbols
+- **Forecast Data**: Weather predictions for upcoming departures
+- **Smart Preloading**: Weather data preloaded for favorite stations at app launch
+- **Per-Departure Weather**: Weather information shown for each individual departure time
+- **Toggle Option**: Can be enabled/disabled in settings
+
+### Weather Display Features
+- Temperature in Celsius with min/max values
+- Wind speed in knots (nautical standard)
+- Wind direction with compass points (N, NE, E, SE, S, SW, W, NW)
+- Atmospheric pressure with trend indicators
+- Weather condition descriptions and icons
+
+## User Interface Features
+
+### Device Flip Gesture
+- **Dual Function**: Flip your device 180° to toggle between light/dark mode OR activate Albis-Class filter
+- **Context-Aware**: In departure view, activates ship filter; elsewhere toggles theme
+- **Smooth Recognition**: Intuitive gesture detection using CoreMotion
+- **Cooldown Period**: 3-second delay prevents accidental repeated triggers
+- **Haptic Feedback**: Different feedback for activation vs. deactivation
+
+### Albis-Class Ship Filter
+- **Quick Access**: Activate by flipping your device in the departure list view
+- **Filter Ships**: Shows only departures with Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
+- **Visual Indicator**: Orange banner shows when filter is active
+- **Best Waves**: Focus on the ships that create the best wake waves
+- **Toggle On/Off**: Flip device again to deactivate and show all departures
+
+### Schedule Period Management
+- **Automatic Detection**: App automatically detects summer and winter schedule periods
+- **Smart Notifications**: Get notified about upcoming schedule changes with fun, personalized messages
+- **30-Day Advance Notice**: Countdown messages appear when schedule transitions are within 31 days
+- **Season-Specific Messages**: Different witty messages for summer, winter, spring, and autumn transitions
+- **All Swiss Lakes**: Works for all 15+ major Swiss lakes with boat services
+
+### Fun User Experience
+- **"No Waves" Messages**: 20+ unique, fun messages when no more departures are available
+- **Variety System**: Messages rotate to keep the experience fresh and entertaining
+- **Personality**: Surf culture references, Hawaiian vibes, and wakethieving humor
+- **No Service Messages**: Friendly messages when stations are temporarily out of service
+- **Examples**: "No more waves today – back in the lineup tomorrow!", "Post-pumping high is real – but even the ships need a break!"
+
+## Technologies & Services
+
+<details>
+<summary><b>Core Technologies</b></summary>
+
+- **SwiftUI**: Modern declarative UI framework for iOS and watchOS
+- **Swift Concurrency**: Async/await patterns for non-blocking operations
+- **CoreMotion**: Device motion detection for flip gestures
+- **CoreLocation**: Location services for nearest station detection
+- **WidgetKit**: Home screen and lock screen widgets
+- **WatchConnectivity**: Real-time data sync between iPhone and Apple Watch
+- **UserNotifications**: Local notifications for wave alerts
+- **MapKit**: Map integration with custom overlays
+
+</details>
+
+<details>
+<summary><b>External APIs & Services</b></summary>
+
+#### Transport Data
+- **[transport.opendata.ch](https://transport.opendata.ch)**: Swiss public transport API
+  - Real-time departure data for all Swiss ferry stations
+  - Station information and timetables
+  - Free, open-source API for Swiss public transport
+
+#### Weather Data
+- **[OpenWeather API](https://openweathermap.org)**: Weather forecasts and current conditions
+  - Temperature, wind speed, and atmospheric pressure
+  - 5-day forecast with 3-hour intervals
+  - Weather condition codes and icons
+
+#### Sun Times
+- **[Sunrise-Sunset.org API](https://sunrise-sunset.org)**: Sunrise and sunset times
+  - Civil twilight begin/end times
+  - Daylight duration calculations
+  - Free API for sun times worldwide
+
+#### Ship Deployment Data
+- **Custom Vercel API** (`/api/ships`): Real-time ship assignments for Lake Zurich
+  - Web scraping from [ZSG ship deployment website](https://einsatzderschiffe.zsg.ch)
+  - Daily cache updates
+  - 3-day forecast of ship-to-route assignments
+
+#### Map Data
+- **[OpenStreetMap](https://www.openstreetmap.org)**: Map tiles and geographic data
+  - Detailed water navigation maps
+  - Shipping routes overlay
+  - Ferry terminal locations
+  - **[Overpass Turbo](https://overpass-turbo.eu)**: Tool for finding ferry terminal data
+
+</details>
+
+<details>
+<summary><b>Backend & Deployment</b></summary>
+
+- **[Vercel](https://vercel.com)**: Serverless functions for ship data API
+  - TypeScript/Node.js runtime
+  - Automatic daily updates
+  - Edge caching for performance
+
+#### Node.js Dependencies
+- **[@vercel/node](https://www.npmjs.com/package/@vercel/node)**: Vercel serverless function helpers
+- **[axios](https://axios-http.com)**: HTTP client for web scraping
+- **[cheerio](https://cheerio.js.org)**: jQuery-like HTML parsing for web scraping
+- **[@sparticuz/chromium](https://www.npmjs.com/package/@sparticuz/chromium)**: Headless browser for complex scraping
+- **[TypeScript](https://www.typescriptlang.org)**: Type-safe JavaScript development
+
+</details>
+
+<details>
+<summary><b>Data Storage & Development Tools</b></summary>
+
+#### Data Storage
+- **UserDefaults**: Local settings and preferences
+- **App Groups**: Shared data between app, widgets, and watch
+- **JSON Files**: Station data and schedule periods
+- **In-Memory Caching**: Weather and ship name caching
+
+#### Development Tools
+- **Xcode**: Primary IDE for iOS development
+- **Python**: Scripts for ship data analysis and wave calculations
+- **Git**: Version control
+
+</details>
+
 ## Installation
 
 1. Clone the repository
 2. Open `Next Wave.xcodeproj` in Xcode
-3. Build and run the project
+3. Create a `Config.swift` file with your API keys:
+   ```swift
+   struct Config {
+       static let openWeatherApiKey = "YOUR_API_KEY"
+   }
+   ```
+4. Build and run the project
 
 ## Privacy
 
@@ -80,6 +255,31 @@ Next Wave offers two flexible ways to get departure information:
 - **Watch App**: Shows departures for favorites or nearest station
 - **Smart Fallback**: If nearest station has no departures, automatically falls back to favorites
 - **Helpful Messages**: Clear instructions when no favorites are set or nearest station is disabled
+
+## Widget Features
+
+### iPhone Widgets
+- **NextWave Widget**: Shows your next boat departure
+  - Available in Small, Medium, Large, and Extra Large sizes
+  - Displays station name, departure time, route, and direction
+  - Visual indicators for nearest station or favorite station
+  - Deep link support to open app at specific station
+  
+- **NextWave - Next 3 Widget**: Shows your next 3 boat departures
+  - Available in Medium and Large sizes
+  - Compact list view of upcoming departures
+  - Perfect for planning your session timing
+  
+- **Widget Modes**:
+  - Favorite Station Mode: Shows departures from your first favorite
+  - Nearest Station Mode: Automatically shows closest station
+  - Configurable in app settings
+
+### Apple Watch Widgets
+- Complications for all watch faces
+- Circular, rectangular, and inline styles
+- Real-time departure information on your wrist
+- Synchronized with iPhone settings
 
 ## Support
 
@@ -138,28 +338,82 @@ All ship stations are displayed. Clicking on the station opens a window where yo
 You can check whether the station is available in the API via https://transport.opendata.ch/v1/locations?query=[uic_ref].
 The link above is for Switzerland. For other countries, you have to find another api to find departure times.
 
-### Technical Details
+## Technical Details
 
-### Recent Technical Improvements
+<details>
+<summary><b>Recent Technical Improvements</b></summary>
 
-#### Smart Nearest Station Algorithm
+### Device Motion Detection
+- **CoreMotion Integration**: Uses device motion sensors to detect 180° flip gestures
+- **Smart Gesture Recognition**: Detects roll rotation with tolerance for natural device handling
+- **Debounce Logic**: 3-second cooldown prevents accidental repeated triggers
+- **State Management**: Tracks initial orientation and reset states for reliable detection
+- **Theme Toggle**: Seamlessly switches between light and dark mode on device flip
+
+### Smart Nearest Station Algorithm
 - **Advanced Location Processing**: Uses CoreLocation to find the geographically closest ferry station
 - **Comprehensive Station Database**: Searches through ALL available stations across multiple Swiss lakes
 - **Intelligent Departure Loading**: Automatically fetches departure data for nearest station even if not in favorites
 - **Fallback System**: Gracefully falls back to favorite stations if nearest station has no departures
 - **Real-time Synchronization**: Coordinates between iOS app, Apple Watch, and widgets via shared data containers
 
-#### Cross-Platform Data Synchronization
+### Cross-Platform Data Synchronization
 - **App Groups**: Seamless data sharing between main app, Watch app, and widgets
 - **WatchConnectivity**: Real-time synchronization of favorites and settings between iPhone and Apple Watch
 - **Smart Caching**: Optimized caching system to minimize API calls while ensuring fresh data
 - **Background Updates**: Intelligent background refresh with adaptive timing based on next departure
 
-### Ship Data and Wave Calculation
+### Schedule Period Management
+- **JSON-Based Configuration**: Centralized schedule period data for all Swiss lakes
+- **Automatic Period Detection**: Real-time detection of active schedule periods based on current date
+- **Smart Countdown System**: Calculates days until next schedule change with personalized messages
+- **Season-Aware Messaging**: Context-aware messages based on transition type (summer/winter/spring/autumn)
+- **Multi-Lake Support**: Handles different schedule periods for 15+ Swiss lakes simultaneously
+
+### Safety and User Experience
+- **First Launch Detection**: UserDefaults-based system to show safety rules on initial app launch
+- **Modal Presentation**: SwiftUI-based modal with comprehensive safety information
+- **Persistent Access**: Safety rules accessible anytime via settings
+- **Community Integration**: Deep links to external safety resources
+
+### Ship Name Integration
+- **VesselAPI Service**: Dedicated Swift service for fetching ship assignments
+- **Async/Await Pattern**: Modern Swift concurrency for non-blocking API calls
+- **Date-Based Caching**: Cache key format: `YYYY-MM-DD_CourseNumber`
+- **Parallel Loading**: Ship names loaded asynchronously after initial departure data
+- **UI Updates**: Progressive enhancement - departures show immediately, ship names appear when loaded
+- **3-Day Window**: Only fetches ship names for departures within next 72 hours
+- **Lake Detection**: Automatically identifies Lake Zurich stations by ID prefix (85036)
+- **Wave Icons**: Dynamic icon selection based on ship name and wave rating database
+
+### Weather API Integration
+- **OpenWeather API**: RESTful API integration for weather forecasts
+- **Async Data Loading**: Non-blocking weather data fetching using Swift async/await
+- **Pressure History Tracking**: 6-hour rolling window for pressure trend calculation
+- **Smart Preloading**: Weather data preloaded for all favorite stations at app launch
+- **Parallel Requests**: TaskGroup-based concurrent loading for multiple stations
+- **Per-Wave Weather**: Individual weather data for each departure time
+- **Forecast Matching**: Finds closest forecast time to each departure
+- **Unit Conversion**: Automatic conversion from m/s to knots for nautical use
+- **Weather Codes**: Comprehensive mapping of OpenWeather condition codes to SF Symbols
+- **Error Handling**: Graceful degradation when weather data unavailable
+
+### Albis-Class Filter System
+- **Ship Database**: Hardcoded list of Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
+- **Real-Time Filtering**: Instant filtering of departure list based on ship names
+- **State Management**: Published property for reactive UI updates
+- **Haptic Feedback**: UINotificationFeedbackGenerator for activation, UIImpactFeedbackGenerator for deactivation
+- **Visual Indicators**: Orange banner with filter status in departure list
+- **Gesture Integration**: Connected to device flip gesture in departure view context
+
+</details>
+
+<details>
+<summary><b>Ship Data and Wave Calculation</b></summary>
 
 The app uses various systems for collecting ship data and calculating wave characteristics:
 
-#### 1. Vessel Data Scraper and Wave Calculation (`scripts/vesseldata.py`)
+### 1. Vessel Data Scraper and Wave Calculation (`scripts/vesseldata.py`)
 - Automatically extracts technical data of all ZSG ships
 - Collects information like length, width, displacement etc.
 - Calculates based on technical data:
@@ -244,13 +498,35 @@ Execution: `python3 scripts/vesseldata.py`
 Saves data to `schiffsdaten.csv`
 
 #### 2. Vessel API (`api/ships.ts`)
-- Vercel-based API for real-time ship deployments
-- Provides current ship-course assignments
-- Currently only available for Lake Zurich
-- Endpoint: `/api/ships`
-- Cache system for optimal performance
-- Automatic updates every 15 minutes
-- Nightly verification of ship deployments for the next day
+- **Vercel-based API**: Serverless function for real-time ship deployments
+- **Web Scraping**: Automatically scrapes ZSG's official ship deployment website
+- **3-Day Forecast**: Fetches ship assignments for today and the next 2 days
+- **Smart Caching**: Daily cache updates with automatic refresh at midnight (Swiss time)
+- **Data Structure**: Returns daily deployments with ship-to-course mappings
+- **Error Handling**: Graceful fallback if data unavailable for specific days
+- **Currently Lake Zurich Only**: ZSG network (station IDs starting with 85036)
+- **Endpoint**: `/api/ships`
+- **Response Format**:
+  ```json
+  {
+    "dailyDeployments": [
+      {
+        "date": "2025-10-23",
+        "routes": [
+          {
+            "shipName": "MS Panta Rhei",
+            "courseNumber": "1"
+          }
+        ]
+      }
+    ],
+    "lastUpdated": "2025-10-23T08:00:00.000Z"
+  }
+  ```
+- **Integration**: iOS app queries API and caches results per date and course number
+- **Performance**: Minimal API calls through intelligent client-side caching
+
+</details>
 
 # Feature Ideas Welcome
 

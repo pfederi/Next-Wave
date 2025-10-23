@@ -9,6 +9,24 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1705363200" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;">
 </a>
 
+## Table of Contents
+
+- [Features](#features)
+- [Map Features](#map-features)
+- [Safety Features](#safety-features)
+- [Lake Zurich Ship Names](#lake-zurich-ship-names)
+- [Weather Integration](#weather-integration)
+- [User Interface Features](#user-interface-features)
+- [Widget Features](#widget-features)
+- [Technologies & Services](#technologies--services)
+- [Installation](#installation)
+- [Privacy](#privacy)
+- [Usage Modes](#usage-modes)
+- [How to Add a New Lake or Station](#how-to-add-a-new-lake-or-station)
+- [Technical Details](#technical-details)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - 🌊 Real-time boat schedule tracking
@@ -120,8 +138,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 ## Technologies & Services
 
-<details>
-<summary>Core Technologies</summary>
+### Core Technologies
 
 - **SwiftUI**: Modern declarative UI framework for iOS and watchOS
 - **Swift Concurrency**: Async/await patterns for non-blocking operations
@@ -132,11 +149,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **UserNotifications**: Local notifications for wave alerts
 - **MapKit**: Map integration with custom overlays
 
-</details>
-
-
-<details>
-<summary>External APIs & Services</summary>
+### External APIs & Services
 
 #### Transport Data
 - **[transport.opendata.ch](https://transport.opendata.ch)**: Swiss public transport API
@@ -169,11 +182,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
   - Ferry terminal locations
   - **[Overpass Turbo](https://overpass-turbo.eu)**: Tool for finding ferry terminal data
 
-</details>
-
-
-<details>
-<summary>Backend & Deployment</summary>
+### Backend & Deployment
 
 - **[Vercel](https://vercel.com)**: Serverless functions for ship data API
   - TypeScript/Node.js runtime
@@ -187,11 +196,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **[@sparticuz/chromium](https://www.npmjs.com/package/@sparticuz/chromium)**: Headless browser for complex scraping
 - **[TypeScript](https://www.typescriptlang.org)**: Type-safe JavaScript development
 
-</details>
-
-
-<details>
-<summary>Data Storage & Development Tools</summary>
+### Data Storage & Development Tools
 
 #### Data Storage
 - **UserDefaults**: Local settings and preferences
@@ -203,9 +208,6 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Xcode**: Primary IDE for iOS development
 - **Python**: Scripts for ship data analysis and wave calculations
 - **Git**: Version control
-
-</details>
-
 
 ## Installation
 
@@ -344,24 +346,23 @@ The link above is for Switzerland. For other countries, you have to find another
 
 ## Technical Details
 
-<details>
-<summary>Recent Technical Improvements</summary>
+### Recent Technical Improvements
 
-### Device Motion Detection
+#### Device Motion Detection
 - **CoreMotion Integration**: Uses device motion sensors to detect 180° flip gestures
 - **Smart Gesture Recognition**: Detects roll rotation with tolerance for natural device handling
 - **Debounce Logic**: 3-second cooldown prevents accidental repeated triggers
 - **State Management**: Tracks initial orientation and reset states for reliable detection
 - **Theme Toggle**: Seamlessly switches between light and dark mode on device flip
 
-### Smart Nearest Station Algorithm
+#### Smart Nearest Station Algorithm
 - **Advanced Location Processing**: Uses CoreLocation to find the geographically closest ferry station
 - **Comprehensive Station Database**: Searches through ALL available stations across multiple Swiss lakes
 - **Intelligent Departure Loading**: Automatically fetches departure data for nearest station even if not in favorites
 - **Fallback System**: Gracefully falls back to favorite stations if nearest station has no departures
 - **Real-time Synchronization**: Coordinates between iOS app, Apple Watch, and widgets via shared data containers
 
-### Cross-Platform Data Synchronization
+#### Cross-Platform Data Synchronization
 - **App Groups**: Seamless data sharing between main app, Watch app, and widgets
 - **WatchConnectivity**: Real-time synchronization of favorites and settings between iPhone and Apple Watch
 - **Smart Caching**: Optimized caching system to minimize API calls while ensuring fresh data
@@ -374,13 +375,13 @@ The link above is for Switzerland. For other countries, you have to find another
 - **Season-Aware Messaging**: Context-aware messages based on transition type (summer/winter/spring/autumn)
 - **Multi-Lake Support**: Handles different schedule periods for 15+ Swiss lakes simultaneously
 
-### Safety and User Experience
+#### Safety and User Experience
 - **First Launch Detection**: UserDefaults-based system to show safety rules on initial app launch
 - **Modal Presentation**: SwiftUI-based modal with comprehensive safety information
 - **Persistent Access**: Safety rules accessible anytime via settings
 - **Community Integration**: Deep links to external safety resources
 
-### Ship Name Integration
+#### Ship Name Integration
 - **VesselAPI Service**: Dedicated Swift service for fetching ship assignments
 - **Async/Await Pattern**: Modern Swift concurrency for non-blocking API calls
 - **Date-Based Caching**: Cache key format: `YYYY-MM-DD_CourseNumber`
@@ -390,7 +391,7 @@ The link above is for Switzerland. For other countries, you have to find another
 - **Lake Detection**: Automatically identifies Lake Zurich stations by ID prefix (85036)
 - **Wave Icons**: Dynamic icon selection based on ship name and wave rating database
 
-### Weather API Integration
+#### Weather API Integration
 - **OpenWeather API**: RESTful API integration for weather forecasts
 - **Async Data Loading**: Non-blocking weather data fetching using Swift async/await
 - **Pressure History Tracking**: 6-hour rolling window for pressure trend calculation
@@ -402,7 +403,7 @@ The link above is for Switzerland. For other countries, you have to find another
 - **Weather Codes**: Comprehensive mapping of OpenWeather condition codes to SF Symbols
 - **Error Handling**: Graceful degradation when weather data unavailable
 
-### Albis-Class Filter System
+#### Albis-Class Filter System
 - **Ship Database**: Hardcoded list of Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
 - **Real-Time Filtering**: Instant filtering of departure list based on ship names
 - **State Management**: Published property for reactive UI updates
@@ -410,15 +411,11 @@ The link above is for Switzerland. For other countries, you have to find another
 - **Visual Indicators**: Orange banner with filter status in departure list
 - **Gesture Integration**: Connected to device flip gesture in departure view context
 
-</details>
-
-
-<details>
-<summary>Ship Data and Wave Calculation</summary>
+### Ship Data and Wave Calculation
 
 The app uses various systems for collecting ship data and calculating wave characteristics:
 
-### 1. Vessel Data Scraper and Wave Calculation (`scripts/vesseldata.py`)
+#### 1. Vessel Data Scraper and Wave Calculation (`scripts/vesseldata.py`)
 - Automatically extracts technical data of all ZSG ships
 - Collects information like length, width, displacement etc.
 - Calculates based on technical data:
@@ -502,7 +499,7 @@ The calculations consider:
 Execution: `python3 scripts/vesseldata.py`
 Saves data to `schiffsdaten.csv`
 
-#### 2. Vessel API (`api/ships.ts`)
+#### 2. Vessel API
 - **Vercel-based API**: Serverless function for real-time ship deployments
 - **Web Scraping**: Automatically scrapes ZSG's official ship deployment website
 - **3-Day Forecast**: Fetches ship assignments for today and the next 2 days
@@ -530,9 +527,6 @@ Saves data to `schiffsdaten.csv`
   ```
 - **Integration**: iOS app queries API and caches results per date and course number
 - **Performance**: Minimal API calls through intelligent client-side caching
-
-</details>
-
 
 # Feature Ideas Welcome
 

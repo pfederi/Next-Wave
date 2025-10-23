@@ -134,6 +134,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 </details>
 
+
 <details>
 <summary>External APIs & Services</summary>
 
@@ -170,6 +171,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 </details>
 
+
 <details>
 <summary>Backend & Deployment</summary>
 
@@ -187,6 +189,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 </details>
 
+
 <details>
 <summary>Data Storage & Development Tools</summary>
 
@@ -202,6 +205,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Git**: Version control
 
 </details>
+
 
 ## Installation
 
@@ -408,6 +412,7 @@ The link above is for Switzerland. For other countries, you have to find another
 
 </details>
 
+
 <details>
 <summary>Ship Data and Wave Calculation</summary>
 
@@ -527,6 +532,7 @@ Saves data to `schiffsdaten.csv`
 - **Performance**: Minimal API calls through intelligent client-side caching
 
 </details>
+
 
 # Feature Ideas Welcome
 

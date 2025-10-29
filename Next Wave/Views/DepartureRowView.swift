@@ -104,12 +104,12 @@ struct DepartureRowView: View {
                         // Schiffsname mit Icon (nur für die nächsten 3 Tage)
                         HStack(spacing: 4) {
                             Text(wave.shipName ?? "Loading...")
-                                .fixedSize(horizontal: true, vertical: false)
+                                .lineLimit(1)
                             if let shipName = wave.shipName {
                                 Image(getWaveIcon(for: shipName))
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 10)
+                                    .frame(width: 16, height: 12)
                             }
                         }
                         .font(.caption)
@@ -117,6 +117,17 @@ struct DepartureRowView: View {
                         .padding(.vertical, 4)
                         .background(Color.blue.opacity(0.1))
                         .cornerRadius(12)
+                    } else if wave.shipName != nil {
+                        // Debug: Zeige warum kein Icon angezeigt wird
+                        Text(wave.shipName ?? "")
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(12)
+                            .onAppear {
+                                print("⚠️ No icon for: \(wave.shipName ?? "nil") - isZurichsee: \(wave.isZurichsee), within3Days: \(isWithinNext3Days(wave.time))")
+                            }
                     }
                     
                     Text("→")
@@ -202,15 +213,20 @@ private struct RemainingTimeView: View {
     }
     
     private func getWaveIcon(for shipName: String) -> String {
-    switch shipName {
-        case "MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel":
+        let cleanName = shipName.trimmingCharacters(in: .whitespaces)
+        print("🚢 Checking wave icon for ship: '\(cleanName)'")
+        switch cleanName {
+        case "MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel", "EM Uetliberg", "EM Pfannenstiel":
+            print("✅ Matched 3 waves")
             return "waves3"
         case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth", "DS Stadt Zürich", "DS Stadt Rapperswil":
+            print("✅ Matched 2 waves")
             return "waves2"
         default:
+            print("⚠️ Default 1 wave")
             return "waves1"
+        }
     }
-}
 
 private struct NotificationButton: View {
     let wave: WaveEvent

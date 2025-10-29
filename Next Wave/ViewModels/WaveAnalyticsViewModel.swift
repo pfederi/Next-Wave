@@ -4,7 +4,7 @@ class WaveAnalyticsViewModel: ObservableObject {
     @Published var spotAnalytics: [SpotAnalytics] = []
     private let maxWaveGap: TimeInterval = 3600 // 1 hour max between waves
     private let minSessionDuration: TimeInterval = 3600 // minimum 1 hour session
-    private let maxSessionDuration: TimeInterval = 10800 // maximum 3 hour session
+    private let maxSessionDuration: TimeInterval = 7200 // maximum 2 hour session
     
     func analyzeWaves(_ waves: [WaveEvent], for spotId: String, spotName: String) {
         Task {
@@ -81,7 +81,13 @@ class WaveAnalyticsViewModel: ObservableObject {
     }
     
     private func calculateSessionScore(_ slot: WaveTimeSlot, sunTimes: SunTimes?) -> Double {
-        var score = slot.wavesPerHour
+        // Berechne Qualitätsscore basierend auf Schiffstypen (wichtigster Faktor)
+        let qualityScore = calculateWaveQualityScore(for: slot.waves)
+        
+        // Frequenz-Bonus: Mehr Wellen pro Stunde ist besser, aber weniger wichtig
+        let frequencyBonus = 1.0 + (slot.wavesPerHour / 10.0) // Max ~1.5x bei 5 Wellen/Stunde
+        
+        var score = qualityScore * frequencyBonus
         
         if let sunTimes = sunTimes {
             // Check if session overlaps with twilight periods
@@ -100,6 +106,37 @@ class WaveAnalyticsViewModel: ObservableObject {
         }
         
         return score
+    }
+    
+    private func calculateWaveQualityScore(for waves: [WaveEvent]) -> Double {
+        guard !waves.isEmpty else { return 0.0 }
+        
+        var totalScore = 0.0
+        
+        for wave in waves {
+            guard let shipName = wave.shipName else {
+                // Wellen ohne Schiffsnamen bekommen minimalen Score
+                totalScore += 1.0
+                continue
+            }
+            
+            let cleanName = shipName.trimmingCharacters(in: .whitespaces)
+            
+            // 3-Wellen Schiffe (beste Qualität) - sehr hoher Score
+            if ["MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel", "EM Uetliberg", "EM Pfannenstiel"].contains(cleanName) {
+                totalScore += 10.0
+            }
+            // 2-Wellen Schiffe (mittlere Qualität) - mittlerer Score
+            else if ["MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth", "DS Stadt Zürich", "DS Stadt Rapperswil"].contains(cleanName) {
+                totalScore += 5.0
+            }
+            // 1-Wellen Schiffe (Standard) - niedriger Score
+            else {
+                totalScore += 2.0
+            }
+        }
+        
+        return totalScore
     }
     
     private func calculateTwilightOverlap(_ slot: WaveTimeSlot, sunTimes: SunTimes) -> Double {

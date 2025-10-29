@@ -49,6 +49,7 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - ⏰ Smart countdown messages for upcoming schedule changes
 - 🚢 Real-time ship name display for Lake Zurich (next 3 days)
 - 🌤️ Real-time weather information with wind speed, temperature, and pressure trends
+- 🌡️ Water temperature display for all Swiss lakes
 - 🔍 Albis-Class ship filter (flip device to activate/deactivate)
 - 💬 Fun "no waves" messages with variety and personality
 
@@ -99,6 +100,14 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Per-Departure Weather**: Weather information shown for each individual departure time
 - **Toggle Option**: Can be enabled/disabled in settings
 
+### Water Temperature Display
+- **Real-Time Data**: Current water temperature for all major Swiss lakes
+- **Meteonews Integration**: Data sourced from meteonews.ch
+- **Daily Updates**: Automatic refresh once per day
+- **Smart Caching**: 24-hour cache to minimize API calls
+- **Visual Integration**: Displayed alongside weather data with consistent UI
+- **Coverage**: Available for 30+ Swiss lakes including Zürichsee, Vierwaldstättersee, Genfersee, Bodensee, and more
+
 ### Weather Display Features
 - Temperature in Celsius with min/max values
 - Wind speed in knots (nautical standard)
@@ -121,6 +130,23 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Visual Indicator**: Orange banner shows when filter is active
 - **Best Waves**: Focus on the ships that create the best wake waves
 - **Toggle On/Off**: Flip device again to deactivate and show all departures
+
+### Best Surf Sessions Analytics
+- **Quality-First Scoring**: Sessions prioritize large ships (3-wave ships) over quantity
+- **Smart Scoring System**: 
+  - 3-wave ships (MS Panta Rhei, MS Albis, EMS Uetliberg, EMS Pfannenstiel): 10 points
+  - 2-wave ships (MS Wädenswil, MS Limmat, MS Helvetia, MS Linth, DS Stadt Zürich, DS Stadt Rapperswil): 5 points
+  - 1-wave ships: 2 points
+- **Frequency Bonus**: Additional scoring for higher wave frequency (secondary factor)
+- **Daylight Optimization**: 
+  - Sessions in complete darkness automatically excluded
+  - Twilight sessions receive reduced scores (80% penalty)
+  - Best sessions during full daylight hours
+- **Session Parameters**: 
+  - Maximum duration: 2 hours
+  - Minimum duration: 1 hour
+  - Maximum gap between waves: 1 hour
+- **Result**: Sessions with 4 large ships rated higher than sessions with 10 small ships
 
 ### Schedule Period Management
 - **Automatic Detection**: App automatically detects summer and winter schedule periods
@@ -484,15 +510,15 @@ The calculations consider:
    - Result: 1 wave
 
 ##### Wave Rating (1-3 waves):
-- **Strong waves (3)**: MS Panta Rhei, MS Albis
+- **Strong waves (3)**: MS Panta Rhei, MS Albis, EMS Uetliberg, EMS Pfannenstiel
   - High wave energy (>250 J/m²)
   - High impact force (>55000 N/m²)
   
-- **Medium waves (2)**: MS Wädenswil, MS Limmat, MS Helvetia, MS Linth
+- **Medium waves (2)**: MS Wädenswil, MS Limmat, MS Helvetia, MS Linth, DS Stadt Zürich, DS Stadt Rapperswil
   - Medium wave energy (150-250 J/m²)
   - Medium impact force (45000-55000 N/m²)
   
-- **Light waves (1)**: MS Bachtel, DS Stadt Rapperswil, DS Stadt Zürich, MS Säntis
+- **Light waves (1)**: MS Bachtel, MS Säntis, and all other ships
   - Low wave energy (<150 J/m²)
   - Low impact force (<45000 N/m²)
 
@@ -527,6 +553,33 @@ Saves data to `schiffsdaten.csv`
   ```
 - **Integration**: iOS app queries API and caches results per date and course number
 - **Performance**: Minimal API calls through intelligent client-side caching
+
+#### 3. Water Temperature API
+- **Vercel-based API**: Serverless function for real-time water temperature data
+- **Web Scraping**: Automatically scrapes meteonews.ch for Swiss lake temperatures
+- **Daily Updates**: Data refreshed once per day at first request
+- **Smart Caching**: 24-hour cache to minimize API calls and server load
+- **Coverage**: 30+ Swiss lakes including all major lakes
+- **Endpoint**: `/api/water-temperature`
+- **Response Format**:
+  ```json
+  {
+    "lakes": [
+      {
+        "name": "Zürichsee",
+        "temperature": 14,
+        "waterLevel": "405.96 m.ü.M."
+      }
+    ],
+    "lastUpdated": "2025-10-29T08:00:00.000Z",
+    "debug": {
+      "currentSwissTime": "29.10.2025, 09:00:00",
+      "lakesCount": 32
+    }
+  }
+  ```
+- **Integration**: iOS app caches data for 24 hours matching backend update frequency
+- **Performance**: Single daily fetch per device, efficient data delivery
 
 # Feature Ideas Welcome
 

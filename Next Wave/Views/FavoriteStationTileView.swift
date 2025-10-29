@@ -135,6 +135,35 @@ struct FavoriteStationTileView: View, Equatable {
                                         .foregroundColor(Color("text-color"))
                                 }
                             }
+                            
+                            // Wassertemperatur direkt nach Lufttemperatur
+                            if let lake = viewModel.lakes.first(where: { lake in
+                                lake.stations.contains(where: { $0.name == station.name })
+                            }), let waterTemp = lake.waterTemperature {
+                                Spacer().frame(width: 4)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 12))
+                                
+                                Spacer().frame(width: 4)
+                                
+                                HStack(spacing: 4) {
+                                    Image(systemName: "drop.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.blue)
+                                    
+                                    Text(String(format: "%.0f°C", waterTemp))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                }
+                                
+                                Spacer().frame(width: 4)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 12))
+                            }
 
                             Spacer().frame(width: 4)
                             

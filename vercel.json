@@ -4,6 +4,10 @@
     "api/ships.ts": {
       "memory": 1024,
       "maxDuration": 60
+    },
+    "api/water-temperature.ts": {
+      "memory": 1024,
+      "maxDuration": 60
     }
   },
   "headers": [

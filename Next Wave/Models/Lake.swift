@@ -4,6 +4,8 @@ struct Lake: Codable, Identifiable, Hashable {
     let name: String
     let operators: [String]
     private let _stations: [Station]
+    var waterTemperature: Double? // Wassertemperatur in °C
+    var waterLevel: String? // Pegel (z.B. "405.96 m.ü.M.")
     
     var stations: [Station] {
         Array(_stations.reduce(into: Set<Station>()) { result, station in
@@ -17,6 +19,8 @@ struct Lake: Codable, Identifiable, Hashable {
         case name
         case operators
         case _stations = "stations"
+        case waterTemperature
+        case waterLevel
     }
     
     struct Station: Codable, Hashable, Identifiable {

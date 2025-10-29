@@ -8,6 +8,7 @@ struct DepartureRowView: View {
     let isCurrentDay: Bool
     @ObservedObject var scheduleViewModel: ScheduleViewModel
     @EnvironmentObject var appSettings: AppSettings
+    @EnvironmentObject var lakeStationsViewModel: LakeStationsViewModel
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -47,6 +48,25 @@ struct DepartureRowView: View {
                                 Text(String(format: "%.1f°", weather.temperature))
                                     .font(.system(size: 12))
                                     .foregroundColor(isPast ? .gray : .primary)
+                                
+                                // Wassertemperatur direkt nach Lufttemperatur
+                                if let selectedStation = lakeStationsViewModel.selectedStation,
+                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                       lake.stations.contains(where: { $0.name == selectedStation.name })
+                                   }), let waterTemp = lake.waterTemperature {
+                                    
+                                    Text("|")
+                                        .foregroundColor(.gray)
+                                        .font(.system(size: 12))
+                                    
+                                    Image(systemName: "drop.fill")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.blue)
+                                    
+                                    Text(String(format: "%.0f°", waterTemp))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(isPast ? .gray : .primary)
+                                }
                                 
                                 Text("|")
                                     .foregroundColor(.gray)

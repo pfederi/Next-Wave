@@ -44,6 +44,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         self.scheduleViewModel = scheduleViewModel
         Task {
             await loadLakes()
+            await loadWaterTemperatures()
         }
         scheduleMidnightRefresh()
         
@@ -99,6 +100,37 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             let response = try decoder.decode(LakesResponse.self, from: data)
             self.lakes = response.lakes
         } catch {
+        }
+    }
+    
+    func loadWaterTemperatures() async {
+        print("🌊 Starting to load water temperatures...")
+        do {
+            let temperatures = try await WaterTemperatureAPI.shared.getWaterTemperatures()
+            print("🌊 Received \(temperatures.count) lake temperatures from API")
+            
+            // Update lakes with water temperatures
+            var updatedCount = 0
+            for i in 0..<lakes.count {
+                let lakeName = lakes[i].name
+                if let temp = temperatures.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
+                    var updatedLake = lakes[i]
+                    updatedLake.waterTemperature = temp.temperature
+                    updatedLake.waterLevel = temp.waterLevel
+                    lakes[i] = updatedLake
+                    updatedCount += 1
+                    print("🌊 Updated \(lakeName): \(temp.temperature ?? 0)°C")
+                } else {
+                    print("🌊 No temperature found for \(lakeName)")
+                }
+            }
+            
+            print("✅ Updated \(updatedCount)/\(lakes.count) lakes with water temperatures")
+        } catch {
+            print("⚠️ Failed to load water temperatures: \(error)")
+            if let urlError = error as? URLError {
+                print("⚠️ URLError code: \(urlError.code.rawValue)")
+            }
         }
     }
     
@@ -183,6 +215,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         if selectedStation != nil {
             Task {
                 await refreshDepartures()
+                await loadWaterTemperatures()
             }
         }
     }

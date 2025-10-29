@@ -169,6 +169,9 @@ struct NextWaveApp: App {
                     // Preload weather data first (faster, more important for users)
                     await WeatherAPI.shared.preloadData()
                     
+                    // Preload water temperature data
+                    await WaterTemperatureAPI.shared.preloadData()
+                    
                     // Then preload vessel data
                     await VesselAPI.shared.preloadData()
                     

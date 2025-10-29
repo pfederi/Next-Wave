@@ -1,0 +1,71 @@
+/**
+ * Promise, or maybe not
+ */
+type Awaitable<T> = T | PromiseLike<T>;
+/**
+ * Array, or not yet
+ */
+type Arrayable<T> = T | Array<T>;
+
+declare const defaultExtensions: string[];
+type BuiltinParsers = 'json' | 'import';
+type CustomParser<T> = (filepath: string) => Awaitable<T | undefined>;
+interface LoadConfigSource<T = any> {
+    files: Arrayable<string>;
+    /**
+     * @default ['mts', 'cts', 'ts', 'mjs', 'cjs', 'js', 'json', '']
+     */
+    extensions?: string[];
+    /**
+     * Parser for loading config,
+     *
+     * @default 'auto'
+     */
+    parser?: BuiltinParsers | CustomParser<T> | 'auto';
+    /**
+     * Rewrite the config object,
+     * return nullish value to bypassing loading the file
+     */
+    rewrite?: <F = any>(obj: F, filepath: string) => Promise<T | undefined> | T | undefined;
+    /**
+     * Transform the source code before loading,
+     * return nullish value to skip transformation
+     */
+    transform?: (code: string, filepath: string) => Promise<string | undefined> | string | undefined;
+    /**
+     * Skip this source if error occurred on loading
+     *
+     * @default false
+     */
+    skipOnError?: boolean;
+}
+interface SearchOptions {
+    /**
+     * Root directory
+     *
+     * @default process.cwd()
+     */
+    cwd?: string;
+    /**
+     * @default path.parse(cwd).root
+     */
+    stopAt?: string;
+    /**
+     * Load from multiple sources and merge them
+     *
+     * @default false
+     */
+    merge?: boolean;
+}
+interface LoadConfigOptions<T = any> extends SearchOptions {
+    sources: Arrayable<LoadConfigSource<T>>;
+    defaults?: T;
+}
+interface LoadConfigResult<T> {
+    config: T;
+    sources: string[];
+    dependencies?: string[];
+}
+
+export { defaultExtensions as d };
+export type { Arrayable as A, BuiltinParsers as B, CustomParser as C, LoadConfigOptions as L, SearchOptions as S, LoadConfigResult as a, LoadConfigSource as b };

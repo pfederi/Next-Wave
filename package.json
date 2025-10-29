@@ -8,12 +8,17 @@
   },
   "dependencies": {
     "@sparticuz/chromium": "^131.0.0",
-    "@vercel/node": "^3.2.0",
+    "@vercel/node": "^4.0.0",
     "axios": "^1.7.0",
     "cheerio": "^1.0.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
-    "vercel": "^37.0.0"
+    "vercel": "^48.0.0"
+  },
+  "overrides": {
+    "path-to-regexp": "^8.0.0",
+    "esbuild": "^0.24.2",
+    "undici": "^7.0.0"
   }
 } 

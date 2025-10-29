@@ -34,55 +34,6 @@ struct DepartureRowView: View {
                     
                     Spacer()
                     
-                    // Wetteranzeige
-                    if !isPast && appSettings.showWeatherInfo {
-                        if let weather = wave.weather {
-                            HStack(spacing: 4) {
-                                Image(systemName: weather.weatherIcon)
-                                    .font(.system(size: 16))
-                                
-                                Text("|")
-                                    .foregroundColor(.gray)
-                                    .font(.system(size: 12))
-                                
-                                Text(String(format: "%.1f°", weather.temperature))
-                                    .font(.system(size: 12))
-                                    .foregroundColor(isPast ? .gray : .primary)
-                                
-                                // Wassertemperatur direkt nach Lufttemperatur
-                                if let selectedStation = lakeStationsViewModel.selectedStation,
-                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
-                                       lake.stations.contains(where: { $0.name == selectedStation.name })
-                                   }), let waterTemp = lake.waterTemperature {
-                                    
-                                    Text("|")
-                                        .foregroundColor(.gray)
-                                        .font(.system(size: 12))
-                                    
-                                    Image(systemName: "drop.fill")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(isPast ? .gray : .primary)
-                                    
-                                    Text(String(format: "%.0f°", waterTemp))
-                                        .font(.system(size: 12))
-                                        .foregroundColor(isPast ? .gray : .primary)
-                                }
-                                
-                                Text("|")
-                                    .foregroundColor(.gray)
-                                    .font(.system(size: 12))
-                                
-                                Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(isPast ? .gray : .primary)
-                            }
-                        } else {
-                            Text("Loading weather...")
-                                .font(.system(size: 12))
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    
                     if scheduleViewModel.hasNotification(for: wave) {
                         Image(systemName: "bell.fill")
                             .foregroundColor(.blue)
@@ -117,17 +68,6 @@ struct DepartureRowView: View {
                         .padding(.vertical, 4)
                         .background(Color.blue.opacity(0.1))
                         .cornerRadius(12)
-                    } else if wave.shipName != nil {
-                        // Debug: Zeige warum kein Icon angezeigt wird
-                        Text(wave.shipName ?? "")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.orange.opacity(0.1))
-                            .cornerRadius(12)
-                            .onAppear {
-                                print("⚠️ No icon for: \(wave.shipName ?? "nil") - isZurichsee: \(wave.isZurichsee), within3Days: \(isWithinNext3Days(wave.time))")
-                            }
                     }
                     
                     Text("→")
@@ -140,6 +80,77 @@ struct DepartureRowView: View {
                         .lineLimit(1)
                         .truncationMode(.tail)
                         .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Dritte Zeile: Wetterdaten und Wasserpegel
+                if !isPast && appSettings.showWeatherInfo {
+                    if let weather = wave.weather {
+                        HStack(spacing: 4) {
+                            // Wetter-Icon
+                            Image(systemName: weather.weatherIcon)
+                                .font(.system(size: 12))
+                                .foregroundColor(.primary)
+                            
+                            // Lufttemperatur
+                            Text(String(format: "%.1f°", weather.temperature))
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            // Wassertemperatur
+                            if let selectedStation = lakeStationsViewModel.selectedStation,
+                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.name == selectedStation.name })
+                               }), let waterTemp = lake.waterTemperature {
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                                
+                                Image(systemName: "drop.fill")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                                
+                                Text(String(format: "%.0f°", waterTemp))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                            }
+                            
+                            Text("|")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 11))
+                            
+                            // Wind
+                            Image(systemName: "wind")
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            // Wasserpegel-Differenz
+                            if let selectedStation = lakeStationsViewModel.selectedStation,
+                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.name == selectedStation.name })
+                               }), let waterLevelDiff = lake.waterLevelDifference {
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                                
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                                
+                                Text(waterLevelDiff)
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.top, 2)
+                    }
                 }
             }
             
@@ -214,16 +225,12 @@ private struct RemainingTimeView: View {
     
     private func getWaveIcon(for shipName: String) -> String {
         let cleanName = shipName.trimmingCharacters(in: .whitespaces)
-        print("🚢 Checking wave icon for ship: '\(cleanName)'")
         switch cleanName {
         case "MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel", "EM Uetliberg", "EM Pfannenstiel":
-            print("✅ Matched 3 waves")
             return "waves3"
         case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth", "DS Stadt Zürich", "DS Stadt Rapperswil":
-            print("✅ Matched 2 waves")
             return "waves2"
         default:
-            print("⚠️ Default 1 wave")
             return "waves1"
         }
     }

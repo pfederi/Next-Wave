@@ -1,0 +1,102 @@
+{
+  "lakes": [
+    {
+      "name": "Zürichsee",
+      "averageLevel": 405.94,
+      "unit": "m.ü.M.",
+      "notes": "Gesetzlich festgelegter Normalpegel. Reguliert durch Wehr."
+    },
+    {
+      "name": "Vierwaldstättersee",
+      "averageLevel": 433.57,
+      "unit": "m.ü.M.",
+      "notes": "Natürlicher See"
+    },
+    {
+      "name": "Bodensee",
+      "averageLevel": 395.60,
+      "unit": "m.ü.M.",
+      "notes": "TODO: Durchschnittspegel recherchieren. Kein Pegel auf meteonews.ch verfügbar."
+    },
+    {
+      "name": "Genfersee",
+      "averageLevel": 372.05,
+      "unit": "m.ü.M.",
+      "notes": "TODO: Durchschnittspegel recherchieren. Kein Pegel auf meteonews.ch verfügbar."
+    },
+    {
+      "name": "Thunersee",
+      "averageLevel": 557.66,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Brienzersee",
+      "averageLevel": 563.77,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Lago Maggiore",
+      "averageLevel": 193.49,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Luganersee",
+      "averageLevel": 270.47,
+      "unit": "m.ü.M.",
+      "notes": "TODO: Durchschnittspegel recherchieren. Kein Pegel auf meteonews.ch verfügbar."
+    },
+    {
+      "name": "Bielersee",
+      "averageLevel": 429.25,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Neuenburgersee",
+      "averageLevel": 429.29,
+      "unit": "m.ü.M.",
+      "notes": "TODO: Durchschnittspegel recherchieren. Kein Pegel auf meteonews.ch verfügbar."
+    },
+    {
+      "name": "Murtensee",
+      "averageLevel": 429.30,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Zugersee",
+      "averageLevel": 413.57,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Walensee",
+      "averageLevel": 419.03,
+      "unit": "m.ü.M.",
+      "notes": "Natürlicher See"
+    },
+    {
+      "name": "Hallwilersee",
+      "averageLevel": 448.66,
+      "unit": "m.ü.M.",
+      "notes": "Regulierter See"
+    },
+    {
+      "name": "Ägerisee",
+      "averageLevel": 723.76,
+      "unit": "m.ü.M.",
+      "notes": "Natürlicher See"
+    }
+  ],
+  "metadata": {
+    "source": "meteonews.ch",
+    "lastUpdated": "2025-10-29",
+    "description": "Average water levels for Swiss lakes that are in the Next Wave app. Only includes lakes where meteonews.ch provides water level data (Pegel).",
+    "displayFormat": "Show difference in cm from average: '+15 cm' or '-8 cm'",
+    "calculation": "difference_cm = (currentLevel - averageLevel) * 100",
+    "notes": "Average levels researched from BAFU historical data. For regulated lakes, uses the legally defined normal level. Lakes without water level data on meteonews.ch are marked as null."
+  }
+}

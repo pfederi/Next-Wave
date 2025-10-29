@@ -108,12 +108,24 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Visual Integration**: Displayed alongside weather data with consistent UI
 - **Coverage**: Available for 30+ Swiss lakes including Zürichsee, Vierwaldstättersee, Genfersee, Bodensee, and more
 
+### Water Level Display
+- **Real-Time Data**: Current water level for all major Swiss lakes
+- **Difference from Average**: Shows how much the current water level differs from the average (e.g., "+7 cm" or "-5 cm")
+- **Meteonews Integration**: Water level data sourced from meteonews.ch
+- **Daily Updates**: Automatic refresh once per day
+- **Visual Integration**: Displayed with chart icon alongside weather data
+- **Coverage**: Available for lakes where meteonews.ch provides water level data
+- **Foiler-Friendly**: Helps foilers assess water conditions and depth
+
 ### Weather Display Features
+- Weather condition icons (visual indicators)
 - Temperature in Celsius with min/max values
+- Water temperature for all Swiss lakes
 - Wind speed in knots (nautical standard)
 - Wind direction with compass points (N, NE, E, SE, S, SW, W, NW)
+- Water level difference from average (in cm)
 - Atmospheric pressure with trend indicators
-- Weather condition descriptions and icons
+- Clean, compact display with separator bars for readability
 
 ## User Interface Features
 
@@ -554,9 +566,9 @@ Saves data to `schiffsdaten.csv`
 - **Integration**: iOS app queries API and caches results per date and course number
 - **Performance**: Minimal API calls through intelligent client-side caching
 
-#### 3. Water Temperature API
-- **Vercel-based API**: Serverless function for real-time water temperature data
-- **Web Scraping**: Automatically scrapes meteonews.ch for Swiss lake temperatures
+#### 3. Water Temperature and Water Level API
+- **Vercel-based API**: Serverless function for real-time water temperature and water level data
+- **Web Scraping**: Automatically scrapes meteonews.ch for Swiss lake data
 - **Daily Updates**: Data refreshed once per day at first request
 - **Smart Caching**: 24-hour cache to minimize API calls and server load
 - **Coverage**: 30+ Swiss lakes including all major lakes
@@ -578,6 +590,11 @@ Saves data to `schiffsdaten.csv`
     }
   }
   ```
+- **Water Level Processing**: 
+  - App calculates difference from historical average levels
+  - Displays as "+X cm" or "-X cm" for easy interpretation
+  - Reference levels stored in `api/lake-water-levels.json`
+  - Helps foilers assess water depth and conditions
 - **Integration**: iOS app caches data for 24 hours matching backend update frequency
 - **Performance**: Single daily fetch per device, efficient data delivery
 

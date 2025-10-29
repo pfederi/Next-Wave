@@ -99,17 +99,18 @@ struct FavoriteStationTileView: View, Equatable {
                     
                     VStack(spacing: 8) {
                         HStack(alignment: .center, spacing: 2) {
-                            // Wetter-Icon und Beschreibung
+                            // Wetter-Icon
                             Image(systemName: weather.weatherIcon)
                                 .font(.system(size: 16))
-                                .padding(.trailing, 4)
-                            
-                            Text(weather.weatherDescription.capitalized)
-                                .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color("text-color"))
-                                .lineLimit(1)
                             
-                            Spacer()
+                            Spacer().frame(width: 4)
+                            
+                            Text("|")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 12))
+                            
+                            Spacer().frame(width: 4)
                             
                             // Temperatur
                             HStack(spacing: 4) {
@@ -180,6 +181,29 @@ struct FavoriteStationTileView: View, Equatable {
                                 } else {
                                     // Für aktuelle Wetterdaten die aktuelle Windgeschwindigkeit mit Richtung anzeigen
                                     Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                }
+                            }
+                            
+                            // Wasserpegel-Differenz
+                            if let lake = viewModel.lakes.first(where: { lake in
+                                lake.stations.contains(where: { $0.name == station.name })
+                            }), let waterLevelDiff = lake.waterLevelDifference {
+                                Spacer().frame(width: 4)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 12))
+                                
+                                Spacer().frame(width: 4)
+                                
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(Color("text-color"))
+                                    
+                                    Text(waterLevelDiff)
                                         .font(.system(size: 12))
                                         .foregroundColor(Color("text-color"))
                                 }

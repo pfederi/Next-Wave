@@ -61,7 +61,7 @@ struct DepartureRowView: View {
                                     
                                     Image(systemName: "drop.fill")
                                         .font(.system(size: 12))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(isPast ? .gray : .primary)
                                     
                                     Text(String(format: "%.0f°", waterTemp))
                                         .font(.system(size: 12))
@@ -203,9 +203,9 @@ private struct RemainingTimeView: View {
     
     private func getWaveIcon(for shipName: String) -> String {
     switch shipName {
-        case "MS Panta Rhei", "MS Albis":
+        case "MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel":
             return "waves3"
-        case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth":
+        case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth", "DS Stadt Zürich", "DS Stadt Rapperswil":
             return "waves2"
         default:
             return "waves1"

@@ -151,7 +151,7 @@ struct FavoriteStationTileView: View, Equatable {
                                 HStack(spacing: 4) {
                                     Image(systemName: "drop.fill")
                                         .font(.system(size: 12))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(Color("text-color"))
                                     
                                     Text(String(format: "%.0f°C", waterTemp))
                                         .font(.system(size: 12))

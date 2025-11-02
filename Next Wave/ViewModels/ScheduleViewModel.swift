@@ -155,6 +155,9 @@ class ScheduleViewModel: ObservableObject {
         currentLoadingTask?.cancel()
         weatherLoadingTask?.cancel()
         
+        // Leere die Liste sofort, damit die ScrollView resettet wird
+        nextWaves = []
+        
         // Starte Task für das Erstellen der Wellen
         currentLoadingTask = Task { @MainActor in
             // Erstelle Wellen OHNE sie sofort anzuzeigen

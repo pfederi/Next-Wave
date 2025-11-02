@@ -13,6 +13,7 @@ struct DeparturesListView: View {
     @State private var showingMaxFavoritesAlert = false
     @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
     @State private var hasTomorrowDepartures: Bool = true
+    @State private var lastScrolledDate: Date?
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -88,13 +89,17 @@ struct DeparturesListView: View {
                                 if let station = viewModel.selectedStation {
                                     scheduleViewModel.updateWaves(from: departures, station: station)
                                 }
-                                // Scroll wird automatisch durch onChange(of: scheduleViewModel.nextWaves) getriggert
+                                // Reset scroll state für neues Datum
+                                lastScrolledDate = nil
                             }
                             .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
-                                // Nur scrollen wenn sich die Wellen tatsächlich geändert haben
+                                // Nur scrollen wenn sich die Wellen geändert haben UND wir noch nicht gescrollt haben für dieses Datum
                                 guard !newWaves.isEmpty else { return }
+                                guard lastScrolledDate != viewModel.selectedDate else { return }
+                                
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     scrollToNextWave(proxy: proxy)
+                                    lastScrolledDate = viewModel.selectedDate
                                 }
                             }
                         }

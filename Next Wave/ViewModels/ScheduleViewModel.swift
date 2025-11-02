@@ -158,7 +158,7 @@ class ScheduleViewModel: ObservableObject {
         // Starte Task für das Erstellen der Wellen
         currentLoadingTask = Task { @MainActor in
             // Erstelle Wellen OHNE sie sofort anzuzeigen
-            var waves = await departures.asyncMap { journey -> WaveEvent in
+            let waves = await departures.asyncMap { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
             

@@ -229,9 +229,9 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 #### Node.js Dependencies
 - **[@vercel/node](https://www.npmjs.com/package/@vercel/node)**: Vercel serverless function helpers
-- **[axios](https://axios-http.com)**: HTTP client for web scraping
+- **[puppeteer-core](https://www.npmjs.com/package/puppeteer-core)**: Headless browser automation for dynamic content scraping
+- **[@sparticuz/chromium](https://www.npmjs.com/package/@sparticuz/chromium)**: Chromium binary optimized for serverless environments
 - **[cheerio](https://cheerio.js.org)**: jQuery-like HTML parsing for web scraping
-- **[@sparticuz/chromium](https://www.npmjs.com/package/@sparticuz/chromium)**: Headless browser for complex scraping
 - **[TypeScript](https://www.typescriptlang.org)**: Type-safe JavaScript development
 
 ### Data Storage & Development Tools
@@ -547,9 +547,11 @@ Saves data to `schiffsdaten.csv`
 
 #### 2. Vessel API
 - **Vercel-based API**: Serverless function for real-time ship deployments
-- **Web Scraping**: Automatically scrapes ZSG's official ship deployment website
+- **Puppeteer Web Scraping**: Uses headless Chrome to handle dynamic AJAX-loaded content
+- **Date Picker Automation**: Simulates clicking "Next Day" button to load data for each day
 - **3-Day Forecast**: Fetches ship assignments for today and the next 2 days
 - **Smart Caching**: Daily cache updates with automatic refresh at midnight (Swiss time)
+- **Client-Side Caching**: 24-hour HTTP cache headers for optimal performance
 - **Data Structure**: Returns daily deployments with ship-to-course mappings
 - **Error Handling**: Graceful fallback if data unavailable for specific days
 - **Currently Lake Zurich Only**: ZSG network (station IDs starting with 85036)

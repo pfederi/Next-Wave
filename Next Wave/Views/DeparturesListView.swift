@@ -14,6 +14,7 @@ struct DeparturesListView: View {
     @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
     @State private var hasTomorrowDepartures: Bool = true
     @State private var lastScrolledDate: Date?
+    @State private var scrollViewId = UUID()
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -100,8 +101,11 @@ struct DeparturesListView: View {
                                 }
                             }
                         }
-                        .id(viewModel.selectedDate) // ScrollView komplett neu erstellen bei Datumswechsel
+                        .id(scrollViewId) // ScrollView komplett neu erstellen bei Datumswechsel
                         .onChange(of: viewModel.selectedDate) { oldDate, newDate in
+                            // Neue ScrollView ID generieren -> zwingt Neuaufbau
+                            scrollViewId = UUID()
+                            
                             if let station = viewModel.selectedStation {
                                 scheduleViewModel.updateWaves(from: departures, station: station)
                             }

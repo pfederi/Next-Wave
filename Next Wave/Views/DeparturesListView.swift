@@ -168,6 +168,17 @@ struct DeparturesListView: View {
     }
     
     private func scrollToNextWave(proxy: ScrollViewProxy) {
+        // Für nicht-heutige Tage: immer zur ersten Abfahrt scrollen
+        if !isCurrentDay {
+            if let firstWave = scheduleViewModel.nextWaves.first {
+                withAnimation {
+                    proxy.scrollTo(firstWave.id, anchor: .top)
+                }
+            }
+            return
+        }
+        
+        // Nur für heute: zur nächsten/aktuellen Abfahrt scrollen
         let now = Date()
         if let currentOrNextWave = scheduleViewModel.nextWaves.first(where: { wave in
             let timeDifference = wave.time.timeIntervalSince(now)

@@ -260,7 +260,11 @@ export default async function handler(
 ) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET')
-  res.setHeader('Cache-Control', 's-maxage=86400') // Cache for 24 hours
+  
+  // Cache for 24 hours on both server and client
+  // s-maxage = server cache (CDN), max-age = client cache
+  // public = can be cached by any cache (CDN, browser, etc.)
+  res.setHeader('Cache-Control', 'public, s-maxage=86400, max-age=86400, stale-while-revalidate=3600')
   
   try {
     const cacheKey = getCacheKey()

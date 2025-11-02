@@ -106,11 +106,22 @@ actor VesselAPI {
                 throw URLError(.badURL)
             }
             
-            let (data, urlResponse) = try await URLSession.shared.data(from: url)
+            // Use URLRequest with cache policy to respect server cache headers
+            var request = URLRequest(url: url)
+            request.cachePolicy = .returnCacheDataElseLoad // Use cache if available
+            
+            let (data, urlResponse) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = urlResponse as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 throw URLError(.badServerResponse)
+            }
+            
+            // Check if data came from cache
+            if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
+                print("📦 Data came from URLCache (size: \(cachedResponse.data.count) bytes)")
+            } else {
+                print("🌐 Data fetched from network")
             }
             
             let decoder = JSONDecoder()
@@ -118,6 +129,11 @@ actor VesselAPI {
             
             print("✅ Received vessel data: \(vesselResponse.dailyDeployments.count) days")
             print("   Days: \(vesselResponse.dailyDeployments.map { $0.date }.joined(separator: ", "))")
+            
+            // Log total routes per day
+            for deployment in vesselResponse.dailyDeployments {
+                print("   \(deployment.date): \(deployment.routes.count) routes")
+            }
             
             return vesselResponse
         }

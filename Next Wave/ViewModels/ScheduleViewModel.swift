@@ -155,8 +155,10 @@ class ScheduleViewModel: ObservableObject {
         currentLoadingTask?.cancel()
         weatherLoadingTask?.cancel()
         
-        // Erstelle Wellen OHNE sie sofort anzuzeigen
-        var waves = await departures.asyncMap { journey -> WaveEvent in
+        // Starte Task für das Erstellen der Wellen
+        currentLoadingTask = Task { @MainActor in
+            // Erstelle Wellen OHNE sie sofort anzuzeigen
+            var waves = await departures.asyncMap { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
             
@@ -198,13 +200,11 @@ class ScheduleViewModel: ObservableObject {
                 shipName: shipName,
                 hasNotification: false
             )
-        }
-        
-        // NICHT sofort anzeigen - warte bis alle Daten geladen sind
-        hasAttemptedLoad = true
-        
-        // Starte einen einzelnen Task für beide Updates
-        currentLoadingTask = Task { @MainActor in
+            }
+            
+            // NICHT sofort anzeigen - warte bis alle Daten geladen sind
+            hasAttemptedLoad = true
+            
             // Erstelle eine Kopie der Wellen für die Verarbeitung
             var updatedWaves = waves
             

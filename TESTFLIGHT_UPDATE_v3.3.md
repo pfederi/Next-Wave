@@ -1,75 +1,75 @@
 # Next Wave v3.3 - TestFlight Update 🚀
 
-Hallo liebe Testuser! 👋
+Hey everyone! 👋
 
-Heute gibt es ein wichtiges Update mit massiven Performance-Verbesserungen für die Schiffsnamen-Anzeige. Die App sollte jetzt deutlich flüssiger und professioneller wirken!
+Today's update brings massive performance improvements for ship name display. The app should now feel much smoother and more professional!
 
-## Was ist neu? ✨
+## What's New? ✨
 
-### 🎯 Hauptverbesserung: Schiffsnamen ohne Flackern
+### 🎯 Main Improvement: Ship Names Without Flickering
 
-**Das Problem:**
-- Beim Öffnen einer Station erschien kurz "Loading..." bei den Schiffsnamen
-- Die Liste "flackerte" mehrmals während des Ladens
-- Schiffsnamen für morgen und übermorgen wurden nicht korrekt geladen
+**The Problem:**
+- When opening a station, "Loading..." briefly appeared for ship names
+- The list "flickered" multiple times during loading
+- Ship names for tomorrow and the day after weren't loading correctly
 
-**Die Lösung:**
-✅ **Keine "Loading..."-Anzeige mehr** - Schiffsnamen erscheinen sofort aus dem Cache  
-✅ **Kein UI-Flackern** - Die Liste wird nur einmal aktualisiert, wenn alle Daten bereit sind  
-✅ **Korrekte 3-Tages-Daten** - Schiffsnamen für heute, morgen und übermorgen werden jetzt zuverlässig geladen  
-✅ **Deutlich schneller** - Daten werden für 24 Stunden gecacht, keine redundanten API-Aufrufe mehr  
+**The Solution:**
+✅ **No More "Loading..." Indicators** - Ship names appear instantly from cache  
+✅ **Zero UI Flickering** - List updates only once when all data is ready  
+✅ **Correct 3-Day Data** - Ship names for today, tomorrow, and the day after now load reliably  
+✅ **Significantly Faster** - Data cached for 24 hours, no redundant API calls  
 
-### 🔧 Technische Verbesserungen
+### 🔧 Technical Improvements
 
-**Intelligentes Caching:**
-- 3-Schicht-Cache-System (API, URLSession, In-Memory)
-- Daten werden nur einmal pro Tag vom Server geladen
-- Danach sofortiger Zugriff ohne Wartezeit
+**Intelligent Caching:**
+- 3-layer cache system (API, URLSession, In-Memory)
+- Data loaded from server only once per day
+- Instant access thereafter with no wait time
 
-**Verbessertes Scraping:**
-- Neue Puppeteer-basierte Technologie für zuverlässigeres Laden der ZSG-Daten
-- Simuliert echte Browser-Interaktion (Klick auf "Nächster Tag" Button)
-- Robustere Fehlerbehandlung
+**Improved Scraping:**
+- New Puppeteer-based technology for more reliable ZSG data loading
+- Simulates real browser interaction (clicking "Next Day" button)
+- More robust error handling
 
-**Optimierte UI-Updates:**
-- Alle Daten (Wetter + Schiffsnamen) werden im Hintergrund geladen
-- UI wird nur einmal aktualisiert, wenn alles fertig ist
-- Smooth, professionelle User Experience
+**Optimized UI Updates:**
+- All data (weather + ship names) loaded in background
+- UI updates only once when everything is ready
+- Smooth, professional user experience
 
-## Was solltet ihr testen? 🧪
+## What Should You Test? 🧪
 
-1. **Schiffsnamen-Anzeige:**
-   - Öffnet verschiedene Zürichsee-Stationen
-   - Achtet darauf, ob "Loading..." noch erscheint (sollte es nicht!)
-   - Prüft, ob die Schiffsnamen sofort angezeigt werden
+1. **Ship Name Display:**
+   - Open different Lake Zurich stations
+   - Watch for any "Loading..." text (there shouldn't be any!)
+   - Check if ship names appear immediately
 
-2. **Mehrfaches Öffnen:**
-   - Öffnet die gleiche Station mehrmals hintereinander
-   - Die Schiffsnamen sollten beim zweiten Mal instant erscheinen
+2. **Multiple Opens:**
+   - Open the same station multiple times in a row
+   - Ship names should appear instantly the second time
 
-3. **Tageswechsel:**
-   - Schaut euch Abfahrten für morgen und übermorgen an
-   - Prüft, ob auch dort Schiffsnamen angezeigt werden
+3. **Day Changes:**
+   - Look at departures for tomorrow and the day after
+   - Verify that ship names are displayed for those days too
 
 4. **Performance:**
-   - Achtet auf die allgemeine Geschwindigkeit der App
-   - Gibt es noch irgendwo Verzögerungen oder Flackern?
+   - Pay attention to the overall app speed
+   - Notice any delays or flickering anywhere?
 
-## Bekannte Einschränkungen ⚠️
+## Known Limitations ⚠️
 
-- Schiffsnamen nur für Zürichsee-Stationen verfügbar
-- Beim ersten App-Start des Tages werden Daten neu geladen (kurze Wartezeit)
-- Danach sind alle Daten für 24 Stunden gecacht
+- Ship names only available for Lake Zurich stations
+- First app launch of the day will reload data (brief wait)
+- After that, all data is cached for 24 hours
 
-## Feedback erwünscht! 💬
+## Feedback Welcome! 💬
 
-Bitte meldet euch, wenn:
-- Ihr noch "Loading..." seht
-- Die App irgendwo flackert oder ruckelt
-- Schiffsnamen fehlen oder falsch sind
-- Ihr andere Performance-Probleme bemerkt
+Please let me know if you:
+- Still see "Loading..." anywhere
+- Notice any flickering or stuttering
+- Find missing or incorrect ship names
+- Experience any other performance issues
 
-Vielen Dank für euer Testing! 🙏
+Thanks so much for your testing! 🙏
 
 Patrick
 
@@ -77,5 +77,5 @@ Patrick
 
 **Version:** 3.3  
 **Build:** [TBD]  
-**Datum:** 2. November 2025
+**Date:** November 2, 2025
 

@@ -155,7 +155,8 @@ class ScheduleViewModel: ObservableObject {
         currentLoadingTask?.cancel()
         weatherLoadingTask?.cancel()
         
-        let waves = await departures.asyncMap { journey -> WaveEvent in
+        // Erstelle Wellen OHNE sie sofort anzuzeigen
+        var waves = await departures.asyncMap { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
             
@@ -199,20 +200,23 @@ class ScheduleViewModel: ObservableObject {
             )
         }
         
-        // Setze die Wellen einmal initial
-        nextWaves = waves
+        // NICHT sofort anzeigen - warte bis alle Daten geladen sind
         hasAttemptedLoad = true
         
         // Starte einen einzelnen Task für beide Updates
         currentLoadingTask = Task { @MainActor in
-            guard let coordinates = station.coordinates else { return }
+            // Erstelle eine Kopie der Wellen für die Verarbeitung
+            var updatedWaves = waves
+            
+            guard let coordinates = station.coordinates else { 
+                // Keine Koordinaten - zeige Wellen sofort an (ohne Wetter)
+                nextWaves = updatedWaves
+                return 
+            }
             let location = CLLocationCoordinate2D(
                 latitude: coordinates.latitude,
                 longitude: coordinates.longitude
             )
-            
-            // Erstelle eine Kopie der Wellen für die Verarbeitung
-            var updatedWaves = waves
             
             // 1. Lade zuerst alle Wetterdaten parallel
             let weatherData = await updatedWaves.asyncMap { wave -> WeatherAPI.WeatherInfo? in
@@ -230,15 +234,11 @@ class ScheduleViewModel: ObservableObject {
                 }
             }
             
-            // Aktualisiere UI sofort mit Wetterdaten
+            // Aktualisiere Wellen mit Wetterdaten (aber zeige noch NICHT an)
             for i in updatedWaves.indices {
                 if let weather = weatherData[i] {
                     updatedWaves[i].updateWeather(weather)
                 }
-            }
-            
-            if !Task.isCancelled {
-                nextWaves = updatedWaves
             }
             
             // 2. Lade nur fehlende Schiffsnamen nach (wenn nicht im Cache)
@@ -277,17 +277,15 @@ class ScheduleViewModel: ObservableObject {
                 return shipName
             }
             
-            // 3. Aktualisiere nur Wellen ohne Schiffsnamen
-            var needsUpdate = false
+            // 3. Aktualisiere Wellen mit fehlenden Schiffsnamen
             for i in updatedWaves.indices {
                 if updatedWaves[i].shipName == nil, let shipName = shipNames[i] {
                     updatedWaves[i].updateShipName(shipName)
-                    needsUpdate = true
                 }
             }
             
-            // 4. Aktualisiere die UI nur wenn neue Schiffsnamen hinzugefügt wurden
-            if needsUpdate && !Task.isCancelled {
+            // 4. Aktualisiere die UI NUR EINMAL mit allen Daten (Wetter + Schiffsnamen)
+            if !Task.isCancelled {
                 nextWaves = updatedWaves
             }
         }

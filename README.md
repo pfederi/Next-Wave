@@ -386,6 +386,14 @@ The link above is for Switzerland. For other countries, you have to find another
 
 ### Recent Technical Improvements
 
+#### Ship Data Loading Optimization (v3.3)
+- **Puppeteer-Based Scraping**: Advanced web scraping using headless Chrome to handle dynamic AJAX content
+- **Multi-Day Data Fetching**: Correctly loads ship assignments for today and next 2 days by simulating date picker clicks
+- **Intelligent Caching System**: Three-layer caching strategy (API cache, URLSession cache, in-memory cache)
+- **Zero Loading Flicker**: Ship names appear instantly from cache without "Loading..." indicators
+- **Single UI Update**: All data (weather + ship names) loaded in background before single smooth UI update
+- **Performance**: 24-hour client-side cache eliminates redundant API calls, dramatically improving app responsiveness
+
 #### Device Motion Detection
 - **CoreMotion Integration**: Uses device motion sensors to detect 180° flip gestures
 - **Smart Gesture Recognition**: Detects roll rotation with tolerance for natural device handling

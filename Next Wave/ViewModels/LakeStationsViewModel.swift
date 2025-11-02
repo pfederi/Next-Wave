@@ -44,6 +44,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         self.scheduleViewModel = scheduleViewModel
         Task {
             await loadLakes()
+            // Load water temperatures immediately after lakes are loaded
             await loadWaterTemperatures()
         }
         scheduleMidnightRefresh()
@@ -212,10 +213,13 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     func appWillEnterForeground() {
         scheduleMidnightRefresh()
-        if selectedStation != nil {
-            Task {
+        Task {
+            // Always reload water temperatures when app enters foreground
+            await loadWaterTemperatures()
+            
+            // Only refresh departures if a station is selected
+            if selectedStation != nil {
                 await refreshDepartures()
-                await loadWaterTemperatures()
             }
         }
     }

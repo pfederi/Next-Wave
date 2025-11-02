@@ -183,6 +183,7 @@ struct NextWaveApp: App {
                         Task {
                             await MainActor.run {
                                 viewModel.appWillEnterForeground()
+                                lakeStationsViewModel.appWillEnterForeground()
                             }
                             
                             // Load widget data every time app becomes active

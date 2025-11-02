@@ -12,12 +12,14 @@ Today's update brings massive performance improvements for ship name display. Th
 - When opening a station, "Loading..." briefly appeared for ship names
 - The list "flickered" multiple times during loading
 - Ship names for tomorrow and the day after weren't loading correctly
+- When switching days, the list jumped around before settling at the top
 
 **The Solution:**
 ✅ **No More "Loading..." Indicators** - Ship names appear instantly from cache  
 ✅ **Zero UI Flickering** - List updates only once when all data is ready  
 ✅ **Correct 3-Day Data** - Ship names for today, tomorrow, and the day after now load reliably  
 ✅ **Significantly Faster** - Data cached for 24 hours, no redundant API calls  
+✅ **Smooth Day Switching** - No more jumping when changing between days  
 
 ### 🔧 Technical Improvements
 
@@ -34,6 +36,7 @@ Today's update brings massive performance improvements for ship name display. Th
 **Optimized UI Updates:**
 - All data (weather + ship names) loaded in background
 - UI updates only once when everything is ready
+- Smart scroll positioning: today scrolls to next departure, other days scroll to top
 - Smooth, professional user experience
 
 ## What Should You Test? 🧪
@@ -47,9 +50,11 @@ Today's update brings massive performance improvements for ship name display. Th
    - Open the same station multiple times in a row
    - Ship names should appear instantly the second time
 
-3. **Day Changes:**
-   - Look at departures for tomorrow and the day after
-   - Verify that ship names are displayed for those days too
+3. **Day Switching:**
+   - Switch between today, tomorrow, and the day after
+   - Verify that ship names are displayed for all days
+   - Check that the list doesn't jump around when switching days
+   - Today should scroll to next departure, other days should show from the top
 
 4. **Performance:**
    - Pay attention to the overall app speed
@@ -66,6 +71,7 @@ Today's update brings massive performance improvements for ship name display. Th
 Please let me know if you:
 - Still see "Loading..." anywhere
 - Notice any flickering or stuttering
+- See the list jumping when switching days
 - Find missing or incorrect ship names
 - Experience any other performance issues
 

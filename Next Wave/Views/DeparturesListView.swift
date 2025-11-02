@@ -93,7 +93,9 @@ struct DeparturesListView: View {
                                 lastScrolledDate = nil
                             }
                             .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
-                                // Nur scrollen wenn sich die Wellen geändert haben UND wir noch nicht gescrollt haben für dieses Datum
+                                // Nur für HEUTE scrollen zur nächsten Abfahrt
+                                // Für andere Tage: nichts tun (Liste zeigt automatisch von oben)
+                                guard isCurrentDay else { return }
                                 guard !newWaves.isEmpty else { return }
                                 guard lastScrolledDate != viewModel.selectedDate else { return }
                                 
@@ -173,17 +175,7 @@ struct DeparturesListView: View {
     }
     
     private func scrollToNextWave(proxy: ScrollViewProxy) {
-        // Für nicht-heutige Tage: immer zur ersten Abfahrt scrollen
-        if !isCurrentDay {
-            if let firstWave = scheduleViewModel.nextWaves.first {
-                withAnimation {
-                    proxy.scrollTo(firstWave.id, anchor: .top)
-                }
-            }
-            return
-        }
-        
-        // Nur für heute: zur nächsten/aktuellen Abfahrt scrollen
+        // Diese Funktion wird nur für heute aufgerufen
         let now = Date()
         if let currentOrNextWave = scheduleViewModel.nextWaves.first(where: { wave in
             let timeDifference = wave.time.timeIntervalSince(now)

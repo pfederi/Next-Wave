@@ -88,6 +88,11 @@ struct DeparturesListView: View {
                                 if let station = viewModel.selectedStation {
                                     scheduleViewModel.updateWaves(from: departures, station: station)
                                 }
+                                // Scroll wird automatisch durch onChange(of: scheduleViewModel.nextWaves) getriggert
+                            }
+                            .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
+                                // Nur scrollen wenn sich die Wellen tatsächlich geändert haben
+                                guard !newWaves.isEmpty else { return }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     scrollToNextWave(proxy: proxy)
                                 }

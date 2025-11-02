@@ -155,7 +155,7 @@ class ScheduleViewModel: ObservableObject {
         currentLoadingTask?.cancel()
         weatherLoadingTask?.cancel()
         
-        let waves = departures.map { journey -> WaveEvent in
+        let waves = await departures.asyncMap { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
             
@@ -164,6 +164,26 @@ class ScheduleViewModel: ObservableObject {
             
             // Nur ZSG Stationen (85036 prefix)
             let isZurichsee = journey.stop.station.id.hasPrefix("85036")
+            
+            // Versuche Schiffsnamen synchron aus dem Cache zu holen
+            var shipName: String? = nil
+            if isZurichsee {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let dateString = dateFormatter.string(from: selectedDate)
+                let cacheKey = "\(dateString)_\(routeNumber)"
+                
+                // Prüfe zuerst den lokalen Cache
+                if let cachedName = shipNamesCache[cacheKey] {
+                    shipName = cachedName
+                } else {
+                    // Prüfe dann den VesselAPI Cache (synchron!)
+                    shipName = await VesselAPI.shared.getCachedShipName(for: routeNumber, date: selectedDate)
+                    if let name = shipName {
+                        shipNamesCache[cacheKey] = name
+                    }
+                }
+            }
             
             return WaveEvent(
                 time: departureTime,
@@ -174,7 +194,7 @@ class ScheduleViewModel: ObservableObject {
                 neighborStopName: nextStation?.name ?? "Unknown",
                 period: "regular",
                 lake: isZurichsee ? "Zürichsee" : "Unknown",
-                shipName: nil,
+                shipName: shipName,
                 hasNotification: false
             )
         }
@@ -221,10 +241,16 @@ class ScheduleViewModel: ObservableObject {
                 nextWaves = updatedWaves
             }
             
-            // 2. Lade dann alle Schiffsnamen parallel (im Hintergrund)
+            // 2. Lade nur fehlende Schiffsnamen nach (wenn nicht im Cache)
+            // Die meisten sollten bereits aus dem Cache geladen worden sein
             let shipNames = await updatedWaves.asyncMap { wave -> String? in
                 guard !Task.isCancelled else { return nil }
                 guard wave.isZurichsee else { return nil }
+                
+                // Wenn bereits vorhanden, überspringe
+                if wave.shipName != nil {
+                    return wave.shipName
+                }
                 
                 // Cache-Key mit Datum und Kursnummer erstellen
                 let dateFormatter = DateFormatter()
@@ -237,7 +263,7 @@ class ScheduleViewModel: ObservableObject {
                     return cachedName
                 }
                 
-                // Wenn nicht im Cache, lade von der API
+                // Wenn nicht im Cache, lade von der API (sollte selten vorkommen)
                 let shipName = await VesselAPI.shared.findShipName(
                     for: wave.routeNumber,
                     date: selectedDate
@@ -251,15 +277,17 @@ class ScheduleViewModel: ObservableObject {
                 return shipName
             }
             
-            // 3. Aktualisiere die Wellen mit Schiffsnamen
+            // 3. Aktualisiere nur Wellen ohne Schiffsnamen
+            var needsUpdate = false
             for i in updatedWaves.indices {
-                if let shipName = shipNames[i] {
+                if updatedWaves[i].shipName == nil, let shipName = shipNames[i] {
                     updatedWaves[i].updateShipName(shipName)
+                    needsUpdate = true
                 }
             }
             
-            // 4. Aktualisiere die UI ein zweites Mal mit Schiffsnamen
-            if !Task.isCancelled {
+            // 4. Aktualisiere die UI nur wenn neue Schiffsnamen hinzugefügt wurden
+            if needsUpdate && !Task.isCancelled {
                 nextWaves = updatedWaves
             }
         }

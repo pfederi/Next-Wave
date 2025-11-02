@@ -162,17 +162,67 @@ actor VesselAPI {
         }
     }
     
+    // Synchrone Methode um Schiffsnamen aus dem Cache zu holen (ohne async/await)
+    func getCachedShipName(for courseNumber: String, date: Date) -> String? {
+        let dateString = dateFormatter.string(from: date)
+        let cacheKey = "\(dateString)_\(courseNumber)"
+        
+        // Prüfe zuerst den shipNameCache
+        if let cachedName = shipNameCache[cacheKey] {
+            return cachedName
+        }
+        
+        // Prüfe dann die gecachte Response
+        if let cached = cachedResponse,
+           let lastFetch = lastFetchDate,
+           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           cached.isDataCurrent {
+            if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {
+                if let match = deployment.routes.first(where: { 
+                    $0.courseNumber.trimmingCharacters(in: .whitespaces)
+                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber 
+                }) {
+                    // Cache für nächstes Mal
+                    shipNameCache[cacheKey] = match.shipName
+                    return match.shipName
+                }
+            }
+        }
+        
+        return nil
+    }
+    
     func findShipName(for courseNumber: String, date: Date) async -> String? {
         // Cache-Key erstellen
         let dateString = dateFormatter.string(from: date)
         let cacheKey = "\(dateString)_\(courseNumber)"
         
-        // Wenn im Cache, direkt zurückgeben
+        // Wenn im Cache, direkt zurückgeben (ohne API-Call!)
         if let cachedName = shipNameCache[cacheKey] {
             return cachedName
         }
         
-        // Sonst von API holen und cachen
+        // Prüfe ob wir bereits gecachte Response-Daten haben
+        if let cached = cachedResponse,
+           let lastFetch = lastFetchDate,
+           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           cached.isDataCurrent {
+            // Suche direkt in den gecachten Daten ohne neuen API-Call
+            if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {
+                if let match = deployment.routes.first(where: { 
+                    $0.courseNumber.trimmingCharacters(in: .whitespaces)
+                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber 
+                }) {
+                    // Im Cache speichern für schnelleren Zugriff
+                    shipNameCache[cacheKey] = match.shipName
+                    return match.shipName
+                }
+            }
+            // Kurs nicht gefunden in gecachten Daten
+            return nil
+        }
+        
+        // Nur wenn keine gecachten Daten vorhanden sind, API aufrufen
         do {
             let response = try await fetchShipData()
             

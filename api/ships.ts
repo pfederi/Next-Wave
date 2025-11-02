@@ -64,11 +64,12 @@ async function fetchDayData(date: string, dayOffset: number): Promise<{routes: S
       console.log(`  🔄 Clicking next day arrow (${i + 1}/${dayOffset})`)
       
       // Wait for the next button and click it
-      await page.waitForSelector('.datepicker-next', { timeout: 10000 })
-      await page.click('.datepicker-next')
+      // The button is: <span class="add-on next" title="Nächster Tag"><i class="icon-arrow-right"></i></span>
+      await page.waitForSelector('.add-on.next', { timeout: 10000 })
+      await page.click('.add-on.next')
       
       // Wait for the content to update (wait for network to be idle)
-      await new Promise(resolve => setTimeout(resolve, 1500)) // Give it time to load
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Give it time to load
       
       console.log(`  ✅ Clicked and waited for content to update`)
     }

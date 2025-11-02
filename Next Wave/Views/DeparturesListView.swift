@@ -81,20 +81,15 @@ struct DeparturesListView: View {
                                 if let station = viewModel.selectedStation {
                                     scheduleViewModel.updateWaves(from: departures, station: station)
                                 }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    scrollToNextWave(proxy: proxy)
+                                // Nur für heute scrollen
+                                if isCurrentDay {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        scrollToNextWave(proxy: proxy)
+                                    }
                                 }
-                            }
-                            .onChange(of: viewModel.selectedDate) { oldDate, newDate in
-                                if let station = viewModel.selectedStation {
-                                    scheduleViewModel.updateWaves(from: departures, station: station)
-                                }
-                                // Reset scroll state für neues Datum
-                                lastScrolledDate = nil
                             }
                             .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
                                 // Nur für HEUTE scrollen zur nächsten Abfahrt
-                                // Für andere Tage: nichts tun (Liste zeigt automatisch von oben)
                                 guard isCurrentDay else { return }
                                 guard !newWaves.isEmpty else { return }
                                 guard lastScrolledDate != viewModel.selectedDate else { return }
@@ -104,6 +99,14 @@ struct DeparturesListView: View {
                                     lastScrolledDate = viewModel.selectedDate
                                 }
                             }
+                        }
+                        .id(viewModel.selectedDate) // ScrollView komplett neu erstellen bei Datumswechsel
+                        .onChange(of: viewModel.selectedDate) { oldDate, newDate in
+                            if let station = viewModel.selectedStation {
+                                scheduleViewModel.updateWaves(from: departures, station: station)
+                            }
+                            // Reset scroll state für neues Datum
+                            lastScrolledDate = nil
                         }
                     }
                 } else if viewModel.hasAttemptedLoad {

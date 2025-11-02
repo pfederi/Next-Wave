@@ -19,6 +19,14 @@ interface CachedData {
     daysProcessed: number
     firstDay: string
     lastDay: string
+    processedDates?: string[]
+    swissTime?: string
+    detailedStats?: Array<{
+      date: string
+      routesFound: number
+      shipsFound: number
+      htmlLength: number
+    }>
   }
 }
 
@@ -27,8 +35,10 @@ function cleanShipName(rawName: string): string {
   return name.split('Kurs')[0].trim()
 }
 
-async function fetchDayData(date: string): Promise<ShipRoute[]> {
+async function fetchDayData(date: string): Promise<{routes: ShipRoute[], stats: {shipsFound: number, htmlLength: number}}> {
   const url = `https://einsatzderschiffe.zsg.ch/schiffeinsatz`
+  
+  console.log(`📡 Fetching data for date: ${date}`)
   
   const response = await axios.get(url, {
     params: {
@@ -46,24 +56,55 @@ async function fetchDayData(date: string): Promise<ShipRoute[]> {
 
   const $ = cheerio.load(response.data)
   const routes: ShipRoute[] = []
+  const htmlLength = response.data.length
+  const shipsFound = $('.ship').length
 
-  $('.ship').each((_, shipElement) => {
+  console.log(`📄 HTML length for ${date}: ${htmlLength} chars`)
+  console.log(`🚢 Found ${shipsFound} ship elements`)
+
+  $('.ship').each((shipIndex, shipElement) => {
     const $ship = $(shipElement)
     const rawShipName = $ship.find('.legend .title').first().text()
     const shipName = cleanShipName(rawShipName)
 
-    if ($ship.find('.disposition').length > 0) {
-      $ship.find('.disposition').each((_, routeElement) => {
-        const courseNumber = $(routeElement).find('.cruise span:last-child').first().text().trim()
+    console.log(`  Ship ${shipIndex + 1}: "${shipName}"`)
+
+    const dispositions = $ship.find('.disposition')
+    console.log(`    Found ${dispositions.length} dispositions`)
+
+    if (dispositions.length > 0) {
+      dispositions.each((dispIndex, routeElement) => {
+        const $route = $(routeElement)
+        
+        // Versuche verschiedene Selektoren für die Kursnummer
+        let courseNumber = $route.find('.cruise span:last-child').first().text().trim()
+        
+        // Fallback: Versuche alle spans in .cruise
+        if (!courseNumber) {
+          const allSpans = $route.find('.cruise span')
+          console.log(`      Disposition ${dispIndex + 1}: Found ${allSpans.length} spans in .cruise`)
+          allSpans.each((spanIndex, span) => {
+            const text = $(span).text().trim()
+            console.log(`        Span ${spanIndex + 1}: "${text}"`)
+          })
+          // Nimm den letzten span mit Inhalt
+          courseNumber = allSpans.last().text().trim()
+        }
+        
+        console.log(`      Disposition ${dispIndex + 1}: Course="${courseNumber}"`)
         
         if (courseNumber && shipName) {
           routes.push({ shipName, courseNumber })
+          console.log(`      ✅ Added route: ${shipName} -> ${courseNumber}`)
+        } else {
+          console.log(`      ⚠️ Skipped: shipName="${shipName}", courseNumber="${courseNumber}"`)
         }
       })
     }
   })
 
-  return routes
+  console.log(`✅ Total routes found for ${date}: ${routes.length}`)
+  return { routes, stats: { shipsFound, htmlLength } }
 }
 
 // Get current date in Swiss timezone
@@ -76,6 +117,7 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
     const dailyDeployments: DailyDeployment[] = []
     const today = getCurrentSwissDate()
     const processedDates: string[] = []
+    const detailedStats: Array<{date: string, routesFound: number, shipsFound: number, htmlLength: number}> = []
     
     console.log('Starting to fetch ship data for 3 days...')
     
@@ -97,13 +139,19 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
       console.log(`Fetching day ${i + 1}/3: ${dateStringForAPI} (stored as ${dateString})`)
       
       try {
-        const routes = await fetchDayData(dateStringForAPI)
-        console.log(`Successfully fetched ${routes.length} routes for ${dateStringForAPI}`)
+        const result = await fetchDayData(dateStringForAPI)
+        console.log(`Successfully fetched ${result.routes.length} routes for ${dateStringForAPI}`)
         dailyDeployments.push({
           date: dateString,
-          routes: routes
+          routes: result.routes
         })
         processedDates.push(dateString)
+        detailedStats.push({
+          date: dateString,
+          routesFound: result.routes.length,
+          shipsFound: result.stats.shipsFound,
+          htmlLength: result.stats.htmlLength
+        })
         
         // Small delay between requests to be nice to the server
         if (i < 2) {
@@ -119,10 +167,17 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
         })
         // Also add to processedDates to track that we tried
         processedDates.push(dateString)
+        detailedStats.push({
+          date: dateString,
+          routesFound: 0,
+          shipsFound: 0,
+          htmlLength: 0
+        })
       }
     }
     
     console.log(`Finished fetching. Processed ${processedDates.length} days:`, processedDates)
+    console.log('Detailed stats:', detailedStats)
 
     const firstDay = processedDates[0] || today.toISOString().split('T')[0]
     const lastDay = processedDates[processedDates.length - 1] || firstDay
@@ -134,7 +189,8 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
         firstDay: firstDay,
         lastDay: lastDay,
         processedDates: processedDates,
-        swissTime: today.toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
+        swissTime: today.toLocaleString('de-CH', { timeZone: 'Europe/Zurich' }),
+        detailedStats: detailedStats
       }
     }
     
@@ -214,7 +270,8 @@ export default async function handler(
       lastUpdated: result.lastUpdated,
       debug: {
         ...result.debug,
-        currentSwissTime: getCurrentSwissDate().toLocaleString('de-CH', { timeZone: 'Europe/Zurich' })
+        currentSwissTime: getCurrentSwissDate().toLocaleString('de-CH', { timeZone: 'Europe/Zurich' }),
+        cacheUsed: cachedData !== null && !needsUpdate(cachedData.lastUpdated, cachedData)
       }
     })
 

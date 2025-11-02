@@ -9,9 +9,9 @@ Today's update brings massive performance improvements for ship name display. Th
 ### 🎯 Main Improvement: Ship Names Without Flickering
 
 **The Problem:**
+- Ship names for tomorrow and the day after weren't loading at all (only today worked)
 - When opening a station, "Loading..." briefly appeared for ship names
 - The list "flickered" multiple times during loading
-- Ship names for tomorrow and the day after weren't loading correctly
 - When switching days, the list jumped around before settling at the top
 
 **The Solution:**
@@ -30,7 +30,8 @@ Today's update brings massive performance improvements for ship name display. Th
 
 **Improved Scraping:**
 - New Puppeteer-based technology for more reliable ZSG data loading
-- Simulates real browser interaction (clicking "Next Day" button)
+- Simulates real browser interaction (clicking "Next Day" button) to load all 3 days
+- Fixed: Ship names now load correctly for tomorrow and the day after (not just today)
 - More robust error handling
 
 **Optimized UI Updates:**

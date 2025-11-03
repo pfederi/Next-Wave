@@ -1,4 +1,14 @@
-What's New in Version 3.4:
+What's New in Version 3.4.1:
+
+Water Level Icon Improvement
+• Dynamic water level icons that show direction at a glance
+• Arrow up when water is higher than average
+• Arrow down when water is lower than average
+• Instantly see water conditions without reading numbers
+
+---
+
+Previous Updates (Version 3.4):
 
 Smart Wetsuit Recommendations
 • Get personalized wetsuit thickness recommendations based on water temperature and wind chill

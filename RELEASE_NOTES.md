@@ -1,5 +1,14 @@
 # NextWave App - Recent Updates
 
+## 🌊 Water Level Icon Improvement (v3.4.1)
+
+### Dynamic Water Level Icons
+- **Directional indicators**: Water level icons now show direction based on whether water is higher or lower than average
+- **Arrow up (↑)**: Displayed when water level is above average (e.g., +15 cm)
+- **Arrow down (↓)**: Displayed when water level is below average (e.g., -5 cm)
+- **Visual clarity**: Instantly see if water level is high or low without reading the number
+- **Consistent across app**: Updated in departure list, favorite stations, and nearest station tiles
+
 ## 🌤️ Weather & Wetsuit Features (v3.4)
 
 ### Smart Wetsuit Thickness Recommendations 🤸

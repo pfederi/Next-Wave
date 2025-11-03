@@ -1,6 +1,6 @@
 # NextWave App - Release History
 
-## Version 3.4.1 (November 2024)
+## Version 3.4.1 (November 2025)
 
 ### Water Level Icon Improvement
 - **Dynamic water level icons**: Icons now show direction based on whether water is higher or lower than average
@@ -11,7 +11,7 @@
 
 ---
 
-## Version 3.4 (November 2024)
+## Version 3.4 (November 2025)
 
 ### Smart Wetsuit Thickness Recommendations 🤸
 - **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
@@ -48,7 +48,7 @@
 
 ---
 
-## Version 3.3.1 (October 2024)
+## Version 3.3.1 (October 2025)
 
 ### Bug Fixes
 - **Ship names loading**: Fixed issue where ship names weren't loading for all 3 days
@@ -57,7 +57,7 @@
 
 ---
 
-## Version 3.3 (October 2024)
+## Version 3.3 (October 2025)
 
 ### Ship Data Loading Optimization
 - **Puppeteer-based scraping**: Advanced web scraping using headless Chrome to handle dynamic AJAX content
@@ -82,7 +82,7 @@
 
 ---
 
-## Version 3.0 (September 2024)
+## Version 3.0 (September 2025)
 
 ### Water Temperature Display
 - **Real-time data**: Current water temperature for all major Swiss lakes
@@ -110,7 +110,7 @@
 
 ---
 
-## Version 3.2 (September 2024)
+## Version 3.2 (September 2025)
 
 ### Widget Enhancements
 - **Multi-day logic**: Intelligent widget functionality with better multi-day support
@@ -121,7 +121,7 @@
 
 ---
 
-## Version 3.1 (September 2024)
+## Version 3.1 (September 2025)
 
 ### Dependency Updates
 - **Security fixes**: Updated dependencies to fix security vulnerabilities
@@ -137,7 +137,7 @@
 
 ---
 
-## Version 2.9.1 (August 2024)
+## Version 2.9.1 (August 2025)
 
 ### Watch App Improvements
 - **Location refresh**: Implement location refresh on app appearance
@@ -148,7 +148,7 @@
 
 ---
 
-## Version 2.9 (August 2024)
+## Version 2.9 (August 2025)
 
 ### Apple Watch App & Widgets
 - **Watch app**: Full-featured Apple Watch app with complications and widgets
@@ -160,7 +160,7 @@
 
 ---
 
-## Version 2.8.5 (July 2024)
+## Version 2.8.5 (July 2025)
 
 ### Time Zone Fixes
 - **Zurich time zone**: Fixed time zone handling for sunrise and sunset times
@@ -175,7 +175,7 @@
 
 ---
 
-## Version 2.8.4 (July 2024)
+## Version 2.8.4 (July 2025)
 
 ### Date & Time Improvements
 - **Improved date handling**: Refactored AppDateFormatter for better date handling
@@ -184,7 +184,7 @@
 
 ---
 
-## Version 2.8 (July 2024)
+## Version 2.8 (July 2025)
 
 ### App Rebranding
 - **Name change**: Rebranded from "Next Wave" to "NextWave" (one word)
@@ -198,7 +198,7 @@
 
 ---
 
-## Version 2.7.1 (June 2024)
+## Version 2.7.1 (June 2025)
 
 ### Bug Fixes & Improvements
 - **Date behavior**: Fixed consistent date behavior when selecting stations
@@ -209,7 +209,7 @@
 
 ---
 
-## Version 2.7 (June 2024)
+## Version 2.7 (June 2025)
 
 ### Favorite Stations
 - **Up to 5 favorites**: Store up to 5 frequently used stations
@@ -229,7 +229,7 @@
 
 ---
 
-## Version 2.6 (May 2024)
+## Version 2.6 (May 2025)
 
 ### Sunrise & Sunset Integration
 - **Sun times**: Display sunrise and sunset times for each day
@@ -245,7 +245,7 @@
 
 ---
 
-## Version 2.5 (May 2024)
+## Version 2.5 (May 2025)
 
 ### Schedule Period Management
 - **Automatic detection**: App automatically detects summer and winter schedule periods
@@ -257,7 +257,7 @@
 
 ---
 
-## Version 2.4 (May 2024)
+## Version 2.4 (May 2025)
 
 ### Ship Data Display Extension
 - **3-day ship forecast**: Extended ship name display from 1 day to 3 days
@@ -267,7 +267,7 @@
 
 ---
 
-## Version 2.3 (May 2024)
+## Version 2.3 (May 2025)
 
 ### Ship Names & Wave Ratings
 - **Real-time ship identification**: Displays actual ship name for each departure on Lake Zurich
@@ -278,7 +278,7 @@
 
 ---
 
-## Version 2.2 (April 2024)
+## Version 2.2 (April 2025)
 
 ### Map Integration
 - **OpenStreetMap**: Detailed water navigation maps
@@ -291,7 +291,7 @@
 
 ---
 
-## Version 2.1 (March 2024)
+## Version 2.1 (March 2025)
 
 ### Notification Improvements
 - **Better notification management**: Improved handling of notification lifecycle
@@ -307,7 +307,7 @@
 
 ---
 
-## Version 2.0 (March 2024)
+## Version 2.0 (March 2025)
 
 ### Major UI Overhaul
 - **Light & Dark Mode**: Full support for both color schemes
@@ -343,7 +343,7 @@
 
 ---
 
-## Version 1.0 (February 2024)
+## Version 1.0 (February 2025)
 
 ### Initial Release
 - **Real-time schedules**: Live boat departure times for Swiss lakes
@@ -356,8 +356,8 @@
 
 ---
 
-*These updates represent our commitment to providing a safe, reliable, and user-friendly wakethieving experience while promoting responsible practices on Swiss waters.*
-
 **Download NextWave**: [App Store](https://apps.apple.com/ch/app/nextwave/id6739363035)
+
+**GitHub Repository**: [github.com/pfederi/Next-Wave](https://github.com/pfederi/Next-Wave)
 
 **Community**: [Pumpfoiling Community](https://pumpfoiling.community)

@@ -496,7 +496,7 @@ struct LinksSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Button(action: {
-                if let url = URL(string: "https://github.com/pfederi/Next-Wave/blob/main/RELEASE_NOTES.md") {
+                if let url = URL(string: "https://nextwaveapp.ch/release-notes.html") {
                     openURL(url)
                 }
             }) {

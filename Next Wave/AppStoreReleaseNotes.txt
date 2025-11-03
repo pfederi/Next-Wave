@@ -1,21 +1,21 @@
 What's New in Version 3.4:
 
-🤸 Smart Wetsuit Recommendations
+Smart Wetsuit Recommendations
 • Get personalized wetsuit thickness recommendations based on water temperature and wind chill
 • Based on professional Quiksilver wetsuit standards
 • Smart 30°C rule: recommends thicker wetsuit when air + water temp < 30°C
 
-📊 Interactive Weather Legend
+Interactive Weather Legend
 • Tap any weather line to learn what each icon and value means
 • Comprehensive guide to all weather conditions and data points
 • Easy-to-understand explanations for better session planning
 
-📤 Share Waves with Friends
+Share Waves with Friends
 • Share wave details via WhatsApp, Messages, or Mail with one tap
 • Includes all important info: station, time, ship, weather, and wetsuit recommendation
 • Fun randomized intro messages to invite friends to join your session
 
-🌤️ Enhanced Weather Display
+Enhanced Weather Display
 • Improved layout with better spacing and full-width display
 • Consistent data ordering: Air Temp | Water Temp | Wind | Wetsuit | Water Level
 • Clear icons and separators for easy reading

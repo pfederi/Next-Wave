@@ -11,6 +11,7 @@ struct DepartureRowView: View {
     @EnvironmentObject var appSettings: AppSettings
     @EnvironmentObject var lakeStationsViewModel: LakeStationsViewModel
     @State private var showShareSheet = false
+    @State private var showWeatherLegend = false
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -100,72 +101,77 @@ struct DepartureRowView: View {
                 // Dritte Zeile: Wetterdaten und Wasserpegel
                 if !isPast && appSettings.showWeatherInfo {
                     if let weather = wave.weather {
-                        HStack(spacing: 4) {
-                            // Wetter-Icon
-                            Image(systemName: weather.weatherIcon)
-                                .font(.system(size: 12))
-                                .foregroundColor(.primary)
-                            
-                            // Lufttemperatur
-                            Text(String(format: "%.1f°", weather.temperature))
-                                .font(.system(size: 11))
-                                .foregroundColor(.primary)
-                            
-                            // Wassertemperatur
-                            if let selectedStation = lakeStationsViewModel.selectedStation,
-                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
-                                   lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterTemp = lake.waterTemperature {
+                        Button(action: {
+                            showWeatherLegend = true
+                        }) {
+                            HStack(spacing: 4) {
+                                // Wetter-Icon
+                                Image(systemName: weather.weatherIcon)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.primary)
+                                
+                                // Lufttemperatur
+                                Text(String(format: "%.1f°", weather.temperature))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                                
+                                // Wassertemperatur
+                                if let selectedStation = lakeStationsViewModel.selectedStation,
+                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                       lake.stations.contains(where: { $0.name == selectedStation.name })
+                                   }), let waterTemp = lake.waterTemperature {
+                                    
+                                    Text("|")
+                                        .foregroundColor(.gray)
+                                        .font(.system(size: 11))
+                                    
+                                    Image(systemName: "drop.fill")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.primary)
+                                    
+                                    Text(String(format: "%.0f°", waterTemp))
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.primary)
+                                }
                                 
                                 Text("|")
                                     .foregroundColor(.gray)
                                     .font(.system(size: 11))
                                 
-                                Image(systemName: "drop.fill")
+                                // Wind
+                                Image(systemName: "wind")
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
-                                Text(String(format: "%.0f°", waterTemp))
+                                Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
+                                
+                                // Wasserpegel-Differenz (nur für heutigen Tag)
+                                if Calendar.current.isDateInToday(wave.time),
+                                   let selectedStation = lakeStationsViewModel.selectedStation,
+                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                       lake.stations.contains(where: { $0.name == selectedStation.name })
+                                   }), let waterLevelDiff = lake.waterLevelDifference {
+                                    
+                                    Text("|")
+                                        .foregroundColor(.gray)
+                                        .font(.system(size: 11))
+                                    
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.primary)
+                                    
+                                    Text(waterLevelDiff)
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.primary)
+                                }
+                                
+                                Spacer()
                             }
-                            
-                            Text("|")
-                                .foregroundColor(.gray)
-                                .font(.system(size: 11))
-                            
-                            // Wind
-                            Image(systemName: "wind")
-                                .font(.system(size: 11))
-                                .foregroundColor(.primary)
-                            
-                            Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
-                                .font(.system(size: 11))
-                                .foregroundColor(.primary)
-                            
-                            // Wasserpegel-Differenz (nur für heutigen Tag)
-                            if Calendar.current.isDateInToday(wave.time),
-                               let selectedStation = lakeStationsViewModel.selectedStation,
-                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
-                                   lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterLevelDiff = lake.waterLevelDifference {
-                                
-                                Text("|")
-                                    .foregroundColor(.gray)
-                                    .font(.system(size: 11))
-                                
-                                Image(systemName: "chart.line.uptrend.xyaxis")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.primary)
-                                
-                                Text(waterLevelDiff)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.primary)
-                            }
-                            
-                            Spacer()
+                            .padding(.top, 2)
                         }
-                        .padding(.top, 2)
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
@@ -183,6 +189,9 @@ struct DepartureRowView: View {
         }
         .sheet(isPresented: $showShareSheet) {
             CustomShareSheet(text: generateShareText(), isPresented: $showShareSheet)
+        }
+        .sheet(isPresented: $showWeatherLegend) {
+            WeatherLegendView(isPresented: $showWeatherLegend)
         }
     }
     
@@ -497,5 +506,124 @@ struct MessageComposeView: UIViewControllerRepresentable {
         func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
             isPresented = false
         }
+    }
+}
+
+// Weather Legend View
+struct WeatherLegendView: View {
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        NavigationView {
+            List {
+                Section(header: Text("Weather Information")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: "sun.max.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.primary)
+                                .frame(width: 30)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Weather Icon + Air Temperature")
+                                    .font(.headline)
+                                
+                                Text("Shows current weather condition and air temperature in degrees Celsius")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    
+                    LegendRow(
+                        icon: "drop.fill",
+                        iconColor: .primary,
+                        title: "Water Temperature",
+                        description: "Current lake water temperature in degrees Celsius"
+                    )
+                    
+                    LegendRow(
+                        icon: "wind",
+                        iconColor: .primary,
+                        title: "Wind Speed & Direction",
+                        description: "Wind speed in knots (kn) and wind direction (N, NE, E, SE, S, SW, W, NW)"
+                    )
+                    
+                    LegendRow(
+                        icon: "chart.line.uptrend.xyaxis",
+                        iconColor: .primary,
+                        title: "Water Level",
+                        description: "Difference from average water level in centimeters (only shown for today)"
+                    )
+                }
+                
+                Section(header: Text("Weather Conditions")) {
+                    LegendRow(
+                        icon: "sun.max.fill",
+                        iconColor: .primary,
+                        title: "Clear Sky",
+                        description: "Sunny weather with no clouds"
+                    )
+                    
+                    LegendRow(
+                        icon: "cloud.sun.fill",
+                        iconColor: .primary,
+                        title: "Partly Cloudy",
+                        description: "Mix of sun and clouds"
+                    )
+                    
+                    LegendRow(
+                        icon: "cloud.fill",
+                        iconColor: .primary,
+                        title: "Cloudy",
+                        description: "Overcast sky"
+                    )
+                    
+                    LegendRow(
+                        icon: "cloud.rain.fill",
+                        iconColor: .primary,
+                        title: "Rain",
+                        description: "Rainy weather"
+                    )
+                }
+            }
+            .navigationTitle("Weather Legend")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        isPresented = false
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Legend Row Component
+struct LegendRow: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let description: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(iconColor)
+                .frame(width: 30)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                
+                Text(description)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 } 

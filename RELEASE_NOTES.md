@@ -15,7 +15,6 @@
 
 ### Smart Wetsuit Thickness Recommendations 🤸
 - **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
-- **Quiksilver reference table**: Based on professional wetsuit thickness standards
 - **30°C rule**: If air + water temperature < 30°C, the app recommends one size thicker for optimal comfort
 - **Temperature ranges**: From 0.5-2mm shorties to 6/5/4mm winter wetsuits
 - **Wind chill integration**: Uses "feels like" temperature for more accurate recommendations

@@ -14,169 +14,201 @@ struct DepartureRowView: View {
     @State private var showWeatherLegend = false
     
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .center, spacing: 12) {
-                Text(formattedTime)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(isPast ? .gray : .primary)
-                if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
-                    RemainingTimeView(targetDate: date)
-                }
-            }
-            .frame(width: 70)
-            
-            Spacer().frame(width: 16)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                // Erste Zeile: Wave-Nummer, Notification und Wetter
-                HStack(alignment: .firstTextBaseline) {
-                    Image(systemName: "water.waves")
-                        .foregroundColor(isPast ? .gray : .blue)
-                    Text("\(index + 1). Wave")
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .center, spacing: 12) {
+                    Text(formattedTime)
+                        .font(.system(size: 24, weight: .bold))
                         .foregroundColor(isPast ? .gray : .primary)
+                    if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
+                        RemainingTimeView(targetDate: date)
+                    }
+                }
+                .frame(width: 70)
+                
+                Spacer().frame(width: 16)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    // Erste Zeile: Wave-Nummer, Notification und Wetter
+                    HStack(alignment: .firstTextBaseline) {
+                        Image(systemName: "water.waves")
+                            .foregroundColor(isPast ? .gray : .blue)
+                        Text("\(index + 1). Wave")
+                            .foregroundColor(isPast ? .gray : .primary)
+                        
+                        Spacer()
+                        
+                        if !isPast {
+                            if scheduleViewModel.hasNotification(for: wave) {
+                                Image(systemName: "bell.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 16))
+                            }
+                            
+                            // Share Button
+                            Button(action: {
+                                print("🔵 Share button tapped")
+                                showShareSheet = true
+                            }) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 16))
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
                     
-                    Spacer()
-                    
-                    if !isPast {
-                        if scheduleViewModel.hasNotification(for: wave) {
-                            Image(systemName: "bell.fill")
-                                .foregroundColor(.blue)
-                                .font(.system(size: 16))
+                    // Zweite Zeile: Route, Schiff und Ziel
+                    HStack(alignment: .center, spacing: 8) {
+                        // Route-Nummer
+                        Text(wave.routeNumber)
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(12)
+                        
+                        if wave.isZurichsee && isWithinNext3Days(wave.time) {
+                            // Schiffsname mit Icon (nur für die nächsten 3 Tage)
+                            HStack(spacing: 4) {
+                                Text(wave.shipName ?? "Loading...")
+                                    .lineLimit(1)
+                                if let shipName = wave.shipName {
+                                    Image(getWaveIcon(for: shipName))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 12)
+                                }
+                            }
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.blue.opacity(0.1))
+                            .cornerRadius(12)
                         }
                         
-                        // Share Button
-                        Button(action: {
-                            print("🔵 Share button tapped")
-                            showShareSheet = true
-                        }) {
-                            Image(systemName: "square.and.arrow.up")
-                                .foregroundColor(.blue)
-                                .font(.system(size: 16))
-                        }
-                        .buttonStyle(PlainButtonStyle())
+                        Text("→")
+                            .font(.caption)
+                            .foregroundColor(isPast ? .gray : .primary)
+                        
+                        Text(wave.neighborStopName)
+                            .font(.caption)
+                            .foregroundColor(isPast ? .gray : .primary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 
-                // Zweite Zeile: Route, Schiff und Ziel
-                HStack(alignment: .center, spacing: 8) {
-                    // Route-Nummer
-                    Text(wave.routeNumber)
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(12)
-                    
-                    if wave.isZurichsee && isWithinNext3Days(wave.time) {
-                        // Schiffsname mit Icon (nur für die nächsten 3 Tage)
-                        HStack(spacing: 4) {
-                            Text(wave.shipName ?? "Loading...")
-                                .lineLimit(1)
-                            if let shipName = wave.shipName {
-                                Image(getWaveIcon(for: shipName))
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 16, height: 12)
-                            }
-                        }
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(12)
-                    }
-                    
-                    Text("→")
-                        .font(.caption)
-                        .foregroundColor(isPast ? .gray : .primary)
-                    
-                    Text(wave.neighborStopName)
-                        .font(.caption)
-                        .foregroundColor(isPast ? .gray : .primary)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                }
-                
-                // Dritte Zeile: Wetterdaten und Wasserpegel
-                if !isPast && appSettings.showWeatherInfo {
-                    if let weather = wave.weather {
-                        Button(action: {
-                            showWeatherLegend = true
-                        }) {
+                Spacer()
+            }
+            
+            // Dritte Zeile: Wetterdaten und Wasserpegel (volle Breite)
+            if !isPast && appSettings.showWeatherInfo {
+                if let weather = wave.weather {
+                    Button(action: {
+                        showWeatherLegend = true
+                    }) {
+                        HStack(spacing: 0) {
+                            Spacer()
                             HStack(spacing: 4) {
-                                // Wetter-Icon
-                                Image(systemName: weather.weatherIcon)
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.primary)
+                            // Wetter-Icon
+                            Image(systemName: weather.weatherIcon)
+                                .font(.system(size: 12))
+                                .foregroundColor(.primary)
+                            
+                            Text("|")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 11))
+                            
+                            // Lufttemperatur Icon
+                            Image(systemName: "thermometer.medium")
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            // Lufttemperatur
+                            Text(String(format: "%.1f°", weather.temperature))
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            Text("|")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 11))
+                            
+                            // Wassertemperatur
+                            if let selectedStation = lakeStationsViewModel.selectedStation,
+                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.name == selectedStation.name })
+                               }), let waterTemp = lake.waterTemperature {
                                 
-                                // Lufttemperatur
-                                Text(String(format: "%.1f°", weather.temperature))
+                                Image(systemName: "drop.fill")
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
-                                // Wassertemperatur
-                                if let selectedStation = lakeStationsViewModel.selectedStation,
-                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
-                                       lake.stations.contains(where: { $0.name == selectedStation.name })
-                                   }), let waterTemp = lake.waterTemperature {
-                                    
-                                    Text("|")
-                                        .foregroundColor(.gray)
-                                        .font(.system(size: 11))
-                                    
-                                    Image(systemName: "drop.fill")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(String(format: "%.0f°", waterTemp))
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.primary)
-                                }
+                                Text(String(format: "%.0f°", waterTemp))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                            }
+                            
+                            // Wind
+                            Image(systemName: "wind")
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
+                                .font(.system(size: 11))
+                                .foregroundColor(.primary)
+                            
+                            // Neoprenanzug-Dicke
+                            if let selectedStation = lakeStationsViewModel.selectedStation,
+                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.name == selectedStation.name })
+                               }), let waterTemp = lake.waterTemperature,
+                               let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
                                 
                                 Text("|")
                                     .foregroundColor(.gray)
                                     .font(.system(size: 11))
                                 
-                                // Wind
-                                Image(systemName: "wind")
+                                Image(systemName: "figure.arms.open")
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
-                                Text("\(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)")
+                                Text(thickness)
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
-                                
-                                // Wasserpegel-Differenz (nur für heutigen Tag)
-                                if Calendar.current.isDateInToday(wave.time),
-                                   let selectedStation = lakeStationsViewModel.selectedStation,
-                                   let lake = lakeStationsViewModel.lakes.first(where: { lake in
-                                       lake.stations.contains(where: { $0.name == selectedStation.name })
-                                   }), let waterLevelDiff = lake.waterLevelDifference {
-                                    
-                                    Text("|")
-                                        .foregroundColor(.gray)
-                                        .font(.system(size: 11))
-                                    
-                                    Image(systemName: "chart.line.uptrend.xyaxis")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(waterLevelDiff)
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.primary)
-                                }
-                                
-                                Spacer()
                             }
-                            .padding(.top, 2)
+                            
+                            // Wasserpegel-Differenz (nur für heutigen Tag)
+                            if Calendar.current.isDateInToday(wave.time),
+                               let selectedStation = lakeStationsViewModel.selectedStation,
+                               let lake = lakeStationsViewModel.lakes.first(where: { lake in
+                                   lake.stations.contains(where: { $0.name == selectedStation.name })
+                               }), let waterLevelDiff = lake.waterLevelDifference {
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                                
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                                
+                                Text("\(waterLevelDiff) cm")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.primary)
+                            }
+                            }
                         }
-                        .buttonStyle(PlainButtonStyle())
+                        .padding(.vertical, 4)
                     }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
-            
-            Spacer()
         }
         .id(wave.id)
         .opacity(isPast ? 0.6 : 1.0)
@@ -192,6 +224,37 @@ struct DepartureRowView: View {
         }
         .sheet(isPresented: $showWeatherLegend) {
             WeatherLegendView(isPresented: $showWeatherLegend)
+        }
+    }
+    
+    private func getWetsuitThickness(for waterTemp: Double, airTemp: Double? = nil) -> String? {
+        // Basierend auf Quiksilver Neoprenanzug-Dicke Tabelle
+        // https://quiksilver.de/expert-guide/surf/buying/neoprenanzug-dicke-beratung.html
+        // Regel: Wenn Lufttemperatur + Wassertemperatur < 30 °C, eine Stufe dicker wählen
+        
+        var adjustedWaterTemp = waterTemp
+        
+        // Prüfe ob wir eine Stufe dicker gehen müssen
+        if let air = airTemp, (air + waterTemp) < 30 {
+            // Simuliere eine niedrigere Wassertemperatur für dickeren Anzug
+            adjustedWaterTemp = waterTemp - 3
+        }
+        
+        switch adjustedWaterTemp {
+        case 23...:
+            return nil // Zu warm für Neoprenanzug
+        case 18..<23:
+            return "0.5-2"
+        case 15..<18:
+            return "3/2"
+        case 12..<15:
+            return "4/3"
+        case 10..<12:
+            return "5/4"
+        case 1..<10:
+            return "6/5/4"
+        default:
+            return "6/5/4"
         }
     }
     
@@ -225,21 +288,36 @@ struct DepartureRowView: View {
             text += "⛴️ \(shipName)\n"
         }
         
-        // Wetterdaten hinzufügen wenn vorhanden
+        // Wetterdaten in der Reihenfolge der Wetterzeile
+        // 1. Lufttemperatur
         if let weather = wave.weather {
             text += "🌡️ \(String(format: "%.1f°C", weather.temperature))\n"
-            text += "💨 \(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)\n"
         }
         
-        // Wassertemperatur hinzufügen wenn vorhanden
+        // 2. Wassertemperatur
         if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
            }), let waterTemp = lake.waterTemperature {
-            text += "💧 Wassertemperatur: \(String(format: "%.0f°C", waterTemp))\n"
+            text += "💧 Water Temperature: \(String(format: "%.0f°C", waterTemp))\n"
         }
         
-        // Wasserpegel-Differenz hinzufügen wenn vorhanden (nur für heutigen Tag)
+        // 3. Wind
+        if let weather = wave.weather {
+            text += "💨 \(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)\n"
+        }
+        
+        // 4. Neoprenanzug-Dicke
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterTemp = lake.waterTemperature,
+           let weather = wave.weather,
+           let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
+            text += "🤸 Wetsuit: \(thickness)mm\n"
+        }
+        
+        // 5. Wasserpegel-Differenz (nur für heutigen Tag)
         let calendar = Calendar.current
         let isToday = calendar.isDateInToday(wave.time)
         
@@ -248,10 +326,10 @@ struct DepartureRowView: View {
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
            }), let waterLevelDiff = lake.waterLevelDifference {
-            text += "📊 Wasserstand: \(waterLevelDiff)\n"
+            text += "📊 Water Level: \(waterLevelDiff) cm\n"
         }
         
-        text += "\n📱 Geteilt via NextWave App\n"
+        text += "\n📱 Shared via NextWave App\n"
         text += "https://apps.apple.com/ch/app/nextwave/id6739363035"
         
         return text
@@ -517,30 +595,32 @@ struct WeatherLegendView: View {
         NavigationView {
             List {
                 Section(header: Text("Weather Information")) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(systemName: "sun.max.fill")
-                                .font(.system(size: 20))
-                                .foregroundColor(.primary)
-                                .frame(width: 30)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Weather Icon + Air Temperature")
-                                    .font(.headline)
-                                
-                                Text("Shows current weather condition and air temperature in degrees Celsius")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
+                    LegendRow(
+                        icon: "sun.max.fill",
+                        iconColor: .primary,
+                        title: "Weather Condition",
+                        description: "Current weather condition (sunny, cloudy, rainy, etc.)"
+                    )
+                    
+                    LegendRow(
+                        icon: "thermometer.medium",
+                        iconColor: .primary,
+                        title: "Air Temperature",
+                        description: "Current air temperature in degrees Celsius"
+                    )
                     
                     LegendRow(
                         icon: "drop.fill",
                         iconColor: .primary,
                         title: "Water Temperature",
                         description: "Current lake water temperature in degrees Celsius"
+                    )
+                    
+                    LegendRow(
+                        icon: "figure.arms.open",
+                        iconColor: .primary,
+                        title: "Wetsuit Thickness",
+                        description: "Recommended wetsuit thickness in millimeters based on water temperature and wind chill. If air + water temp < 30°C, one size thicker is recommended (e.g. 3/2mm, 4/3mm)"
                     )
                     
                     LegendRow(

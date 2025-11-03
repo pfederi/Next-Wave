@@ -41,6 +41,7 @@ class WeatherAPI {
     
     struct WeatherInfo {
         let temperature: Double // in Celsius
+        let feelsLike: Double // in Celsius, gefühlte Temperatur (inkl. Windchill)
         let tempMin: Double // in Celsius
         let tempMax: Double // in Celsius
         let morningTemp: Double? // in Celsius, für Morgen (ca. 8-10 Uhr)
@@ -249,6 +250,7 @@ class WeatherAPI {
             // Wetterdaten in WeatherInfo-Struktur umwandeln
             var currentWeatherInfo = WeatherInfo(
                 temperature: currentForecast.main.temp,
+                feelsLike: currentForecast.main.feels_like,
                 tempMin: currentForecast.main.temp_min,
                 tempMax: currentForecast.main.temp_max,
                 morningTemp: nil,
@@ -320,6 +322,7 @@ class WeatherAPI {
                 let (tomorrowDescription, tomorrowIcon) = weatherDescriptionAndIcon(from: tomorrowWeather.id)
                 tomorrowWeatherInfo = WeatherInfo(
                     temperature: tomorrowForecast.main.temp,
+                    feelsLike: tomorrowForecast.main.feels_like,
                     tempMin: tomorrowForecast.main.temp_min,
                     tempMax: tomorrowForecast.main.temp_max,
                     morningTemp: morningTemp,
@@ -402,6 +405,7 @@ class WeatherAPI {
         
         return WeatherInfo(
             temperature: forecast.main.temp,
+            feelsLike: forecast.main.feels_like,
             tempMin: forecast.main.temp_min,
             tempMax: forecast.main.temp_max,
             morningTemp: nil,

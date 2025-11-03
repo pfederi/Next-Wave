@@ -91,116 +91,116 @@ struct NearestStationTileView: View {
                     Divider()
                     
                     VStack(spacing: 8) {
-                        HStack(alignment: .center, spacing: 2) {
+                        HStack(alignment: .center, spacing: 4) {
                             // Wetter-Icon
                             Image(systemName: weather.weatherIcon)
-                                .font(.system(size: 14))
+                                .font(.system(size: 12))
                                 .foregroundColor(Color("text-color"))
-                            
-                            Spacer().frame(width: 4)
                             
                             Text("|")
                                 .foregroundColor(.gray)
-                                .font(.system(size: 12))
+                                .font(.system(size: 11))
                             
-                            Spacer().frame(width: 4)
+                            // Lufttemperatur Icon
+                            Image(systemName: "thermometer.medium")
+                                .font(.system(size: 11))
+                                .foregroundColor(Color("text-color"))
                             
                             // Temperatur
-                            HStack(spacing: 4) {
-                                Image(systemName: "thermometer")
-                                    .font(.system(size: 12))
-                                
-                                if weather.forecastDate != nil {
-                                    // Wenn es eine Wettervorhersage ist, zeige Morgen- und Nachmittagstemperatur
-                                    if let morning = weather.morningTemp, let afternoon = weather.afternoonTemp {
-                                        Text(String(format: "%.0f° / %.0f°", morning, afternoon))
-                                            .font(.system(size: 12))
-                                            .foregroundColor(Color("text-color"))
-                                    } else {
-                                        // Fallback auf Min/Max wenn keine spezifischen Zeiten verfügbar sind
-                                        Text(String(format: "%.0f° / %.0f°", weather.tempMin, weather.tempMax))
-                                            .font(.system(size: 12))
-                                            .foregroundColor(Color("text-color"))
-                                    }
+                            if weather.forecastDate != nil {
+                                // Wenn es eine Wettervorhersage ist, zeige Morgen- und Nachmittagstemperatur
+                                if let morning = weather.morningTemp, let afternoon = weather.afternoonTemp {
+                                    Text(String(format: "%.0f° / %.0f°", morning, afternoon))
+                                        .font(.system(size: 11))
+                                        .foregroundColor(Color("text-color"))
                                 } else {
-                                    // Für aktuelle Wetterdaten zeige nur die aktuelle Temperatur
-                                    Text(String(format: "%.1f°C", weather.temperature))
-                                        .font(.system(size: 12))
+                                    // Fallback auf Min/Max wenn keine spezifischen Zeiten verfügbar sind
+                                    Text(String(format: "%.0f° / %.0f°", weather.tempMin, weather.tempMax))
+                                        .font(.system(size: 11))
                                         .foregroundColor(Color("text-color"))
                                 }
+                            } else {
+                                // Für aktuelle Wetterdaten zeige nur die aktuelle Temperatur
+                                Text(String(format: "%.1f°", weather.temperature))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
                             }
                             
-                            // Wassertemperatur direkt nach Lufttemperatur
+                            Text("|")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 11))
+                            
+                            // Wassertemperatur
                             if let lake = viewModel.lakes.first(where: { lake in
                                 lake.stations.contains(where: { $0.name == station.name })
                             }), let waterTemp = lake.waterTemperature {
-                                Spacer().frame(width: 4)
+                                Image(systemName: "drop.fill")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
+                                
+                                Text(String(format: "%.0f°", waterTemp))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
                                 
                                 Text("|")
                                     .foregroundColor(.gray)
-                                    .font(.system(size: 12))
-                                
-                                Spacer().frame(width: 4)
-                                
-                                HStack(spacing: 4) {
-                                    Image(systemName: "drop.fill")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                    
-                                    Text(String(format: "%.0f°C", waterTemp))
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                }
-                                
-                                Spacer().frame(width: 4)
-                                
-                                Text("|")
-                                    .foregroundColor(.gray)
-                                    .font(.system(size: 12))
+                                    .font(.system(size: 11))
                             }
-
-                            Spacer().frame(width: 4)
                             
                             // Wind-Information
-                            HStack(spacing: 4) {
-                                Image(systemName: "wind")
-                                    .font(.system(size: 12))
+                            Image(systemName: "wind")
+                                .font(.system(size: 11))
+                                .foregroundColor(Color("text-color"))
+                            
+                            if weather.forecastDate != nil, let maxWind = weather.maxWindSpeedKnots {
+                                // Für Wettervorhersage die maximale Windgeschwindigkeit anzeigen
+                                Text(String(format: "max %.0f kn", maxWind))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
+                            } else {
+                                // Für aktuelle Wetterdaten die aktuelle Windgeschwindigkeit mit Richtung anzeigen
+                                Text(String(format: "%.0f kn %@", weather.windSpeedKnots, weather.windDirectionText))
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
+                            }
+                            
+                            // Neoprenanzug-Dicke
+                            if let lake = viewModel.lakes.first(where: { lake in
+                                lake.stations.contains(where: { $0.name == station.name })
+                            }), let waterTemp = lake.waterTemperature,
+                               let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
                                 
-                                if weather.forecastDate != nil, let maxWind = weather.maxWindSpeedKnots {
-                                    // Für Wettervorhersage die maximale Windgeschwindigkeit anzeigen
-                                    Text(String(format: "max %.1f kn", maxWind))
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                } else {
-                                    // Für aktuelle Wetterdaten die aktuelle Windgeschwindigkeit mit Richtung anzeigen
-                                    Text(String(format: "%.1f kn %@", weather.windSpeedKnots, weather.windDirectionText))
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                }
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                                
+                                Image(systemName: "figure.arms.open")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
+                                
+                                Text("\(thickness)mm")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
                             }
                             
                             // Wasserpegel-Differenz
                             if let lake = viewModel.lakes.first(where: { lake in
                                 lake.stations.contains(where: { $0.name == station.name })
                             }), let waterLevelDiff = lake.waterLevelDifference {
-                                Spacer().frame(width: 4)
-                                
                                 Text("|")
                                     .foregroundColor(.gray)
-                                    .font(.system(size: 12))
+                                    .font(.system(size: 11))
                                 
-                                Spacer().frame(width: 4)
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
                                 
-                                HStack(spacing: 4) {
-                                    Image(systemName: "chart.line.uptrend.xyaxis")
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                    
-                                    Text(waterLevelDiff)
-                                        .font(.system(size: 12))
-                                        .foregroundColor(Color("text-color"))
-                                }
+                                Text("\(waterLevelDiff) cm")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color("text-color"))
                             }
+                            
+                            Spacer()
                         }
                     }
                     .padding(.top, 4)
@@ -346,5 +346,31 @@ struct NearestStationTileView: View {
         }
         
         isLoadingWeather = false
+    }
+    
+    private func getWetsuitThickness(for waterTemp: Double, airTemp: Double? = nil) -> String? {
+        // Regel: Wenn Lufttemperatur + Wassertemperatur < 30 °C, eine Stufe dicker wählen
+        var adjustedWaterTemp = waterTemp
+        
+        if let air = airTemp, (air + waterTemp) < 30 {
+            adjustedWaterTemp = waterTemp - 3
+        }
+        
+        switch adjustedWaterTemp {
+        case 23...:
+            return nil
+        case 18..<23:
+            return "0.5-2"
+        case 15..<18:
+            return "3/2"
+        case 12..<15:
+            return "4/3"
+        case 10..<12:
+            return "5/4"
+        case 1..<10:
+            return "6/5/4"
+        default:
+            return "6/5/4"
+        }
     }
 } 

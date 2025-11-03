@@ -108,10 +108,10 @@ private func calculateWaterLevelDifference(for lakeName: String, currentLevel: S
     let differenceCm = Int(round((current - averageLevel) * 100))
     
     if differenceCm > 0 {
-        return "+\(differenceCm) cm"
+        return "+\(differenceCm)"
     } else if differenceCm < 0 {
-        return "\(differenceCm) cm"
+        return "\(differenceCm)"
     } else {
-        return "±0 cm"
+        return "±0"
     }
 } 

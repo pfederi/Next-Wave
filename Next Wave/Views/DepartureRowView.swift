@@ -1,4 +1,5 @@
 import SwiftUI
+import MessageUI
 
 struct DepartureRowView: View {
     let wave: WaveEvent
@@ -191,7 +192,6 @@ struct DepartureRowView: View {
         dateFormatter.timeZone = TimeZone(identifier: "Europe/Zurich")
         
         let dateString = dateFormatter.string(from: wave.time)
-        let direction = wave.isArrival ? "von" : "nach"
         let stationName = lakeStationsViewModel.selectedStation?.name ?? ""
         
         // Zufälliger Intro-Text
@@ -336,6 +336,7 @@ private struct NotificationButton: View {
 struct CustomShareSheet: View {
     let text: String
     @Binding var isPresented: Bool
+    @State private var showMessageComposer = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -378,8 +379,9 @@ struct CustomShareSheet: View {
                     backgroundColor: .green,
                     title: "Messages",
                     action: {
-                        shareToMessages()
-                        isPresented = false
+                        if MFMessageComposeViewController.canSendText() {
+                            showMessageComposer = true
+                        }
                     }
                 )
                 .frame(maxWidth: .infinity)
@@ -402,6 +404,12 @@ struct CustomShareSheet: View {
         }
         .presentationDetents([.height(220)])
         .presentationDragIndicator(.visible)
+        .sheet(isPresented: $showMessageComposer) {
+            MessageComposeView(text: text, isPresented: $showMessageComposer)
+                .onDisappear {
+                    isPresented = false
+                }
+        }
     }
     
     private func canOpenWhatsApp() -> Bool {
@@ -416,12 +424,6 @@ struct CustomShareSheet: View {
         }
     }
     
-    private func shareToMessages() {
-        if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-           let smsURL = URL(string: "sms:&body=\(encodedText)") {
-            UIApplication.shared.open(smsURL)
-        }
-    }
     
     private func shareToMail() {
         if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -458,5 +460,37 @@ struct ShareTileButton: View {
             }
         }
         .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// Message Compose View
+struct MessageComposeView: UIViewControllerRepresentable {
+    let text: String
+    @Binding var isPresented: Bool
+    
+    func makeUIViewController(context: Context) -> MFMessageComposeViewController {
+        let controller = MFMessageComposeViewController()
+        controller.body = text
+        controller.messageComposeDelegate = context.coordinator
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: MFMessageComposeViewController, context: Context) {
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isPresented: $isPresented)
+    }
+    
+    class Coordinator: NSObject, MFMessageComposeViewControllerDelegate {
+        @Binding var isPresented: Bool
+        
+        init(isPresented: Binding<Bool>) {
+            _isPresented = isPresented
+        }
+        
+        func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+            isPresented = false
+        }
     }
 } 

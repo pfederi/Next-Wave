@@ -191,7 +191,11 @@ struct NearestStationTileView: View {
                                     .foregroundColor(.gray)
                                     .font(.system(size: 11))
                                 
-                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                // Icon basierend auf Wasserpegel-Richtung
+                                let isHigher = waterLevelDiff.hasPrefix("+")
+                                let iconName = isHigher ? "water.waves.and.arrow.trianglehead.up" : "water.waves.and.arrow.trianglehead.down"
+                                
+                                Image(systemName: iconName)
                                     .font(.system(size: 11))
                                     .foregroundColor(Color("text-color"))
                                 

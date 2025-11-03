@@ -194,7 +194,11 @@ struct DepartureRowView: View {
                                     .foregroundColor(.gray)
                                     .font(.system(size: 11))
                                 
-                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                // Icon basierend auf Wasserpegel-Richtung
+                                let isHigher = waterLevelDiff.hasPrefix("+")
+                                let iconName = isHigher ? "water.waves.and.arrow.trianglehead.up" : "water.waves.and.arrow.trianglehead.down"
+                                
+                                Image(systemName: iconName)
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
@@ -630,12 +634,12 @@ struct WeatherLegendView: View {
                         description: "Wind speed in knots (kn) and wind direction (N, NE, E, SE, S, SW, W, NW)"
                     )
                     
-                    LegendRow(
-                        icon: "chart.line.uptrend.xyaxis",
-                        iconColor: .primary,
-                        title: "Water Level",
-                        description: "Difference from average water level in centimeters (only shown for today)"
-                    )
+                        LegendRow(
+                            icon: "water.waves.and.arrow.trianglehead.up",
+                            iconColor: .primary,
+                            title: "Water Level",
+                            description: "Difference from average water level in centimeters. Arrow up (↑) indicates higher water level, arrow down (↓) indicates lower water level (only shown for today)"
+                        )
                 }
                 
                 Section(header: Text("Weather Conditions")) {

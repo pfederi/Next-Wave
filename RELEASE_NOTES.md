@@ -1,5 +1,40 @@
 # NextWave App - Recent Updates
 
+## 🌤️ Weather & Wetsuit Features (v3.4)
+
+### Smart Wetsuit Thickness Recommendations 🤸
+- **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
+- **Quiksilver reference table**: Based on professional wetsuit thickness standards
+- **30°C rule**: If air + water temperature < 30°C, the app recommends one size thicker for optimal comfort
+- **Temperature ranges**: From 0.5-2mm shorties to 6/5/4mm winter wetsuits
+- **Wind chill integration**: Uses "feels like" temperature for more accurate recommendations
+- **Visual display**: Shows thickness in millimeters (e.g., 3/2mm, 4/3mm) with intuitive icon
+
+### Interactive Weather Legend 📊
+- **Tap to learn**: Tap on any weather line to see detailed explanations of all weather data
+- **Comprehensive information**: Learn what each weather icon and value means
+- **Weather conditions guide**: Understand different weather conditions (clear, cloudy, rainy, etc.)
+- **Professional design**: Clean, organized modal with easy-to-read information
+- **Always accessible**: Available on every departure with weather data
+
+### Enhanced Weather Display
+- **Improved layout**: Weather data now spans full width for better readability
+- **Consistent ordering**: Air Temp | Water Temp | Wind | Wetsuit | Water Level
+- **Better spacing**: Increased vertical spacing for improved visual hierarchy
+- **Clear separators**: Pipe separators (|) between data points for easy scanning
+- **Icon consistency**: Each data point has its own descriptive icon
+- **Today-only water level**: Water level difference only shown for current day departures
+
+### Share Wave Feature 📤
+- **Share with friends**: Share wave details via WhatsApp, Messages, or Mail
+- **Fun intro messages**: 5 randomized intro texts like "🥳 Let's share the next wave for a party wave!"
+- **Complete information**: Includes station, date, time, route, ship name, and all weather data
+- **Weather details**: Air temperature, water temperature, wind, wetsuit recommendation, and water level
+- **One-click sharing**: Direct integration with WhatsApp, Messages, and Mail apps
+- **Smart formatting**: Proper emoji support and formatting for each platform
+- **App promotion**: Includes link to NextWave on App Store
+- **Future waves only**: Share button only visible for upcoming departures
+
 ## 🔄 Widget Enhancements
 
 ### Improved Widget Performance

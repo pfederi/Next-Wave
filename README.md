@@ -16,7 +16,11 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - [Safety Features](#safety-features)
 - [Lake Zurich Ship Names](#lake-zurich-ship-names)
 - [Weather Integration](#weather-integration)
+  - [Weather Display Features](#weather-display-features)
+  - [Wetsuit Thickness Recommendation](#wetsuit-thickness-recommendation)
+  - [Interactive Weather Legend](#interactive-weather-legend)
 - [User Interface Features](#user-interface-features)
+  - [Share Wave Feature](#share-wave-feature)
 - [Widget Features](#widget-features)
 - [Technologies & Services](#technologies--services)
 - [Installation](#installation)
@@ -50,8 +54,10 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - 🚢 Real-time ship name display for Lake Zurich (next 3 days)
 - 🌤️ Real-time weather information with wind speed, temperature, and pressure trends
 - 🌡️ Water temperature display for all Swiss lakes
+- 🤸 Smart wetsuit thickness recommendations based on water temperature and wind chill
 - 🔍 Albis-Class ship filter (flip device to activate/deactivate)
 - 💬 Fun "no waves" messages with variety and personality
+- 📤 Share waves with friends via WhatsApp, Messages, or Mail with all relevant details
 
 ## Map Features
 
@@ -119,13 +125,19 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 
 ### Weather Display Features
 - Weather condition icons (visual indicators)
-- Temperature in Celsius with min/max values
-- Water temperature for all Swiss lakes
-- Wind speed in knots (nautical standard)
-- Wind direction with compass points (N, NE, E, SE, S, SW, W, NW)
-- Water level difference from average (in cm)
-- Atmospheric pressure with trend indicators
-- Clean, compact display with separator bars for readability
+- Air temperature in Celsius with thermometer icon
+- Water temperature for all Swiss lakes with drop icon
+- Wind speed in knots (nautical standard) with wind direction (N, NE, E, SE, S, SW, W, NW)
+- **Wetsuit Thickness Recommendation**: Smart wetsuit thickness calculator based on water temperature and wind chill
+  - Uses Quiksilver wetsuit thickness table as reference
+  - Considers water temperature and "feels like" temperature (wind chill)
+  - Applies 30°C rule: If air + water temperature < 30°C, recommends one size thicker
+  - Displays thickness in millimeters (e.g., 3/2mm, 4/3mm, 5/4mm)
+  - Helps surfers and foilers choose the right wetsuit for optimal comfort
+- Water level difference from average (in cm, only shown for current day)
+- **Interactive Weather Legend**: Tap on weather line to see detailed explanations of all weather data
+- Clean, compact display with separator bars and icons for readability
+- Consistent weather data order: Air Temp | Water Temp | Wind | Wetsuit | Water Level
 
 ## User Interface Features
 
@@ -173,6 +185,16 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **Personality**: Surf culture references, Hawaiian vibes, and wakethieving humor
 - **No Service Messages**: Friendly messages when stations are temporarily out of service
 - **Examples**: "No more waves today – back in the lineup tomorrow!", "Post-pumping high is real – but even the ships need a break!"
+
+### Share Wave Feature
+- **Custom Share Sheet**: Share wave details with friends via WhatsApp, Messages, or Mail
+- **Comprehensive Information**: Includes station, date, time, route, ship name, and all weather data
+- **Weather Details**: Air temperature, water temperature, wind speed & direction, wetsuit recommendation, and water level
+- **Fun Intro Messages**: 5 randomized intro texts like "🥳 Let's share the next wave for a party wave!"
+- **One-Click Sharing**: Direct integration with WhatsApp, Messages, and Mail apps
+- **Smart Formatting**: Different formatting for each platform (emojis, line breaks, etc.)
+- **App Promotion**: Includes link to NextWave on App Store
+- **Only for Future Waves**: Share button only visible for upcoming departures, not past ones
 
 ## Technologies & Services
 
@@ -440,6 +462,7 @@ The link above is for Switzerland. For other countries, you have to find another
 #### Weather API Integration
 - **OpenWeather API**: RESTful API integration for weather forecasts
 - **Async Data Loading**: Non-blocking weather data fetching using Swift async/await
+- **Wind Chill Integration**: Uses `feels_like` temperature from OpenWeather for accurate wetsuit recommendations
 - **Pressure History Tracking**: 6-hour rolling window for pressure trend calculation
 - **Smart Preloading**: Weather data preloaded for all favorite stations at app launch
 - **Parallel Requests**: TaskGroup-based concurrent loading for multiple stations
@@ -448,6 +471,36 @@ The link above is for Switzerland. For other countries, you have to find another
 - **Unit Conversion**: Automatic conversion from m/s to knots for nautical use
 - **Weather Codes**: Comprehensive mapping of OpenWeather condition codes to SF Symbols
 - **Error Handling**: Graceful degradation when weather data unavailable
+
+#### Wetsuit Thickness Calculator
+- **Quiksilver Reference Table**: Based on professional wetsuit thickness recommendations
+- **Water Temperature Based**: Primary factor for wetsuit selection
+- **Wind Chill Consideration**: Uses "feels like" temperature (wind chill) for more accurate recommendations
+- **30°C Rule**: If air temperature + water temperature < 30°C, recommends one size thicker
+- **Temperature Ranges**:
+  - 23°C+: No wetsuit needed
+  - 18-23°C: 0.5-2mm (shorty)
+  - 15-18°C: 3/2mm
+  - 12-15°C: 4/3mm
+  - 10-12°C: 5/4mm
+  - 1-10°C: 6/5/4mm (winter wetsuit)
+- **Smart Algorithm**: Adjusts recommendation based on combined air and water temperature
+- **Visual Display**: Shows thickness in millimeters with figure icon
+- **Interactive Legend**: Tap weather line to see detailed explanation of wetsuit recommendations
+
+#### Share Feature Implementation
+- **Custom SwiftUI Share Sheet**: Purpose-built share interface with WhatsApp, Messages, and Mail
+- **Platform-Specific Integration**:
+  - **WhatsApp**: Direct URL scheme integration (`whatsapp://send?text=`)
+  - **Messages**: Native `MFMessageComposeViewController` for full text support
+  - **Mail**: URL scheme with proper encoding (`mailto:?body=`)
+- **Smart Text Generation**: Dynamic share text with randomized intro messages
+- **Comprehensive Data**: Includes all relevant wave and weather information
+- **Emoji Support**: Full emoji support across all platforms including Mail
+- **URL Encoding**: Proper encoding for special characters and line breaks
+- **State Management**: SwiftUI state variables for sheet presentation
+- **Conditional Display**: Share button only visible for future departures
+- **Weather Legend Modal**: SwiftUI modal with detailed explanations of all weather data points
 
 #### Albis-Class Filter System
 - **Ship Database**: Hardcoded list of Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)

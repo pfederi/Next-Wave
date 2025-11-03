@@ -110,6 +110,33 @@
 
 ---
 
+## Version 3.2 (September 2024)
+
+### Widget Enhancements
+- **Multi-day logic**: Intelligent widget functionality with better multi-day support
+- **Improved UX**: Enhanced user experience for widgets
+- **Auto-refresh**: Widgets automatically update departure data when app launches
+- **Data synchronization**: Better sync between app, widgets, and watch
+- **Settings improvements**: Enhanced widget settings UI
+
+---
+
+## Version 3.1 (September 2024)
+
+### Dependency Updates
+- **Security fixes**: Updated dependencies to fix security vulnerabilities
+  - path-to-regexp: ^8.0.0 (fixes high severity CVE)
+  - undici: ^7.0.0 (fixes moderate severity CVE)
+  - esbuild: ^0.24.2
+- **Vercel updates**: Updated @vercel/node from 3.2.0 to 4.0.0
+- **Build improvements**: Updated vercel from 37.0.0 to 48.0.0
+
+### UI Improvements
+- **Enhanced departure view**: Improved ship icon handling and debugging
+- **Better error handling**: More robust error handling throughout the app
+
+---
+
 ## Version 2.9.1 (August 2024)
 
 ### Watch App Improvements
@@ -157,6 +184,20 @@
 
 ---
 
+## Version 2.8 (July 2024)
+
+### App Rebranding
+- **Name change**: Rebranded from "Next Wave" to "NextWave" (one word)
+- **Consistent branding**: Updated all references throughout the app
+- **Configuration updates**: Updated bundle identifiers and project settings
+
+### Weather Improvements
+- **Weather data in favorites**: Added weather information to favorite station tiles
+- **API improvements**: Enhanced weather API integration
+- **Bug fixes**: Fixed various weather data display issues
+
+---
+
 ## Version 2.7.1 (June 2024)
 
 ### Bug Fixes & Improvements
@@ -188,14 +229,23 @@
 
 ---
 
-## Version 2.3 (May 2024)
+## Version 2.6 (May 2024)
 
-### Ship Names & Wave Ratings
-- **Real-time ship identification**: Displays actual ship name for each departure on Lake Zurich
-- **3-day forecast**: Shows ship names for departures within the next 3 days
-- **Wave rating icons**: Visual indicators showing expected wave quality (1-3 waves)
-- **Automatic updates**: Ship assignments fetched daily from ZSG
-- **Smart caching**: Efficient caching system to minimize API calls
+### Sunrise & Sunset Integration
+- **Sun times**: Display sunrise and sunset times for each day
+- **Twilight phases**: Show civil twilight begin and end times
+- **Daylight duration**: Calculate total daylight hours
+- **Visual gradients**: Beautiful gradient visualization of daylight phases
+- **Session planning**: Plan your sessions based on available daylight
+
+### Wave Analytics Enhancements
+- **Auto-scroll to current time**: Wave timeline automatically scrolls to current time
+- **Line chart updates**: Improved wave frequency visualization
+- **Better time slots**: Enhanced time slot calculations for wave analysis
+
+---
+
+## Version 2.5 (May 2024)
 
 ### Schedule Period Management
 - **Automatic detection**: App automatically detects summer and winter schedule periods
@@ -203,6 +253,28 @@
 - **30-day advance notice**: Countdown messages appear when schedule transitions are within 31 days
 - **Season-specific messages**: Different witty messages for summer, winter, spring, and autumn transitions
 - **All Swiss lakes**: Works for all 15+ major Swiss lakes with boat services
+- **Schedule footer**: Display countdown messages in departure list footer
+
+---
+
+## Version 2.4 (May 2024)
+
+### Ship Data Display Extension
+- **3-day ship forecast**: Extended ship name display from 1 day to 3 days
+- **Date format fix**: Corrected date format for ZSG API (DD.MM.YYYY)
+- **Better logging**: Added detailed logging for ship data fetching
+- **Cache improvements**: Force cache update if less than 3 days of data available
+
+---
+
+## Version 2.3 (May 2024)
+
+### Ship Names & Wave Ratings
+- **Real-time ship identification**: Displays actual ship name for each departure on Lake Zurich
+- **Wave rating icons**: Visual indicators showing expected wave quality (1-3 waves)
+- **Automatic updates**: Ship assignments fetched daily from ZSG
+- **Smart caching**: Efficient caching system to minimize API calls
+- **Web scraping**: Custom API for scraping ZSG ship deployment data
 
 ---
 
@@ -216,6 +288,22 @@
 - **Light & dark mode**: Optimized for both themes
 - **Location tracking**: Show your position on the map
 - **Failsafe**: Fallback to Apple Maps if needed
+
+---
+
+## Version 2.1 (March 2024)
+
+### Notification Improvements
+- **Better notification management**: Improved handling of notification lifecycle
+- **Notification cleanup**: Notifications properly removed after being played
+- **Background notifications**: Enhanced background notification delivery
+- **Notification text**: Improved notification text formatting with route direction
+
+### Bug Fixes
+- **Timer fixes**: Fixed timer-related bugs
+- **Date change at midnight**: Fixed issue where date wasn't updated at midnight
+- **Browser link crash**: Fixed crash when swiping back from browser
+- **Scroll behavior**: Improved scroll-to-time functionality
 
 ---
 

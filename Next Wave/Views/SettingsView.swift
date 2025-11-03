@@ -496,14 +496,33 @@ struct LinksSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Button(action: {
+                if let url = URL(string: "https://github.com/pfederi/Next-Wave/blob/main/RELEASE_NOTES.md") {
+                    openURL(url)
+                }
+            }) {
+                HStack {
+                    Image(systemName: "doc.text")
+                        .foregroundColor(.accentColor)
+                    Text("Release Notes")
+                        .font(.body)
+                        .foregroundColor(.accentColor)
+                        .underline(true, color: .accentColor)
+                }
+            }
+            
+            Button(action: {
                 if let url = URL(string: "https://nextwaveapp.ch/privacy.html") {
                     openURL(url)
                 }
             }) {
-                Text("Privacy Policy")
-                    .font(.body)
-                    .foregroundColor(.accentColor)
-                    .underline(true, color: .accentColor)
+                HStack {
+                    Image(systemName: "hand.raised")
+                        .foregroundColor(.accentColor)
+                    Text("Privacy Policy")
+                        .font(.body)
+                        .foregroundColor(.accentColor)
+                        .underline(true, color: .accentColor)
+                }
             }
 
             Button(action: {
@@ -511,10 +530,14 @@ struct LinksSection: View {
                     openURL(url)
                 }
             }) {
-                Text("Visit pumpfoiling.community")
-                    .font(.body)
-                    .foregroundColor(.accentColor)
-                    .underline(true, color: .accentColor)
+                HStack {
+                    Image(systemName: "person.3")
+                        .foregroundColor(.accentColor)
+                    Text("Visit pumpfoiling.community")
+                        .font(.body)
+                        .foregroundColor(.accentColor)
+                        .underline(true, color: .accentColor)
+                }
             }
         }
         .foregroundColor(Color("text-color"))

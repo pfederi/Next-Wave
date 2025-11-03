@@ -359,7 +359,5 @@
 ## Links
 
 **Download NextWave**: [App Store](https://apps.apple.com/ch/app/nextwave/id6739363035)
-
 **GitHub Repository**: [github.com/pfederi/Next-Wave](https://github.com/pfederi/Next-Wave)
-
 **Community**: [Pumpfoiling Community](https://pumpfoiling.community)

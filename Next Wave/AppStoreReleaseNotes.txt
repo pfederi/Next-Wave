@@ -1,8 +1,23 @@
-What's New in Version 1.1:
+What's New in Version 3.4:
 
-• Fixed time zone handling for sunrise and sunset times after daylight saving time change
-• Improved weather forecast display with morning and afternoon temperatures
-• Enhanced wave analysis with better time slot calculations
-• Various UI improvements and bug fixes
+🤸 Smart Wetsuit Recommendations
+• Get personalized wetsuit thickness recommendations based on water temperature and wind chill
+• Based on professional Quiksilver wetsuit standards
+• Smart 30°C rule: recommends thicker wetsuit when air + water temp < 30°C
 
-Thank you for using Next Wave! We're continuously working to improve your experience with the app. 
+📊 Interactive Weather Legend
+• Tap any weather line to learn what each icon and value means
+• Comprehensive guide to all weather conditions and data points
+• Easy-to-understand explanations for better session planning
+
+📤 Share Waves with Friends
+• Share wave details via WhatsApp, Messages, or Mail with one tap
+• Includes all important info: station, time, ship, weather, and wetsuit recommendation
+• Fun randomized intro messages to invite friends to join your session
+
+🌤️ Enhanced Weather Display
+• Improved layout with better spacing and full-width display
+• Consistent data ordering: Air Temp | Water Temp | Wind | Wetsuit | Water Level
+• Clear icons and separators for easy reading
+
+Thank you for using NextWave! We're continuously working to improve your wakethieving experience. 

@@ -9,6 +9,7 @@ struct DepartureRowView: View {
     @ObservedObject var scheduleViewModel: ScheduleViewModel
     @EnvironmentObject var appSettings: AppSettings
     @EnvironmentObject var lakeStationsViewModel: LakeStationsViewModel
+    @State private var showShareSheet = false
     
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -34,10 +35,23 @@ struct DepartureRowView: View {
                     
                     Spacer()
                     
-                    if scheduleViewModel.hasNotification(for: wave) {
-                        Image(systemName: "bell.fill")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 16))
+                    if !isPast {
+                        if scheduleViewModel.hasNotification(for: wave) {
+                            Image(systemName: "bell.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 16))
+                        }
+                        
+                        // Share Button
+                        Button(action: {
+                            print("🔵 Share button tapped")
+                            showShareSheet = true
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 16))
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 
@@ -165,6 +179,68 @@ struct DepartureRowView: View {
                                  isCurrentDay: isCurrentDay)
             }
         }
+        .sheet(isPresented: $showShareSheet) {
+            CustomShareSheet(text: generateShareText(), isPresented: $showShareSheet)
+        }
+    }
+    
+    private func generateShareText() -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE, d. MMMM yyyy"
+        dateFormatter.locale = Locale(identifier: "de_CH")
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        
+        let dateString = dateFormatter.string(from: wave.time)
+        let direction = wave.isArrival ? "von" : "nach"
+        let stationName = lakeStationsViewModel.selectedStation?.name ?? ""
+        
+        // Zufälliger Intro-Text
+        let introTexts = [
+            "🥳 Let's share the next wave for a party wave!",
+            "🌊 Catch the wave with me!",
+            "🌊 Ready to ride the next wave together?",
+            "🚢 All aboard for the next adventure!",
+            "🌊 Join me on this wave - it's going to be epic!"
+        ]
+        let randomIntro = introTexts.randomElement() ?? introTexts[0]
+        
+        var text = "\(randomIntro)\n\n"
+        text += "📍 \(stationName) → \(wave.neighborStopName)\n"
+        text += "📅 \(dateString)\n"
+        text += "🕐 \(formattedTime) Uhr\n"
+        text += "🚢 Route \(wave.routeNumber)\n"
+        
+        // Schiffsname hinzufügen wenn vorhanden
+        if let shipName = wave.shipName {
+            text += "⛴️ \(shipName)\n"
+        }
+        
+        // Wetterdaten hinzufügen wenn vorhanden
+        if let weather = wave.weather {
+            text += "🌡️ \(String(format: "%.1f°C", weather.temperature))\n"
+            text += "💨 \(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)\n"
+        }
+        
+        // Wassertemperatur hinzufügen wenn vorhanden
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterTemp = lake.waterTemperature {
+            text += "💧 Wassertemperatur: \(String(format: "%.0f°C", waterTemp))\n"
+        }
+        
+        // Wasserpegel-Differenz hinzufügen wenn vorhanden
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterLevelDiff = lake.waterLevelDifference {
+            text += "📊 Wasserstand: \(waterLevelDiff)\n"
+        }
+        
+        text += "\n📱 Geteilt via NextWave App\n"
+        text += "https://apps.apple.com/ch/app/nextwave/id6739363035"
+        
+        return text
     }
 }
 
@@ -253,5 +329,134 @@ private struct NotificationButton: View {
         }
         .tint(scheduleViewModel.hasNotification(for: wave) ? .red : .blue)
         .disabled(!isCurrentDay && !scheduleViewModel.hasNotification(for: wave))
+    }
+}
+
+// Custom Share Sheet
+struct CustomShareSheet: View {
+    let text: String
+    @Binding var isPresented: Bool
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Spacer()
+                Button("Fertig") {
+                    isPresented = false
+                }
+                .padding()
+            }
+            
+            // Erklärungstext
+            Text("Share your next wave with friends")
+                .font(.headline)
+                .foregroundColor(.primary)
+                .padding(.bottom, 25)
+            
+            // Share Options in Grid
+            HStack(spacing: 0) {
+                // WhatsApp
+                if canOpenWhatsApp() {
+                    ShareTileButton(
+                        icon: "message.fill",
+                        iconColor: .white,
+                        backgroundColor: Color(red: 0.15, green: 0.78, blue: 0.45),
+                        title: "WhatsApp",
+                        action: {
+                            shareToWhatsApp()
+                            isPresented = false
+                        }
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                
+                // Messages
+                ShareTileButton(
+                    icon: "message.fill",
+                    iconColor: .white,
+                    backgroundColor: .green,
+                    title: "Messages",
+                    action: {
+                        shareToMessages()
+                        isPresented = false
+                    }
+                )
+                .frame(maxWidth: .infinity)
+                
+                // Mail
+                ShareTileButton(
+                    icon: "envelope.fill",
+                    iconColor: .white,
+                    backgroundColor: .blue,
+                    title: "Mail",
+                    action: {
+                        shareToMail()
+                        isPresented = false
+                    }
+                )
+                .frame(maxWidth: .infinity)
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 30)
+        }
+        .presentationDetents([.height(220)])
+        .presentationDragIndicator(.visible)
+    }
+    
+    private func canOpenWhatsApp() -> Bool {
+        guard let whatsappURL = URL(string: "whatsapp://") else { return false }
+        return UIApplication.shared.canOpenURL(whatsappURL)
+    }
+    
+    private func shareToWhatsApp() {
+        if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let whatsappURL = URL(string: "whatsapp://send?text=\(encodedText)") {
+            UIApplication.shared.open(whatsappURL)
+        }
+    }
+    
+    private func shareToMessages() {
+        if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let smsURL = URL(string: "sms:&body=\(encodedText)") {
+            UIApplication.shared.open(smsURL)
+        }
+    }
+    
+    private func shareToMail() {
+        if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+           let mailURL = URL(string: "mailto:?subject=Next%20Wave&body=\(encodedText)") {
+            UIApplication.shared.open(mailURL)
+        }
+    }
+}
+
+struct ShareTileButton: View {
+    let icon: String
+    let iconColor: Color
+    let backgroundColor: Color
+    let title: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(backgroundColor)
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: icon)
+                        .foregroundColor(iconColor)
+                        .font(.system(size: 28))
+                }
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                    .lineLimit(1)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 } 

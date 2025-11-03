@@ -143,8 +143,9 @@ struct DepartureRowView: View {
                                 .font(.system(size: 11))
                                 .foregroundColor(.primary)
                             
-                            // Wasserpegel-Differenz
-                            if let selectedStation = lakeStationsViewModel.selectedStation,
+                            // Wasserpegel-Differenz (nur für heutigen Tag)
+                            if Calendar.current.isDateInToday(wave.time),
+                               let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
                                }), let waterLevelDiff = lake.waterLevelDifference {
@@ -229,8 +230,12 @@ struct DepartureRowView: View {
             text += "💧 Wassertemperatur: \(String(format: "%.0f°C", waterTemp))\n"
         }
         
-        // Wasserpegel-Differenz hinzufügen wenn vorhanden
-        if let selectedStation = lakeStationsViewModel.selectedStation,
+        // Wasserpegel-Differenz hinzufügen wenn vorhanden (nur für heutigen Tag)
+        let calendar = Calendar.current
+        let isToday = calendar.isDateInToday(wave.time)
+        
+        if isToday,
+           let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
            }), let waterLevelDiff = lake.waterLevelDifference {

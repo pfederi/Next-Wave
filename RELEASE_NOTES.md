@@ -35,7 +35,7 @@
 - **Icon consistency**: Each data point has its own descriptive icon
 - **Today-only water level**: Water level difference only shown for current day departures
 
-### Share Wave Feature 📤
+### Share Wave Feature
 - **Share with friends**: Share wave details via WhatsApp, Messages, or Mail
 - **Fun intro messages**: 5 randomized intro texts like "🥳 Let's share the next wave for a party wave!"
 - **Complete information**: Includes station, date, time, route, ship name, and all weather data

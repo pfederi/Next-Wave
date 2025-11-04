@@ -13,14 +13,14 @@
 
 ## Version 3.4 (November 2025)
 
-### Smart Wetsuit Thickness Recommendations 🤸
+### Smart Wetsuit Thickness Recommendations
 - **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
 - **30°C rule**: If air + water temperature < 30°C, the app recommends one size thicker for optimal comfort
 - **Temperature ranges**: From 0.5-2mm shorties to 6/5/4mm winter wetsuits
 - **Wind chill integration**: Uses "feels like" temperature for more accurate recommendations
 - **Visual display**: Shows thickness in millimeters (e.g., 3/2mm, 4/3mm) with intuitive icon
 
-### Interactive Weather Legend 📊
+### Interactive Weather Legend
 - **Tap to learn**: Tap on any weather line to see detailed explanations of all weather data
 - **Comprehensive information**: Learn what each weather icon and value means
 - **Weather conditions guide**: Understand different weather conditions (clear, cloudy, rainy, etc.)

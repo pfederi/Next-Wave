@@ -428,6 +428,7 @@
 					};
 					8A225F4A2D0ABC70008BA92B = {
 						CreatedOnToolsVersion = 16.1;
+						LastSwiftMigration = 2600;
 						TestTargetID = 8A225F302D0ABC6F008BA92B;
 					};
 					8A5C5AFE2DF0CFD500569B58 = {
@@ -839,6 +840,7 @@
 		8A225F5C2D0ABC70008BA92B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -846,6 +848,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-WaveUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Next WaveUITests/Next WaveUITests-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = "Next Wave";
@@ -855,6 +859,7 @@
 		8A225F5D2D0ABC70008BA92B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -862,6 +867,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-WaveUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Next WaveUITests/Next WaveUITests-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = "Next Wave";

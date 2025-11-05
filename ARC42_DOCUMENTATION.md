@@ -64,25 +64,34 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ### 3.1 Business Context
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Next Wave App                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   iOS App    │  │  Watch App   │  │   Widgets    │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-└─────────────────────────────────────────────────────────────┘
-           │                    │                    │
-           ▼                    ▼                    ▼
-┌──────────────────────────────────────────────────────────────┐
-│                     External Systems                          │
-├──────────────────────────────────────────────────────────────┤
-│  • transport.opendata.ch (Schedule data)                     │
-│  • OpenWeather API (Weather data)                            │
-│  • Sunrise-Sunset.org (Sun times)                            │
-│  • Custom Vercel API (Ship assignments)                      │
-│  • MeteoNews (Water temperature & levels)                    │
-│  • OpenStreetMap (Map data)                                  │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph NextWave["Next Wave App"]
+        iOS["iOS App"]
+        Watch["Watch App"]
+        Widgets["Widgets"]
+    end
+    
+    subgraph External["External Systems"]
+        Transport["transport.opendata.ch<br/>(Schedule data)"]
+        Weather["OpenWeather API<br/>(Weather data)"]
+        Sun["Sunrise-Sunset.org<br/>(Sun times)"]
+        Vercel["Custom Vercel API<br/>(Ship assignments)"]
+        Meteo["MeteoNews<br/>(Water temperature & levels)"]
+        OSM["OpenStreetMap<br/>(Map data)"]
+    end
+    
+    iOS --> Transport
+    iOS --> Weather
+    iOS --> Sun
+    iOS --> Vercel
+    iOS --> Meteo
+    iOS --> OSM
+    
+    Watch --> Transport
+    Watch --> Weather
+    
+    Widgets --> Transport
 ```
 
 ### 3.2 Technical Context
@@ -145,69 +154,65 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ### 5.1 Level 1: System Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Next Wave System                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │              │  │              │  │              │      │
-│  │   iOS App    │◄─┤  Watch App   │  │   Widgets    │      │
-│  │              │  │              │  │              │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                 │                 │              │
-│         └─────────────────┴─────────────────┘              │
-│                           │                                │
-│                  ┌────────▼────────┐                       │
-│                  │                 │                       │
-│                  │  Shared Data    │                       │
-│                  │  (App Groups)   │                       │
-│                  │                 │                       │
-│                  └─────────────────┘                       │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph System["Next Wave System"]
+        iOS["iOS App"]
+        Watch["Watch App"]
+        Widgets["Widgets"]
+        Shared["Shared Data<br/>(App Groups)"]
+        
+        iOS --> Shared
+        Watch --> Shared
+        Widgets --> Shared
+        Watch -.sync.-> iOS
+    end
+    
+    style Shared fill:#e1f5ff
 ```
 
 ### 5.2 Level 2: iOS App Components
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         iOS App                              │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │                    Views Layer                        │   │
-│  │  • ContentView                                        │   │
-│  │  • DeparturesListView                                 │   │
-│  │  • LocationPickerView                                 │   │
-│  │  • SettingsView                                       │   │
-│  │  • WaveAnalyticsView                                  │   │
-│  └──────────────────┬───────────────────────────────────┘   │
-│                     │                                        │
-│  ┌──────────────────▼───────────────────────────────────┐   │
-│  │                ViewModels Layer                       │   │
-│  │  • ScheduleViewModel                                  │   │
-│  │  • LakeStationsViewModel                              │   │
-│  │  • WaveAnalyticsViewModel                             │   │
-│  │  • AppSettings                                        │   │
-│  └──────────────────┬───────────────────────────────────┘   │
-│                     │                                        │
-│  ┌──────────────────▼───────────────────────────────────┐   │
-│  │                   API Layer                           │   │
-│  │  • TransportAPI (Fahrplandaten)                       │   │
-│  │  • WeatherAPI (Wetterdaten)                           │   │
-│  │  • VesselAPI (Schiffsnamen)                           │   │
-│  │  • WaterTemperatureAPI (Wassertemperatur)             │   │
-│  └──────────────────┬───────────────────────────────────┘   │
-│                     │                                        │
-│  ┌──────────────────▼───────────────────────────────────┐   │
-│  │                  Models Layer                         │   │
-│  │  • Journey, Lake, Station                             │   │
-│  │  • DepartureInfo, FavoriteStation                     │   │
-│  │  • WaveAnalytics, SunTimes                            │   │
-│  └───────────────────────────────────────────────────────┘   │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph iOS["iOS App"]
+        subgraph Views["Views Layer"]
+            ContentView["ContentView"]
+            DeparturesListView["DeparturesListView"]
+            LocationPickerView["LocationPickerView"]
+            SettingsView["SettingsView"]
+            WaveAnalyticsView["WaveAnalyticsView"]
+        end
+        
+        subgraph ViewModels["ViewModels Layer"]
+            ScheduleVM["ScheduleViewModel"]
+            LakeStationsVM["LakeStationsViewModel"]
+            WaveAnalyticsVM["WaveAnalyticsViewModel"]
+            AppSettings["AppSettings"]
+        end
+        
+        subgraph API["API Layer"]
+            TransportAPI["TransportAPI<br/>(Schedule data)"]
+            WeatherAPI["WeatherAPI<br/>(Weather data)"]
+            VesselAPI["VesselAPI<br/>(Ship names)"]
+            WaterTempAPI["WaterTemperatureAPI<br/>(Water temperature)"]
+        end
+        
+        subgraph Models["Models Layer"]
+            Journey["Journey, Lake, Station"]
+            DepartureInfo["DepartureInfo, FavoriteStation"]
+            Analytics["WaveAnalytics, SunTimes"]
+        end
+        
+        Views --> ViewModels
+        ViewModels --> API
+        API --> Models
+    end
+    
+    style Views fill:#e3f2fd
+    style ViewModels fill:#fff3e0
+    style API fill:#f3e5f5
+    style Models fill:#e8f5e9
 ```
 
 ### 5.3 Key Components
@@ -255,90 +260,64 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ### 6.1 Scenario: Loading Departures
 
-```
-┌──────┐         ┌──────────────┐         ┌──────────────┐         ┌─────────────┐
-│ User │         │ ContentView  │         │ViewModel     │         │ TransportAPI│
-└──┬───┘         └──────┬───────┘         └──────┬───────┘         └──────┬──────┘
-   │                    │                        │                        │
-   │ Select Station     │                        │                        │
-   ├───────────────────►│                        │                        │
-   │                    │                        │                        │
-   │                    │ loadDepartures()       │                        │
-   │                    ├───────────────────────►│                        │
-   │                    │                        │                        │
-   │                    │                        │ getStationboard()      │
-   │                    │                        ├───────────────────────►│
-   │                    │                        │                        │
-   │                    │                        │                        │ HTTP GET
-   │                    │                        │                        ├─────────►
-   │                    │                        │                        │
-   │                    │                        │      [Journey]         │
-   │                    │                        │◄───────────────────────┤
-   │                    │                        │                        │
-   │                    │      [Journey]         │                        │
-   │                    │◄───────────────────────┤                        │
-   │                    │                        │                        │
-   │  Display Departures│                        │                        │
-   │◄───────────────────┤                        │                        │
-   │                    │                        │                        │
+```mermaid
+sequenceDiagram
+    actor User
+    participant ContentView
+    participant ViewModel
+    participant TransportAPI
+    participant API as transport.opendata.ch
+    
+    User->>ContentView: Select Station
+    ContentView->>ViewModel: loadDepartures()
+    ViewModel->>TransportAPI: getStationboard()
+    TransportAPI->>API: HTTP GET
+    API-->>TransportAPI: JSON Response
+    TransportAPI-->>ViewModel: [Journey]
+    ViewModel-->>ContentView: [Journey]
+    ContentView-->>User: Display Departures
 ```
 
 ### 6.2 Scenario: Widget Update
 
-```
-┌─────────┐         ┌──────────────┐         ┌─────────────────┐
-│ Widget  │         │ SharedData   │         │ iOS App         │
-│         │         │ Manager      │         │                 │
-└────┬────┘         └──────┬───────┘         └────────┬────────┘
-     │                     │                          │
-     │ Timeline Request    │                          │
-     ├────────────────────►│                          │
-     │                     │                          │
-     │                     │ loadNextDepartures()     │
-     │                     ├─────────────────────────►│
-     │                     │                          │
-     │                     │                          │ Load from
-     │                     │                          │ App Groups
-     │                     │                          │
-     │                     │   [DepartureInfo]        │
-     │                     │◄─────────────────────────┤
-     │                     │                          │
-     │  [DepartureInfo]    │                          │
-     │◄────────────────────┤                          │
-     │                     │                          │
-     │ Display Widget      │                          │
-     │                     │                          │
+```mermaid
+sequenceDiagram
+    participant Widget
+    participant SharedDataManager
+    participant AppGroups as App Groups<br/>(UserDefaults)
+    participant iOSApp as iOS App
+    
+    Widget->>SharedDataManager: Timeline Request
+    SharedDataManager->>AppGroups: loadNextDepartures()
+    AppGroups-->>SharedDataManager: [DepartureInfo]
+    SharedDataManager-->>Widget: [DepartureInfo]
+    Widget->>Widget: Display Widget
+    
+    Note over iOSApp,AppGroups: iOS App writes data<br/>to App Groups periodically
+    iOSApp->>AppGroups: saveNextDepartures()
 ```
 
 ### 6.3 Scenario: Loading Ship Names (with Caching)
 
-```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│ViewModel     │    │ VesselAPI    │    │ Cache        │    │ Vercel API   │
-└──────┬───────┘    └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
-       │                   │                   │                   │
-       │ getShipName()     │                   │                   │
-       ├──────────────────►│                   │                   │
-       │                   │                   │                   │
-       │                   │ Check Cache       │                   │
-       │                   ├──────────────────►│                   │
-       │                   │                   │                   │
-       │                   │  Cache Hit?       │                   │
-       │                   │◄──────────────────┤                   │
-       │                   │                   │                   │
-       │                   │                   │                   │
-       │                   │ [If Miss] HTTP GET│                   │
-       │                   ├───────────────────┴──────────────────►│
-       │                   │                                       │
-       │                   │              Ship Name                │
-       │                   │◄──────────────────────────────────────┤
-       │                   │                                       │
-       │                   │ Store in Cache    │                   │
-       │                   ├──────────────────►│                   │
-       │                   │                   │                   │
-       │  Ship Name        │                   │                   │
-       │◄──────────────────┤                   │                   │
-       │                   │                   │                   │
+```mermaid
+sequenceDiagram
+    participant ViewModel
+    participant VesselAPI
+    participant Cache as Cache<br/>(UserDefaults)
+    participant VercelAPI as Vercel API
+    
+    ViewModel->>VesselAPI: getShipName(course, date)
+    VesselAPI->>Cache: Check Cache
+    
+    alt Cache Hit
+        Cache-->>VesselAPI: Ship Name
+        VesselAPI-->>ViewModel: Ship Name
+    else Cache Miss
+        VesselAPI->>VercelAPI: HTTP GET /api/ships
+        VercelAPI-->>VesselAPI: Ship Data (JSON)
+        VesselAPI->>Cache: Store in Cache (24h)
+        VesselAPI-->>ViewModel: Ship Name
+    end
 ```
 
 ---
@@ -347,43 +326,39 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ### 7.1 Infrastructure
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        User Devices                          │
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │   iPhone     │  │  Apple Watch │  │  iPad        │      │
-│  │              │  │              │  │              │      │
-│  │  iOS 16+     │  │  watchOS 9+  │  │  iOS 16+     │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                 │                 │              │
-└─────────┼─────────────────┼─────────────────┼──────────────┘
-          │                 │                 │
-          └─────────────────┴─────────────────┘
-                            │
-                            │ HTTPS
-                            │
-          ┌─────────────────▼─────────────────┐
-          │                                   │
-          │        Internet / Cloud           │
-          │                                   │
-          └─────────────────┬─────────────────┘
-                            │
-          ┌─────────────────┴─────────────────┐
-          │                                   │
-          │                                   │
-┌─────────▼──────────┐            ┌───────────▼──────────┐
-│                    │            │                      │
-│  Vercel Serverless │            │  External APIs       │
-│  Functions         │            │                      │
-│                    │            │  • transport.opendata│
-│  • /api/ships      │            │  • OpenWeather       │
-│  • /api/water-temp │            │  • Sunrise-Sunset    │
-│                    │            │  • MeteoNews         │
-│  Node.js Runtime   │            │  • OpenStreetMap     │
-│  Puppeteer         │            │                      │
-│                    │            │                      │
-└────────────────────┘            └──────────────────────┘
+```mermaid
+graph TB
+    subgraph Devices["User Devices"]
+        iPhone["iPhone<br/>iOS 16+"]
+        Watch["Apple Watch<br/>watchOS 9+"]
+        iPad["iPad<br/>iOS 16+"]
+    end
+    
+    subgraph Cloud["Internet / Cloud"]
+        subgraph Vercel["Vercel Serverless"]
+            Ships["/api/ships<br/>Node.js + Puppeteer"]
+            WaterTemp["/api/water-temperature<br/>Node.js"]
+        end
+        
+        subgraph External["External APIs"]
+            Transport["transport.opendata.ch"]
+            Weather["OpenWeather"]
+            Sun["Sunrise-Sunset.org"]
+            Meteo["MeteoNews"]
+            OSM["OpenStreetMap"]
+        end
+    end
+    
+    iPhone -->|HTTPS| Vercel
+    iPhone -->|HTTPS| External
+    Watch -->|HTTPS| Vercel
+    Watch -->|HTTPS| External
+    iPad -->|HTTPS| Vercel
+    iPad -->|HTTPS| External
+    
+    style Devices fill:#e3f2fd
+    style Vercel fill:#fff3e0
+    style External fill:#f3e5f5
 ```
 
 ### 7.2 Deployment
@@ -540,28 +515,42 @@ do {
 
 ### 10.1 Quality Tree
 
-```
-Quality
-├── Performance
-│   ├── App start < 2s
-│   ├── Load departures < 1s
-│   └── Widget update < 500ms
-├── Reliability
-│   ├── Availability > 99%
-│   ├── Fault tolerance (graceful degradation)
-│   └── Data integrity
-├── Usability
-│   ├── Intuitive navigation
-│   ├── Clear error messages
-│   └── Accessibility
-├── Maintainability
-│   ├── Modular architecture
-│   ├── Code documentation
-│   └── Testability
-└── Security
-    ├── Privacy (no tracking)
-    ├── HTTPS for all APIs
-    └── Secure data storage
+```mermaid
+graph TB
+    Quality["Quality"]
+    
+    Quality --> Performance
+    Quality --> Reliability
+    Quality --> Usability
+    Quality --> Maintainability
+    Quality --> Security
+    
+    Performance --> P1["App start < 2s"]
+    Performance --> P2["Load departures < 1s"]
+    Performance --> P3["Widget update < 500ms"]
+    
+    Reliability --> R1["Availability > 99%"]
+    Reliability --> R2["Fault tolerance<br/>(graceful degradation)"]
+    Reliability --> R3["Data integrity"]
+    
+    Usability --> U1["Intuitive navigation"]
+    Usability --> U2["Clear error messages"]
+    Usability --> U3["Accessibility"]
+    
+    Maintainability --> M1["Modular architecture"]
+    Maintainability --> M2["Code documentation"]
+    Maintainability --> M3["Testability"]
+    
+    Security --> S1["Privacy (no tracking)"]
+    Security --> S2["HTTPS for all APIs"]
+    Security --> S3["Secure data storage"]
+    
+    style Quality fill:#e1f5ff
+    style Performance fill:#fff3e0
+    style Reliability fill:#f3e5f5
+    style Usability fill:#e8f5e9
+    style Maintainability fill:#fce4ec
+    style Security fill:#ffebee
 ```
 
 ### 10.2 Quality Scenarios

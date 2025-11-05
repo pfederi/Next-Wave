@@ -322,6 +322,441 @@ sequenceDiagram
 
 ---
 
+### 6.4 Scenario: Loading Weather Data
+
+```mermaid
+sequenceDiagram
+    participant ViewModel
+    participant WeatherAPI
+    participant Cache as In-Memory Cache
+    participant OpenWeather as OpenWeather API
+    
+    ViewModel->>WeatherAPI: getWeather(station)
+    WeatherAPI->>Cache: Check Cache (6h validity)
+    
+    alt Cache Valid
+        Cache-->>WeatherAPI: Weather Data
+    else Cache Expired/Missing
+        WeatherAPI->>OpenWeather: HTTP GET /forecast
+        OpenWeather-->>WeatherAPI: Weather Data (JSON)
+        WeatherAPI->>Cache: Store in Cache (6h)
+    end
+    
+    WeatherAPI->>WeatherAPI: Calculate pressure trend
+    WeatherAPI->>WeatherAPI: Match forecast to departure times
+    WeatherAPI-->>ViewModel: Weather Data per Departure
+```
+
+---
+
+### 6.5 Scenario: Watch Connectivity Sync
+
+```mermaid
+sequenceDiagram
+    participant iOSApp
+    participant WatchConnectivity
+    participant WatchApp
+    participant WatchUI
+    
+    iOSApp->>iOSApp: User adds/removes favorite
+    iOSApp->>WatchConnectivity: updateApplicationContext(favorites)
+    WatchConnectivity->>WatchApp: didReceiveApplicationContext
+    WatchApp->>WatchApp: Update local favorites
+    WatchApp->>WatchUI: Refresh UI
+    
+    Note over iOSApp,WatchApp: Automatic sync when<br/>iPhone and Watch are paired
+```
+
+---
+
+### 6.6 Scenario: Notification Scheduling
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant DepartureView
+    participant NotificationManager
+    participant UNUserNotificationCenter
+    
+    User->>DepartureView: Tap notification button
+    DepartureView->>DepartureView: Select time (3/5/10/15 min)
+    DepartureView->>NotificationManager: scheduleNotification(departure, time)
+    NotificationManager->>UNUserNotificationCenter: Request permission
+    
+    alt Permission Granted
+        UNUserNotificationCenter-->>NotificationManager: Authorized
+        NotificationManager->>NotificationManager: Calculate trigger time
+        NotificationManager->>UNUserNotificationCenter: Add notification request
+        UNUserNotificationCenter-->>NotificationManager: Success
+        NotificationManager-->>DepartureView: Notification scheduled
+        DepartureView-->>User: Show confirmation
+    else Permission Denied
+        UNUserNotificationCenter-->>NotificationManager: Denied
+        NotificationManager-->>DepartureView: Permission error
+        DepartureView-->>User: Show settings link
+    end
+```
+
+---
+
+### 6.7 Scenario: Finding Nearest Station
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant App
+    participant LocationManager
+    participant LakeStationsViewModel
+    participant TransportAPI
+    
+    User->>App: Open app
+    App->>LocationManager: Request location permission
+    
+    alt Permission Granted
+        LocationManager-->>App: Location authorized
+        LocationManager->>LocationManager: Start location updates
+        LocationManager-->>LakeStationsViewModel: Current location
+        LakeStationsViewModel->>LakeStationsViewModel: Load all stations
+        LakeStationsViewModel->>LakeStationsViewModel: Calculate distances
+        LakeStationsViewModel->>LakeStationsViewModel: Find nearest station
+        LakeStationsViewModel->>TransportAPI: Load departures for nearest
+        TransportAPI-->>LakeStationsViewModel: [Journey]
+        LakeStationsViewModel-->>App: Display nearest station
+    else Permission Denied
+        LocationManager-->>App: Location denied
+        App->>App: Hide nearest station feature
+        App->>App: Show only favorites
+    end
+```
+
+---
+
+### 6.8 Scenario: Wave Analytics Calculation
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant AnalyticsView
+    participant WaveAnalyticsViewModel
+    participant ScheduleViewModel
+    participant SunTimesAPI
+    
+    User->>AnalyticsView: Open Analytics
+    AnalyticsView->>WaveAnalyticsViewModel: Calculate analytics
+    WaveAnalyticsViewModel->>ScheduleViewModel: Get all departures for date
+    ScheduleViewModel-->>WaveAnalyticsViewModel: [Journey with ship names]
+    WaveAnalyticsViewModel->>SunTimesAPI: Get sun times for date
+    SunTimesAPI-->>WaveAnalyticsViewModel: Sunrise, sunset, twilight
+    
+    WaveAnalyticsViewModel->>WaveAnalyticsViewModel: Calculate wave ratings
+    WaveAnalyticsViewModel->>WaveAnalyticsViewModel: Find best sessions (1-2h)
+    WaveAnalyticsViewModel->>WaveAnalyticsViewModel: Apply daylight penalties
+    WaveAnalyticsViewModel->>WaveAnalyticsViewModel: Sort by quality score
+    WaveAnalyticsViewModel->>WaveAnalyticsViewModel: Calculate wave frequency
+    
+    WaveAnalyticsViewModel-->>AnalyticsView: Analytics data
+    AnalyticsView-->>User: Display timeline & sessions
+```
+
+---
+
+### 6.9 Scenario: Background Widget Data Refresh
+
+```mermaid
+sequenceDiagram
+    participant System as iOS System
+    participant BackgroundTask
+    participant FavoritesManager
+    participant TransportAPI
+    participant SharedData
+    participant Widget
+    
+    System->>BackgroundTask: Trigger at 17:00
+    BackgroundTask->>FavoritesManager: loadDepartureDataForWidgets()
+    
+    loop For each favorite station
+        FavoritesManager->>TransportAPI: getStationboard(today)
+        TransportAPI-->>FavoritesManager: Today's departures
+        
+        alt Less than 15 departures today
+            FavoritesManager->>TransportAPI: getStationboard(tomorrow)
+            TransportAPI-->>FavoritesManager: Tomorrow's departures
+        end
+    end
+    
+    FavoritesManager->>FavoritesManager: Take up to 25 departures per station
+    FavoritesManager->>SharedData: saveNextDepartures([DepartureInfo])
+    FavoritesManager->>Widget: reloadAllTimelines()
+    Widget->>Widget: Update display
+    
+    BackgroundTask->>System: Task completed
+```
+
+---
+
+### 6.10 Scenario: Device Flip Gesture (Theme Toggle)
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Device as Device Motion
+    participant ShakeDetector
+    participant AppSettings
+    participant UI
+    
+    User->>Device: Flip device 180°
+    Device->>ShakeDetector: Motion update
+    ShakeDetector->>ShakeDetector: Detect roll rotation
+    ShakeDetector->>ShakeDetector: Check cooldown (3s)
+    
+    alt In Departure View
+        ShakeDetector->>ViewModel: Toggle Albis filter
+        ViewModel->>ViewModel: Filter departures
+        ViewModel->>UI: Update departure list
+        ShakeDetector->>Device: Haptic feedback (notification)
+    else In Other Views
+        ShakeDetector->>AppSettings: Toggle theme
+        AppSettings->>AppSettings: Switch light/dark mode
+        AppSettings->>UI: Apply new theme
+        ShakeDetector->>Device: Haptic feedback (impact)
+    end
+```
+
+---
+
+### 6.11 Scenario: Share Wave with Friends
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant DepartureView
+    participant ShareSheet
+    participant MessageComposer
+    participant WhatsApp
+    participant Mail
+    
+    User->>DepartureView: Tap share button
+    DepartureView->>DepartureView: Generate share text<br/>(station, time, weather, ship)
+    DepartureView->>ShareSheet: Show share options
+    
+    alt Share via WhatsApp
+        User->>ShareSheet: Select WhatsApp
+        ShareSheet->>WhatsApp: Open with pre-filled text
+        WhatsApp-->>User: Compose message
+    else Share via Messages
+        User->>ShareSheet: Select Messages
+        ShareSheet->>MessageComposer: Open native composer
+        MessageComposer-->>User: Select recipients
+    else Share via Mail
+        User->>ShareSheet: Select Mail
+        ShareSheet->>Mail: Open with subject & body
+        Mail-->>User: Compose email
+    end
+```
+
+---
+
+### 6.12 Scenario: Water Temperature & Level Loading
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant WaterTempAPI
+    participant Cache as Cache (24h)
+    participant VercelAPI as Vercel API
+    participant MeteoNews
+    participant ViewModel
+    
+    App->>WaterTempAPI: preloadData() on startup
+    WaterTempAPI->>Cache: Check cache
+    
+    alt Cache Valid (< 24h)
+        Cache-->>WaterTempAPI: Lake temperatures & levels
+    else Cache Expired
+        WaterTempAPI->>VercelAPI: GET /api/water-temperature
+        VercelAPI->>MeteoNews: Scrape data
+        MeteoNews-->>VercelAPI: HTML with lake data
+        VercelAPI->>VercelAPI: Parse temperatures & levels
+        VercelAPI-->>WaterTempAPI: JSON response
+        WaterTempAPI->>Cache: Store for 24h
+    end
+    
+    WaterTempAPI-->>App: Data ready
+    
+    Note over ViewModel: When displaying station
+    ViewModel->>WaterTempAPI: getTemperature(lakeName)
+    WaterTempAPI-->>ViewModel: Temperature & level
+    ViewModel->>ViewModel: Calculate level difference
+    ViewModel->>ViewModel: Calculate wetsuit recommendation
+```
+
+---
+
+### 6.13 Scenario: Map Interaction
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant MapView
+    participant LocationManager
+    participant LakeStationsViewModel
+    participant StationAnnotations
+    
+    User->>MapView: Open map view
+    MapView->>LakeStationsViewModel: Load all stations
+    LakeStationsViewModel-->>MapView: [Station with coordinates]
+    MapView->>StationAnnotations: Create annotations
+    MapView->>MapView: Cluster nearby stations
+    
+    opt User grants location
+        User->>LocationManager: Enable location
+        LocationManager-->>MapView: Current location
+        MapView->>MapView: Show user location dot
+    end
+    
+    User->>MapView: Tap station annotation
+    MapView->>MapView: Show station details
+    
+    User->>MapView: Tap "View Departures"
+    MapView->>LakeStationsViewModel: selectStation(station)
+    LakeStationsViewModel->>LakeStationsViewModel: Load departures
+    MapView-->>User: Navigate to departure view
+```
+
+---
+
+### 6.14 Scenario: Schedule Period Detection
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant SchedulePeriodService
+    participant PeriodsJSON as schedule_periods.json
+    participant ViewModel
+    participant UI
+    
+    App->>SchedulePeriodService: Check on app start
+    SchedulePeriodService->>PeriodsJSON: Load periods for all lakes
+    PeriodsJSON-->>SchedulePeriodService: Period definitions
+    
+    SchedulePeriodService->>SchedulePeriodService: Get current date
+    SchedulePeriodService->>SchedulePeriodService: Find active period
+    SchedulePeriodService->>SchedulePeriodService: Calculate days until next change
+    
+    alt Within 31 days of change
+        SchedulePeriodService->>SchedulePeriodService: Generate countdown message
+        SchedulePeriodService->>SchedulePeriodService: Determine season transition
+        SchedulePeriodService-->>ViewModel: Show countdown message
+        ViewModel->>UI: Display fun transition message
+    else No upcoming change
+        SchedulePeriodService-->>ViewModel: No message
+    end
+```
+
+---
+
+### 6.15 Scenario: First Launch Safety Rules
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant App
+    participant UserDefaults
+    participant SafetyModal
+    
+    User->>App: Launch app for first time
+    App->>UserDefaults: Check "hasShownNavigationRules"
+    UserDefaults-->>App: false (first launch)
+    
+    App->>App: Delay 0.5s (view loaded)
+    App->>SafetyModal: Show modal
+    SafetyModal-->>User: Display safety rules<br/>• 50-meter rule<br/>• Priority vessels<br/>• Equipment requirements<br/>• Swiss Pumpfoilers Code
+    
+    User->>SafetyModal: Read & dismiss
+    SafetyModal->>UserDefaults: Set "hasShownNavigationRules" = true
+    SafetyModal->>App: Close modal
+    App-->>User: Show main interface
+    
+    Note over App,UserDefaults: Modal won't show again<br/>but accessible via settings
+```
+
+---
+
+### 6.16 Scenario: Error Handling & Graceful Degradation
+
+```mermaid
+sequenceDiagram
+    participant ViewModel
+    participant TransportAPI
+    participant API as transport.opendata.ch
+    participant Cache
+    participant UI
+    
+    ViewModel->>TransportAPI: getStationboard()
+    TransportAPI->>API: HTTP GET
+    
+    alt API Success
+        API-->>TransportAPI: [Journey] data
+        TransportAPI->>Cache: Store in cache
+        TransportAPI-->>ViewModel: [Journey]
+        ViewModel->>UI: Display departures
+    else API Error (Network/Timeout)
+        API-->>TransportAPI: Error
+        TransportAPI->>Cache: Check for cached data
+        
+        alt Cache Available
+            Cache-->>TransportAPI: Cached [Journey]
+            TransportAPI-->>ViewModel: [Journey] (cached)
+            ViewModel->>UI: Display cached departures
+            Note over UI: No error shown to user
+        else No Cache
+            TransportAPI-->>ViewModel: Empty array
+            ViewModel->>UI: Show "no waves" message
+            Note over UI: Friendly message, not error
+        end
+        
+        TransportAPI->>TransportAPI: Log error for debugging
+    end
+```
+
+---
+
+### 6.17 Scenario: Parallel Data Loading on App Start
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant WeatherAPI
+    participant WaterTempAPI
+    participant VesselAPI
+    participant FavoritesManager
+    
+    App->>App: App launches
+    
+    par Parallel Preloading
+        App->>WeatherAPI: preloadData()
+        WeatherAPI->>WeatherAPI: Load weather for favorites
+        WeatherAPI-->>App: Ready
+    and
+        App->>WaterTempAPI: preloadData()
+        WaterTempAPI->>WaterTempAPI: Load all lake temperatures
+        WaterTempAPI-->>App: Ready
+    and
+        App->>VesselAPI: preloadData()
+        VesselAPI->>VesselAPI: Load ship assignments
+        VesselAPI-->>App: Ready
+    and
+        App->>FavoritesManager: loadDepartureDataForWidgets()
+        FavoritesManager->>FavoritesManager: Load departures for widgets
+        FavoritesManager-->>App: Ready
+    end
+    
+    Note over App: All data loaded in parallel<br/>for optimal performance
+    App->>App: Show UI with preloaded data
+```
+
+---
+
 ## 7. Deployment View
 
 ### 7.1 Infrastructure

@@ -530,28 +530,47 @@ sequenceDiagram
 sequenceDiagram
     actor User
     participant DepartureView
+    participant ShareGenerator
     participant ShareSheet
-    participant MessageComposer
     participant WhatsApp
+    participant Messages as Messages (MFMessageComposer)
     participant Mail
     
-    User->>DepartureView: Tap share button
-    DepartureView->>DepartureView: Generate share text<br/>(station, time, weather, ship)
-    DepartureView->>ShareSheet: Show share options
+    User->>DepartureView: Tap share button (only for future departures)
+    DepartureView->>ShareGenerator: Generate share content
+    ShareGenerator->>ShareGenerator: Select random intro message (5 variations)
+    ShareGenerator->>ShareGenerator: Format departure details<br/>• Station name<br/>• Date & Time<br/>• Route & Ship name<br/>• Weather (temp, wind, wetsuit)<br/>• Water level<br/>• App Store link
+    ShareGenerator-->>DepartureView: Share text ready
+    DepartureView->>ShareSheet: Show custom share sheet
+    ShareSheet-->>User: Display options:<br/>WhatsApp | Messages | Mail
     
-    alt Share via WhatsApp
-        User->>ShareSheet: Select WhatsApp
-        ShareSheet->>WhatsApp: Open with pre-filled text
-        WhatsApp-->>User: Compose message
-    else Share via Messages
-        User->>ShareSheet: Select Messages
-        ShareSheet->>MessageComposer: Open native composer
-        MessageComposer-->>User: Select recipients
-    else Share via Mail
-        User->>ShareSheet: Select Mail
-        ShareSheet->>Mail: Open with subject & body
-        Mail-->>User: Compose email
+    alt User selects WhatsApp
+        User->>ShareSheet: Tap WhatsApp button
+        ShareSheet->>ShareSheet: Check if WhatsApp installed
+        ShareSheet->>WhatsApp: Open via URL scheme<br/>whatsapp://send?text=...
+        WhatsApp->>WhatsApp: Pre-fill message with text
+        WhatsApp-->>User: Ready to send
+        User->>WhatsApp: Select contacts & send
+    else User selects Messages
+        User->>ShareSheet: Tap Messages button
+        ShareSheet->>Messages: Present MFMessageComposer
+        Messages->>Messages: Pre-fill body with full text<br/>(supports emojis & formatting)
+        Messages-->>User: Native message composer
+        User->>Messages: Select recipients
+        User->>Messages: Send message
+        Messages-->>ShareSheet: Dismiss
+    else User selects Mail
+        User->>ShareSheet: Tap Mail button
+        ShareSheet->>Mail: Open via URL scheme<br/>mailto:?subject=...&body=...
+        Mail->>Mail: Pre-fill subject: "Next Wave 🌊"
+        Mail->>Mail: Pre-fill body with text<br/>(URL encoded, emoji support)
+        Mail-->>User: Mail composer
+        User->>Mail: Add recipients
+        User->>Mail: Send email
     end
+    
+    ShareSheet->>DepartureView: Dismiss sheet
+    DepartureView-->>User: Return to departure list
 ```
 
 ---

@@ -1,68 +1,68 @@
-# Arc42 Architektur-Dokumentation: Next Wave
+# Arc42 Architecture Documentation: Next Wave
 
-Version 1.0 | Stand: November 2025
-
----
-
-## 1. Einführung und Ziele
-
-### 1.1 Aufgabenstellung
-
-Next Wave ist eine iOS-App, die Wake-Surfern und Foilern auf dem Zürichsee und anderen Schweizer Seen hilft, die perfekte Welle zu erwischen. Die App bietet Echtzeit-Schiffsfahrpläne, intelligente Benachrichtigungen und umfassende Wetterinformationen.
-
-### 1.2 Qualitätsziele
-
-| Priorität | Qualitätsziel | Beschreibung |
-|-----------|---------------|--------------|
-| 1 | Performance | Schnelle Ladezeiten durch intelligentes Caching (< 2s für Abfahrten) |
-| 2 | Zuverlässigkeit | Hohe Verfügbarkeit der Fahrplandaten durch Fallback-Mechanismen |
-| 3 | Benutzerfreundlichkeit | Intuitive Bedienung mit maximal 2 Klicks zum Ziel |
-| 4 | Datenschutz | Keine Datensammlung, alle Daten bleiben auf dem Gerät |
-| 5 | Offline-Fähigkeit | Grundfunktionen auch ohne Internetverbindung nutzbar |
-
-### 1.3 Stakeholder
-
-| Rolle | Kontakt | Erwartungshaltung |
-|-------|---------|-------------------|
-| Wake-Surfer & Foiler | Community | Zuverlässige Wellenvorhersagen, präzise Timing-Informationen |
-| Entwickler | @pfederi | Wartbare, erweiterbare Codebasis |
-| App Store Nutzer | Öffentlich | Stabile App ohne Crashes, regelmäßige Updates |
-| Schifffahrtsgesellschaften | ZSG, etc. | Korrekte Darstellung der Fahrpläne |
+Version 1.0 | Date: November 2025
 
 ---
 
-## 2. Randbedingungen
+## 1. Introduction and Goals
 
-### 2.1 Technische Randbedingungen
+### 1.1 Requirements Overview
 
-| Randbedingung | Erläuterung |
-|---------------|-------------|
-| iOS 16+ | Mindestversion für SwiftUI-Features |
-| watchOS 9+ | Für Apple Watch Companion App |
-| Swift 5.9+ | Programmiersprache |
-| Xcode 15+ | Entwicklungsumgebung |
-| Vercel | Serverless Functions für Backend-APIs |
+Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and other Swiss lakes catch their perfect wave. The app provides real-time boat schedules, smart notifications, and comprehensive weather information.
 
-### 2.2 Organisatorische Randbedingungen
+### 1.2 Quality Goals
 
-| Randbedingung | Erläuterung |
-|---------------|-------------|
-| Open Source | MIT Lizenz, öffentliches GitHub Repository |
-| Solo-Entwicklung | Hauptentwickler: Patrick Federi |
-| Community-Driven | Feature-Requests aus der Pumpfoiling Community |
+| Priority | Quality Goal | Description |
+|----------|--------------|-------------|
+| 1 | Performance | Fast loading times through intelligent caching (< 2s for departures) |
+| 2 | Reliability | High availability of schedule data through fallback mechanisms |
+| 3 | Usability | Intuitive navigation with maximum 2 clicks to goal |
+| 4 | Privacy | No data collection, all data stays on device |
+| 5 | Offline Capability | Core functions available without internet connection |
 
-### 2.3 Konventionen
+### 1.3 Stakeholders
+
+| Role | Contact | Expectations |
+|------|---------|--------------|
+| Wake Surfers & Foilers | Community | Reliable wave predictions, precise timing information |
+| Developer | @pfederi | Maintainable, extensible codebase |
+| App Store Users | Public | Stable app without crashes, regular updates |
+| Shipping Companies | ZSG, etc. | Correct representation of schedules |
+
+---
+
+## 2. Architecture Constraints
+
+### 2.1 Technical Constraints
+
+| Constraint | Explanation |
+|------------|-------------|
+| iOS 16+ | Minimum version for SwiftUI features |
+| watchOS 9+ | For Apple Watch companion app |
+| Swift 5.9+ | Programming language |
+| Xcode 15+ | Development environment |
+| Vercel | Serverless functions for backend APIs |
+
+### 2.2 Organizational Constraints
+
+| Constraint | Explanation |
+|------------|-------------|
+| Open Source | MIT License, public GitHub repository |
+| Solo Development | Main developer: Patrick Federi |
+| Community-Driven | Feature requests from Pumpfoiling Community |
+
+### 2.3 Conventions
 
 - **Code Style**: Swift Standard Library Conventions
 - **Branching**: Git Flow (main, develop, feature branches)
-- **Dokumentation**: Inline-Kommentare für komplexe Logik
-- **Testing**: Manuelle Tests vor jedem Release
+- **Documentation**: Inline comments for complex logic
+- **Testing**: Manual testing before each release
 
 ---
 
-## 3. Kontextabgrenzung
+## 3. Context and Scope
 
-### 3.1 Fachlicher Kontext
+### 3.1 Business Context
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -74,38 +74,38 @@ Next Wave ist eine iOS-App, die Wake-Surfern und Foilern auf dem Zürichsee und 
            │                    │                    │
            ▼                    ▼                    ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                     Externe Systeme                           │
+│                     External Systems                          │
 ├──────────────────────────────────────────────────────────────┤
-│  • transport.opendata.ch (Fahrplandaten)                     │
-│  • OpenWeather API (Wetterdaten)                             │
-│  • Sunrise-Sunset.org (Sonnenzeiten)                         │
-│  • Custom Vercel API (Schiffszuweisungen)                    │
-│  • MeteoNews (Wassertemperatur & Pegelstände)                │
-│  • OpenStreetMap (Kartendaten)                               │
+│  • transport.opendata.ch (Schedule data)                     │
+│  • OpenWeather API (Weather data)                            │
+│  • Sunrise-Sunset.org (Sun times)                            │
+│  • Custom Vercel API (Ship assignments)                      │
+│  • MeteoNews (Water temperature & levels)                    │
+│  • OpenStreetMap (Map data)                                  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Technischer Kontext
+### 3.2 Technical Context
 
-**Eingehende Schnittstellen:**
+**Incoming Interfaces:**
 
-| Schnittstelle | Technologie | Zweck |
-|---------------|-------------|-------|
-| transport.opendata.ch | REST API | Echtzeit-Fahrplandaten für Schweizer Fähren |
-| OpenWeather API | REST API | Wetter-Forecasts (Temperatur, Wind, Druck) |
-| Sunrise-Sunset.org | REST API | Sonnenauf-/untergangszeiten |
-| Custom Vercel API | REST API | Schiffszuweisungen für Zürichsee (Web Scraping) |
-| MeteoNews API | REST API | Wassertemperatur & Pegelstände |
-| OpenStreetMap | Tile Server | Kartendarstellung |
+| Interface | Technology | Purpose |
+|-----------|------------|---------|
+| transport.opendata.ch | REST API | Real-time schedule data for Swiss ferries |
+| OpenWeather API | REST API | Weather forecasts (temperature, wind, pressure) |
+| Sunrise-Sunset.org | REST API | Sunrise/sunset times |
+| Custom Vercel API | REST API | Ship assignments for Lake Zurich (web scraping) |
+| MeteoNews API | REST API | Water temperature & water levels |
+| OpenStreetMap | Tile Server | Map rendering |
 
-**Ausgehende Schnittstellen:**
+**Outgoing Interfaces:**
 
-| Schnittstelle | Technologie | Zweck |
-|---------------|-------------|-------|
-| UserNotifications | iOS Framework | Lokale Push-Benachrichtigungen |
-| WidgetKit | iOS Framework | Home Screen & Lock Screen Widgets |
-| WatchConnectivity | iOS Framework | Datensynchronisation mit Apple Watch |
-| CoreLocation | iOS Framework | GPS-Positionsbestimmung |
+| Interface | Technology | Purpose |
+|-----------|------------|---------|
+| UserNotifications | iOS Framework | Local push notifications |
+| WidgetKit | iOS Framework | Home screen & lock screen widgets |
+| WatchConnectivity | iOS Framework | Data synchronization with Apple Watch |
+| CoreLocation | iOS Framework | GPS positioning |
 
 ---
 

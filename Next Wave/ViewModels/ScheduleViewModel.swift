@@ -64,6 +64,7 @@ class ScheduleViewModel: ObservableObject {
         }
     }
     @Published var albisClassFilterActive = false
+    @Published var sunTimes: SunTimes?
     
     private let userDefaults = UserDefaults.standard
     private let notifiedJourneysKey = "com.nextwave.notifiedJourneys"
@@ -287,7 +288,22 @@ class ScheduleViewModel: ObservableObject {
                 }
             }
             
-            // 4. Aktualisiere die UI NUR EINMAL mit allen Daten (Wetter + Schiffsnamen)
+            // 4. Lade Sun Times für den ausgewählten Tag
+            Task {
+                do {
+                    let times = try await SunTimeService.shared.getSunTimes(date: selectedDate)
+                    if !Task.isCancelled {
+                        sunTimes = times
+                    }
+                } catch {
+                    // Fehler beim Laden der Sun Times - ignorieren und ohne Darkness Indicator fortfahren
+                    #if DEBUG
+                    print("Failed to load sun times: \(error)")
+                    #endif
+                }
+            }
+            
+            // 5. Aktualisiere die UI NUR EINMAL mit allen Daten (Wetter + Schiffsnamen)
             if !Task.isCancelled {
                 nextWaves = updatedWaves
             }

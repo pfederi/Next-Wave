@@ -349,7 +349,54 @@ sequenceDiagram
 
 ---
 
-### 6.5 Scenario: Watch Connectivity Sync
+### 6.5 Scenario: Loading Sun Times and Darkness Indicator
+
+```mermaid
+sequenceDiagram
+    participant ViewModel
+    participant SunTimeService
+    participant Cache as UserDefaults Cache
+    participant SunAPI as Sunrise-Sunset.org API
+    participant DepartureView
+    
+    ViewModel->>SunTimeService: getSunTimes(date)
+    SunTimeService->>Cache: Check Cache (24h validity)
+    
+    alt Cache Valid
+        Cache-->>SunTimeService: Sun Times Data
+    else Cache Expired/Missing
+        SunTimeService->>SunAPI: HTTP GET /json?lat=...&lng=...&date=...
+        SunAPI-->>SunTimeService: Sun Times (JSON)<br/>• Sunrise<br/>• Sunset<br/>• Civil Twilight Begin<br/>• Civil Twilight End
+        SunTimeService->>Cache: Store in Cache (24h)
+    end
+    
+    SunTimeService-->>ViewModel: Sun Times
+    ViewModel->>ViewModel: Store sunTimes in @Published property
+    
+    DepartureView->>DepartureView: For each departure:<br/>getDarknessIcon(departureTime)
+    DepartureView->>DepartureView: Compare departure time with:<br/>• Sunrise/Sunset<br/>• Civil Twilight times
+    
+    alt Before Sunrise or After Sunset
+        alt During Twilight Period
+            DepartureView->>DepartureView: Show moon.stars.fill icon
+        else Full Darkness
+            DepartureView->>DepartureView: Show moon.fill icon
+        end
+    else Daylight Hours
+        DepartureView->>DepartureView: No icon displayed
+    end
+```
+
+**Key Features:**
+- Automatic detection of night departures
+- Distinction between full darkness and twilight
+- Uses local sunrise/sunset times for station location
+- Graceful degradation if API unavailable (no icon shown)
+- Cached data prevents excessive API calls
+
+---
+
+### 6.6 Scenario: Watch Connectivity Sync
 
 ```mermaid
 sequenceDiagram
@@ -369,7 +416,7 @@ sequenceDiagram
 
 ---
 
-### 6.6 Scenario: Notification Scheduling
+### 6.7 Scenario: Notification Scheduling
 
 ```mermaid
 sequenceDiagram
@@ -399,7 +446,7 @@ sequenceDiagram
 
 ---
 
-### 6.7 Scenario: Finding Nearest Station
+### 6.8 Scenario: Finding Nearest Station
 
 ```mermaid
 sequenceDiagram
@@ -431,7 +478,7 @@ sequenceDiagram
 
 ---
 
-### 6.8 Scenario: Wave Analytics Calculation
+### 6.9 Scenario: Wave Analytics Calculation
 
 ```mermaid
 sequenceDiagram
@@ -460,7 +507,7 @@ sequenceDiagram
 
 ---
 
-### 6.9 Scenario: Background Widget Data Refresh
+### 6.10 Scenario: Background Widget Data Refresh
 
 ```mermaid
 sequenceDiagram
@@ -494,7 +541,7 @@ sequenceDiagram
 
 ---
 
-### 6.10 Scenario: Device Flip Gesture (Theme Toggle)
+### 6.11 Scenario: Device Flip Gesture (Theme Toggle)
 
 ```mermaid
 sequenceDiagram
@@ -524,7 +571,7 @@ sequenceDiagram
 
 ---
 
-### 6.11 Scenario: Share Wave with Friends
+### 6.12 Scenario: Share Wave with Friends
 
 ```mermaid
 sequenceDiagram
@@ -575,7 +622,7 @@ sequenceDiagram
 
 ---
 
-### 6.12 Scenario: Water Temperature & Level Loading
+### 6.13 Scenario: Water Temperature & Level Loading
 
 ```mermaid
 sequenceDiagram
@@ -611,7 +658,7 @@ sequenceDiagram
 
 ---
 
-### 6.13 Scenario: Map Interaction
+### 6.14 Scenario: Map Interaction
 
 ```mermaid
 sequenceDiagram
@@ -644,7 +691,7 @@ sequenceDiagram
 
 ---
 
-### 6.14 Scenario: Schedule Period Detection
+### 6.15 Scenario: Schedule Period Detection
 
 ```mermaid
 sequenceDiagram
@@ -674,7 +721,7 @@ sequenceDiagram
 
 ---
 
-### 6.15 Scenario: First Launch Safety Rules
+### 6.16 Scenario: First Launch Safety Rules
 
 ```mermaid
 sequenceDiagram
@@ -701,7 +748,7 @@ sequenceDiagram
 
 ---
 
-### 6.16 Scenario: Error Handling & Graceful Degradation
+### 6.17 Scenario: Error Handling & Graceful Degradation
 
 ```mermaid
 sequenceDiagram
@@ -740,7 +787,7 @@ sequenceDiagram
 
 ---
 
-### 6.17 Scenario: Parallel Data Loading on App Start
+### 6.18 Scenario: Parallel Data Loading on App Start
 
 ```mermaid
 sequenceDiagram
@@ -838,6 +885,7 @@ graph TB
 | Departures | In-Memory | ViewModel | On refresh |
 | Ship Names | 24h | UserDefaults | Midnight |
 | Weather Data | 6h | In-Memory | Time-based |
+| Sun Times | 24h | UserDefaults | Midnight |
 | Water Temperature | 24h | UserDefaults | Midnight |
 | Map Tiles | Unlimited | Disk Cache | Manual |
 

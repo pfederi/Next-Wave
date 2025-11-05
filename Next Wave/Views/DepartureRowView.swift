@@ -112,6 +112,17 @@ struct DepartureRowView: View {
                         HStack(spacing: 0) {
                             Spacer()
                             HStack(spacing: 4) {
+                            // Night/Darkness Indicator (if applicable)
+                            if let darknessIcon = getDarknessIcon(for: wave.time) {
+                                Image(systemName: darknessIcon)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.primary)
+                                
+                                Text("|")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 11))
+                            }
+                            
                             // Wetter-Icon
                             Image(systemName: weather.weatherIcon)
                                 .font(.system(size: 12))
@@ -260,6 +271,67 @@ struct DepartureRowView: View {
         default:
             return "6/5/4"
         }
+    }
+    
+    // MARK: - Darkness Indicator Helpers
+    
+    private func getDarknessIcon(for departureTime: Date) -> String? {
+        guard let sunTimes = scheduleViewModel.sunTimes else {
+            return nil
+        }
+        
+        let calendar = Calendar.current
+        let departureComponents = calendar.dateComponents([.hour, .minute], from: departureTime)
+        let sunriseComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.sunrise)
+        let sunsetComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.sunset)
+        let twilightBeginComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.civilTwilightBegin)
+        let twilightEndComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.civilTwilightEnd)
+        
+        guard let departureMinutes = departureComponents.hour.map({ $0 * 60 + (departureComponents.minute ?? 0) }),
+              let sunriseMinutes = sunriseComponents.hour.map({ $0 * 60 + (sunriseComponents.minute ?? 0) }),
+              let sunsetMinutes = sunsetComponents.hour.map({ $0 * 60 + (sunsetComponents.minute ?? 0) }),
+              let twilightBeginMinutes = twilightBeginComponents.hour.map({ $0 * 60 + (twilightBeginComponents.minute ?? 0) }),
+              let twilightEndMinutes = twilightEndComponents.hour.map({ $0 * 60 + (twilightEndComponents.minute ?? 0) }) else {
+            return nil
+        }
+        
+        // Check if departure is before sunrise or after sunset
+        if departureMinutes < sunriseMinutes || departureMinutes > sunsetMinutes {
+            // Check if it's during twilight (±15 minutes)
+            if (departureMinutes >= twilightBeginMinutes && departureMinutes < sunriseMinutes) ||
+               (departureMinutes > sunsetMinutes && departureMinutes <= twilightEndMinutes) {
+                return "moon.stars.fill" // Twilight icon
+            } else {
+                return "moon.fill" // Full night icon
+            }
+        }
+        
+        return nil // Daylight - no icon
+    }
+    
+    private func isDuskOrDawn(for departureTime: Date) -> Bool {
+        guard let sunTimes = scheduleViewModel.sunTimes else {
+            return false
+        }
+        
+        let calendar = Calendar.current
+        let departureComponents = calendar.dateComponents([.hour, .minute], from: departureTime)
+        let sunriseComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.sunrise)
+        let sunsetComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.sunset)
+        let twilightBeginComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.civilTwilightBegin)
+        let twilightEndComponents = calendar.dateComponents([.hour, .minute], from: sunTimes.civilTwilightEnd)
+        
+        guard let departureMinutes = departureComponents.hour.map({ $0 * 60 + (departureComponents.minute ?? 0) }),
+              let sunriseMinutes = sunriseComponents.hour.map({ $0 * 60 + (sunriseComponents.minute ?? 0) }),
+              let sunsetMinutes = sunsetComponents.hour.map({ $0 * 60 + (sunsetComponents.minute ?? 0) }),
+              let twilightBeginMinutes = twilightBeginComponents.hour.map({ $0 * 60 + (twilightBeginComponents.minute ?? 0) }),
+              let twilightEndMinutes = twilightEndComponents.hour.map({ $0 * 60 + (twilightEndComponents.minute ?? 0) }) else {
+            return false
+        }
+        
+        // Check if departure is during twilight period
+        return (departureMinutes >= twilightBeginMinutes && departureMinutes < sunriseMinutes) ||
+               (departureMinutes > sunsetMinutes && departureMinutes <= twilightEndMinutes)
     }
     
     private func generateShareText() -> String {
@@ -634,12 +706,19 @@ struct WeatherLegendView: View {
                         description: "Wind speed in knots (kn) and wind direction (N, NE, E, SE, S, SW, W, NW)"
                     )
                     
-                        LegendRow(
-                            icon: "water.waves.and.arrow.trianglehead.up",
-                            iconColor: .primary,
-                            title: "Water Level",
-                            description: "Difference from average water level in centimeters. Arrow up (↑) indicates higher water level, arrow down (↓) indicates lower water level (only shown for today)"
-                        )
+                    LegendRow(
+                        icon: "moon.fill",
+                        iconColor: .primary,
+                        title: "Night Time",
+                        description: "Departure is before sunrise or after sunset. Moon icon indicates full darkness, moon with stars indicates twilight (dusk/dawn)"
+                    )
+                    
+                    LegendRow(
+                        icon: "water.waves.and.arrow.trianglehead.up",
+                        iconColor: .primary,
+                        title: "Water Level",
+                        description: "Difference from average water level in centimeters. Arrow up (↑) indicates higher water level, arrow down (↓) indicates lower water level (only shown for today)"
+                    )
                 }
                 
                 Section(header: Text("Weather Conditions")) {

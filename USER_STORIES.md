@@ -346,9 +346,30 @@ Version 1.0 | Date: November 2025
 
 ---
 
+### US-019: Display Night/Darkness Indicator ✅
+**As a** user  
+**I want to** see an icon when a scheduled departure takes place during darkness  
+**So that** I can easily recognize trips that occur at night
+
+**Acceptance Criteria:**
+- [x] Night icon (moon) is displayed if departure is before sunrise or after sunset
+- [x] No icon is displayed during daylight hours
+- [x] Local sunrise/sunset times are calculated based on station location
+- [x] Data is fetched from Sunrise-Sunset.org API (already integrated)
+- [x] Icon is visually clear but subtle, placed in front of weather data
+- [x] Twilight icon (moon with stars) is shown during civil twilight period (dusk/dawn state)
+- [x] Icon adapts to light/dark mode (uses .primary color)
+- [x] Cached sun times are used when API is unavailable
+
+**Priority:** Medium  
+**Story Points:** 3  
+**Status:** ✅ Implemented
+
+---
+
 ## 5. Notifications
 
-### US-019: Schedule Wave Notifications
+### US-020: Schedule Wave Notifications
 **As a** user  
 **I want to** receive notifications before waves arrive  
 **So that** I don't miss my session
@@ -366,7 +387,7 @@ Version 1.0 | Date: November 2025
 
 ---
 
-### US-020: Manage Notification Permissions
+### US-021: Manage Notification Permissions
 **As a** user  
 **I want to** control notification permissions  
 **So that** I'm not disturbed when I don't want to be
@@ -383,7 +404,7 @@ Version 1.0 | Date: November 2025
 
 ---
 
-### US-021: Choose Notification Sound
+### US-022: Choose Notification Sound
 **As a** user  
 **I want to** choose from different notification sounds  
 **So that** I can personalize my experience

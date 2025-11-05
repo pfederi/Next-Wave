@@ -460,180 +460,180 @@ do {
 
 ---
 
-## 9. Architekturentscheidungen
+## 9. Architecture Decisions
 
-### 9.1 ADR-001: MVVM statt MVC
+### 9.1 ADR-001: MVVM instead of MVC
 
-**Status**: Akzeptiert
+**Status**: Accepted
 
-**Kontext**: SwiftUI bevorzugt reaktive Programmierung
+**Context**: SwiftUI favors reactive programming
 
-**Entscheidung**: MVVM mit @Published Properties und Combine
+**Decision**: MVVM with @Published properties and Combine
 
-**Begründung**:
-- Bessere Testbarkeit
-- Klare Trennung von UI und Logic
-- SwiftUI-native Datenbindung
+**Rationale**:
+- Better testability
+- Clear separation of UI and logic
+- SwiftUI-native data binding
 
-**Konsequenzen**:
-- Mehr Boilerplate Code
-- Steilere Lernkurve für neue Entwickler
+**Consequences**:
+- More boilerplate code
+- Steeper learning curve for new developers
 
-### 9.2 ADR-002: Vercel für Backend statt eigener Server
+### 9.2 ADR-002: Vercel for Backend instead of Own Server
 
-**Status**: Akzeptiert
+**Status**: Accepted
 
-**Kontext**: Web Scraping für Schiffszuweisungen notwendig
+**Context**: Web scraping for ship assignments necessary
 
-**Entscheidung**: Vercel Serverless Functions mit Puppeteer
+**Decision**: Vercel Serverless Functions with Puppeteer
 
-**Begründung**:
-- Kostenlos für kleine Projekte
-- Automatisches Scaling
-- Einfaches Deployment
-- Integriertes Caching
+**Rationale**:
+- Free for small projects
+- Automatic scaling
+- Simple deployment
+- Integrated caching
 
-**Konsequenzen**:
-- Vendor Lock-in
-- Cold Start Latency
-- Begrenzte Ausführungszeit (10s)
+**Consequences**:
+- Vendor lock-in
+- Cold start latency
+- Limited execution time (10s)
 
-### 9.3 ADR-003: App Groups für Datenaustausch
+### 9.3 ADR-003: App Groups for Data Sharing
 
-**Status**: Akzeptiert
+**Status**: Accepted
 
-**Kontext**: Widgets und Watch App benötigen Zugriff auf Abfahrtsdaten
+**Context**: Widgets and Watch app need access to departure data
 
-**Entscheidung**: Shared UserDefaults via App Groups
+**Decision**: Shared UserDefaults via App Groups
 
-**Begründung**:
-- Native iOS-Lösung
-- Einfache API
-- Keine zusätzlichen Dependencies
+**Rationale**:
+- Native iOS solution
+- Simple API
+- No additional dependencies
 
-**Konsequenzen**:
-- Datengröße begrenzt (wenige MB)
-- Keine Echtzeit-Synchronisation
-- Manuelle Serialisierung notwendig
+**Consequences**:
+- Data size limited (few MB)
+- No real-time synchronization
+- Manual serialization required
 
-### 9.4 ADR-004: 24h-Cache für externe Daten
+### 9.4 ADR-004: 24h Cache for External Data
 
-**Status**: Akzeptiert
+**Status**: Accepted
 
-**Kontext**: API-Limits und Performance-Optimierung
+**Context**: API limits and performance optimization
 
-**Entscheidung**: Aggressive Caching-Strategie mit 24h Gültigkeit
+**Decision**: Aggressive caching strategy with 24h validity
 
-**Begründung**:
-- Reduziert API-Calls um 95%
-- Verbessert App-Startzeit
-- Offline-Fähigkeit
+**Rationale**:
+- Reduces API calls by 95%
+- Improves app startup time
+- Enables offline capability
 
-**Konsequenzen**:
-- Daten können bis zu 24h alt sein
-- Komplexere Cache-Invalidierung
-- Höherer Speicherbedarf
+**Consequences**:
+- Data can be up to 24h old
+- More complex cache invalidation
+- Higher storage requirements
 
 ---
 
-## 10. Qualitätsanforderungen
+## 10. Quality Requirements
 
-### 10.1 Qualitätsbaum
+### 10.1 Quality Tree
 
 ```
-Qualität
+Quality
 ├── Performance
-│   ├── App-Start < 2s
-│   ├── Abfragen laden < 1s
-│   └── Widget-Update < 500ms
-├── Zuverlässigkeit
-│   ├── Verfügbarkeit > 99%
-│   ├── Fehlertoleranz (Graceful Degradation)
-│   └── Datenintegrität
-├── Benutzerfreundlichkeit
-│   ├── Intuitive Navigation
-│   ├── Klare Fehlermeldungen
+│   ├── App start < 2s
+│   ├── Load departures < 1s
+│   └── Widget update < 500ms
+├── Reliability
+│   ├── Availability > 99%
+│   ├── Fault tolerance (graceful degradation)
+│   └── Data integrity
+├── Usability
+│   ├── Intuitive navigation
+│   ├── Clear error messages
 │   └── Accessibility
-├── Wartbarkeit
-│   ├── Modulare Architektur
-│   ├── Code-Dokumentation
-│   └── Testbarkeit
-└── Sicherheit
-    ├── Datenschutz (keine Tracking)
-    ├── HTTPS für alle APIs
-    └── Sichere Datenspeicherung
+├── Maintainability
+│   ├── Modular architecture
+│   ├── Code documentation
+│   └── Testability
+└── Security
+    ├── Privacy (no tracking)
+    ├── HTTPS for all APIs
+    └── Secure data storage
 ```
 
-### 10.2 Qualitätsszenarien
+### 10.2 Quality Scenarios
 
-| ID | Szenario | Qualitätsmerkmal | Priorität |
-|----|----------|------------------|-----------|
-| QS-1 | User öffnet App → Abfahrten werden in < 1s angezeigt | Performance | Hoch |
-| QS-2 | API nicht erreichbar → App zeigt gecachte Daten | Zuverlässigkeit | Hoch |
-| QS-3 | User aktiviert VoiceOver → Alle Elemente sind lesbar | Accessibility | Mittel |
-| QS-4 | Entwickler fügt neuen See hinzu → < 30min Aufwand | Wartbarkeit | Mittel |
-| QS-5 | User dreht Gerät → Theme wechselt sofort | Benutzerfreundlichkeit | Niedrig |
-
----
-
-## 11. Risiken und technische Schulden
-
-### 11.1 Risiken
-
-| ID | Risiko | Wahrscheinlichkeit | Auswirkung | Maßnahme |
-|----|--------|-------------------|------------|----------|
-| R-1 | transport.opendata.ch API ändert sich | Mittel | Hoch | Monitoring, Fallback-Logik |
-| R-2 | ZSG ändert Website-Struktur | Hoch | Mittel | Flexibles Scraping, Fehlerbehandlung |
-| R-3 | Apple ändert WidgetKit API | Niedrig | Hoch | Regelmäßige Updates, Beta-Testing |
-| R-4 | Vercel Free Tier Limits | Niedrig | Mittel | Monitoring, Upgrade-Plan |
-| R-5 | Schlechte Performance bei vielen Favoriten | Mittel | Niedrig | Pagination, Lazy Loading |
-
-### 11.2 Technische Schulden
-
-| ID | Beschreibung | Priorität | Aufwand |
-|----|--------------|-----------|---------|
-| TD-1 | Fehlende Unit Tests für ViewModels | Hoch | 2 Wochen |
-| TD-2 | Keine Lokalisierung (nur Englisch) | Mittel | 1 Woche |
-| TD-3 | Hardcodierte Schiffsbewertungen | Niedrig | 2 Tage |
-| TD-4 | Keine CI/CD Pipeline | Mittel | 3 Tage |
-| TD-5 | Veraltete Dependencies | Niedrig | 1 Tag |
+| ID | Scenario | Quality Attribute | Priority |
+|----|----------|-------------------|----------|
+| QS-1 | User opens app → Departures displayed in < 1s | Performance | High |
+| QS-2 | API unreachable → App shows cached data | Reliability | High |
+| QS-3 | User activates VoiceOver → All elements are readable | Accessibility | Medium |
+| QS-4 | Developer adds new lake → < 30min effort | Maintainability | Medium |
+| QS-5 | User flips device → Theme switches immediately | Usability | Low |
 
 ---
 
-## 12. Glossar
+## 11. Risks and Technical Debt
 
-| Begriff | Definition |
-|---------|------------|
-| Wakethieving | Sport, bei dem man auf den Wellen hinter Schiffen surft |
-| Foiling | Surfen auf einem Hydrofoil-Board |
-| ZSG | Zürichsee-Schifffahrtsgesellschaft |
-| Albis-Class | Große Schiffe, die besonders gute Wellen erzeugen |
-| UIC-Ref | Eindeutige Stationskennung im Schweizer Transportsystem |
-| Stationboard | Fahrplan-Anzeigetafel mit Abfahrten |
-| Wave Rating | Bewertung der Wellenqualität (1-3 Wellen) |
-| Session | Surf-Session mit mehreren Wellen |
-| Nearest Station | Nächstgelegene Schiffsstation basierend auf GPS |
-| Widget Timeline | Zeitplan für Widget-Updates |
-| App Groups | iOS-Mechanismus für Datenaustausch zwischen Apps |
-| Serverless Function | Cloud-Funktion ohne eigenen Server (Vercel) |
-| Puppeteer | Headless Browser für Web Scraping |
-| Graceful Degradation | Fehlertolerantes Verhalten mit reduzierter Funktionalität |
+### 11.1 Risks
+
+| ID | Risk | Probability | Impact | Mitigation |
+|----|------|-------------|--------|------------|
+| R-1 | transport.opendata.ch API changes | Medium | High | Monitoring, fallback logic |
+| R-2 | ZSG changes website structure | High | Medium | Flexible scraping, error handling |
+| R-3 | Apple changes WidgetKit API | Low | High | Regular updates, beta testing |
+| R-4 | Vercel free tier limits | Low | Medium | Monitoring, upgrade plan |
+| R-5 | Poor performance with many favorites | Medium | Low | Pagination, lazy loading |
+
+### 11.2 Technical Debt
+
+| ID | Description | Priority | Effort |
+|----|-------------|----------|--------|
+| TD-1 | Missing unit tests for ViewModels | High | 2 weeks |
+| TD-2 | No localization (English only) | Medium | 1 week |
+| TD-3 | Hardcoded ship ratings | Low | 2 days |
+| TD-4 | No CI/CD pipeline | Medium | 3 days |
+| TD-5 | Outdated dependencies | Low | 1 day |
 
 ---
 
-## Anhang
+## 12. Glossary
 
-### A.1 Verwendete Frameworks und Libraries
+| Term | Definition |
+|------|------------|
+| Wakethieving | Sport of surfing on waves created by boats |
+| Foiling | Surfing on a hydrofoil board |
+| ZSG | Zürichsee-Schifffahrtsgesellschaft (Lake Zurich Shipping Company) |
+| Albis-Class | Large ships that create particularly good waves |
+| UIC-Ref | Unique station identifier in Swiss transport system |
+| Stationboard | Schedule board showing departures |
+| Wave Rating | Quality rating of waves (1-3 waves) |
+| Session | Surf session with multiple waves |
+| Nearest Station | Closest ferry station based on GPS |
+| Widget Timeline | Schedule for widget updates |
+| App Groups | iOS mechanism for data sharing between apps |
+| Serverless Function | Cloud function without own server (Vercel) |
+| Puppeteer | Headless browser for web scraping |
+| Graceful Degradation | Fault-tolerant behavior with reduced functionality |
+
+---
+
+## Appendix
+
+### A.1 Frameworks and Libraries Used
 
 **iOS/Swift**:
 - SwiftUI (UI Framework)
 - Combine (Reactive Programming)
 - CoreLocation (GPS)
-- CoreMotion (Gerätebewegung)
-- MapKit (Karten)
+- CoreMotion (Device Motion)
+- MapKit (Maps)
 - WidgetKit (Widgets)
-- WatchConnectivity (Watch-Sync)
-- UserNotifications (Benachrichtigungen)
+- WatchConnectivity (Watch Sync)
+- UserNotifications (Notifications)
 
 **Backend (Node.js)**:
 - @vercel/node (Serverless Runtime)
@@ -642,54 +642,54 @@ Qualität
 - cheerio (HTML Parsing)
 - axios (HTTP Client)
 
-### A.2 Externe APIs
+### A.2 External APIs
 
-| API | Zweck | Dokumentation |
-|-----|-------|---------------|
-| transport.opendata.ch | Fahrplandaten | https://transport.opendata.ch |
-| OpenWeather | Wetterdaten | https://openweathermap.org/api |
-| Sunrise-Sunset.org | Sonnenzeiten | https://sunrise-sunset.org/api |
-| MeteoNews | Wassertemperatur | https://meteonews.ch |
-| OpenStreetMap | Kartendaten | https://www.openstreetmap.org |
+| API | Purpose | Documentation |
+|-----|---------|---------------|
+| transport.opendata.ch | Schedule data | https://transport.opendata.ch |
+| OpenWeather | Weather data | https://openweathermap.org/api |
+| Sunrise-Sunset.org | Sun times | https://sunrise-sunset.org/api |
+| MeteoNews | Water temperature | https://meteonews.ch |
+| OpenStreetMap | Map data | https://www.openstreetmap.org |
 
-### A.3 Projektstruktur
+### A.3 Project Structure
 
 ```
 Next Wave/
 ├── Next Wave/                    # iOS App
 │   ├── API/                      # API Layer
-│   ├── Models/                   # Datenmodelle
+│   ├── Models/                   # Data Models
 │   ├── ViewModels/               # Business Logic
 │   ├── Views/                    # SwiftUI Views
-│   ├── Utilities/                # Helper-Klassen
-│   └── Data/                     # Statische Daten (JSON)
+│   ├── Utilities/                # Helper Classes
+│   └── Data/                     # Static Data (JSON)
 ├── Next Wave Watch Watch App/    # watchOS App
 ├── NextWaveWidget/               # iOS Widgets
 ├── NextWaveWatchWidgetExtension/ # watchOS Widgets
 ├── api/                          # Vercel Serverless Functions
-│   ├── ships.ts                  # Schiffszuweisungen
-│   └── water-temperature.ts      # Wassertemperatur
+│   ├── ships.ts                  # Ship Assignments
+│   └── water-temperature.ts      # Water Temperature
 ├── scripts/                      # Python Scripts
-└── Shared/                       # Gemeinsame Daten
+└── Shared/                       # Shared Data
 ```
 
-### A.4 Deployment-Prozess
+### A.4 Deployment Process
 
 **iOS App**:
-1. Code-Änderungen in Feature-Branch
-2. Pull Request + Code Review
-3. Merge in `develop`
-4. Testing auf TestFlight
-5. Release in `main` Branch
-6. App Store Submission
+1. Code changes in feature branch
+2. Pull request + code review
+3. Merge to `develop`
+4. Testing on TestFlight
+5. Release to `main` branch
+6. App Store submission
 
 **Backend APIs**:
-1. Code-Änderungen in Git
-2. Push zu GitHub
-3. Automatisches Deployment via Vercel
-4. Edge Caching aktiviert
+1. Code changes in Git
+2. Push to GitHub
+3. Automatic deployment via Vercel
+4. Edge caching enabled
 
-### A.5 Kontakt und Ressourcen
+### A.5 Contact and Resources
 
 - **GitHub**: https://github.com/pfederi/Next-Wave
 - **App Store**: https://apps.apple.com/ch/app/next-wave/id6739363035
@@ -698,8 +698,8 @@ Next Wave/
 
 ---
 
-**Dokumentversion**: 1.0  
-**Letzte Aktualisierung**: November 2025  
-**Autor**: Patrick Federi  
+**Document Version**: 1.0  
+**Last Updated**: November 2025  
+**Author**: Patrick Federi  
 **Status**: Living Document
 

@@ -109,41 +109,41 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ---
 
-## 4. Lösungsstrategie
+## 4. Solution Strategy
 
-### 4.1 Technologieentscheidungen
+### 4.1 Technology Decisions
 
-| Entscheidung | Begründung |
-|--------------|------------|
-| SwiftUI | Moderne, deklarative UI, plattformübergreifend (iOS/watchOS) |
-| Swift Concurrency (async/await) | Nicht-blockierende API-Aufrufe, bessere Performance |
-| MVVM-Architektur | Klare Trennung von UI und Business Logic |
-| App Groups | Datenaustausch zwischen App, Widgets und Watch |
-| Vercel Serverless | Kostengünstige Backend-Lösung für Web Scraping |
+| Decision | Rationale |
+|----------|-----------|
+| SwiftUI | Modern, declarative UI, cross-platform (iOS/watchOS) |
+| Swift Concurrency (async/await) | Non-blocking API calls, better performance |
+| MVVM Architecture | Clear separation of UI and business logic |
+| App Groups | Data sharing between app, widgets, and watch |
+| Vercel Serverless | Cost-effective backend solution for web scraping |
 
-### 4.2 Architekturmuster
+### 4.2 Architecture Patterns
 
 **MVVM (Model-View-ViewModel)**
-- **Models**: Datenstrukturen (Journey, Lake, Station, etc.)
+- **Models**: Data structures (Journey, Lake, Station, etc.)
 - **Views**: SwiftUI Views (ContentView, DeparturesListView, etc.)
-- **ViewModels**: Business Logic (ScheduleViewModel, LakeStationsViewModel, etc.)
+- **ViewModels**: Business logic (ScheduleViewModel, LakeStationsViewModel, etc.)
 
 **Repository Pattern**
-- API-Layer abstrahiert externe Datenquellen
-- Caching-Strategien in API-Services implementiert
+- API layer abstracts external data sources
+- Caching strategies implemented in API services
 
-### 4.3 Qualitätssicherung
+### 4.3 Quality Assurance
 
-- **Caching**: 24h-Cache für Schiffsnamen, Wetter und Wassertemperatur
-- **Error Handling**: Graceful Degradation bei API-Fehlern
-- **Offline Support**: Gecachte Daten bleiben verfügbar
-- **Performance**: Parallele API-Aufrufe mit TaskGroups
+- **Caching**: 24h cache for ship names, weather, and water temperature
+- **Error Handling**: Graceful degradation on API failures
+- **Offline Support**: Cached data remains available
+- **Performance**: Parallel API calls with TaskGroups
 
 ---
 
-## 5. Bausteinsicht
+## 5. Building Block View
 
-### 5.1 Ebene 1: Systemübersicht
+### 5.1 Level 1: System Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -168,7 +168,7 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 Ebene 2: iOS App Komponenten
+### 5.2 Level 2: iOS App Components
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -210,50 +210,50 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 5.3 Wichtige Komponenten
+### 5.3 Key Components
 
 #### 5.3.1 ScheduleViewModel
-**Verantwortlichkeit**: Verwaltung der Abfahrtsdaten und Business Logic
+**Responsibility**: Management of departure data and business logic
 
-**Schnittstellen**:
-- `loadDepartures(for station: Station, date: Date)` - Lädt Abfahrten
-- `refreshDepartures()` - Aktualisiert Daten
-- `scheduleNotification(for departure: Journey)` - Plant Benachrichtigung
+**Interfaces**:
+- `loadDepartures(for station: Station, date: Date)` - Loads departures
+- `refreshDepartures()` - Refreshes data
+- `scheduleNotification(for departure: Journey)` - Schedules notification
 
-**Abhängigkeiten**: TransportAPI, WeatherAPI, VesselAPI
+**Dependencies**: TransportAPI, WeatherAPI, VesselAPI
 
 #### 5.3.2 TransportAPI
-**Verantwortlichkeit**: Kommunikation mit transport.opendata.ch
+**Responsibility**: Communication with transport.opendata.ch
 
-**Schnittstellen**:
+**Interfaces**:
 - `getStationboard(stationId: String, for date: Date) async throws -> [Journey]`
 
-**Caching**: In-Memory Cache für Abfragen
+**Caching**: In-memory cache for queries
 
 #### 5.3.3 VesselAPI
-**Verantwortlichkeit**: Abruf von Schiffszuweisungen
+**Responsibility**: Fetching ship assignments
 
-**Schnittstellen**:
+**Interfaces**:
 - `getShipName(for courseNumber: String, date: Date) async -> String?`
-- `preloadData() async` - Lädt Daten im Voraus
+- `preloadData() async` - Preloads data
 
-**Caching**: 24h-Cache mit Datum als Schlüssel
+**Caching**: 24h cache with date as key
 
 #### 5.3.4 SharedDataManager
-**Verantwortlichkeit**: Datenaustausch zwischen App, Widgets und Watch
+**Responsibility**: Data exchange between app, widgets, and watch
 
-**Schnittstellen**:
+**Interfaces**:
 - `saveNextDepartures(_ departures: [DepartureInfo])`
 - `loadNextDepartures() -> [DepartureInfo]`
 - `saveWidgetSettings(_ settings: WidgetSettings)`
 
-**Speicherort**: UserDefaults mit App Group Container
+**Storage**: UserDefaults with App Group container
 
 ---
 
-## 6. Laufzeitsicht
+## 6. Runtime View
 
-### 6.1 Szenario: Abfahrten laden
+### 6.1 Scenario: Loading Departures
 
 ```
 ┌──────┐         ┌──────────────┐         ┌──────────────┐         ┌─────────────┐
@@ -283,7 +283,7 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
    │                    │                        │                        │
 ```
 
-### 6.2 Szenario: Widget-Update
+### 6.2 Scenario: Widget Update
 
 ```
 ┌─────────┐         ┌──────────────┐         ┌─────────────────┐
@@ -310,7 +310,7 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
      │                     │                          │
 ```
 
-### 6.3 Szenario: Schiffsnamen laden (mit Caching)
+### 6.3 Scenario: Loading Ship Names (with Caching)
 
 ```
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
@@ -343,9 +343,9 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 
 ---
 
-## 7. Verteilungssicht
+## 7. Deployment View
 
-### 7.1 Infrastruktur
+### 7.1 Infrastructure
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -389,74 +389,74 @@ Next Wave is an iOS app that helps wake surfers and foilers on Lake Zurich and o
 ### 7.2 Deployment
 
 **iOS App**:
-- Verteilung über Apple App Store
-- TestFlight für Beta-Testing
-- Xcode Cloud für CI/CD (optional)
+- Distribution via Apple App Store
+- TestFlight for beta testing
+- Xcode Cloud for CI/CD (optional)
 
 **Backend APIs**:
-- Vercel für Serverless Functions
-- Automatisches Deployment via Git Push
-- Edge Caching für Performance
+- Vercel for serverless functions
+- Automatic deployment via Git push
+- Edge caching for performance
 
 ---
 
-## 8. Querschnittliche Konzepte
+## 8. Cross-Cutting Concepts
 
-### 8.1 Caching-Strategie
+### 8.1 Caching Strategy
 
-| Datentyp | Cache-Dauer | Speicherort | Invalidierung |
-|----------|-------------|-------------|---------------|
-| Abfahrten | In-Memory | ViewModel | Bei Refresh |
-| Schiffsnamen | 24h | UserDefaults | Mitternacht |
-| Wetterdaten | 6h | In-Memory | Zeitbasiert |
-| Wassertemperatur | 24h | UserDefaults | Mitternacht |
-| Kartenkacheln | Unbegrenzt | Disk Cache | Manuell |
+| Data Type | Cache Duration | Storage Location | Invalidation |
+|-----------|----------------|------------------|--------------|
+| Departures | In-Memory | ViewModel | On refresh |
+| Ship Names | 24h | UserDefaults | Midnight |
+| Weather Data | 6h | In-Memory | Time-based |
+| Water Temperature | 24h | UserDefaults | Midnight |
+| Map Tiles | Unlimited | Disk Cache | Manual |
 
 ### 8.2 Error Handling
 
-**Strategie**: Graceful Degradation
-- API-Fehler werden geloggt, aber nicht dem User angezeigt
-- Fallback auf gecachte Daten
-- Leere States mit hilfreichen Nachrichten
+**Strategy**: Graceful Degradation
+- API errors are logged but not shown to user
+- Fallback to cached data
+- Empty states with helpful messages
 
-**Beispiel**:
+**Example**:
 ```swift
 do {
     let journeys = try await TransportAPI().getStationboard(...)
 } catch {
     Logger.shared.error("Failed to load departures: \(error)")
-    // Fallback auf gecachte Daten oder leere Liste
+    // Fallback to cached data or empty list
 }
 ```
 
 ### 8.3 Logging
 
-**Logger-Komponente**:
-- Zentrale Logging-Klasse für strukturierte Logs
-- Log-Level: Debug, Info, Warning, Error
-- Ausgabe in Xcode Console
-- Keine Logs in Production (nur bei DEBUG Flag)
+**Logger Component**:
+- Central logging class for structured logs
+- Log levels: Debug, Info, Warning, Error
+- Output to Xcode console
+- No logs in production (DEBUG flag only)
 
-### 8.4 Datenschutz
+### 8.4 Privacy
 
 **Privacy by Design**:
-- Keine Tracking-SDKs
-- Keine Analytics
-- Standortdaten nur lokal verarbeitet
-- Keine Datenübertragung an Dritte (außer APIs)
-- Alle Nutzerdaten in App Groups (lokal)
+- No tracking SDKs
+- No analytics
+- Location data processed locally only
+- No data transmission to third parties (except APIs)
+- All user data in App Groups (local)
 
-### 8.5 Lokalisierung
+### 8.5 Localization
 
-**Aktuell**: Nur Englisch
-**Geplant**: Deutsch, Französisch, Italienisch
+**Current**: English only
+**Planned**: German, French, Italian
 
 ### 8.6 Accessibility
 
-- VoiceOver-Unterstützung
-- Dynamic Type für Schriftgrößen
-- Kontrastreiche Farben
-- Haptic Feedback für wichtige Aktionen
+- VoiceOver support
+- Dynamic Type for font sizes
+- High-contrast colors
+- Haptic feedback for important actions
 
 ---
 

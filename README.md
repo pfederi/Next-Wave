@@ -9,269 +9,76 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
     <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&amp;releaseDate=1705363200" alt="Download on the App Store" style="border-radius: 13px; width: 250px; height: 83px;">
 </a>
 
+## 📚 Documentation
+
+- **[Arc42 Architecture Documentation](ARC42_DOCUMENTATION.md)** - Complete architecture documentation with diagrams and technical details
+- **[User Stories & Acceptance Criteria](USER_STORIES.md)** - All 47 user stories with acceptance criteria and release planning
+- **[API Documentation](API_DOCUMENTATION.md)** - Backend API endpoints and integration details
+
 ## Table of Contents
 
-- [Features](#features)
-- [Map Features](#map-features)
-- [Safety Features](#safety-features)
-- [Lake Zurich Ship Names](#lake-zurich-ship-names)
-- [Weather Integration](#weather-integration)
-  - [Weather Display Features](#weather-display-features)
-  - [Wetsuit Thickness Recommendation](#wetsuit-thickness-recommendation)
-  - [Interactive Weather Legend](#interactive-weather-legend)
-- [User Interface Features](#user-interface-features)
-  - [Share Wave Feature](#share-wave-feature)
-- [Widget Features](#widget-features)
-- [Technologies & Services](#technologies--services)
+- [Quick Start](#quick-start)
+- [Features Overview](#features-overview)
 - [Installation](#installation)
+- [Usage](#usage)
 - [Privacy](#privacy)
-- [Usage Modes](#usage-modes)
-- [How to Add a New Lake or Station](#how-to-add-a-new-lake-or-station)
-- [Technical Details](#technical-details)
 - [Contributing](#contributing)
+- [Support](#support)
 - [License](#license)
 
-## Features
+## Quick Start
 
-- 🌊 Real-time boat schedule tracking
-- 🔔 Smart notifications 3,5,10 or 15 minutes before waves
-- 📍 Easy spot selection on Swiss lakes
-- 🆕 Store up to 5 favorite stations
-- 🆕 Smart nearest station detection
-- ⌚️ Apple Watch app with complications and widgets
-- 🎯 Apple Watch app with two usage modes: Favorite stations OR automatic nearest station
-- 🆕 Analytics View with session recommendations, wave timeline, best session detection and wave frequency analysis
-- 🆕 Daylight Integration with sunrise, sunset, twilight phase visualization, smart session planning based on daylight and beautiful gradient visualization
-- 🎯️ Interactive map with OpenStreetMap integration
-- 🎯 Precise wave timing information
-- 🔊 Custom sound notifications
-- 🎨 Clean, intuitive interface
-- 📱 Light & Dark Mode
-- 🔄 Device flip gesture to toggle between light and dark mode
-- 🛡️ Integrated safety rules and wakethieving guidelines
-- 📅 Automatic schedule period detection (summer/winter schedules)
-- ⏰ Smart countdown messages for upcoming schedule changes
-- 🚢 Real-time ship name display for Lake Zurich (next 3 days)
-- 🌤️ Real-time weather information with wind speed, temperature, and pressure trends
-- 🌡️ Water temperature display for all Swiss lakes
-- 🤸 Smart wetsuit thickness recommendations based on water temperature and wind chill
-- 🔍 Albis-Class ship filter (flip device to activate/deactivate)
-- 💬 Fun "no waves" messages with variety and personality
-- 📤 Share waves with friends via WhatsApp, Messages, or Mail with all relevant details
+1. **Download**: Get Next Wave from the [App Store](https://apps.apple.com/ch/app/next-wave/id6739363035)
+2. **Add Favorites**: Select up to 5 favorite ferry stations
+3. **Get Notifications**: Set alerts 3, 5, 10, or 15 minutes before waves
+4. **Catch Waves**: Head to the water at the perfect time! 🌊
 
-## Map Features
+For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTATION.md).
 
-- OpenStreetMap integration for detailed water navigation
-- Shipping routes overlay for better orientation
-- Station clustering for better overview
-- Automatic map caching for offline use
-- Optimized for both light and dark mode
+## Features Overview
 
-## Safety Features
+### Core Features
+- 🌊 **Real-time boat schedules** for Swiss lakes
+- 🔔 **Smart notifications** (3, 5, 10, or 15 minutes before waves)
+- ⭐ **Favorite stations** (up to 5)
+- 📍 **Nearest station detection** with GPS
+- ⌚️ **Apple Watch app** with complications and widgets
 
-- **Integrated Safety Rules**: Built-in wakethieving safety guidelines displayed on first launch
-- **Easy Access**: Safety rules accessible anytime via the orange shield icon in settings
-- **Comprehensive Guidelines**: Complete safety information including:
-  - Safe distance requirements (50-meter rule)
-  - Priority vessel identification (day and night)
-  - Required safety equipment
-  - Emergency procedures
-- **Community Integration**: Direct link to Swiss Pumpfoilers Code of Conduct
+### Wave Intelligence
+- 🚢 **Ship names & wave ratings** (1-3 waves) for Lake Zurich
+- 📊 **Wave analytics** with best session recommendations
+- 🌅 **Daylight integration** for optimal session planning
+- 🔍 **Albis-Class filter** for best waves
 
-## Lake Zurich Ship Names
+### Weather & Conditions
+- 🌤️ **Real-time weather** (temperature, wind, pressure)
+- 🌡️ **Water temperature** for all Swiss lakes
+- 💧 **Water level** indicators
+- 🤸 **Wetsuit recommendations** based on conditions
 
-### Real-Time Ship Identification
-- **Live Ship Data**: Displays the actual ship name for each departure on Lake Zurich
-- **3-Day Forecast**: Shows ship names for departures within the next 3 days
-- **Wave Rating Icons**: Visual indicators showing expected wave quality (1-3 waves) based on ship type
-- **Automatic Updates**: Ship assignments are fetched daily from ZSG (Zürichsee-Schifffahrtsgesellschaft)
-- **Smart Caching**: Efficient caching system to minimize API calls while keeping data fresh
+### User Experience
+- 🗺️ **Interactive map** with OpenStreetMap
+- 📱 **Light & Dark Mode** with device flip gesture
+- 📤 **Share waves** via WhatsApp, Messages, or Mail
+- 🛡️ **Safety guidelines** integrated
+- 💬 **Fun messages** with personality
 
-### Ship Information Display
-- Ship names appear directly in the departure list alongside route numbers
-- Wave quality icons help you identify the best sessions
-- Only available for Lake Zurich stations (ZSG network)
-- Seamlessly integrated into the existing departure view
-
-## Weather Integration
-
-### Real-Time Weather Information
-- **OpenWeather API Integration**: Live weather data for all stations
-- **Comprehensive Data**: Temperature, wind speed (in knots), wind direction, and atmospheric pressure
-- **Pressure Trends**: Automatic tracking of pressure changes over 6 hours (rising/falling/stable)
-- **Wind Information**: Current wind speed, maximum wind speed, and wind gusts
-- **Weather Icons**: Visual weather condition indicators with SF Symbols
-- **Forecast Data**: Weather predictions for upcoming departures
-- **Smart Preloading**: Weather data preloaded for favorite stations at app launch
-- **Per-Departure Weather**: Weather information shown for each individual departure time
-- **Toggle Option**: Can be enabled/disabled in settings
-
-### Water Temperature Display
-- **Real-Time Data**: Current water temperature for all major Swiss lakes
-- **Meteonews Integration**: Data sourced from meteonews.ch
-- **Daily Updates**: Automatic refresh once per day
-- **Smart Caching**: 24-hour cache to minimize API calls
-- **Visual Integration**: Displayed alongside weather data with consistent UI
-- **Coverage**: Available for 30+ Swiss lakes including Zürichsee, Vierwaldstättersee, Genfersee, Bodensee, and more
-
-### Water Level Display
-- **Real-Time Data**: Current water level for all major Swiss lakes
-- **Difference from Average**: Shows how much the current water level differs from the average (e.g., "+7 cm" or "-5 cm")
-- **Meteonews Integration**: Water level data sourced from meteonews.ch
-- **Daily Updates**: Automatic refresh once per day
-- **Visual Integration**: Displayed with chart icon alongside weather data
-- **Coverage**: Available for lakes where meteonews.ch provides water level data
-- **Foiler-Friendly**: Helps foilers assess water conditions and depth
-
-### Weather Display Features
-- Weather condition icons (visual indicators)
-- Air temperature in Celsius with thermometer icon
-- Water temperature for all Swiss lakes with drop icon
-- Wind speed in knots (nautical standard) with wind direction (N, NE, E, SE, S, SW, W, NW)
-- **Wetsuit Thickness Recommendation**: Smart wetsuit thickness calculator based on water temperature and wind chill
-  - Uses Quiksilver wetsuit thickness table as reference
-  - Considers water temperature and "feels like" temperature (wind chill)
-  - Applies 30°C rule: If air + water temperature < 30°C, recommends one size thicker
-  - Displays thickness in millimeters (e.g., 3/2mm, 4/3mm, 5/4mm)
-  - Helps surfers and foilers choose the right wetsuit for optimal comfort
-- Water level difference from average (in cm, only shown for current day)
-- **Interactive Weather Legend**: Tap on weather line to see detailed explanations of all weather data
-- Clean, compact display with separator bars and icons for readability
-- Consistent weather data order: Air Temp | Water Temp | Wind | Wetsuit | Water Level
-
-## User Interface Features
-
-### Device Flip Gesture
-- **Dual Function**: Flip your device 180° to toggle between light/dark mode OR activate Albis-Class filter
-- **Context-Aware**: In departure view, activates ship filter; elsewhere toggles theme
-- **Smooth Recognition**: Intuitive gesture detection using CoreMotion
-- **Cooldown Period**: 3-second delay prevents accidental repeated triggers
-- **Haptic Feedback**: Different feedback for activation vs. deactivation
-
-### Albis-Class Ship Filter
-- **Quick Access**: Activate by flipping your device in the departure list view
-- **Filter Ships**: Shows only departures with Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
-- **Visual Indicator**: Orange banner shows when filter is active
-- **Best Waves**: Focus on the ships that create the best wake waves
-- **Toggle On/Off**: Flip device again to deactivate and show all departures
-
-### Best Surf Sessions Analytics
-- **Quality-First Scoring**: Sessions prioritize large ships (3-wave ships) over quantity
-- **Smart Scoring System**: 
-  - 3-wave ships (MS Panta Rhei, MS Albis, EMS Uetliberg, EMS Pfannenstiel): 10 points
-  - 2-wave ships (MS Wädenswil, MS Limmat, MS Helvetia, MS Linth, DS Stadt Zürich, DS Stadt Rapperswil): 5 points
-  - 1-wave ships: 2 points
-- **Frequency Bonus**: Additional scoring for higher wave frequency (secondary factor)
-- **Daylight Optimization**: 
-  - Sessions in complete darkness automatically excluded
-  - Twilight sessions receive reduced scores (80% penalty)
-  - Best sessions during full daylight hours
-- **Session Parameters**: 
-  - Maximum duration: 2 hours
-  - Minimum duration: 1 hour
-  - Maximum gap between waves: 1 hour
-- **Result**: Sessions with 4 large ships rated higher than sessions with 10 small ships
-
-### Schedule Period Management
-- **Automatic Detection**: App automatically detects summer and winter schedule periods
-- **Smart Notifications**: Get notified about upcoming schedule changes with fun, personalized messages
-- **30-Day Advance Notice**: Countdown messages appear when schedule transitions are within 31 days
-- **Season-Specific Messages**: Different witty messages for summer, winter, spring, and autumn transitions
-- **All Swiss Lakes**: Works for all 15+ major Swiss lakes with boat services
-
-### Fun User Experience
-- **"No Waves" Messages**: 20+ unique, fun messages when no more departures are available
-- **Variety System**: Messages rotate to keep the experience fresh and entertaining
-- **Personality**: Surf culture references, Hawaiian vibes, and wakethieving humor
-- **No Service Messages**: Friendly messages when stations are temporarily out of service
-- **Examples**: "No more waves today – back in the lineup tomorrow!", "Post-pumping high is real – but even the ships need a break!"
-
-### Share Wave Feature
-- **Custom Share Sheet**: Share wave details with friends via WhatsApp, Messages, or Mail
-- **Comprehensive Information**: Includes station, date, time, route, ship name, and all weather data
-- **Weather Details**: Air temperature, water temperature, wind speed & direction, wetsuit recommendation, and water level
-- **Fun Intro Messages**: 5 randomized intro texts like "🥳 Let's share the next wave for a party wave!"
-- **One-Click Sharing**: Direct integration with WhatsApp, Messages, and Mail apps
-- **Smart Formatting**: Different formatting for each platform (emojis, line breaks, etc.)
-- **App Promotion**: Includes link to NextWave on App Store
-- **Only for Future Waves**: Share button only visible for upcoming departures, not past ones
-
-## Technologies & Services
-
-### Core Technologies
-
-- **SwiftUI**: Modern declarative UI framework for iOS and watchOS
-- **Swift Concurrency**: Async/await patterns for non-blocking operations
-- **CoreMotion**: Device motion detection for flip gestures
-- **CoreLocation**: Location services for nearest station detection
-- **WidgetKit**: Home screen and lock screen widgets
-- **WatchConnectivity**: Real-time data sync between iPhone and Apple Watch
-- **UserNotifications**: Local notifications for wave alerts
-- **MapKit**: Map integration with custom overlays
-
-### External APIs & Services
-
-#### Transport Data
-- **[transport.opendata.ch](https://transport.opendata.ch)**: Swiss public transport API
-  - Real-time departure data for all Swiss ferry stations
-  - Station information and timetables
-  - Free, open-source API for Swiss public transport
-
-#### Weather Data
-- **[OpenWeather API](https://openweathermap.org)**: Weather forecasts and current conditions
-  - Temperature, wind speed, and atmospheric pressure
-  - 5-day forecast with 3-hour intervals
-  - Weather condition codes and icons
-
-#### Sun Times
-- **[Sunrise-Sunset.org API](https://sunrise-sunset.org)**: Sunrise and sunset times
-  - Civil twilight begin/end times
-  - Daylight duration calculations
-  - Free API for sun times worldwide
-
-#### Ship Deployment Data
-- **Custom Vercel API** (`/api/ships`): Real-time ship assignments for Lake Zurich
-  - Web scraping from [ZSG ship deployment website](https://einsatzderschiffe.zsg.ch)
-  - Daily cache updates
-  - 3-day forecast of ship-to-route assignments
-
-#### Map Data
-- **[OpenStreetMap](https://www.openstreetmap.org)**: Map tiles and geographic data
-  - Detailed water navigation maps
-  - Shipping routes overlay
-  - Ferry terminal locations
-  - **[Overpass Turbo](https://overpass-turbo.eu)**: Tool for finding ferry terminal data
-
-### Backend & Deployment
-
-- **[Vercel](https://vercel.com)**: Serverless functions for ship data API
-  - TypeScript/Node.js runtime
-  - Automatic daily updates
-  - Edge caching for performance
-
-#### Node.js Dependencies
-- **[@vercel/node](https://www.npmjs.com/package/@vercel/node)**: Vercel serverless function helpers
-- **[puppeteer-core](https://www.npmjs.com/package/puppeteer-core)**: Headless browser automation for dynamic content scraping
-- **[@sparticuz/chromium](https://www.npmjs.com/package/@sparticuz/chromium)**: Chromium binary optimized for serverless environments
-- **[cheerio](https://cheerio.js.org)**: jQuery-like HTML parsing for web scraping
-- **[TypeScript](https://www.typescriptlang.org)**: Type-safe JavaScript development
-
-### Data Storage & Development Tools
-
-#### Data Storage
-- **UserDefaults**: Local settings and preferences
-- **App Groups**: Shared data between app, widgets, and watch
-- **JSON Files**: Station data and schedule periods
-- **In-Memory Caching**: Weather and ship name caching
-
-#### Development Tools
-- **Xcode**: Primary IDE for iOS development
-- **Python**: Scripts for ship data analysis and wave calculations
-- **Git**: Version control
+For complete feature details and technical specifications, see the [Arc42 Documentation](ARC42_DOCUMENTATION.md).
 
 ## Installation
 
+### For Users
+1. Download from the [App Store](https://apps.apple.com/ch/app/next-wave/id6739363035)
+2. Grant location permissions (optional, for nearest station feature)
+3. Grant notification permissions (optional, for wave alerts)
+4. Add your favorite stations
+5. Start catching waves! 🌊
+
+### For Developers
 1. Clone the repository
+   ```bash
+   git clone https://github.com/pfederi/Next-Wave.git
+   ```
 2. Open `Next Wave.xcodeproj` in Xcode
 3. Create a `Config.swift` file with your API keys:
    ```swift
@@ -281,6 +88,25 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
    ```
 4. Build and run the project
 
+For detailed architecture and technical information, see the [Arc42 Documentation](ARC42_DOCUMENTATION.md).
+
+## Usage
+
+### Basic Usage
+1. **Select a Station**: Choose from favorites or browse all Swiss lakes
+2. **View Departures**: See upcoming boat departures with ship names and wave ratings
+3. **Check Weather**: View temperature, wind, and wetsuit recommendations
+4. **Set Notifications**: Tap the bell icon to get alerted before waves arrive
+5. **Analyze Sessions**: Use the analytics view to find the best surf sessions
+
+### Advanced Features
+- **Nearest Station**: Enable in settings to automatically show closest station
+- **Albis Filter**: Flip device in departure view to show only best waves
+- **Share Waves**: Tap share button to invite friends via WhatsApp, Messages, or Mail
+- **Apple Watch**: Install watch app for wrist-based departure times
+
+For detailed usage scenarios and workflows, see the [Arc42 Documentation - Runtime View](ARC42_DOCUMENTATION.md#6-runtime-view).
+
 ## Privacy
 
 - No tracking or analytics
@@ -288,6 +114,19 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - All data stays on device
 - Location data is only used to show nearest station and your position on the map and is never stored or shared
 - Location access can be denied without losing core app functionality
+
+## Data Sources & Attribution
+
+Next Wave aggregates data from various public sources:
+
+- **Ferry Schedules**: [transport.opendata.ch](https://transport.opendata.ch) - Swiss public transport API
+- **Ship Assignments**: [ZSG (Zürichsee-Schifffahrtsgesellschaft)](https://einsatzderschiffe.zsg.ch) - Lake Zurich ship deployment data
+- **Water Temperature & Levels**: [MeteoNews](https://meteonews.ch) - Swiss lake water data
+- **Weather Data**: [OpenWeather](https://openweathermap.org) - Weather forecasts and conditions
+- **Sun Times**: [Sunrise-Sunset.org](https://sunrise-sunset.org) - Sunrise, sunset, and twilight data
+- **Maps**: [OpenStreetMap](https://www.openstreetmap.org) contributors - Map tiles and geographic data
+
+We are grateful to these services for providing public access to their data.
 
 ## Location Permission
 

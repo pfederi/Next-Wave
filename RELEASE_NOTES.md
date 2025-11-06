@@ -11,9 +11,9 @@
 
 ### Daylight Phase Icons
 - **Time-of-day indicators**: New icon system showing current daylight phase for each departure
-- **Sun icon (☀️)**: Displayed during full daylight hours
-- **Twilight icon (🌅)**: Shown during civil twilight (dawn and dusk)
-- **Moon icon (🌙)**: Displayed during nighttime hours
+- **Sun icon**: Displayed during full daylight hours
+- **Twilight icon**: Shown during civil twilight (dawn and dusk)
+- **Moon icon**: Displayed during nighttime hours
 - **Smart positioning**: Icons appear next to departure time for instant recognition
 - **Session planning**: Quickly identify which departures occur during optimal daylight conditions
 - **Consistent experience**: Icons integrated throughout the app (departure list, favorites, search)

@@ -1,28 +1,7 @@
-What's New in Version 3.4.1:
-
-Features
-• Create SECURITY.md for security policy
-• Update Share Wave Feature section in RELEASE_NOTES.md for clarity
-• Update project versioning in Xcode project file to reflect new version 2
-• Add .vercelignore to exclude iOS project from Vercel build
-• Add axios dependency for API
+What's New in Version 3.4.3:
 
 Improvements
-• Update release notes for version 3.4
-• Update MARKETING_VERSION to 3.4.1 in project.pbxproj for consistency across targets
-• Update RELEASE_NOTES.md to remove Quiksilver reference table entry from Smart Wetsuit Thickness Recommendations section for clarity
-• Update formatting in "Links" section of RELEASE_NOTES.md for consistency
-• Translate TestFlight update notes to English
-
-UI/UX
-• Theme change
-• Implemented theme switch
-
-Bug Fixes
-• Emphasize main bug fix: ship names now load for all 3 days
-• Remove template file to fix compilation issues
-• Fixed a double plist bug
-• Fixed an issue where notifications weren't deleted after being played ounce
-• Fexed the timer bug
+• Updated winter wetsuit recommendation from 6/5/4mm to 6/5mm for better clarity and accuracy
+• Improved wetsuit thickness display throughout the app
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

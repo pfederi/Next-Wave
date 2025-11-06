@@ -1,5 +1,25 @@
 # NextWave App - Release History
 
+## Version 3.4.3 (November 2025)
+
+### Improvements
+- **Wetsuit thickness**: Updated winter wetsuit recommendation from 6/5/4mm to 6/5mm for better clarity and accuracy
+
+---
+
+## Version 3.4.2 (November 2025)
+
+### Daylight Phase Icons
+- **Time-of-day indicators**: New icon system showing current daylight phase for each departure
+- **Sun icon (☀️)**: Displayed during full daylight hours
+- **Twilight icon (🌅)**: Shown during civil twilight (dawn and dusk)
+- **Moon icon (🌙)**: Displayed during nighttime hours
+- **Smart positioning**: Icons appear next to departure time for instant recognition
+- **Session planning**: Quickly identify which departures occur during optimal daylight conditions
+- **Consistent experience**: Icons integrated throughout the app (departure list, favorites, search)
+
+---
+
 ## Version 3.4.1 (November 2025)
 
 ### Water Level Icon Improvement
@@ -16,7 +36,7 @@
 ### Smart Wetsuit Thickness Recommendations
 - **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
 - **30°C rule**: If air + water temperature < 30°C, the app recommends one size thicker for optimal comfort
-- **Temperature ranges**: From 0.5-2mm shorties to 6/5/4mm winter wetsuits
+- **Temperature ranges**: From 0.5-2mm shorties to 6/5mm winter wetsuits
 - **Wind chill integration**: Uses "feels like" temperature for more accurate recommendations
 - **Visual display**: Shows thickness in millimeters (e.g., 3/2mm, 4/3mm) with intuitive icon
 

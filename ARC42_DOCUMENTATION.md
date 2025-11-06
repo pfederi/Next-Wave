@@ -349,7 +349,7 @@ sequenceDiagram
 
 ---
 
-### 6.5 Scenario: Loading Sun Times and Darkness Indicator
+### 6.5 Scenario: Loading Sun Times and Daylight Phase Icons
 
 ```mermaid
 sequenceDiagram
@@ -373,24 +373,28 @@ sequenceDiagram
     SunTimeService-->>ViewModel: Sun Times
     ViewModel->>ViewModel: Store sunTimes in @Published property
     
-    DepartureView->>DepartureView: For each departure:<br/>getDarknessIcon(departureTime)
+    DepartureView->>DepartureView: For each departure:<br/>getDaylightPhaseIcon(departureTime)
     DepartureView->>DepartureView: Compare departure time with:<br/>• Sunrise/Sunset<br/>• Civil Twilight times
     
-    alt Before Sunrise or After Sunset
-        alt During Twilight Period
-            DepartureView->>DepartureView: Show moon.stars.fill icon
-        else Full Darkness
-            DepartureView->>DepartureView: Show moon.fill icon
+    alt Full Daylight (After Sunrise, Before Sunset)
+        DepartureView->>DepartureView: Show sun.max.fill icon (☀️)
+    else During Twilight Period
+        alt Morning Twilight (Before Sunrise)
+            DepartureView->>DepartureView: Show sunrise.fill icon (🌅)
+        else Evening Twilight (After Sunset)
+            DepartureView->>DepartureView: Show sunset.fill icon (🌅)
         end
-    else Daylight Hours
-        DepartureView->>DepartureView: No icon displayed
+    else Full Darkness
+        DepartureView->>DepartureView: Show moon.fill icon (🌙)
     end
 ```
 
 **Key Features:**
-- Automatic detection of night departures
-- Distinction between full darkness and twilight
+- Visual daylight phase indicators for all departures
+- Three distinct phases: Sun (daylight), Twilight (dawn/dusk), Moon (night)
+- Instant session planning with quick visual feedback
 - Uses local sunrise/sunset times for station location
+- Icons displayed consistently across departure list, favorites, and search
 - Graceful degradation if API unavailable (no icon shown)
 - Cached data prevents excessive API calls
 

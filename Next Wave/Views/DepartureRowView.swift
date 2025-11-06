@@ -267,9 +267,9 @@ struct DepartureRowView: View {
         case 10..<12:
             return "5/4"
         case 1..<10:
-            return "6/5/4"
+            return "6/5"
         default:
-            return "6/5/4"
+            return "6/5"
         }
     }
     

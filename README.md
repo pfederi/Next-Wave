@@ -47,7 +47,8 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
 ### Wave Intelligence
 - 🚢 **Ship names & wave ratings** (1-3 waves) for Lake Zurich
 - 📊 **Wave analytics** with best session recommendations
-- 🌅 **Daylight integration** for optimal session planning
+- 🌅 **Daylight phase icons** (sun/twilight/moon) for each departure
+- ☀️ **Daylight integration** for optimal session planning
 - 🔍 **Albis-Class filter** for best waves
 
 ### Weather & Conditions
@@ -322,7 +323,7 @@ The link above is for Switzerland. For other countries, you have to find another
   - 15-18°C: 3/2mm
   - 12-15°C: 4/3mm
   - 10-12°C: 5/4mm
-  - 1-10°C: 6/5/4mm (winter wetsuit)
+  - 1-10°C: 6/5mm (winter wetsuit)
 - **Smart Algorithm**: Adjusts recommendation based on combined air and water temperature
 - **Visual Display**: Shows thickness in millimeters with figure icon
 - **Interactive Legend**: Tap weather line to see detailed explanation of wetsuit recommendations

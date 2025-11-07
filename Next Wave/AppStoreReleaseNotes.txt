@@ -1,7 +1,13 @@
-What's New in Version 3.4.3:
+What's New in Version 3.4.4:
+
+New Features
+• Clear Ship Data Cache: Manually refresh ship deployment data in Settings > Data Management
+• Albis-Class Filter Settings: Enable/disable the device flip filter in Settings (enabled by default)
+• Flip your device 180° in the departure view to filter for the best waves on Zürichsee (Albis-Class ships only)
 
 Improvements
-• Updated winter wetsuit recommendation from 6/5/4mm to 6/5mm for better clarity and accuracy
-• Improved wetsuit thickness display throughout the app
+• Changed "Loading..." to "No data" for more accurate ship information display
+• Improved cache handling for ship deployment data - always fetches fresh data from server
+• Better troubleshooting options with manual cache clearing
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

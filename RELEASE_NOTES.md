@@ -3,13 +3,19 @@
 ## [Unreleased]
 
 ### Added
-- **Fastlane Snapshot Integration**: Automated screenshot generation for App Store submissions
+- **Fastlane Snapshot Integration**: Automated screenshot generation for App Store submissions (development tool)
   - Supports iPhone 17 Pro Max, iPhone 17 Pro, iPhone 16e, and iPad Pro 13-inch (M4)
   - Automated status bar customization (9:41 AM, full battery)
   - Optional device frame generation with Frameit
   - Configuration in `fastlane/Snapfile` and `fastlane/Fastfile`
   - UI Tests extended for screenshot capture at key app screens
   - Commands: `fastlane screenshots`, `fastlane add_frames`, `fastlane generate_all_screenshots`
+
+---
+
+## Version 3.4.4 (November 2025)
+
+### Added
 - **Clear Ship Data Cache**: New settings option to manually clear ship deployment data cache
   - Force reload of ship assignments from Vercel API
   - Accessible in Settings > Data Management

@@ -1,0 +1,158 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NextWave - App Store Submission Summary
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Version: 3.4.4
+Date: 2025-11-07
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 RELEASE NOTES (App Store Connect)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+What's New in Version 3.4.4:
+
+New Features
+• Clear Ship Data Cache: Manually refresh ship deployment data in Settings > Data Management
+• Albis-Class Filter Settings: Enable/disable the device flip filter in Settings (enabled by default)
+• Flip your device 180° in the departure view to filter for the best waves on Zürichsee (Albis-Class ships only)
+
+Improvements
+• Changed "Loading..." to "No data" for more accurate ship information display
+• Improved cache handling for ship deployment data - always fetches fresh data from server
+• Better troubleshooting options with manual cache clearing
+
+Thank you for using NextWave! We're continuously working to improve your wakethieving experience.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 TESTFLIGHT NOTES (English)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+What to Test in Version 3.4.4:
+
+1. Clear Ship Data Cache Feature
+   - Navigate to Settings > Data Management
+   - Tap "Clear Ship Data Cache"
+   - Confirm the action
+   - Verify that ship names reload correctly after clearing
+   - Test with different days (today, tomorrow)
+   - Check that fresh data is fetched from server
+
+2. Albis-Class Filter Settings
+   - Navigate to Settings > Display Options
+   - Find "Enable Albis-Class Filter" toggle
+   - Verify it's enabled by default for new installations
+   - Toggle it off and on to test state changes
+   - Read the description text for clarity
+
+3. Device Flip Filter (when enabled in Settings)
+   - Go to a Zürichsee station (e.g., Zürich Bürkliplatz)
+   - View the departure list
+   - Flip device 180° (upside down)
+   - Verify filter activates - only Albis-Class ships shown (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
+   - Orange banner should appear: "Albis-Class Filter Active"
+   - Flip device again to deactivate filter
+   - Verify all ships are shown again
+
+4. Device Flip Filter (when disabled in Settings)
+   - Disable "Enable Albis-Class Filter" in Settings
+   - Go to departure view
+   - Flip device 180°
+   - Verify nothing happens (filter doesn't activate)
+   - Re-enable in settings and verify it works again
+
+5. Ship Data Display
+   - Check that "No data" appears instead of "Loading..." when ship info is unavailable
+   - Test with different dates
+   - Verify ship names load correctly for available data
+
+6. Cache Improvements
+   - Test ship data loading for multiple days
+   - Verify fresh data is always fetched (not stale cached data)
+   - Check performance is good despite new cache policy
+
+7. General Testing
+   - All existing features should work as before
+   - Weather information displays correctly
+   - Notifications work properly
+   - Map functionality intact
+   - Favorite stations work correctly
+
+Please report any issues or suggestions!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📸 SCREENSHOTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Screenshots location: /Users/federi/Library/CloudStorage/Dropbox/Apps/Next-Wave/Screenshots/
+
+Device sizes:
+  - 6.9inch (iPad Pro 13"): Required for App Store
+  - 6.7inch (iPhone Pro Max): Required for App Store
+  - 6.1inch (iPhone Pro): Optional
+  - 5.5inch (iPhone Plus): Optional
+
+Recommended screenshots to update:
+  - Settings screen (shows new "Enable Albis-Class Filter" toggle and "Data Management" section)
+  - Departure view with Albis-Class Filter active (orange banner)
+  - Optional: Settings > Data Management with "Clear Ship Data Cache" button
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before submitting to App Store Connect:
+
+[ ] Update version number in Xcode to 3.4.4 (CFBundleShortVersionString) ✓
+[ ] Update build number (CFBundleVersion) to 4 ✓
+[ ] Test app on physical device
+[ ] Test "Clear Ship Data Cache" functionality
+[ ] Test Albis-Class Filter toggle in Settings
+[ ] Test device flip gesture with filter enabled
+[ ] Test device flip gesture with filter disabled
+[ ] Verify "No data" displays correctly instead of "Loading..."
+[ ] Test ship data loading for multiple days (today, tomorrow)
+[ ] Verify fresh data is fetched from server
+[ ] Test all existing features (weather, notifications, favorites, etc.)
+[ ] Review release notes for accuracy
+[ ] Update screenshots if needed (Settings, Data Management)
+[ ] Submit TestFlight build for testing
+[ ] Submit for App Store review
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 USEFUL LINKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+App Store Connect: https://appstoreconnect.apple.com
+TestFlight: https://testflight.apple.com
+App Store Guidelines: https://developer.apple.com/app-store/review/guidelines/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 KEY CHANGES SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+User-Facing Changes:
+✨ Clear Ship Data Cache button in Settings > Data Management
+✨ Albis-Class Filter Settings toggle (enabled by default)
+✨ Device flip gesture to filter for best waves (Zürichsee only)
+🔧 "Loading..." → "No data" for better UX
+🔧 Always fetch fresh ship data from server
+
+Technical Changes:
+🔧 URLSession cache policy changed to .reloadIgnoringLocalCacheData
+🔧 Clear cache now also clears URLSession cache
+🔧 Improved VesselAPI cache handling
+🔧 Added enableAlbisClassFilter setting in AppSettings
+🔧 Conditional device flip gesture based on settings
+
+Files Modified:
+- Next Wave/API/VesselAPI.swift
+- Next Wave/ViewModels/AppSettings.swift
+- Next Wave/Views/SettingsView.swift
+- Next Wave/Views/DeparturesListView.swift
+- Next Wave/Views/DepartureRowView.swift
+- RELEASE_NOTES.md
+- AppStoreReleaseNotes.txt
+- ARC42_DOCUMENTATION.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+

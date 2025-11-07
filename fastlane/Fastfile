@@ -1,0 +1,52 @@
+# Fastfile for Next Wave
+# More documentation: https://docs.fastlane.tools
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Generate screenshots for App Store"
+  lane :screenshots do
+    # Boot simulator first
+    sh("xcrun simctl boot 'iPhone 17 Pro' || true")
+    sleep(5)  # Wait for simulator to fully boot
+    
+    # Set location on booted simulator (Zürich Bürkliplatz - nearest station)
+    sh("xcrun simctl location booted set 47.365662,8.541005")
+    
+    # Now capture screenshots
+    snapshot
+    
+    # Add frames using frameme and replace originals
+    Dir.glob("../Screenshots/en-US/*.png").each do |screenshot|
+      next if screenshot.include?("_framed")
+      
+      # Frame the screenshot
+      sh("/tmp/frameme '/Users/federi/Library/CloudStorage/Dropbox/Apps/Bezels/iPhone 17 Pro - Deep Blue - Portrait.png' '#{screenshot}'")
+      
+      # Replace original with framed version
+      framed = screenshot.gsub(".png", "_framed.png")
+      if File.exist?(framed)
+        File.rename(framed, screenshot)
+      end
+    end
+  end
+
+  desc "Add device frames to screenshots"
+  lane :add_frames do
+    sh("find ../Screenshots/en-US -name '*.png' ! -name '*_framed.png' -exec /tmp/frameme '/Users/federi/Library/CloudStorage/Dropbox/Apps/Bezels/iPhone 17 Pro - Deep Blue - Portrait.png' {} \\;")
+  end
+
+  desc "Generate and frame screenshots"
+  lane :generate_all_screenshots do
+    screenshots
+  end
+  
+  desc "Build the app for testing"
+  lane :build_for_testing do
+    scan(
+      scheme: "Next Wave",
+      build_for_testing: true
+    )
+  end
+end
+

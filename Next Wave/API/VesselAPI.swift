@@ -32,12 +32,10 @@ struct VesselResponse: Codable {
         
         if let updateDate = formatter.date(from: lastUpdated) {
             let isToday = Calendar.current.isDate(updateDate, inSameDayAs: Date())
-            print("📊 isDataCurrent: isToday=\(isToday), hasEnoughDays=\(hasEnoughDays)")
             return isToday && hasEnoughDays
         }
         
         // Fallback: Wenn wir 3 Tage haben, sind die Daten wahrscheinlich aktuell
-        print("📊 isDataCurrent: Using fallback, hasEnoughDays=\(hasEnoughDays)")
         return hasEnoughDays
     }
 }
@@ -108,7 +106,7 @@ actor VesselAPI {
             
             // Use URLRequest with cache policy to respect server cache headers
             var request = URLRequest(url: url)
-            request.cachePolicy = .returnCacheDataElseLoad // Use cache if available
+            request.cachePolicy = .reloadIgnoringLocalCacheData // Always fetch fresh data
             
             let (data, urlResponse) = try await URLSession.shared.data(for: request)
             
@@ -149,9 +147,6 @@ actor VesselAPI {
                 cachedResponse = result
                 lastFetchDate = Date()
                 shipNameCache.removeAll()
-                print("💾 Cached vessel data for future use")
-            } else {
-                print("⚠️ Data not current: days=\(result.dailyDeployments.count)")
             }
             
             return result
@@ -245,5 +240,16 @@ actor VesselAPI {
         } catch {
             return nil
         }
+    }
+    
+    // Manuelles Cache-Löschen für Debugging/Testing
+    func clearCache() {
+        cachedResponse = nil
+        lastFetchDate = nil
+        shipNameCache.removeAll()
+        initialFetchTask = nil
+        
+        // URLSession Cache auch löschen
+        URLCache.shared.removeAllCachedResponses()
     }
 } 

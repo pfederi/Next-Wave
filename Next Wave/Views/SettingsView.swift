@@ -47,6 +47,11 @@ struct SettingsView: View {
                 
                 Divider()
                 
+                // Data Management section
+                DataManagementSection()
+                
+                Divider()
+                
                 // Information section
                 InformationSection(openURL: openURL)
                 
@@ -183,6 +188,26 @@ struct DisplayOptionsSection: View {
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
+            
+            Toggle(isOn: $appSettings.enableAlbisClassFilter) {
+                HStack {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Enable Albis-Class Filter")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Flip device 180° in departure view to filter for best waves (Zürichsee)")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                }
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
         }
         .foregroundColor(Color("text-color"))
     }
@@ -212,6 +237,67 @@ struct NotificationSettingsSection: View {
                 scheduleViewModel: scheduleViewModel,
                 playSound: playSound
             )
+        }
+        .foregroundColor(Color("text-color"))
+    }
+}
+
+// MARK: - Data Management Section
+struct DataManagementSection: View {
+    @State private var showingClearCacheAlert = false
+    @State private var cacheCleared = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Data Management")
+                .font(.headline)
+            
+            Button(action: {
+                showingClearCacheAlert = true
+            }) {
+                HStack {
+                    Image(systemName: "trash")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Clear Ship Data Cache")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Force reload ship deployment data")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                    
+                    Spacer()
+                    
+                    if cacheCleared {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.system(size: 20))
+                    }
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .alert("Clear Cache", isPresented: $showingClearCacheAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Clear", role: .destructive) {
+                    Task {
+                        await VesselAPI.shared.clearCache()
+                        cacheCleared = true
+                        
+                        // Reset checkmark after 2 seconds
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            cacheCleared = false
+                        }
+                    }
+                }
+            } message: {
+                Text("This will clear the cached ship deployment data and force a fresh reload from the server.")
+            }
         }
         .foregroundColor(Color("text-color"))
     }

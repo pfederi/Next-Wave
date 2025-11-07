@@ -241,10 +241,25 @@ graph TB
 **Interfaces**:
 - `getShipName(for courseNumber: String, date: Date) async -> String?`
 - `preloadData() async` - Preloads data
+- `clearCache()` - Manually clears all cached vessel data
 
 **Caching**: 24h cache with date as key
+- Manual cache clearing available via Settings > Data Management
+- Useful for troubleshooting or forcing immediate updates
 
-#### 5.3.4 SharedDataManager
+#### 5.3.4 AppSettings
+**Responsibility**: User preferences and app configuration
+
+**Settings**:
+- `theme`: Light, dark, or system theme
+- `showNearestStation`: Show nearest station on home screen
+- `showWeatherInfo`: Display weather information
+- `enableAlbisClassFilter`: Enable device flip gesture for Albis-Class filter (Zürichsee only)
+- `useNearestStationForWidget`: Widget mode (nearest station vs favorites)
+
+**Storage**: UserDefaults
+
+#### 5.3.5 SharedDataManager
 **Responsibility**: Data exchange between app, widgets, and watch
 
 **Interfaces**:
@@ -887,11 +902,13 @@ graph TB
 | Data Type | Cache Duration | Storage Location | Invalidation |
 |-----------|----------------|------------------|--------------|
 | Departures | In-Memory | ViewModel | On refresh |
-| Ship Names | 24h | UserDefaults | Midnight |
+| Ship Names | 24h | UserDefaults | Midnight / Manual |
 | Weather Data | 6h | In-Memory | Time-based |
 | Sun Times | 24h | UserDefaults | Midnight |
 | Water Temperature | 24h | UserDefaults | Midnight |
 | Map Tiles | Unlimited | Disk Cache | Manual |
+
+**Note**: Ship Names cache can be manually cleared via Settings > Data Management > Clear Ship Data Cache
 
 ### 8.2 Error Handling
 
@@ -1175,8 +1192,9 @@ Next Wave/
 2. Pull request + code review
 3. Merge to `develop`
 4. Testing on TestFlight
-5. Release to `main` branch
-6. App Store submission
+5. Generate App Store screenshots with Fastlane: `fastlane screenshots`
+6. Release to `main` branch
+7. App Store submission
 
 **Backend APIs**:
 1. Code changes in Git
@@ -1184,7 +1202,27 @@ Next Wave/
 3. Automatic deployment via Vercel
 4. Edge caching enabled
 
-### A.5 Contact and Resources
+### A.5 Automated Screenshot Generation
+
+**Fastlane Snapshot**:
+- Automated screenshot generation for App Store
+- Supports multiple device sizes (iPhone 17 Pro Max, iPhone 17 Pro, iPhone 16e, iPad Pro 13-inch M4)
+- Status bar customization (9:41 AM, full battery)
+- Optional device frames with Frameit
+
+**Configuration**:
+- `fastlane/Snapfile`: Device and language configuration
+- `fastlane/Fastfile`: Automation lanes
+- `Next WaveUITests/Next_WaveUITestsLaunchTests.swift`: Screenshot capture logic
+
+**Commands**:
+```bash
+fastlane screenshots              # Generate screenshots
+fastlane add_frames               # Add device frames
+fastlane generate_all_screenshots # Both combined
+```
+
+### A.6 Contact and Resources
 
 - **GitHub**: https://github.com/pfederi/Next-Wave
 - **App Store**: https://apps.apple.com/ch/app/next-wave/id6739363035

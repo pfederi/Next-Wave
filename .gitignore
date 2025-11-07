@@ -19,6 +19,17 @@ build/
 # Config files with sensitive data
 # Next Wave/Config.swift - Now tracked with placeholder, overwritten by CI
 
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+fastlane/.env
+
+# Ruby / Bundler
+vendor/bundle/
+.bundle/
+Gemfile.lock
+
 # Other
 *.log
 .env

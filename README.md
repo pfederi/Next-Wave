@@ -246,6 +246,29 @@ The link above is for Switzerland. For other countries, you have to find another
 
 ## Technical Details
 
+### Automated Screenshot Generation
+
+Next Wave uses **Fastlane Snapshot** for automated App Store screenshot generation:
+
+- **Automated Screenshots**: Generate screenshots for all required device sizes automatically
+- **Consistent Quality**: Status bar is set to 9:41 AM with full battery and reception
+- **Multiple Devices**: iPhone 17 Pro Max, iPhone 17 Pro, iPhone 16e, iPad Pro 13-inch (M4)
+- **Device Frames**: Optional device frames can be added automatically
+
+**Quick Start:**
+```bash
+# Generate screenshots
+fastlane screenshots
+
+# Add device frames
+fastlane add_frames
+
+# Generate and frame in one command
+fastlane generate_all_screenshots
+```
+
+For detailed setup instructions, see [`fastlane/README.md`](fastlane/README.md).
+
 ### Recent Technical Improvements
 
 #### Ship Data Loading Optimization (v3.3)

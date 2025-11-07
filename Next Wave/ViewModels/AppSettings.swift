@@ -46,6 +46,12 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var enableAlbisClassFilter: Bool {
+        didSet {
+            UserDefaults.standard.set(enableAlbisClassFilter, forKey: "enableAlbisClassFilter")
+        }
+    }
+    
     @Published var useNearestStationForWidget: Bool {
         didSet {
             UserDefaults.standard.set(useNearestStationForWidget, forKey: "useNearestStationForWidget")
@@ -105,6 +111,9 @@ class AppSettings: ObservableObject {
         
         // Initialize showWeatherInfo with default value true
         self.showWeatherInfo = UserDefaults.standard.bool(forKey: "showWeatherInfo", defaultValue: true)
+        
+        // Initialize enableAlbisClassFilter with default value true
+        self.enableAlbisClassFilter = UserDefaults.standard.bool(forKey: "enableAlbisClassFilter", defaultValue: true)
         
         // Initialize useNearestStationForWidget with default value false (favorites first)
         self.useNearestStationForWidget = UserDefaults.standard.bool(forKey: "useNearestStationForWidget", defaultValue: false)

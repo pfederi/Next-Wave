@@ -6,6 +6,7 @@ struct DeparturesListView: View {
     let selectedStation: Lake.Station?
     @ObservedObject var viewModel: LakeStationsViewModel
     @ObservedObject var scheduleViewModel: ScheduleViewModel
+    @EnvironmentObject var appSettings: AppSettings
     @StateObject private var analyticsViewModel = WaveAnalyticsViewModel()
     @State private var showingAnalytics = false
     @State private var errorMessage: String?
@@ -172,8 +173,10 @@ struct DeparturesListView: View {
             Text("You can have a maximum of \(FavoriteStation.maxFavorites) favorite spots. Please remove one before adding another.")
         }
         .onFlip {
-            // Toggle Albis-Klasse Filter (nur in der Stationview)
-            scheduleViewModel.toggleAlbisClassFilter()
+            // Toggle Albis-Klasse Filter (nur in der Stationview, und nur wenn aktiviert)
+            if appSettings.enableAlbisClassFilter {
+                scheduleViewModel.toggleAlbisClassFilter()
+            }
         }
     }
     

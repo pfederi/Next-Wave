@@ -71,7 +71,7 @@ struct DepartureRowView: View {
                         if wave.isZurichsee && isWithinNext3Days(wave.time) {
                             // Schiffsname mit Icon (nur für die nächsten 3 Tage)
                             HStack(spacing: 4) {
-                                Text(wave.shipName ?? "Loading...")
+                                Text(wave.shipName ?? "No data")
                                     .lineLimit(1)
                                 if let shipName = wave.shipName {
                                     Image(getWaveIcon(for: shipName))

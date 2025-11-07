@@ -1,5 +1,37 @@
 # NextWave App - Release History
 
+## [Unreleased]
+
+### Added
+- **Fastlane Snapshot Integration**: Automated screenshot generation for App Store submissions
+  - Supports iPhone 17 Pro Max, iPhone 17 Pro, iPhone 16e, and iPad Pro 13-inch (M4)
+  - Automated status bar customization (9:41 AM, full battery)
+  - Optional device frame generation with Frameit
+  - Configuration in `fastlane/Snapfile` and `fastlane/Fastfile`
+  - UI Tests extended for screenshot capture at key app screens
+  - Commands: `fastlane screenshots`, `fastlane add_frames`, `fastlane generate_all_screenshots`
+- **Clear Ship Data Cache**: New settings option to manually clear ship deployment data cache
+  - Force reload of ship assignments from Vercel API
+  - Accessible in Settings > Data Management
+  - Helpful for troubleshooting or forcing immediate updates
+  - Confirmation dialog to prevent accidental clearing
+- **Albis-Class Filter Settings**: New toggle to enable/disable the Albis-Class filter feature
+  - Located in Settings > Display Options
+  - Enabled by default
+  - When enabled, flip device 180° in departure view to filter for best waves on Zürichsee
+  - Shows only Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
+  - Includes helpful description in settings
+
+### Changed
+- **Ship Data Display**: Changed "Loading..." to "No data" when ship information is unavailable
+  - More accurate representation after background loading completes
+- **URLSession Cache**: Improved cache handling for vessel data API
+  - Changed cache policy to always fetch fresh data
+  - Clear Ship Data Cache now also clears URLSession cache
+  - Fixes issue where old ship deployment data was being displayed
+
+---
+
 ## Version 3.4.3 (November 2025)
 
 ### Improvements

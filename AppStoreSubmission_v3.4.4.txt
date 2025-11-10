@@ -6,6 +6,71 @@ Version: 3.4.4
 Date: 2025-11-07
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 APP STORE MARKETING (App Store Connect)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SUBTITLE (max 30 characters):
+Catch every perfect wave
+
+PROMOTIONAL TEXT (max 170 characters):
+Never miss a wave! Real-time boat schedules, smart notifications, and weather data for wake foiling on Swiss lakes. With Apple Watch support for instant access.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📱 APP DESCRIPTION (App Store Connect)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Next Wave is your essential companion for wake foiling on Swiss lakes. Get real-time boat schedules, smart notifications, and weather data to catch every perfect wave - now with full Apple Watch support for instant access on your wrist.
+
+MAIN FEATURES:
+
+- Real-time schedule data for all boats across 17 Swiss lakes
+- Apple Watch app with complications
+- iPhone Home Screen & Lock Screen widgets
+- Watch complications for instant departure times on your watch face
+- Intelligent analysis of the best surfing time slots
+- Visualization of times of day including twilight phases
+- Smart notifications 3-15 minutes before the wave
+- Clearly arranged spots on all Swiss lakes
+- Choice of different notification sounds
+- Weather data display for each spot
+- Manual cache refresh for ship deployment data
+- Albis-Class Filter for the best waves on Zürichsee
+
+APPLE WATCH EXPERIENCE:
+
+- Glance at your watch face to see next departures instantly
+- Automatic nearest station detection based on your location
+- Synchronized with your iPhone favorites
+- Perfect for quick checks while at the water
+
+PERFECT PLANNING:
+
+- Automatically analyzes the best surf sessions
+- Takes into account the time of day, wave frequency, and weather conditions
+- Shows sunrise and sunset times
+- Visualizes twilight phases for better planning
+- Access all information from your wrist without pulling out your phone
+- Filter for Albis-Class ships with a simple device flip gesture (Zürichsee)
+
+EASY TO USE:
+
+- Intuitive design across iPhone, iPad, and Apple Watch
+- Quick spot selection with nearest station detection
+- Simple activation of notifications
+- Dark mode support on all devices
+- Seamless synchronization between all your devices
+- Manual troubleshooting options in settings
+
+SAFETY AND RESPECT:
+
+- Integrated safety instructions
+- Respectful interaction with other water sports enthusiasts
+- Focus on safe surf spots
+- Real-time updates to keep you informed
+
+Plan your next session smart and never miss a perfect wave again - whether you are checking your iPhone or glancing at your Apple Watch!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📝 RELEASE NOTES (App Store Connect)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

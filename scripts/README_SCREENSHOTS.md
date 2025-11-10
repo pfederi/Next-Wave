@@ -42,13 +42,12 @@ Zwei Scripts für einfaches Screenshot-Management:
 
 ## 📦 Script 2: frame_screenshots.sh
 
-Automatisches Hinzufügen von Device Frames zu App Store Screenshots.
+**Automatisches Framing von bestehenden Screenshots mit Device-Erkennung**
 
-## 📋 Voraussetzungen
-
-- **frameme** installiert unter `/tmp/frameme`
-- **Device Bezel** vorhanden unter:
-  `/Users/federi/Library/CloudStorage/Dropbox/Apps/Bezels/iPhone 17 Pro - Deep Blue - Portrait.png`
+Dieses Script analysiert die Dimensionen deiner Screenshots und wählt automatisch den richtigen Bezel:
+- **iPhone 17 Pro**: 1290x2796px → Deep Blue Frame
+- **iPad Air 13-inch**: 2048x2732px → Space Gray Frame  
+- **Apple Watch Ultra 3**: 416x496px → Black Ocean Band Frame
 
 ## 🚀 Verwendung
 
@@ -77,20 +76,44 @@ Screenshots/en-US/
 ./scripts/frame_screenshots.sh
 ```
 
-### 4. Fertig! 🎉
-Die Screenshots werden automatisch mit Device Frames versehen und die Originale werden ersetzt.
+Das Script:
+- ✅ **Erkennt automatisch das Device** anhand der Dimensionen
+- ✅ Wählt den passenden Bezel (iPhone, iPad oder Watch)
+- ✅ Framed den Screenshot
+- ✅ Löscht das Original
+- ✅ Speichert als `*-framed.png`
+
+### 4. Beispiel-Output
+```
+→ Framing: 0x0ss.png
+  Device: Apple Watch Ultra 3
+  ✓ Framed successfully: 0x0ss-framed.png
+
+→ Framing: IMG_1234.png
+  Device: iPhone 17 Pro
+  ✓ Framed successfully: IMG_1234-framed.png
+```
+
+### 5. Fertig! 🎉
+Alle Screenshots sind jetzt geframed und bereit für den App Store Upload!
 
 ## 📸 Empfohlene Screenshot-Größen
 
 - **iPhone 17 Pro Max** (6.7"): 1290 x 2796 px
 - **iPad Pro 13"** (6.9"): 2048 x 2732 px
 
-## 🎨 Device Bezel ändern
+## 🎨 Unterstützte Geräte
 
-Um einen anderen Device Bezel zu verwenden, bearbeite die Zeile in `frame_screenshots.sh`:
-```bash
-BEZEL_PATH="/Users/federi/Library/CloudStorage/Dropbox/Apps/Bezels/[DEIN-BEZEL].png"
-```
+Das Script erkennt automatisch folgende Geräte:
+
+| Device | Auflösung | Bezel |
+|--------|-----------|-------|
+| iPhone 17 Pro | 1290 x 2796 px | Deep Blue - Portrait |
+| iPad Air 13-inch | 2048 x 2732 px | Space Gray - Portrait |
+| Apple Watch Ultra 3 | 416 x 496 px | Black + Ocean Band Black |
+
+**Neue Geräte hinzufügen:**  
+Bearbeite die `detect_device()` Funktion in `frame_screenshots.sh` und füge die Dimensionen und den Bezel-Pfad hinzu.
 
 ## 🔧 Troubleshooting
 

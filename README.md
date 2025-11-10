@@ -2,7 +2,7 @@
 
 Next Wave is an iOS app that helps wake surfers and foilers catch their perfect wave on Lake Zurich by providing real-time boat schedules and smart notifications.
 
-<img src="Screenshots/next-wave8.png" alt="Screenshot8" width="200"><img src="Screenshots/next-wave9.png" alt="Screenshot9" width="200">
+<img src="Screenshots/next-wave1.png" alt="Screenshot1" width="200"><img src="Screenshots/next-wave2.png" alt="Screenshot2" width="200"><img src="Screenshots/next-wave3.png" alt="Screenshot3" width="200"><img src="Screenshots/next-wave4.png" alt="Screenshot4" width="200"><img src="Screenshots/next-wave5.png" alt="Screenshot5" width="200"><img src="Screenshots/next-wave6.png" alt="Screenshot6" width="200"><img src="Screenshots/next-wave7.png" alt="Screenshot7" width="200"><img src="Screenshots/next-wave8.png" alt="Screenshot8" width="200"><img src="Screenshots/next-wave9.png" alt="Screenshot9" width="200">
 
 
 <a href="https://apps.apple.com/ch/app/next-wave/id6739363035">
@@ -245,29 +245,6 @@ You can check whether the station is available in the API via https://transport.
 The link above is for Switzerland. For other countries, you have to find another api to find departure times.
 
 ## Technical Details
-
-### Automated Screenshot Generation
-
-Next Wave uses **Fastlane Snapshot** for automated App Store screenshot generation:
-
-- **Automated Screenshots**: Generate screenshots for all required device sizes automatically
-- **Consistent Quality**: Status bar is set to 9:41 AM with full battery and reception
-- **Multiple Devices**: iPhone 17 Pro Max, iPhone 17 Pro, iPhone 16e, iPad Pro 13-inch (M4)
-- **Device Frames**: Optional device frames can be added automatically
-
-**Quick Start:**
-```bash
-# Generate screenshots
-fastlane screenshots
-
-# Add device frames
-fastlane add_frames
-
-# Generate and frame in one command
-fastlane generate_all_screenshots
-```
-
-For detailed setup instructions, see [`fastlane/README.md`](fastlane/README.md).
 
 ### Recent Technical Improvements
 

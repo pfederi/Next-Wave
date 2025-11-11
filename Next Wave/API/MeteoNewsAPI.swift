@@ -1,8 +1,8 @@
 import Foundation
 
-/// API für Wasserpegel-Daten von MeteoNews
-class WaterLevelAPI {
-    static let shared = WaterLevelAPI()
+/// API für Wasserpegel und Temperatur-Fallback von MeteoNews
+class MeteoNewsAPI {
+    static let shared = MeteoNewsAPI()
     
     // Vercel API URL - anpassen an deine Deployment URL
     private let baseURL = "https://vesseldata-api.vercel.app/api/water-temperature"
@@ -15,11 +15,12 @@ class WaterLevelAPI {
     struct LakeWaterLevel: Codable {
         let name: String
         let waterLevel: String?
+        let temperature: Double? // Fallback für Seen ohne Alplakes-Daten
         
-        // Für Kompatibilität mit alter API - ignorieren wir die Temperatur
-        private enum CodingKeys: String, CodingKey {
+        enum CodingKeys: String, CodingKey {
             case name
             case waterLevel
+            case temperature
         }
     }
     
@@ -43,38 +44,38 @@ class WaterLevelAPI {
     private func getMockData() -> [LakeWaterLevel] {
         print("🌊 Using MOCK water level data (set useMockData = false after Vercel deployment)")
         return [
-            LakeWaterLevel(name: "Zürichsee", waterLevel: "405.96 m.ü.M."),
-            LakeWaterLevel(name: "Vierwaldstättersee", waterLevel: "433.53 m.ü.M."),
-            LakeWaterLevel(name: "Genfersee", waterLevel: nil),
-            LakeWaterLevel(name: "Bodensee", waterLevel: nil),
-            LakeWaterLevel(name: "Thunersee", waterLevel: "557.77 m.ü.M."),
-            LakeWaterLevel(name: "Brienzersee", waterLevel: "563.68 m.ü.M."),
-            LakeWaterLevel(name: "Zugersee", waterLevel: "413.58 m.ü.M."),
-            LakeWaterLevel(name: "Walensee", waterLevel: "418.51 m.ü.M."),
-            LakeWaterLevel(name: "Bielersee", waterLevel: "429.18 m.ü.M."),
-            LakeWaterLevel(name: "Neuenburgersee", waterLevel: nil),
-            LakeWaterLevel(name: "Murtensee", waterLevel: "429.36 m.ü.M."),
-            LakeWaterLevel(name: "Lago Maggiore", waterLevel: "193.47 m.ü.M."),
-            LakeWaterLevel(name: "Luganersee", waterLevel: nil),
-            LakeWaterLevel(name: "Sempachersee", waterLevel: "503.78 m.ü.M."),
-            LakeWaterLevel(name: "Hallwilersee", waterLevel: "448.58 m.ü.M."),
-            LakeWaterLevel(name: "Greifensee", waterLevel: "435.14 m.ü.M."),
-            LakeWaterLevel(name: "Pfäffikersee", waterLevel: "536.80 m.ü.M."),
-            LakeWaterLevel(name: "Ägerisee", waterLevel: "723.64 m.ü.M."),
-            LakeWaterLevel(name: "Baldeggersee", waterLevel: nil),
-            LakeWaterLevel(name: "Sarnersee", waterLevel: "469.37 m.ü.M."),
-            LakeWaterLevel(name: "Alpnachersee", waterLevel: nil),
-            LakeWaterLevel(name: "Sihlsee", waterLevel: nil),
-            LakeWaterLevel(name: "Lauerzersee", waterLevel: "447.14 m.ü.M."),
-            LakeWaterLevel(name: "Türlersee", waterLevel: nil),
-            LakeWaterLevel(name: "Katzensee", waterLevel: nil),
-            LakeWaterLevel(name: "Lützelsee", waterLevel: nil),
-            LakeWaterLevel(name: "Silsersee", waterLevel: "1796.57 m.ü.M."),
-            LakeWaterLevel(name: "Silvaplanersee", waterLevel: "1790.66 m.ü.M."),
-            LakeWaterLevel(name: "St. Moritzersee", waterLevel: "1767.93 m.ü.M."),
-            LakeWaterLevel(name: "Lac de Joux", waterLevel: "1004.12 m.ü.M."),
-            LakeWaterLevel(name: "Burgäschisee", waterLevel: nil),
-            LakeWaterLevel(name: "Mettmenhaslisee", waterLevel: nil)
+            LakeWaterLevel(name: "Zürichsee", waterLevel: "405.96 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Vierwaldstättersee", waterLevel: "433.53 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Genfersee", waterLevel: nil, temperature: 15),
+            LakeWaterLevel(name: "Bodensee", waterLevel: nil, temperature: 14),
+            LakeWaterLevel(name: "Thunersee", waterLevel: "557.77 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Brienzersee", waterLevel: "563.68 m.ü.M.", temperature: 12),
+            LakeWaterLevel(name: "Zugersee", waterLevel: "413.58 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Walensee", waterLevel: "418.51 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Bielersee", waterLevel: "429.18 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Neuenburgersee", waterLevel: nil, temperature: 14),
+            LakeWaterLevel(name: "Murtensee", waterLevel: "429.36 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Lago Maggiore", waterLevel: "193.47 m.ü.M.", temperature: 16),
+            LakeWaterLevel(name: "Luganersee", waterLevel: nil, temperature: 16),
+            LakeWaterLevel(name: "Sempachersee", waterLevel: "503.78 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Hallwilersee", waterLevel: "448.58 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Greifensee", waterLevel: "435.14 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Pfäffikersee", waterLevel: "536.80 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Ägerisee", waterLevel: "723.64 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Baldeggersee", waterLevel: nil, temperature: 14),
+            LakeWaterLevel(name: "Sarnersee", waterLevel: "469.37 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Alpnachersee", waterLevel: nil, temperature: 13),
+            LakeWaterLevel(name: "Sihlsee", waterLevel: nil, temperature: 12),
+            LakeWaterLevel(name: "Lauerzersee", waterLevel: "447.14 m.ü.M.", temperature: 14),
+            LakeWaterLevel(name: "Türlersee", waterLevel: nil, temperature: 13),
+            LakeWaterLevel(name: "Katzensee", waterLevel: nil, temperature: 13),
+            LakeWaterLevel(name: "Lützelsee", waterLevel: nil, temperature: 13),
+            LakeWaterLevel(name: "Silsersee", waterLevel: "1796.57 m.ü.M.", temperature: 8),
+            LakeWaterLevel(name: "Silvaplanersee", waterLevel: "1790.66 m.ü.M.", temperature: 8),
+            LakeWaterLevel(name: "St. Moritzersee", waterLevel: "1767.93 m.ü.M.", temperature: 9),
+            LakeWaterLevel(name: "Lac de Joux", waterLevel: "1004.12 m.ü.M.", temperature: 13),
+            LakeWaterLevel(name: "Burgäschisee", waterLevel: nil, temperature: 14),
+            LakeWaterLevel(name: "Mettmenhaslisee", waterLevel: nil, temperature: 13)
         ]
     }
     

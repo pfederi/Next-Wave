@@ -105,30 +105,67 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func loadWaterTemperatures() async {
-        print("🌊 Starting to load water temperatures...")
+        print("🌊 Starting to load water data...")
+        
+        // Load water levels and temperature fallback from MeteoNews API
+        var meteoNewsData: [String: MeteoNewsAPI.LakeWaterLevel] = [:]
         do {
-            let temperatures = try await WaterTemperatureAPI.shared.getWaterTemperatures()
-            print("🌊 Received \(temperatures.count) lake temperatures from API")
+            let waterLevels = try await MeteoNewsAPI.shared.getWaterLevels()
+            print("🌊 [MeteoNews] Received \(waterLevels.count) lake water levels and temperature fallbacks")
             
-            // Update lakes with water temperatures
-            var updatedCount = 0
+            // Store MeteoNews data for fallback and update water levels
             for i in 0..<lakes.count {
                 let lakeName = lakes[i].name
-                if let temp = temperatures.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
+                if let level = waterLevels.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
+                    meteoNewsData[lakeName] = level
+                    
                     var updatedLake = lakes[i]
-                    updatedLake.waterTemperature = temp.temperature
-                    updatedLake.waterLevel = temp.waterLevel
+                    updatedLake.waterLevel = level.waterLevel
                     lakes[i] = updatedLake
-                    updatedCount += 1
-                    print("🌊 Updated \(lakeName): \(temp.temperature ?? 0)°C")
-                } else {
-                    print("🌊 No temperature found for \(lakeName)")
                 }
             }
-            
-            print("✅ Updated \(updatedCount)/\(lakes.count) lakes with water temperatures")
         } catch {
-            print("⚠️ Failed to load water temperatures: \(error)")
+            print("⚠️ [MeteoNews] Failed to load water levels: \(error)")
+        }
+        
+        // Load temperature and forecasts from Alplakes (priority)
+        do {
+            var alplakesCount = 0
+            var fallbackCount = 0
+            
+            for i in 0..<lakes.count {
+                let lakeName = lakes[i].name
+                var updatedLake = lakes[i]
+                
+                // Try Alplakes first
+                if let data = try await AlplakesAPI.shared.getTemperature(for: lakeName) {
+                    updatedLake.waterTemperature = data.temperature
+                    
+                    // Convert forecast data to Lake.TemperatureForecast
+                    if let forecast = data.forecast {
+                        updatedLake.temperatureForecast = forecast.map { f in
+                            Lake.TemperatureForecast(time: f.time, temperature: f.temperature)
+                        }
+                    }
+                    
+                    alplakesCount += 1
+                    let forecastInfo = data.forecast != nil ? " (+ \(data.forecast!.count) forecasts)" : ""
+                    print("🌊 [Alplakes] Updated \(lakeName): \(data.temperature ?? 0)°C\(forecastInfo)")
+                    
+                } else if let meteoNews = meteoNewsData[lakeName], let temp = meteoNews.temperature {
+                    // Fallback to MeteoNews temperature (no forecast available)
+                    updatedLake.waterTemperature = temp
+                    updatedLake.temperatureForecast = nil
+                    fallbackCount += 1
+                    print("🌊 [MeteoNews Fallback] Updated \(lakeName): \(temp)°C (no forecast)")
+                }
+                
+                lakes[i] = updatedLake
+            }
+            
+            print("✅ [Temperature] \(alplakesCount) from Alplakes (with forecast), \(fallbackCount) from MeteoNews (fallback)")
+        } catch {
+            print("⚠️ [Alplakes] Failed to load temperatures: \(error)")
             if let urlError = error as? URLError {
                 print("⚠️ URLError code: \(urlError.code.rawValue)")
             }

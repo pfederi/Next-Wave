@@ -13,6 +13,37 @@ struct DepartureRowView: View {
     @State private var showShareSheet = false
     @State private var showWeatherLegend = false
     
+    // Helper: Gibt die richtige Wassertemperatur für das Datum und die Uhrzeit der Wave zurück
+    private func getWaterTemperatureForWave(lake: Lake) -> Double? {
+        let waveDate = wave.time
+        let calendar = Calendar.current
+        
+        // Für heute: Aktuelle Temperatur verwenden
+        if calendar.isDateInToday(waveDate) {
+            return lake.waterTemperature
+        }
+        
+        // Für zukünftige Tage: Vorhersage-Temperatur zur Abfahrtszeit verwenden
+        guard let forecasts = lake.temperatureForecast, !forecasts.isEmpty else {
+            return nil // Keine Vorhersage verfügbar
+        }
+        
+        // Finde die Vorhersage, die der Abfahrtszeit am nächsten liegt
+        let closestForecast = forecasts.min(by: { forecast1, forecast2 in
+            let diff1 = abs(forecast1.time.timeIntervalSince(waveDate))
+            let diff2 = abs(forecast2.time.timeIntervalSince(waveDate))
+            return diff1 < diff2
+        })
+        
+        // Prüfe, ob die nächstliegende Vorhersage am selben Tag ist (max. 12h Differenz)
+        if let forecast = closestForecast,
+           abs(forecast.time.timeIntervalSince(waveDate)) < 12 * 3600 {
+            return forecast.temperature
+        }
+        
+        return nil // Keine passende Vorhersage verfügbar
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline) {
@@ -146,17 +177,17 @@ struct DepartureRowView: View {
                                 .foregroundColor(.gray)
                                 .font(.system(size: 11))
                             
-                            // Wassertemperatur
+                            // Wassertemperatur & Neoprenanzug-Dicke (nur wenn Wassertemp verfügbar)
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterTemp = lake.waterTemperature {
+                               }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
                                 
                                 Image(systemName: "drop.fill")
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
-                                Text(String(format: "%.0f°", waterTemp))
+                                Text(String(format: "%.1f°", waterTemp))
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
@@ -174,11 +205,11 @@ struct DepartureRowView: View {
                                 .font(.system(size: 11))
                                 .foregroundColor(.primary)
                             
-                            // Neoprenanzug-Dicke
+                            // Neoprenanzug-Dicke (nur wenn Wassertemperatur verfügbar)
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterTemp = lake.waterTemperature,
+                               }), let waterTemp = getWaterTemperatureForWave(lake: lake),
                                let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
                                 
                                 Text("|")
@@ -374,8 +405,8 @@ struct DepartureRowView: View {
         if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = lake.waterTemperature {
-            text += "💧 Water Temperature: \(String(format: "%.0f°C", waterTemp))\n"
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
+            text += "💧 Water Temperature: \(String(format: "%.1f°C", waterTemp))\n"
         }
         
         // 3. Wind
@@ -387,7 +418,7 @@ struct DepartureRowView: View {
         if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = lake.waterTemperature,
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake),
            let weather = wave.weather,
            let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
             text += "🤸 Wetsuit: \(thickness)mm\n"

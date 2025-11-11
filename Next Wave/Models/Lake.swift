@@ -6,9 +6,15 @@ struct Lake: Codable, Identifiable, Hashable {
     private let _stations: [Station]
     var waterTemperature: Double? // Wassertemperatur in °C
     var waterLevel: String? // Pegel (z.B. "405.96 m.ü.M.")
+    var temperatureForecast: [TemperatureForecast]? // Vorhersage für nächste 2 Tage
     var waterLevelDifference: String? { // Differenz zum Durchschnitt (z.B. "+7 cm")
         guard let waterLevel = waterLevel else { return nil }
         return calculateWaterLevelDifference(for: name, currentLevel: waterLevel)
+    }
+    
+    struct TemperatureForecast: Codable, Hashable {
+        let time: Date
+        let temperature: Double
     }
     
     var stations: [Station] {
@@ -19,12 +25,23 @@ struct Lake: Codable, Identifiable, Hashable {
     
     var id: String { name }
     
+    // Custom initializer for testing and previews
+    init(name: String, operators: [String], stations: [Station], waterTemperature: Double? = nil, waterLevel: String? = nil, temperatureForecast: [TemperatureForecast]? = nil) {
+        self.name = name
+        self.operators = operators
+        self._stations = stations
+        self.waterTemperature = waterTemperature
+        self.waterLevel = waterLevel
+        self.temperatureForecast = temperatureForecast
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name
         case operators
         case _stations = "stations"
         case waterTemperature
         case waterLevel
+        case temperatureForecast
     }
     
     struct Station: Codable, Hashable, Identifiable {

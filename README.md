@@ -53,7 +53,8 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
 
 ### Weather & Conditions
 - 🌤️ **Real-time weather** (temperature, wind, pressure)
-- 🌡️ **Water temperature** for all Swiss lakes
+- 🌡️ **Water temperature** for all Swiss lakes (via Alplakes API from Eawag)
+- 📈 **Temperature forecasts** for the next 2 days
 - 💧 **Water level** indicators
 - 🤸 **Wetsuit recommendations** based on conditions
 

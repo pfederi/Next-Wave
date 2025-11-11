@@ -1,5 +1,31 @@
 # NextWave App - Release History
 
+## [Unreleased]
+
+### Added
+- **Alplakes API Integration**: Integration der Alplakes API von Eawag für präzise Wassertemperaturen
+  - Wassertemperaturen für alle großen Schweizer Seen
+  - Temperatur-Vorhersagen für die nächsten 2 Tage (3-Stunden-Intervalle)
+  - Wissenschaftlich validierte Daten von der Eawag (Schweizer Gewässerforschungsinstitut)
+  - Automatische Updates alle 3 Stunden
+  - Unterstützt 15+ Schweizer Seen: Zürichsee, Vierwaldstättersee, Bodensee, Genfersee, Thunersee, Brienzersee, Lago Maggiore, Luganersee, Bielersee, Neuenburgersee, Murtensee, Zugersee, Walensee, Hallwilersee, Ägerisee
+
+- **Präzise Temperatur-Anzeige**: Wassertemperatur jetzt mit einer Dezimalstelle (z.B. 18.5°C)
+  - Genauere Temperaturwerte in allen Listen (Abfahrten, Favoriten, Nächste Station)
+  - Temperatur-Vorhersagen werden automatisch für zukünftige Tage verwendet
+  - **Zeitgenaue Temperatur**: Bei Abfahrten wird die Temperatur zur Abfahrtszeit angezeigt (nicht Tagesdurchschnitt)
+  - Share-Funktion enthält präzise Temperaturwerte
+
+### Changed
+- **Datenquellen Optimierung**: Intelligente Temperatur-Abfrage mit Fallback-Strategie
+  - **Primär**: Alplakes API (Eawag) für Temperatur + 2-Tage-Vorhersage
+  - **Fallback**: MeteoNews für Seen ohne Alplakes-Daten (ohne Vorhersage)
+  - Genauere Temperaturwerte durch hydrodynamische Modelle
+  - Maximale Abdeckung durch Fallback-Strategie
+  - Wasserstände weiterhin von MeteoNews (stabil und bewährt)
+
+---
+
 ## Version 3.4.4 (November 2025)
 
 ### Added

@@ -77,7 +77,8 @@ graph TB
         Weather["OpenWeather API<br/>(Weather data)"]
         Sun["Sunrise-Sunset.org<br/>(Sun times)"]
         Vercel["Custom Vercel API<br/>(Ship assignments)"]
-        Meteo["MeteoNews<br/>(Water temperature & levels)"]
+        Meteo["MeteoNews<br/>(Water levels)"]
+        Alplakes["Alplakes API (Eawag)<br/>(Water temperature & forecasts)"]
         OSM["OpenStreetMap<br/>(Map data)"]
     end
     
@@ -86,6 +87,7 @@ graph TB
     iOS --> Sun
     iOS --> Vercel
     iOS --> Meteo
+    iOS --> Alplakes
     iOS --> OSM
     
     Watch --> Transport
@@ -104,7 +106,8 @@ graph TB
 | OpenWeather API | REST API | Weather forecasts (temperature, wind, pressure) |
 | Sunrise-Sunset.org | REST API | Sunrise/sunset times |
 | Custom Vercel API | REST API | Ship assignments for Lake Zurich (web scraping) |
-| MeteoNews API | REST API | Water temperature & water levels |
+| Alplakes API (Eawag) | REST API | Water temperature & 2-day forecasts (scientific data) |
+| MeteoNews API | REST API | Water levels |
 | OpenStreetMap | Tile Server | Map rendering |
 
 **Outgoing Interfaces:**
@@ -182,6 +185,7 @@ graph TB
             LocationPickerView["LocationPickerView"]
             SettingsView["SettingsView"]
             WaveAnalyticsView["WaveAnalyticsView"]
+            TemperatureForecastView["TemperatureForecastView"]
         end
         
         subgraph ViewModels["ViewModels Layer"]
@@ -195,7 +199,8 @@ graph TB
             TransportAPI["TransportAPI<br/>(Schedule data)"]
             WeatherAPI["WeatherAPI<br/>(Weather data)"]
             VesselAPI["VesselAPI<br/>(Ship names)"]
-            WaterTempAPI["WaterTemperatureAPI<br/>(Water temperature)"]
+            MeteoNewsAPI["MeteoNewsAPI<br/>(Water levels & temp fallback)"]
+            AlplakesAPI["AlplakesAPI<br/>(Water temperature & forecasts)"]
         end
         
         subgraph Models["Models Layer"]

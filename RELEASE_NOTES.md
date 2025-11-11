@@ -20,10 +20,12 @@
   - Datenquellen-Attribution (Alplakes API - Eawag)
 
 ### Changed
-- **Datenquellen Optimierung**: Wassertemperaturen jetzt von Alplakes statt Meteonews
+- **Datenquellen Optimierung**: Intelligente Temperatur-Abfrage mit Fallback-Strategie
+  - **Primär**: Alplakes API (Eawag) für Temperatur + 2-Tage-Vorhersage
+  - **Fallback**: MeteoNews für Seen ohne Alplakes-Daten (ohne Vorhersage)
   - Genauere Temperaturwerte durch hydrodynamische Modelle
-  - Zusätzliche Vorhersage-Funktionalität
-  - Wasserstände weiterhin von Meteonews (stabil und bewährt)
+  - Maximale Abdeckung durch Fallback-Strategie
+  - Wasserstände weiterhin von MeteoNews (stabil und bewährt)
 
 ---
 

@@ -107,15 +107,18 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     func loadWaterTemperatures() async {
         print("🌊 Starting to load water data...")
         
-        // Load water levels from MeteoNews API
+        // Load water levels and temperature fallback from MeteoNews API
+        var meteoNewsData: [String: MeteoNewsAPI.LakeWaterLevel] = [:]
         do {
-            let waterLevels = try await WaterLevelAPI.shared.getWaterLevels()
-            print("🌊 [MeteoNews] Received \(waterLevels.count) lake water levels")
+            let waterLevels = try await MeteoNewsAPI.shared.getWaterLevels()
+            print("🌊 [MeteoNews] Received \(waterLevels.count) lake water levels and temperature fallbacks")
             
-            // Update lakes with water levels
+            // Store MeteoNews data for fallback and update water levels
             for i in 0..<lakes.count {
                 let lakeName = lakes[i].name
                 if let level = waterLevels.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
+                    meteoNewsData[lakeName] = level
+                    
                     var updatedLake = lakes[i]
                     updatedLake.waterLevel = level.waterLevel
                     lakes[i] = updatedLake
@@ -125,14 +128,17 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             print("⚠️ [MeteoNews] Failed to load water levels: \(error)")
         }
         
-        // Load temperature and forecasts from Alplakes
+        // Load temperature and forecasts from Alplakes (priority)
         do {
-            var updatedCount = 0
+            var alplakesCount = 0
+            var fallbackCount = 0
+            
             for i in 0..<lakes.count {
                 let lakeName = lakes[i].name
+                var updatedLake = lakes[i]
                 
+                // Try Alplakes first
                 if let data = try await AlplakesAPI.shared.getTemperature(for: lakeName) {
-                    var updatedLake = lakes[i]
                     updatedLake.waterTemperature = data.temperature
                     
                     // Convert forecast data to Lake.TemperatureForecast
@@ -142,15 +148,22 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                         }
                     }
                     
-                    lakes[i] = updatedLake
-                    updatedCount += 1
-                    
+                    alplakesCount += 1
                     let forecastInfo = data.forecast != nil ? " (+ \(data.forecast!.count) forecasts)" : ""
                     print("🌊 [Alplakes] Updated \(lakeName): \(data.temperature ?? 0)°C\(forecastInfo)")
+                    
+                } else if let meteoNews = meteoNewsData[lakeName], let temp = meteoNews.temperature {
+                    // Fallback to MeteoNews temperature (no forecast available)
+                    updatedLake.waterTemperature = temp
+                    updatedLake.temperatureForecast = nil
+                    fallbackCount += 1
+                    print("🌊 [MeteoNews Fallback] Updated \(lakeName): \(temp)°C (no forecast)")
                 }
+                
+                lakes[i] = updatedLake
             }
             
-            print("✅ [Alplakes] Updated \(updatedCount)/\(lakes.count) lakes with temperatures and forecasts")
+            print("✅ [Temperature] \(alplakesCount) from Alplakes (with forecast), \(fallbackCount) from MeteoNews (fallback)")
         } catch {
             print("⚠️ [Alplakes] Failed to load temperatures: \(error)")
             if let urlError = error as? URLError {

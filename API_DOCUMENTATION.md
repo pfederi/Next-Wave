@@ -85,23 +85,26 @@ If the API fails to fetch data, it returns:
 ```
 
 ### Usage in iOS App
-The iOS app uses the `WaterLevelAPI` class to fetch water levels (Wasserpegel):
+The iOS app uses the `MeteoNewsAPI` class to fetch water levels and temperature fallback:
 
 ```swift
-// Fetch all water levels
-let levels = try await WaterLevelAPI.shared.getWaterLevels()
+// Fetch all water levels and temperature data
+let data = try await MeteoNewsAPI.shared.getWaterLevels()
 
 // Get water level for a specific lake
-let level = try await WaterLevelAPI.shared.getWaterLevel(for: "Zürichsee")
+let level = try await MeteoNewsAPI.shared.getWaterLevel(for: "Zürichsee")
 
 // Preload data (called at app startup)
-await WaterLevelAPI.shared.preloadData()
+await MeteoNewsAPI.shared.preloadData()
 ```
 
 ### Data Source
-Water level data is sourced from [MeteoNews](https://meteonews.ch/de/Cms/D121/seen-in-der-schweiz).
+Water level and fallback temperature data is sourced from [MeteoNews](https://meteonews.ch/de/Cms/D121/seen-in-der-schweiz).
 
-**Note:** Water temperature is now provided by [Alplakes API (Eawag)](https://alplakes-api.eawag.ch/docs) instead of MeteoNews.
+**Temperature Strategy:**
+- **Primary:** [Alplakes API (Eawag)](https://alplakes-api.eawag.ch/docs) provides water temperature + 2-day forecasts for 27 lakes
+- **Fallback:** MeteoNews provides temperature for lakes not covered by Alplakes (no forecast available)
+- This ensures maximum coverage while prioritizing high-quality forecast data
 
 ---
 

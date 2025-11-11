@@ -13,6 +13,7 @@
 - **Präzise Temperatur-Anzeige**: Wassertemperatur jetzt mit einer Dezimalstelle (z.B. 18.5°C)
   - Genauere Temperaturwerte in allen Listen (Abfahrten, Favoriten, Nächste Station)
   - Temperatur-Vorhersagen werden automatisch für zukünftige Tage verwendet
+  - **Zeitgenaue Temperatur**: Bei Abfahrten wird die Temperatur zur Abfahrtszeit angezeigt (nicht Tagesdurchschnitt)
   - Share-Funktion enthält präzise Temperaturwerte
 
 ### Changed

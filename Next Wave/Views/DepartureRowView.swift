@@ -13,7 +13,7 @@ struct DepartureRowView: View {
     @State private var showShareSheet = false
     @State private var showWeatherLegend = false
     
-    // Helper: Gibt die richtige Wassertemperatur für das Datum der Wave zurück
+    // Helper: Gibt die richtige Wassertemperatur für das Datum und die Uhrzeit der Wave zurück
     private func getWaterTemperatureForWave(lake: Lake) -> Double? {
         let waveDate = wave.time
         let calendar = Calendar.current
@@ -23,24 +23,25 @@ struct DepartureRowView: View {
             return lake.waterTemperature
         }
         
-        // Für zukünftige Tage: NUR Vorhersage-Temperaturen verwenden
+        // Für zukünftige Tage: Vorhersage-Temperatur zur Abfahrtszeit verwenden
         guard let forecasts = lake.temperatureForecast, !forecasts.isEmpty else {
             return nil // Keine Vorhersage verfügbar
         }
         
-        let startOfDay = calendar.startOfDay(for: waveDate)
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        // Finde die Vorhersage, die der Abfahrtszeit am nächsten liegt
+        let closestForecast = forecasts.min(by: { forecast1, forecast2 in
+            let diff1 = abs(forecast1.time.timeIntervalSince(waveDate))
+            let diff2 = abs(forecast2.time.timeIntervalSince(waveDate))
+            return diff1 < diff2
+        })
         
-        let forecastsForDay = forecasts.filter { forecast in
-            forecast.time >= startOfDay && forecast.time < endOfDay
+        // Prüfe, ob die nächstliegende Vorhersage am selben Tag ist (max. 12h Differenz)
+        if let forecast = closestForecast,
+           abs(forecast.time.timeIntervalSince(waveDate)) < 12 * 3600 {
+            return forecast.temperature
         }
         
-        if !forecastsForDay.isEmpty {
-            let avgTemp = forecastsForDay.reduce(0.0) { $0 + $1.temperature } / Double(forecastsForDay.count)
-            return avgTemp
-        }
-        
-        return nil // Keine Vorhersage für diesen Tag verfügbar
+        return nil // Keine passende Vorhersage verfügbar
     }
     
     var body: some View {

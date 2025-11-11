@@ -105,30 +105,54 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func loadWaterTemperatures() async {
-        print("🌊 Starting to load water temperatures...")
+        print("🌊 [Alplakes] Starting to load water temperatures and forecasts...")
+        
+        // Load water levels from old API (MeteoNews)
         do {
             let temperatures = try await WaterTemperatureAPI.shared.getWaterTemperatures()
-            print("🌊 Received \(temperatures.count) lake temperatures from API")
+            print("🌊 [MeteoNews] Received \(temperatures.count) lake water levels")
             
-            // Update lakes with water temperatures
-            var updatedCount = 0
+            // Update lakes with water levels only
             for i in 0..<lakes.count {
                 let lakeName = lakes[i].name
                 if let temp = temperatures.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
                     var updatedLake = lakes[i]
-                    updatedLake.waterTemperature = temp.temperature
                     updatedLake.waterLevel = temp.waterLevel
                     lakes[i] = updatedLake
+                }
+            }
+        } catch {
+            print("⚠️ [MeteoNews] Failed to load water levels: \(error)")
+        }
+        
+        // Load temperature and forecasts from Alplakes
+        do {
+            var updatedCount = 0
+            for i in 0..<lakes.count {
+                let lakeName = lakes[i].name
+                
+                if let data = try await AlplakesAPI.shared.getTemperature(for: lakeName) {
+                    var updatedLake = lakes[i]
+                    updatedLake.waterTemperature = data.temperature
+                    
+                    // Convert forecast data to Lake.TemperatureForecast
+                    if let forecast = data.forecast {
+                        updatedLake.temperatureForecast = forecast.map { f in
+                            Lake.TemperatureForecast(time: f.time, temperature: f.temperature)
+                        }
+                    }
+                    
+                    lakes[i] = updatedLake
                     updatedCount += 1
-                    print("🌊 Updated \(lakeName): \(temp.temperature ?? 0)°C")
-                } else {
-                    print("🌊 No temperature found for \(lakeName)")
+                    
+                    let forecastInfo = data.forecast != nil ? " (+ \(data.forecast!.count) forecasts)" : ""
+                    print("🌊 [Alplakes] Updated \(lakeName): \(data.temperature ?? 0)°C\(forecastInfo)")
                 }
             }
             
-            print("✅ Updated \(updatedCount)/\(lakes.count) lakes with water temperatures")
+            print("✅ [Alplakes] Updated \(updatedCount)/\(lakes.count) lakes with temperatures and forecasts")
         } catch {
-            print("⚠️ Failed to load water temperatures: \(error)")
+            print("⚠️ [Alplakes] Failed to load temperatures: \(error)")
             if let urlError = error as? URLError {
                 print("⚠️ URLError code: \(urlError.code.rawValue)")
             }

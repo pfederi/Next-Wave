@@ -1,0 +1,86 @@
+{
+  "mapping": {
+    "Zürichsee": {
+      "alplakes_1d": "upperzurich",
+      "alplakes_3d": "zurich",
+      "coordinates": { "lat": 47.366, "lon": 8.55 }
+    },
+    "Vierwaldstättersee": {
+      "alplakes_1d": "lucernealpnachersee",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 47.053, "lon": 8.31 }
+    },
+    "Thunersee": {
+      "alplakes_1d": "thun",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 46.688, "lon": 7.69 }
+    },
+    "Brienzersee": {
+      "alplakes_1d": "brienz",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 46.735, "lon": 8.02 }
+    },
+    "Zugersee": {
+      "alplakes_1d": "zug",
+      "alplakes_3d": "zug",
+      "coordinates": { "lat": 47.17, "lon": 8.51 }
+    },
+    "Walensee": {
+      "alplakes_1d": "walensee",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 47.115, "lon": 9.22 }
+    },
+    "Bielersee": {
+      "alplakes_1d": "biel",
+      "alplakes_3d": "biel",
+      "coordinates": { "lat": 47.08, "lon": 7.14 }
+    },
+    "Neuenburgersee": {
+      "alplakes_1d": "neuchatel",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 46.99, "lon": 6.93 }
+    },
+    "Murtensee": {
+      "alplakes_1d": "murten",
+      "alplakes_3d": "murten",
+      "coordinates": { "lat": 46.93, "lon": 7.12 }
+    },
+    "Lac Léman": {
+      "alplakes_1d": "geneva",
+      "alplakes_3d": "geneva",
+      "coordinates": { "lat": 46.40, "lon": 6.50 }
+    },
+    "Lago Maggiore": {
+      "alplakes_1d": "maggiore",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 46.17, "lon": 8.80 }
+    },
+    "Lago di Lugano": {
+      "alplakes_1d": "upperlugano",
+      "alplakes_3d": "lugano",
+      "coordinates": { "lat": 46.00, "lon": 8.95 }
+    },
+    "Hallwilersee": {
+      "alplakes_1d": "hallwil",
+      "alplakes_3d": "hallwil",
+      "coordinates": { "lat": 47.28, "lon": 8.22 }
+    },
+    "Ägerisee": {
+      "alplakes_1d": "aegeri",
+      "alplakes_3d": "ageri",
+      "coordinates": { "lat": 47.13, "lon": 8.59 }
+    },
+    "Bodensee": {
+      "alplakes_1d": "upperconstance",
+      "alplakes_3d": null,
+      "coordinates": { "lat": 47.57, "lon": 9.38 }
+    }
+  },
+  "notes": {
+    "1d_models": "simstrat - better coverage, more lakes",
+    "3d_models": "delft3d-flow - only major lakes, but with spatial resolution",
+    "recommendation": "Use 1D models for temperature profiles and forecasts",
+    "api_base": "https://alplakes-api.eawag.ch"
+  }
+}
+

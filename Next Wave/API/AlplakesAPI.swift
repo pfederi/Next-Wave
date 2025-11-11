@@ -75,23 +75,31 @@ class AlplakesAPI {
     // MARK: - Lake Name Mapping
     
     /// Mappt Next Wave See-Namen auf Alplakes API Namen
-    private let lakeMapping: [String: String] = [
-        "Zürichsee": "upperzurich",
-        "Vierwaldstättersee": "lucernealpnachersee",
-        "Thunersee": "thun",
-        "Brienzersee": "brienz",
-        "Zugersee": "zug",
-        "Walensee": "walensee",
-        "Bielersee": "biel",
-        "Neuenburgersee": "neuchatel",
-        "Murtensee": "murten",
-        "Lac Léman": "geneva",
-        "Lago Maggiore": "maggiore",
-        "Lago di Lugano": "upperlugano",
-        "Hallwilersee": "hallwil",
-        "Ägerisee": "aegeri",
-        "Bodensee": "upperconstance"
-    ]
+    private lazy var lakeMapping: [String: String] = {
+        guard let url = Bundle.main.url(forResource: "alplakes-lake-mapping", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let mapping = try? JSONDecoder().decode([String: String].self, from: data) else {
+            print("⚠️ [Alplakes] Failed to load lake mapping, using fallback")
+            return [
+                "Zürichsee": "upperzurich",
+                "Vierwaldstättersee": "lucernealpnachersee",
+                "Thunersee": "thun",
+                "Brienzersee": "brienz",
+                "Zugersee": "zug",
+                "Walensee": "walensee",
+                "Bielersee": "biel",
+                "Neuenburgersee": "neuchatel",
+                "Murtensee": "murten",
+                "Genfersee": "geneva",
+                "Lago Maggiore": "maggiore",
+                "Luganersee": "upperlugano",
+                "Hallwilersee": "hallwil",
+                "Ägerisee": "aegeri",
+                "Bodensee": "upperconstance"
+            ]
+        }
+        return mapping
+    }()
     
     // MARK: - Public Methods
     

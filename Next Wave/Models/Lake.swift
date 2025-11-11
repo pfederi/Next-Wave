@@ -25,6 +25,16 @@ struct Lake: Codable, Identifiable, Hashable {
     
     var id: String { name }
     
+    // Custom initializer for testing and previews
+    init(name: String, operators: [String], stations: [Station], waterTemperature: Double? = nil, waterLevel: String? = nil, temperatureForecast: [TemperatureForecast]? = nil) {
+        self.name = name
+        self.operators = operators
+        self._stations = stations
+        self.waterTemperature = waterTemperature
+        self.waterLevel = waterLevel
+        self.temperatureForecast = temperatureForecast
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name
         case operators

@@ -273,7 +273,7 @@ struct TemperatureForecastView_Previews: PreviewProvider {
         let sampleLake = Lake(
             name: "Zürichsee",
             operators: ["ZSG"],
-            _stations: [],
+            stations: [],
             waterTemperature: 18.5,
             waterLevel: "405.96 m.ü.M.",
             temperatureForecast: sampleForecasts

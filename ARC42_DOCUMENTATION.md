@@ -199,7 +199,7 @@ graph TB
             TransportAPI["TransportAPI<br/>(Schedule data)"]
             WeatherAPI["WeatherAPI<br/>(Weather data)"]
             VesselAPI["VesselAPI<br/>(Ship names)"]
-            WaterTempAPI["WaterTemperatureAPI<br/>(Water levels)"]
+            WaterLevelAPI["WaterLevelAPI<br/>(Water levels)"]
             AlplakesAPI["AlplakesAPI<br/>(Water temperature & forecasts)"]
         end
         

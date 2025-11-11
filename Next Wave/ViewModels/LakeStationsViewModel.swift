@@ -105,19 +105,19 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func loadWaterTemperatures() async {
-        print("🌊 [Alplakes] Starting to load water temperatures and forecasts...")
+        print("🌊 Starting to load water data...")
         
-        // Load water levels from old API (MeteoNews)
+        // Load water levels from MeteoNews API
         do {
-            let temperatures = try await WaterTemperatureAPI.shared.getWaterTemperatures()
-            print("🌊 [MeteoNews] Received \(temperatures.count) lake water levels")
+            let waterLevels = try await WaterLevelAPI.shared.getWaterLevels()
+            print("🌊 [MeteoNews] Received \(waterLevels.count) lake water levels")
             
-            // Update lakes with water levels only
+            // Update lakes with water levels
             for i in 0..<lakes.count {
                 let lakeName = lakes[i].name
-                if let temp = temperatures.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
+                if let level = waterLevels.first(where: { $0.name.lowercased() == lakeName.lowercased() }) {
                     var updatedLake = lakes[i]
-                    updatedLake.waterLevel = temp.waterLevel
+                    updatedLake.waterLevel = level.waterLevel
                     lakes[i] = updatedLake
                 }
             }

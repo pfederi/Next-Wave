@@ -1,12 +1,14 @@
 # Next Wave API Documentation
 
-## Water Temperature API
+## Water Level API (MeteoNews)
 
 ### Endpoint
-`GET /api/water-temperature`
+`GET /api/water-temperature` *(legacy endpoint name, now returns water levels only)*
 
 ### Description
-Scrapes water temperature data from meteonews.ch for Swiss lakes once per day and caches the results.
+Scrapes water level (Wasserpegel) data from meteonews.ch for Swiss lakes once per day and caches the results. 
+
+**Note:** Water temperature is now provided by the separate Alplakes API (Eawag). This endpoint only returns water levels.
 
 ### Response Format
 ```json
@@ -83,21 +85,23 @@ If the API fails to fetch data, it returns:
 ```
 
 ### Usage in iOS App
-The iOS app uses the `WaterTemperatureAPI` class to fetch water temperatures:
+The iOS app uses the `WaterLevelAPI` class to fetch water levels (Wasserpegel):
 
 ```swift
-// Fetch all water temperatures
-let temperatures = try await WaterTemperatureAPI.shared.getWaterTemperatures()
+// Fetch all water levels
+let levels = try await WaterLevelAPI.shared.getWaterLevels()
 
-// Get temperature for a specific lake
-let temp = try await WaterTemperatureAPI.shared.getTemperature(for: "Zürichsee")
+// Get water level for a specific lake
+let level = try await WaterLevelAPI.shared.getWaterLevel(for: "Zürichsee")
 
 // Preload data (called at app startup)
-await WaterTemperatureAPI.shared.preloadData()
+await WaterLevelAPI.shared.preloadData()
 ```
 
 ### Data Source
-Water temperature data is sourced from [MeteoNews](https://meteonews.ch/de/Cms/D121/seen-in-der-schweiz).
+Water level data is sourced from [MeteoNews](https://meteonews.ch/de/Cms/D121/seen-in-der-schweiz).
+
+**Note:** Water temperature is now provided by [Alplakes API (Eawag)](https://alplakes-api.eawag.ch/docs) instead of MeteoNews.
 
 ---
 

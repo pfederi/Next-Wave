@@ -173,7 +173,7 @@ struct NextWaveApp: App {
                     await AlplakesAPI.shared.preloadData()
                     
                     // Preload water levels from MeteoNews
-                    await WaterTemperatureAPI.shared.preloadData()
+                    await WaterLevelAPI.shared.preloadData()
                     
                     // Then preload vessel data
                     await VesselAPI.shared.preloadData()

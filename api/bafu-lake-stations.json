@@ -1,0 +1,163 @@
+{
+  "source": "BAFU GeoAdmin API",
+  "api_url": "https://data.geo.admin.ch/ch.bafu.hydroweb-messstationen_zustand/ch.bafu.hydroweb-messstationen_zustand_de.json",
+  "update_interval": "5 minutes (300000ms)",
+  "last_updated": "2025-11-11",
+  "notes": "Station IDs from official BAFU GeoAdmin API. Use these IDs to query hydrodaten.admin.ch",
+  "lakes": [
+    {
+      "name": "Zürichsee",
+      "stations": [
+        { "id": "2014", "location": "Schmerikon", "url": "https://www.hydrodaten.admin.ch/de/2014.html" },
+        { "id": "2209", "location": "Zürich", "url": "https://www.hydrodaten.admin.ch/de/2209.html" }
+      ]
+    },
+    {
+      "name": "Vierwaldstättersee",
+      "stations": [
+        { "id": "2025", "location": "Brunnen", "url": "https://www.hydrodaten.admin.ch/de/2025.html" },
+        { "id": "2207", "location": "Luzern", "url": "https://www.hydrodaten.admin.ch/de/2207.html" }
+      ]
+    },
+    {
+      "name": "Bodensee",
+      "stations": [
+        { "id": "2032", "location": "Obersee - Romanshorn", "url": "https://www.hydrodaten.admin.ch/de/2032.html" },
+        { "id": "2043", "location": "Untersee - Berlingen", "url": "https://www.hydrodaten.admin.ch/de/2043.html" }
+      ]
+    },
+    {
+      "name": "Genfersee",
+      "stations": [
+        { "id": "2027", "location": "St-Prex", "url": "https://www.hydrodaten.admin.ch/de/2027.html" },
+        { "id": "2028", "location": "Genève, Sécheron", "url": "https://www.hydrodaten.admin.ch/de/2028.html" }
+      ]
+    },
+    {
+      "name": "Thunersee",
+      "stations": [
+        { "id": "2093", "location": "Spiez", "url": "https://www.hydrodaten.admin.ch/de/2093.html" }
+      ]
+    },
+    {
+      "name": "Brienzersee",
+      "stations": [
+        { "id": "2023", "location": "Ringgenberg", "url": "https://www.hydrodaten.admin.ch/de/2023.html" }
+      ]
+    },
+    {
+      "name": "Lago Maggiore",
+      "stations": [
+        { "id": "2022", "location": "Locarno", "url": "https://www.hydrodaten.admin.ch/de/2022.html" },
+        { "id": "2074", "location": "Brissago", "url": "https://www.hydrodaten.admin.ch/de/2074.html" }
+      ]
+    },
+    {
+      "name": "Luganersee",
+      "stations": [
+        { "id": "2021", "location": "Ponte Tresa", "url": "https://www.hydrodaten.admin.ch/de/2021.html" },
+        { "id": "2101", "location": "Melide, Ferrera", "url": "https://www.hydrodaten.admin.ch/de/2101.html" }
+      ]
+    },
+    {
+      "name": "Bielersee",
+      "stations": [
+        { "id": "2208", "location": "Ligerz, Klein Twann", "url": "https://www.hydrodaten.admin.ch/de/2208.html" }
+      ]
+    },
+    {
+      "name": "Neuenburgersee",
+      "stations": [
+        { "id": "2154", "location": "Grandson", "url": "https://www.hydrodaten.admin.ch/de/2154.html" },
+        { "id": "2642", "location": "Neuchâtel, Nid-du-Crô", "url": "https://www.hydrodaten.admin.ch/de/2642.html" }
+      ]
+    },
+    {
+      "name": "Murtensee",
+      "stations": [
+        { "id": "2004", "location": "Murten", "url": "https://www.hydrodaten.admin.ch/de/2004.html" }
+      ]
+    },
+    {
+      "name": "Zugersee",
+      "stations": [
+        { "id": "2017", "location": "Zug", "url": "https://www.hydrodaten.admin.ch/de/2017.html" }
+      ]
+    },
+    {
+      "name": "Walensee",
+      "stations": [
+        { "id": "2118", "location": "Murg", "url": "https://www.hydrodaten.admin.ch/de/2118.html" }
+      ]
+    },
+    {
+      "name": "Hallwilersee",
+      "stations": [
+        { "id": "2097", "location": "Meisterschwanden", "url": "https://www.hydrodaten.admin.ch/de/2097.html" }
+      ]
+    },
+    {
+      "name": "Ägerisee",
+      "stations": [
+        { "id": "2031", "location": "Unterägeri", "url": "https://www.hydrodaten.admin.ch/de/2031.html" }
+      ]
+    },
+    {
+      "name": "Sempachersee",
+      "stations": [
+        { "id": "2168", "location": "Sempach", "url": "https://www.hydrodaten.admin.ch/de/2168.html" }
+      ]
+    },
+    {
+      "name": "Baldeggersee",
+      "stations": [
+        { "id": "2137", "location": "Gelfingen", "url": "https://www.hydrodaten.admin.ch/de/2137.html" }
+      ]
+    },
+    {
+      "name": "Sarnersee",
+      "stations": [
+        { "id": "2088", "location": "Sarnen", "url": "https://www.hydrodaten.admin.ch/de/2088.html" }
+      ]
+    },
+    {
+      "name": "Lauerzersee",
+      "stations": [
+        { "id": "2484", "location": "Lauerz, Chlostermatt", "url": "https://www.hydrodaten.admin.ch/de/2484.html" }
+      ]
+    }
+  ],
+  "additional_lakes": [
+    {
+      "name": "Lac de Joux",
+      "stations": [
+        { "id": "2007", "location": "Le Pont", "url": "https://www.hydrodaten.admin.ch/de/2007.html" }
+      ]
+    },
+    {
+      "name": "Lac des Brenets",
+      "stations": [
+        { "id": "2057", "location": "Les Brenets", "url": "https://www.hydrodaten.admin.ch/de/2057.html" }
+      ]
+    },
+    {
+      "name": "St. Moritzersee",
+      "stations": [
+        { "id": "2066", "location": "St. Moritz", "url": "https://www.hydrodaten.admin.ch/de/2066.html" }
+      ]
+    },
+    {
+      "name": "Silsersee",
+      "stations": [
+        { "id": "2072", "location": "Sils Baselgia", "url": "https://www.hydrodaten.admin.ch/de/2072.html" }
+      ]
+    },
+    {
+      "name": "Silvaplanersee",
+      "stations": [
+        { "id": "2073", "location": "Silvaplana", "url": "https://www.hydrodaten.admin.ch/de/2073.html" }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,125 @@
+{
+  "source": "BAFU GeoAdmin API - Vorhersagen",
+  "api_url": "https://data.geo.admin.ch/ch.bafu.hydroweb-messstationen_vorhersage/ch.bafu.hydroweb-messstationen_vorhersage_de.json",
+  "last_updated": "2025-11-10T17:05:01Z",
+  "notes": "Vorhersage-Klassifizierung für Wasserstände. Wird täglich aktualisiert.",
+  "forecast_classes": {
+    "0": "Keine Vorhersage oder normal",
+    "1": "Vorhersage verfügbar"
+  },
+  "lakes_with_forecast": [
+    {
+      "name": "Zürichsee",
+      "station_id": "2209",
+      "location": "Zürich",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2209.html"
+    },
+    {
+      "name": "Vierwaldstättersee",
+      "station_id": "2207",
+      "location": "Luzern",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2207.html"
+    },
+    {
+      "name": "Bodensee (Obersee)",
+      "station_id": "2032",
+      "location": "Romanshorn",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2032.html"
+    },
+    {
+      "name": "Bodensee (Untersee)",
+      "station_id": "2043",
+      "location": "Berlingen",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2043.html"
+    },
+    {
+      "name": "Genfersee",
+      "station_id": "2027",
+      "location": "St-Prex",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2027.html"
+    },
+    {
+      "name": "Thunersee",
+      "station_id": "2093",
+      "location": "Spiez, Kraftwerk BKW",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2093.html"
+    },
+    {
+      "name": "Brienzersee",
+      "station_id": "2023",
+      "location": "Ringgenberg",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2023.html"
+    },
+    {
+      "name": "Lago Maggiore",
+      "station_id": "2022",
+      "location": "Locarno",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2022.html"
+    },
+    {
+      "name": "Luganersee",
+      "station_id": "2101",
+      "location": "Melide, Ferrera",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2101.html"
+    },
+    {
+      "name": "Bielersee",
+      "station_id": "2208",
+      "location": "Ligerz, Klein Twann",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2208.html"
+    },
+    {
+      "name": "Neuenburgersee",
+      "station_id": "2642",
+      "location": "Neuchâtel, Nid-du-Crô",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2642.html"
+    },
+    {
+      "name": "Murtensee",
+      "station_id": "2004",
+      "location": "Murten",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2004.html"
+    },
+    {
+      "name": "Walensee",
+      "station_id": "2118",
+      "location": "Murg",
+      "param": "Pegel",
+      "forecast_class": 1,
+      "url": "https://www.hydrodaten.admin.ch/de/2118.html"
+    }
+  ],
+  "coverage": {
+    "total_next_wave_lakes": 15,
+    "with_forecast": 13,
+    "missing_forecast": [
+      "Zugersee",
+      "Hallwilersee"
+    ]
+  }
+}
+

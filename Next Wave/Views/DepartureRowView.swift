@@ -23,9 +23,9 @@ struct DepartureRowView: View {
             return lake.waterTemperature
         }
         
-        // Für zukünftige Tage: Durchschnitt der Vorhersage-Temperaturen für diesen Tag
+        // Für zukünftige Tage: NUR Vorhersage-Temperaturen verwenden
         guard let forecasts = lake.temperatureForecast, !forecasts.isEmpty else {
-            return lake.waterTemperature // Fallback auf aktuelle Temperatur
+            return nil // Keine Vorhersage verfügbar
         }
         
         let startOfDay = calendar.startOfDay(for: waveDate)
@@ -40,7 +40,7 @@ struct DepartureRowView: View {
             return avgTemp
         }
         
-        return lake.waterTemperature // Fallback
+        return nil // Keine Vorhersage für diesen Tag verfügbar
     }
     
     var body: some View {

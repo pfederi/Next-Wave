@@ -176,7 +176,7 @@ struct DepartureRowView: View {
                                 .foregroundColor(.gray)
                                 .font(.system(size: 11))
                             
-                            // Wassertemperatur
+                            // Wassertemperatur & Neoprenanzug-Dicke (nur wenn Wassertemp verfügbar)
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
@@ -204,7 +204,7 @@ struct DepartureRowView: View {
                                 .font(.system(size: 11))
                                 .foregroundColor(.primary)
                             
-                            // Neoprenanzug-Dicke
+                            // Neoprenanzug-Dicke (nur wenn Wassertemperatur verfügbar)
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })

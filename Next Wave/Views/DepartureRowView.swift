@@ -13,6 +13,36 @@ struct DepartureRowView: View {
     @State private var showShareSheet = false
     @State private var showWeatherLegend = false
     
+    // Helper: Gibt die richtige Wassertemperatur für das Datum der Wave zurück
+    private func getWaterTemperatureForWave(lake: Lake) -> Double? {
+        let waveDate = wave.time
+        let calendar = Calendar.current
+        
+        // Für heute: Aktuelle Temperatur verwenden
+        if calendar.isDateInToday(waveDate) {
+            return lake.waterTemperature
+        }
+        
+        // Für zukünftige Tage: Durchschnitt der Vorhersage-Temperaturen für diesen Tag
+        guard let forecasts = lake.temperatureForecast, !forecasts.isEmpty else {
+            return lake.waterTemperature // Fallback auf aktuelle Temperatur
+        }
+        
+        let startOfDay = calendar.startOfDay(for: waveDate)
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        
+        let forecastsForDay = forecasts.filter { forecast in
+            forecast.time >= startOfDay && forecast.time < endOfDay
+        }
+        
+        if !forecastsForDay.isEmpty {
+            let avgTemp = forecastsForDay.reduce(0.0) { $0 + $1.temperature } / Double(forecastsForDay.count)
+            return avgTemp
+        }
+        
+        return lake.waterTemperature // Fallback
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline) {
@@ -150,7 +180,7 @@ struct DepartureRowView: View {
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterTemp = lake.waterTemperature {
+                               }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
                                 
                                 Image(systemName: "drop.fill")
                                     .font(.system(size: 11))
@@ -178,7 +208,7 @@ struct DepartureRowView: View {
                             if let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })
-                               }), let waterTemp = lake.waterTemperature,
+                               }), let waterTemp = getWaterTemperatureForWave(lake: lake),
                                let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
                                 
                                 Text("|")
@@ -374,7 +404,7 @@ struct DepartureRowView: View {
         if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = lake.waterTemperature {
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
             text += "💧 Water Temperature: \(String(format: "%.0f°C", waterTemp))\n"
         }
         
@@ -387,7 +417,7 @@ struct DepartureRowView: View {
         if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = lake.waterTemperature,
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake),
            let weather = wave.weather,
            let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
             text += "🤸 Wetsuit: \(thickness)mm\n"

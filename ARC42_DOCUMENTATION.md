@@ -185,6 +185,7 @@ graph TB
             LocationPickerView["LocationPickerView"]
             SettingsView["SettingsView"]
             WaveAnalyticsView["WaveAnalyticsView"]
+            TemperatureForecastView["TemperatureForecastView"]
         end
         
         subgraph ViewModels["ViewModels Layer"]
@@ -198,7 +199,8 @@ graph TB
             TransportAPI["TransportAPI<br/>(Schedule data)"]
             WeatherAPI["WeatherAPI<br/>(Weather data)"]
             VesselAPI["VesselAPI<br/>(Ship names)"]
-            WaterTempAPI["WaterTemperatureAPI<br/>(Water temperature)"]
+            WaterTempAPI["WaterTemperatureAPI<br/>(Water levels)"]
+            AlplakesAPI["AlplakesAPI<br/>(Water temperature & forecasts)"]
         end
         
         subgraph Models["Models Layer"]

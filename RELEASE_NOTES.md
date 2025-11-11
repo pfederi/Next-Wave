@@ -10,6 +10,15 @@
   - Automatische Updates alle 3 Stunden
   - Unterstützt 15+ Schweizer Seen: Zürichsee, Vierwaldstättersee, Bodensee, Genfersee, Thunersee, Brienzersee, Lago Maggiore, Luganersee, Bielersee, Neuenburgersee, Murtensee, Zugersee, Walensee, Hallwilersee, Ägerisee
 
+- **Temperatur-Vorhersage UI**: Neue Ansicht für detaillierte Wassertemperatur-Vorhersagen
+  - Thermometer-Button in der Abfahrts-Ansicht (oben rechts) öffnet Vorhersage-Details
+  - Aktuelle Wassertemperatur mit großer, übersichtlicher Anzeige
+  - 2-Tages-Vorhersage mit stündlichen Werten (alle 3 Stunden)
+  - Gruppierung nach Tagen mit Min/Max-Temperaturen
+  - Farbcodierte Temperatur-Anzeige (blau=kalt, grün=angenehm, rot=warm)
+  - Horizontal scrollbare Ansicht für stündliche Vorhersagen
+  - Datenquellen-Attribution (Alplakes API - Eawag)
+
 ### Changed
 - **Datenquellen Optimierung**: Wassertemperaturen jetzt von Alplakes statt Meteonews
   - Genauere Temperaturwerte durch hydrodynamische Modelle

@@ -15,7 +15,6 @@ struct DeparturesListView: View {
     @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
     @State private var hasTomorrowDepartures: Bool = true
     @State private var lastScrolledDate: Date?
-    @State private var showingTemperatureForecast = false
     
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
@@ -135,18 +134,6 @@ struct DeparturesListView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack {
-                    // Temperature Forecast Button
-                    if let station = selectedStation,
-                       let lake = viewModel.lakes.first(where: { $0.stations.contains(where: { $0.id == station.id }) }),
-                       lake.waterTemperature != nil {
-                        Button(action: {
-                            showingTemperatureForecast = true
-                        }) {
-                            Image(systemName: "thermometer.medium")
-                                .foregroundColor(.accentColor)
-                        }
-                    }
-                    
                     if let station = selectedStation {
                         Button(action: {
                             if favoritesManager.isFavorite(station) {
@@ -178,12 +165,6 @@ struct DeparturesListView: View {
                         }
                     }
                 }
-            }
-        }
-        .sheet(isPresented: $showingTemperatureForecast) {
-            if let station = selectedStation,
-               let lake = viewModel.lakes.first(where: { $0.stations.contains(where: { $0.id == station.id }) }) {
-                TemperatureForecastView(lake: lake)
             }
         }
         .alert("Maximum Favorites Reached", isPresented: $showingMaxFavoritesAlert) {

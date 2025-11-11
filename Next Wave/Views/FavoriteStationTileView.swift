@@ -145,7 +145,7 @@ struct FavoriteStationTileView: View, Equatable {
                                     .font(.system(size: 11))
                                     .foregroundColor(Color("text-color"))
                                 
-                                Text(String(format: "%.0f°", waterTemp))
+                                Text(String(format: "%.1f°", waterTemp))
                                     .font(.system(size: 11))
                                     .foregroundColor(Color("text-color"))
                                 

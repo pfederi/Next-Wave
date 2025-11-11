@@ -186,7 +186,7 @@ struct DepartureRowView: View {
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
-                                Text(String(format: "%.0f°", waterTemp))
+                                Text(String(format: "%.1f°", waterTemp))
                                     .font(.system(size: 11))
                                     .foregroundColor(.primary)
                                 
@@ -405,7 +405,7 @@ struct DepartureRowView: View {
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
            }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
-            text += "💧 Water Temperature: \(String(format: "%.0f°C", waterTemp))\n"
+            text += "💧 Water Temperature: \(String(format: "%.1f°C", waterTemp))\n"
         }
         
         // 3. Wind

@@ -3,26 +3,38 @@
 ## [Unreleased]
 
 ### Added
-- **Alplakes API Integration**: Integration der Alplakes API von Eawag für präzise Wassertemperaturen
-  - Wassertemperaturen für alle großen Schweizer Seen
-  - Temperatur-Vorhersagen für die nächsten 2 Tage (3-Stunden-Intervalle)
-  - Wissenschaftlich validierte Daten von der Eawag (Schweizer Gewässerforschungsinstitut)
-  - Automatische Updates alle 3 Stunden
-  - Unterstützt 15+ Schweizer Seen: Zürichsee, Vierwaldstättersee, Bodensee, Genfersee, Thunersee, Brienzersee, Lago Maggiore, Luganersee, Bielersee, Neuenburgersee, Murtensee, Zugersee, Walensee, Hallwilersee, Ägerisee
-
-- **Präzise Temperatur-Anzeige**: Wassertemperatur jetzt mit einer Dezimalstelle (z.B. 18.5°C)
-  - Genauere Temperaturwerte in allen Listen (Abfahrten, Favoriten, Nächste Station)
-  - Temperatur-Vorhersagen werden automatisch für zukünftige Tage verwendet
-  - **Zeitgenaue Temperatur**: Bei Abfahrten wird die Temperatur zur Abfahrtszeit angezeigt (nicht Tagesdurchschnitt)
-  - Share-Funktion enthält präzise Temperaturwerte
 
 ### Changed
-- **Datenquellen Optimierung**: Intelligente Temperatur-Abfrage mit Fallback-Strategie
-  - **Primär**: Alplakes API (Eawag) für Temperatur + 2-Tage-Vorhersage
-  - **Fallback**: MeteoNews für Seen ohne Alplakes-Daten (ohne Vorhersage)
-  - Genauere Temperaturwerte durch hydrodynamische Modelle
-  - Maximale Abdeckung durch Fallback-Strategie
-  - Wasserstände weiterhin von MeteoNews (stabil und bewährt)
+
+### Fixed
+
+### Removed
+
+---
+
+## Version 3.5.0 (November 19, 2025)
+
+### Added
+- **Alplakes API Integration**: Integration of Eawag's Alplakes API for precise water temperatures
+  - Water temperatures for all major Swiss lakes
+  - Temperature forecasts for the next 2 days (3-hour intervals)
+  - Scientifically validated data from Eawag (Swiss Federal Institute of Aquatic Science and Technology)
+  - Automatic updates every 3 hours
+  - Supports 15+ Swiss lakes: Lake Zurich, Lake Lucerne, Lake Constance, Lake Geneva, Lake Thun, Lake Brienz, Lake Maggiore, Lake Lugano, Lake Biel, Lake Neuchâtel, Lake Murten, Lake Zug, Lake Walen, Lake Hallwil, Lake Aegeri
+
+- **Precise Temperature Display**: Water temperature now with one decimal place (e.g. 18.5°C)
+  - More accurate temperature values in all lists (departures, favorites, nearest station)
+  - Temperature forecasts automatically used for future days
+  - **Time-specific temperature**: For departures, temperature is shown for the exact departure time (not daily average)
+  - Share function includes precise temperature values
+
+### Changed
+- **Data Source Optimization**: Intelligent temperature queries with fallback strategy
+  - **Primary**: Alplakes API (Eawag) for temperature + 2-day forecast
+  - **Fallback**: MeteoNews for lakes without Alplakes data (without forecast)
+  - More accurate temperature values through hydrodynamic models
+  - Maximum coverage through fallback strategy
+  - Water levels still from MeteoNews (stable and proven)
 
 ---
 

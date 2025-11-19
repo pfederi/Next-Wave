@@ -1,17 +1,5 @@
 # NextWave App - Release History
 
-## [Unreleased]
-
-### Added
-
-### Changed
-
-### Fixed
-
-### Removed
-
----
-
 ## Version 3.5.0 (November 19, 2025)
 
 ### Added

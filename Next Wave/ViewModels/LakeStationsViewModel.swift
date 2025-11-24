@@ -8,7 +8,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var selectedStation: Lake.Station? {
         didSet {
             if selectedStation?.id != oldValue?.id {
-                hasAttemptedLoad = false
+                // Don't reset hasAttemptedLoad here - it's managed in selectStation()
                 scrolledToNext = false
             }
         }
@@ -183,16 +183,21 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     func refreshDepartures() async {
         guard let station = selectedStation,
-              let uicRef = station.uic_ref else { return }
+              let uicRef = station.uic_ref else { 
+            print("⚠️ [ViewModel] refreshDepartures: No station or uic_ref")
+            return 
+        }
         
+        print("🔄 [ViewModel] Starting refresh for station: \(station.name), date: \(selectedDate)")
         isLoading = true
         error = nil
         
         let cacheKey = getCacheKey(for: station, date: selectedDate)
+        
+        // Check cache for today's data
         if Calendar.current.isDateInToday(selectedDate),
            let cachedDepartures = departuresCache[cacheKey] {
-            self.departures = []
-            try? await Task.sleep(nanoseconds: 100_000_000)
+            print("✅ [ViewModel] Using cached departures (\(cachedDepartures.count) items)")
             self.departures = cachedDepartures
             self.isLoading = false
             self.isInitialLoad = false
@@ -200,27 +205,35 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             return
         }
         
+        // Fetch fresh data
         do {
+            print("🌐 [ViewModel] Fetching fresh departures from API...")
             let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
+            
+            // Small delay only for non-initial loads to avoid jarring UI updates
             if !isInitialLoad {
                 try? await Task.sleep(nanoseconds: 250_000_000)
             }
             
+            // Cache today's data
             if Calendar.current.isDateInToday(selectedDate) {
                 departuresCache[cacheKey] = journeys
             }
             
+            print("✅ [ViewModel] Successfully loaded \(journeys.count) departures")
             self.departures = journeys
             self.isLoading = false
             self.isInitialLoad = false
             self.hasAttemptedLoad = true
             self.error = nil
         } catch let apiError as TransportAPI.APIError {
+            print("❌ [ViewModel] API Error: \(apiError.userMessage)")
             self.error = apiError.userMessage
             self.departures = []
             self.isLoading = false
             self.hasAttemptedLoad = true
         } catch {
+            print("❌ [ViewModel] Unexpected error: \(error)")
             self.error = "Ein unerwarteter Fehler ist aufgetreten"
             self.departures = []
             self.isLoading = false
@@ -238,11 +251,23 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func selectStation(_ station: Lake.Station) {
+        print("🎯 [ViewModel] Selecting station: \(station.name)")
+        
+        // IMPORTANT: Set loading state FIRST to prevent empty screen flicker
+        self.isLoading = true
+        self.error = nil
+        self.hasAttemptedLoad = false
+        
+        // Then update the selected station
         self.selectedStation = station
+        
+        // Clear old data
         self.departures = []
+        
         if let scheduleViewModel {
             scheduleViewModel.nextWaves = []
         }
+        
         Task {
             await refreshDepartures()
         }

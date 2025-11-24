@@ -31,8 +31,11 @@ struct DeparturesListView: View {
                 )
             } else {
                 if viewModel.isLoading {
+                    let _ = print("🔄 [UI] Showing loader (isLoading=true)")
                     LoaderView()
                 } else if let error = viewModel.error {
+                    let _ = print("❌ [UI] Showing error: \(error)")
+
                     VStack {
                         Spacer()
                         Text(error)
@@ -42,6 +45,7 @@ struct DeparturesListView: View {
                         Spacer()
                     }
                 } else if !departures.isEmpty {
+                    let _ = print("✅ [UI] Showing departures list (\(departures.count) items)")
                     VStack(spacing: 0) {
                         // Fixed filter indicator at the top
                         if scheduleViewModel.albisClassFilterActive {
@@ -111,6 +115,7 @@ struct DeparturesListView: View {
                         }
                     }
                 } else if viewModel.hasAttemptedLoad {
+                    let _ = print("ℹ️ [UI] Showing 'no service' message (hasAttemptedLoad=true, departures=empty)")
                     VStack {
                         Spacer()
                         Text(noServiceMessage)
@@ -122,6 +127,14 @@ struct DeparturesListView: View {
                         if let station = selectedStation {
                             hasTomorrowDepartures = await viewModel.hasDeparturesTomorrow(for: station.id)
                         }
+                    }
+                } else {
+                    let _ = print("⚠️ [UI] Unexpected state: isLoading=\(viewModel.isLoading), hasAttemptedLoad=\(viewModel.hasAttemptedLoad), departures.count=\(departures.count), error=\(viewModel.error ?? "nil")")
+                    VStack {
+                        Spacer()
+                        Text("Loading...")
+                            .foregroundColor(.secondary)
+                        Spacer()
                     }
                 }
             }

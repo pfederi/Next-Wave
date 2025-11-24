@@ -1,5 +1,24 @@
 # NextWave App - Release History
 
+## Version 3.5.1 (November 24, 2025)
+
+### Fixed
+- **Improved Station Loading**: Eliminated screen flicker when switching between stations
+  - Loading state now appears instantly before data clearing
+  - Smoother transitions with optimized state management
+  - Fixed race condition in cached data handling
+  - Removed unnecessary delays for cached departures
+- **Enhanced Debugging**: Added comprehensive logging for better troubleshooting
+  - View model state tracking (station selection, API calls, cache hits)
+  - UI state visibility tracking (loading, errors, data display)
+  - Better error messages and state information
+
+### Changed
+- **Optimized Cache Performance**: Cache hits now display instantly without artificial delays
+- **Better Error Handling**: More informative error states and fallback UI
+
+---
+
 ## Version 3.5.0 (November 19, 2025)
 
 ### Added

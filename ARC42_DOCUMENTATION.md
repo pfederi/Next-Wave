@@ -917,14 +917,8 @@ graph TB
 **HTTP Caching**:
 - All API requests use `URLRequest.cachePolicy = .returnCacheDataElseLoad`
 - iOS respects server cache headers (e.g., `Cache-Control`, `ETag`)
-- Significantly improves performance for repeated requests (10-20x faster)
+- Significantly improves performance for repeated requests
 - Reduces server load and network traffic
-
-**Background Cache Warm-Up**:
-- Morning task (6:00 AM) preloads favorite stations
-- iOS wakes app in background to warm up caches
-- Ensures instant data availability when user opens app
-- Reduces first-load latency from 5-10s to < 0.1s
 
 **Note**: Ship Names cache can be manually cleared via Settings > Data Management > Clear Ship Data Cache
 

@@ -6,7 +6,6 @@
 	<array>
 		<string>com.nextwave.midnight</string>
 		<string>com.nextwave.widget-refresh</string>
-		<string>com.nextwave.morning-warmup</string>
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>NextWave</string>

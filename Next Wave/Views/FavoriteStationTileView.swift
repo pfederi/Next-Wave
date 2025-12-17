@@ -278,7 +278,7 @@ struct FavoriteStationTileView: View, Equatable {
                     }
                 } else {
                     // Background loading not in progress - load immediately
-                    await refreshDeparture()
+            await refreshDeparture()
                 }
             }
             
@@ -311,11 +311,11 @@ struct FavoriteStationTileView: View, Equatable {
             await MainActor.run {
                 // Invalidate any existing timer first
                 timer?.invalidate()
-                timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
-                    Task { @MainActor in
-                        await refreshDeparture()
-                        if appSettings.showWeatherInfo {
-                            await loadWeather()
+            timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
+                Task { @MainActor in
+                    await refreshDeparture()
+                    if appSettings.showWeatherInfo {
+                        await loadWeather()
                         }
                     }
                 }
@@ -359,7 +359,7 @@ struct FavoriteStationTileView: View, Equatable {
         
         // Only show loading if we don't have cached data and no departure time yet
         if !hasCachedData && nextDeparture == nil {
-            isLoading = true
+        isLoading = true
         }
         
         let departure = await viewModel.getNextDepartureForToday(for: station.id)

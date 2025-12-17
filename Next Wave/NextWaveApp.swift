@@ -20,16 +20,8 @@ class BackgroundTaskManager {
             }
         }
         
-        // Register morning cache warm-up task
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.nextwave.morning-warmup", using: nil) { task in
-            if let task = task as? BGProcessingTask {
-                self.handleMorningWarmupTask(task)
-            }
-        }
-        
         scheduleMidnightTask()
         scheduleWidgetRefreshTask()
-        scheduleMorningWarmupTask()
     }
     
     private func scheduleMidnightTask() {
@@ -109,88 +101,6 @@ class BackgroundTaskManager {
         } catch {
             print("📱 Could not schedule widget refresh task: \(error)")
         }
-    }
-    
-    private func scheduleMorningWarmupTask() {
-        let request = BGProcessingTaskRequest(identifier: "com.nextwave.morning-warmup")
-        
-        let calendar = Calendar.current
-        let now = Date()
-        
-        // Schedule for 6:00 AM today, or 6:00 AM tomorrow if it's already past 6:00 AM
-        let hour = calendar.component(.hour, from: now)
-        let targetTime: Date
-        
-        if hour < 6 {
-            // Schedule for 6:00 AM today
-            targetTime = calendar.date(bySettingHour: 6, minute: 0, second: 0, of: now) ?? now
-        } else {
-            // Schedule for 6:00 AM tomorrow
-            let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
-            targetTime = calendar.date(bySettingHour: 6, minute: 0, second: 0, of: tomorrow) ?? tomorrow
-        }
-        
-        request.earliestBeginDate = targetTime
-        request.requiresNetworkConnectivity = true
-        request.requiresExternalPower = false
-        
-        do {
-            try BGTaskScheduler.shared.submit(request)
-            print("🌅 Scheduled morning cache warm-up task for \(targetTime)")
-        } catch {
-            print("🌅 Could not schedule morning cache warm-up task: \(error)")
-        }
-    }
-    
-    private func handleMorningWarmupTask(_ task: BGProcessingTask) {
-        task.expirationHandler = {
-            task.setTaskCompleted(success: false)
-        }
-        
-        // Warm up the API cache by loading favorite stations
-        Task {
-            await warmUpAPICache()
-            task.setTaskCompleted(success: true)
-        }
-        
-        // Schedule next morning warm-up
-        scheduleMorningWarmupTask()
-    }
-    
-    @MainActor
-    private func warmUpAPICache() async {
-        print("🌅 Morning cache warm-up started")
-        
-        // Get favorite stations
-        let favorites = FavoriteStationsManager.shared.favorites
-        if favorites.isEmpty {
-            print("🌅 No favorite stations - skipping warm-up")
-            return
-        }
-        
-        print("🌅 Warming up cache for \(favorites.count) favorite stations")
-        
-        // Create a temporary ViewModel to load data
-        let viewModel = LakeStationsViewModel()
-        await viewModel.loadLakes()
-        
-        // Load departures for each favorite station
-        // This will populate both the URLCache and the app-level cache
-        for (index, favorite) in favorites.enumerated() {
-            print("🌅 Warming up cache for station \(index + 1)/\(favorites.count): \(favorite.name)")
-            
-            do {
-                // Load today's departures
-                _ = try await TransportAPI().getStationboard(stationId: favorite.uicRef, for: Date(), limit: 30)
-                
-                // Small delay to avoid overwhelming the API
-                try? await Task.sleep(nanoseconds: 200_000_000)  // 0.2 seconds
-            } catch {
-                print("🌅 Failed to warm up cache for \(favorite.name): \(error)")
-            }
-        }
-        
-        print("🌅 Morning cache warm-up completed")
     }
     
     @MainActor

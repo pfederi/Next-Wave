@@ -40,11 +40,19 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     private let locationManager = LocationManager()
     
+    // Background loading state for favorites
+    private var isBackgroundLoadingFavorites = false
+    private var backgroundLoadingTask: Task<Void, Never>?
+    
     init(scheduleViewModel: ScheduleViewModel? = nil) {
         self.scheduleViewModel = scheduleViewModel
         Task {
             await loadLakes()
-            // Load water temperatures immediately after lakes are loaded
+            // Start loading favorite stations in background immediately after lakes are loaded
+            // (don't wait for water temperatures)
+            loadFavoriteStationsInBackground()
+            
+            // Load water temperatures in parallel
             await loadWaterTemperatures()
         }
         scheduleMidnightRefresh()
@@ -106,6 +114,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     func loadWaterTemperatures() async {
         print("🌊 Starting to load water data...")
+        let startTime = Date()
         
         // Load water levels and temperature fallback from MeteoNews API
         var meteoNewsData: [String: MeteoNewsAPI.LakeWaterLevel] = [:]
@@ -128,17 +137,30 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             print("⚠️ [MeteoNews] Failed to load water levels: \(error)")
         }
         
-        // Load temperature and forecasts from Alplakes (priority)
-        do {
+        // Load temperature and forecasts from Alplakes (priority) - PARALLEL!
+        await withTaskGroup(of: (Int, String, AlplakesAPI.LakeTemperatureData?).self) { group in
+            // Create parallel tasks for all lakes
+            for i in 0..<lakes.count {
+                let lakeName = lakes[i].name
+                group.addTask {
+                    do {
+                        let data = try await AlplakesAPI.shared.getTemperature(for: lakeName)
+                        return (i, lakeName, data)
+                    } catch {
+                        return (i, lakeName, nil)
+                    }
+                }
+            }
+            
             var alplakesCount = 0
             var fallbackCount = 0
             
-            for i in 0..<lakes.count {
-                let lakeName = lakes[i].name
-                var updatedLake = lakes[i]
+            // Collect results as they come in
+            for await (index, lakeName, data) in group {
+                var updatedLake = lakes[index]
                 
-                // Try Alplakes first
-                if let data = try await AlplakesAPI.shared.getTemperature(for: lakeName) {
+                if let data = data {
+                    // Alplakes data available
                     updatedLake.waterTemperature = data.temperature
                     
                     // Convert forecast data to Lake.TemperatureForecast
@@ -160,15 +182,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                     print("🌊 [MeteoNews Fallback] Updated \(lakeName): \(temp)°C (no forecast)")
                 }
                 
-                lakes[i] = updatedLake
+                lakes[index] = updatedLake
             }
             
-            print("✅ [Temperature] \(alplakesCount) from Alplakes (with forecast), \(fallbackCount) from MeteoNews (fallback)")
-        } catch {
-            print("⚠️ [Alplakes] Failed to load temperatures: \(error)")
-            if let urlError = error as? URLError {
-                print("⚠️ URLError code: \(urlError.code.rawValue)")
-            }
+            let duration = Date().timeIntervalSince(startTime)
+            print("✅ [Temperature] \(alplakesCount) from Alplakes (with forecast), \(fallbackCount) from MeteoNews (fallback) in \(String(format: "%.2f", duration))s")
         }
     }
     
@@ -179,6 +197,17 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     private func getCacheKey(for station: Lake.Station, date: Date) -> String {
         let dateString = cacheFormatter.string(from: date)
         return "\(station.id)_\(dateString)"
+    }
+    
+    // Helper function to get cache key for a station ID
+    func getCacheKey(for stationId: String, date: Date) -> String {
+        let dateString = cacheFormatter.string(from: date)
+        return "\(stationId)_\(dateString)"
+    }
+    
+    // Check if cached data exists for a cache key
+    func hasCachedData(for cacheKey: String) -> Bool {
+        return departuresCache[cacheKey] != nil
     }
     
     func refreshDepartures() async {
@@ -287,13 +316,21 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     }
     
     func selectStation(withId id: String) {
-        selectedStation = lakes.flatMap { $0.stations }.first { $0.id == id }
-        if selectedStation != nil {
-            selectedDate = Date() // Reset to current date
-            Task {
-                await refreshDepartures()
-            }
+        print("🎯 [ViewModel] Selecting station with ID: \(id)")
+        
+        // Find the station by ID
+        guard let station = lakes.flatMap({ $0.stations }).first(where: { $0.id == id }) else {
+            print("⚠️ [ViewModel] Station with ID \(id) not found")
+            return
         }
+        
+        print("✅ [ViewModel] Found station: \(station.name) with ID: \(station.id)")
+        
+        // Reset to current date
+        selectedDate = Date()
+        
+        // Use the proper selectStation method to ensure all state is set correctly
+        selectStation(station)
     }
     
     func getNextDepartureForToday(for stationId: String) async -> Date? {
@@ -462,5 +499,146 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     func setScheduleViewModel(_ viewModel: ScheduleViewModel) {
         self.scheduleViewModel = viewModel
+    }
+    
+    // Load favorite stations in background sequentially (top to bottom)
+    func loadFavoriteStationsInBackground() {
+        // Cancel any existing background loading task
+        backgroundLoadingTask?.cancel()
+        
+        // Don't start if already loading or if a station is selected
+        guard !isBackgroundLoadingFavorites, selectedStation == nil else {
+            return
+        }
+        
+        let favorites = FavoriteStationsManager.shared.favorites
+        guard !favorites.isEmpty else {
+            return
+        }
+        
+        isBackgroundLoadingFavorites = true
+        
+        backgroundLoadingTask = Task { @MainActor in
+            // OPTIMIZATION: Only load first 2 favorites immediately for fast app start
+            // The rest will be loaded on-demand when tiles appear
+            let priorityFavorites = Array(favorites.prefix(2))
+            print("🔄 [Background] Loading priority favorites: \(priorityFavorites.map { $0.name }.joined(separator: ", "))")
+            
+            // Load priority favorites sequentially
+            for favorite in priorityFavorites {
+                // Check if task was cancelled
+                if Task.isCancelled {
+                    break
+                }
+                
+                // Don't load if a station was selected (user navigated away)
+                if selectedStation != nil {
+                    break
+                }
+                
+                guard let uicRef = favorite.uic_ref else {
+                    continue
+                }
+                
+                do {
+                    let today = Date()
+                    let cacheKey = "\(favorite.id)_\(cacheFormatter.string(from: today))"
+                    
+                    // Only load if not already cached
+                    if departuresCache[cacheKey] == nil {
+                        print("🔄 [Background] Loading departures for favorite: \(favorite.name)")
+                        let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today)
+                        
+                        // Cache the data
+                        departuresCache[cacheKey] = journeys
+                        print("✅ [Background] Cached \(journeys.count) departures for \(favorite.name)")
+                        
+                        // Notify that data is available for this station
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("StationDataLoaded"),
+                            object: nil,
+                            userInfo: ["stationId": favorite.id]
+                        )
+                    } else {
+                        print("✅ [Background] Using cached data for \(favorite.name)")
+                    }
+                } catch {
+                    print("⚠️ [Background] Failed to load departures for \(favorite.name): \(error)")
+                    // Continue with next favorite even if this one fails
+                }
+                
+                // Small delay between stations to avoid overwhelming the API
+                try? await Task.sleep(nanoseconds: 50_000_000) // 0.05 seconds
+            }
+            
+            // After priority favorites, load remaining favorites with lower priority
+            let remainingFavorites = Array(favorites.dropFirst(2))
+            if !remainingFavorites.isEmpty {
+                print("🔄 [Background] Loading remaining favorites: \(remainingFavorites.map { $0.name }.joined(separator: ", "))")
+                
+                // Add a longer delay before loading remaining favorites
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                
+                for favorite in remainingFavorites {
+                    // Check if task was cancelled
+                    if Task.isCancelled {
+                        break
+                    }
+                    
+                    // Don't load if a station was selected (user navigated away)
+                    if selectedStation != nil {
+                        break
+                    }
+                    
+                    guard let uicRef = favorite.uic_ref else {
+                        continue
+                    }
+                    
+                    do {
+                        let today = Date()
+                        let cacheKey = "\(favorite.id)_\(cacheFormatter.string(from: today))"
+                        
+                        // Only load if not already cached
+                        if departuresCache[cacheKey] == nil {
+                            print("🔄 [Background] Loading departures for: \(favorite.name)")
+                            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today)
+                            
+                            // Cache the data
+                            departuresCache[cacheKey] = journeys
+                            print("✅ [Background] Cached \(journeys.count) departures for \(favorite.name)")
+                            
+                            // Notify that data is available for this station
+                            NotificationCenter.default.post(
+                                name: NSNotification.Name("StationDataLoaded"),
+                                object: nil,
+                                userInfo: ["stationId": favorite.id]
+                            )
+                        } else {
+                            print("✅ [Background] Using cached data for \(favorite.name)")
+                        }
+                    } catch {
+                        print("⚠️ [Background] Failed to load departures for \(favorite.name): \(error)")
+                    }
+                    
+                    // Longer delay for remaining favorites
+                    try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+                }
+            }
+            
+            isBackgroundLoadingFavorites = false
+            print("✅ [Background] Finished loading all favorite stations")
+        }
+    }
+    
+    // Cancel background loading if needed
+    func cancelBackgroundLoading() {
+        backgroundLoadingTask?.cancel()
+        backgroundLoadingTask = nil
+        isBackgroundLoadingFavorites = false
+    }
+    
+    // Check if background loading is in progress
+    func isBackgroundLoadingInProgress() -> Bool {
+        return isBackgroundLoadingFavorites
     }
 } 

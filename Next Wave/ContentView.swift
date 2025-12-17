@@ -188,6 +188,20 @@ struct ContentView: View {
             
             // Check if widget requested a refresh and handle it
             checkForWidgetRefreshRequests()
+            
+            // Load favorite stations in background when on home screen
+            if viewModel.selectedStation == nil {
+                viewModel.loadFavoriteStationsInBackground()
+            }
+        }
+        .onChange(of: viewModel.selectedStation) { oldValue, newValue in
+            // Cancel background loading if user selects a station
+            if newValue != nil {
+                viewModel.cancelBackgroundLoading()
+            } else {
+                // Resume background loading when returning to home screen
+                viewModel.loadFavoriteStationsInBackground()
+            }
         }
     }
     
@@ -275,8 +289,8 @@ struct ContentView: View {
                 let now = today
                 let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) ?? today
                 
-                // Load today's journeys first
-                let todayJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: today)
+                // Load today's journeys first (use higher limit for widgets to ensure enough data)
+                let todayJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: today, limit: 50)
                 print("📱 Total journeys from API for \(favorite.name) today: \(todayJourneys.count)")
                 
                 // Find today's future departures
@@ -301,7 +315,7 @@ struct ContentView: View {
                     print("📱 Loading tomorrow's departures for \(favorite.name) (only \(todayFutureJourneys.count) today, want \(minDeparturesBeforeLoadingNextDay)+)")
                     
                     do {
-                        let tomorrowJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: tomorrow)
+                        let tomorrowJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: tomorrow, limit: 50)
                         
                         let tomorrowFutureJourneys = tomorrowJourneys.compactMap { journey -> (Journey, Date)? in
                             guard let departureStr = journey.stop.departure else { return nil }
@@ -333,7 +347,7 @@ struct ContentView: View {
                             
                             do {
                                 let dayAfterTomorrow = Calendar.current.date(byAdding: .day, value: 2, to: today) ?? tomorrow
-                                let dayAfterJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: dayAfterTomorrow)
+                                let dayAfterJourneys = try await TransportAPI().getStationboard(stationId: uicRef, for: dayAfterTomorrow, limit: 50)
                                 
                                 let dayAfterFutureJourneys = dayAfterJourneys.compactMap { journey -> (Journey, Date)? in
                                     guard let departureStr = journey.stop.departure else { return nil }

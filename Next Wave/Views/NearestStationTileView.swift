@@ -239,18 +239,56 @@ struct NearestStationTileView: View {
         }
         .buttonStyle(PlainButtonStyle())
         .task {
-            await refreshDeparture()
+            // First check cache - if data is available, use it immediately
+            let cacheKey = viewModel.getCacheKey(for: station.id, date: Date())
+            let hasCachedData = viewModel.hasCachedData(for: cacheKey)
+            
+            if hasCachedData {
+                // Use cached data immediately - no API call needed
+                await refreshDeparture()
+            } else {
+                // No cached data - wait for background loading if it's in progress
+                if viewModel.isBackgroundLoadingInProgress() {
+                    // Wait up to 3 seconds for background loading to complete
+                    for _ in 0..<6 {
+                        try? await Task.sleep(nanoseconds: 500_000_000) // Wait 0.5 seconds
+                        if viewModel.hasCachedData(for: cacheKey) {
+                            // Background loading provided the data
+                            await refreshDeparture()
+                            break
+                        }
+                        if !viewModel.isBackgroundLoadingInProgress() {
+                            // Background loading finished, check cache one more time
+                            if viewModel.hasCachedData(for: cacheKey) {
+                                await refreshDeparture()
+                            } else {
+                                // Still no data - load it now
+                                await refreshDeparture()
+                            }
+                            break
+                        }
+                    }
+                } else {
+                    // Background loading not in progress - load immediately
+                    await refreshDeparture()
+                }
+            }
+            
             // Lade Wetterdaten nur, wenn die Einstellung aktiviert ist
             if appSettings.showWeatherInfo {
                 await loadWeather()
             }
             
-            // Start timer for periodic updates
-            timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
-                Task { @MainActor in
-                    await refreshDeparture()
-                    if appSettings.showWeatherInfo {
-                        await loadWeather()
+            // Start timer for periodic updates on main thread
+            await MainActor.run {
+                // Invalidate any existing timer first
+                timer?.invalidate()
+                timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { _ in
+                    Task { @MainActor in
+                        await refreshDeparture()
+                        if appSettings.showWeatherInfo {
+                            await loadWeather()
+                        }
                     }
                 }
             }
@@ -271,7 +309,15 @@ struct NearestStationTileView: View {
     
     @MainActor
     private func refreshDeparture() async {
-        isLoading = true
+        // Check cache first before showing loading
+        let cacheKey = viewModel.getCacheKey(for: station.id, date: Date())
+        let hasCachedData = viewModel.hasCachedData(for: cacheKey)
+        
+        // Only show loading if we don't have cached data and no departure time yet
+        if !hasCachedData && nextDeparture == nil {
+            isLoading = true
+        }
+        
         let departure = await viewModel.getNextDepartureForToday(for: station.id)
         
         // Prüfe, ob sich der Wellen-Status geändert hat

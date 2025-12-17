@@ -200,8 +200,8 @@ class FavoriteStationsManager: ObservableObject {
                      let now = Date()
                      let calendar = Calendar.current
                      
-                     // Load today's departures
-                     let todayJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: now)
+                     // Load today's departures (use higher limit for widgets)
+                     let todayJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: now, limit: 50)
                      print("🔍 API returned \(todayJourneys.count) journeys for today for \(favorite.name)")
                      
                      // Get today's future departures
@@ -225,7 +225,7 @@ class FavoriteStationsManager: ObservableObject {
                          print("🔍 Only \(allDepartures.count) departures today for \(favorite.name), loading tomorrow's as well (want \(minDeparturesBeforeLoadingNextDay)+)")
                          
                          let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
-                         let tomorrowJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow)
+                         let tomorrowJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow, limit: 50)
                          print("🔍 API returned \(tomorrowJourneys.count) journeys for tomorrow for \(favorite.name)")
                          
                          let tomorrowDepartures = tomorrowJourneys
@@ -251,7 +251,7 @@ class FavoriteStationsManager: ObservableObject {
                              
                              let dayAfterTomorrow = calendar.date(byAdding: .day, value: 2, to: now) ?? now
                              do {
-                                 let dayAfterJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: dayAfterTomorrow)
+                                 let dayAfterJourneys = try await transportAPI.getStationboard(stationId: uicRef, for: dayAfterTomorrow, limit: 50)
                                  print("🔍 API returned \(dayAfterJourneys.count) journeys for day after tomorrow for \(favorite.name)")
                                  
                                  let dayAfterDepartures = dayAfterJourneys

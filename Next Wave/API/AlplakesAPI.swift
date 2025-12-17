@@ -172,7 +172,12 @@ class AlplakesAPI {
         let endpoint = "/simulations/1d/profile/simstrat/\(lake)/\(timeString)"
         let url = URL(string: baseURL + endpoint)!
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        // Configure URLRequest with HTTP caching
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.timeoutInterval = 15.0
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -201,7 +206,12 @@ class AlplakesAPI {
         let endpoint = "/simulations/1d/point/simstrat/\(lake)/\(startString)/\(endString)/0"
         let url = URL(string: baseURL + endpoint)!
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        // Configure URLRequest with HTTP caching
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.timeoutInterval = 15.0
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {

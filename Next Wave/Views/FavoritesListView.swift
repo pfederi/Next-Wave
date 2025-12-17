@@ -41,6 +41,7 @@ struct FavoritesListView: View {
                         FavoriteStationTileView(
                             station: favorite,
                             onTap: {
+                                print("🔵 [FavoritesListView] Tapped on favorite: \(favorite.name) with ID: \(favorite.id)")
                                 viewModel.selectStation(withId: favorite.id)
                             },
                             viewModel: viewModel

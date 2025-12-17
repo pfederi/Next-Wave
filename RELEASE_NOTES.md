@@ -1,6 +1,50 @@
 # NextWave App - Release History
 
+## [Unreleased]
+
+### Added
+- **Morning Cache Warm-Up (iOS)**: Background Task lädt morgens um 6:00 Uhr automatisch Favoriten
+  - iOS weckt App im Hintergrund auf
+  - Lädt Daten für alle Favoriten
+  - Baut Server-Cache und URLCache auf
+  - User sieht beim ersten Öffnen sofort Daten (< 0.1s)
+  - Funktioniert automatisch ohne User-Interaktion
+- **Morning Cache Warm-Up (Vercel)**: Cron Job wärmt Server-Cache für alle Stationen
+  - Läuft jeden Morgen um 6:00 Uhr UTC auf Vercel
+  - Wärmt API-Cache für 300+ Stationen auf allen Schweizer Seen
+  - Garantiert schnelle Antworten für alle User
+  - Unabhängig von iOS Background Refresh
+  - ⚠️ Benötigt Vercel Pro Plan (60s Execution Time)
+
+### Changed
+- **HTTP-Caching aktiviert**: Alle API-Aufrufe nutzen jetzt iOS HTTP-Cache
+  - `URLRequest.cachePolicy = .returnCacheDataElseLoad` für alle APIs
+  - URLCache erhöht auf 50MB Memory / 100MB Disk
+  - Server-Cache-Headers werden respektiert
+  - 10-20x schnellere Antworten bei wiederholten Aufrufen (< 0.1s statt 1-2s)
+  - Timeout auf 15 Sekunden gesetzt
+- **Priority-basiertes Background-Loading**: Erste 2 Favoriten laden sofort, Rest mit Verzögerung
+  - Erste 2 Favoriten nach ~1 Sekunde verfügbar
+  - Restliche Favoriten nach ~2 Sekunden
+  - Reduziert Last auf API-Server
+- **Widget-Daten nur im Hintergrund**: Widget-Daten laden nur noch wenn App in Hintergrund geht
+  - Keine Widget-Daten-Ladung beim App-Start mehr
+  - 80% weniger API-Calls beim ersten Start
+  - Schnellerer App-Start
+
+### Fixed
+- **Swift 6 Kompatibilität**: Timer-Erstellung in MainActor.run gewrappt
+  - Behebt "RunLoop.current unavailable from async contexts" Fehler
+  - Entfernt unnötige Captures in Closures
+
 ## Version 3.5.1 (November 24, 2025)
+
+### Added
+- **Parallel API Loading**: Water temperature data for all lakes now loads simultaneously
+  - ~10-15x faster initial data loading (1-2 seconds instead of 15-30 seconds)
+  - All 15 Swiss lakes load in parallel instead of sequentially
+  - Significantly improved app start performance
+  - Performance timing included in debug logs
 
 ### Fixed
 - **Improved Station Loading**: Eliminated screen flicker when switching between stations

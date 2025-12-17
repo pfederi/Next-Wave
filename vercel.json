@@ -8,8 +8,18 @@
     "api/water-temperature.ts": {
       "memory": 1024,
       "maxDuration": 60
+    },
+    "api/cache-warmup.ts": {
+      "memory": 512,
+      "maxDuration": 300
     }
   },
+  "crons": [
+    {
+      "path": "/api/cache-warmup",
+      "schedule": "0 6 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",

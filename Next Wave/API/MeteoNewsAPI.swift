@@ -98,9 +98,14 @@ class MeteoNewsAPI {
             throw URLError(.badURL)
         }
         
+        // Configure URLRequest with HTTP caching
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.timeoutInterval = 15.0
+        
         do {
             print("🌊 [MeteoNews] Fetching water levels from API...")
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw URLError(.badServerResponse)

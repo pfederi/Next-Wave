@@ -24,18 +24,26 @@ class TransportAPI {
         }
     }
     
-    func getStationboard(stationId: String, for date: Date = Date()) async throws -> [Journey] {
+    func getStationboard(stationId: String, for date: Date = Date(), limit: Int = 30) async throws -> [Journey] {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: date)
         
-        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=100&date=\(dateString)"
+        // Use a smaller limit by default (30 instead of 100) to reduce API response time
+        // This is especially important for the first API call of the day when the API builds its cache
+        // For widgets or special cases, a higher limit can be passed
+        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=\(limit)&date=\(dateString)"
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
         }
         
+        // Configure URLRequest with HTTP caching to speed up subsequent requests
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad  // Use cache if available, otherwise load from network
+        request.timeoutInterval = 15.0  // 15 seconds timeout
+        
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw APIError.networkError("No connection to the server possible")
@@ -77,7 +85,12 @@ class TransportAPI {
             throw APIError.invalidURL
         }
         
-        let (data, response) = try await URLSession.shared.data(from: url)
+        // Configure URLRequest with HTTP caching
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.timeoutInterval = 15.0
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {

@@ -1,7 +1,7 @@
 import Foundation
 
 /// API für Wasserpegel und Temperatur-Fallback von MeteoNews
-class MeteoNewsAPI {
+actor MeteoNewsAPI {
     static let shared = MeteoNewsAPI()
     
     // Vercel API URL - anpassen an deine Deployment URL
@@ -153,6 +153,12 @@ class MeteoNewsAPI {
         cachedData = nil
         lastFetchTime = nil
         print("🌊 [MeteoNews] Water level cache invalidated")
+    }
+    
+    // Clear cache
+    func clearCache() {
+        invalidateCache()
+        print("🗑️ [MeteoNews] Water level cache cleared")
     }
 }
 

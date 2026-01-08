@@ -4,6 +4,7 @@ import AVFoundation
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
+    @EnvironmentObject var lakeStationsViewModel: LakeStationsViewModel
     @EnvironmentObject var appSettings: AppSettings
     @State private var audioPlayer: AVAudioPlayer?
     
@@ -48,7 +49,10 @@ struct SettingsView: View {
                 Divider()
                 
                 // Data Management section
-                DataManagementSection()
+                DataManagementSection(
+                    scheduleViewModel: scheduleViewModel,
+                    lakeStationsViewModel: lakeStationsViewModel
+                )
                 
                 Divider()
                 
@@ -208,6 +212,52 @@ struct DisplayOptionsSection: View {
             }
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
+            
+            Toggle(isOn: $appSettings.showPromoTiles) {
+                HStack {
+                    Image(systemName: "megaphone.fill")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Show Promo Tiles")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Display announcements and updates on home screen")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                }
+            }
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            
+            // Reset dismissed tiles
+            Button(action: {
+                appSettings.resetDismissedPromoTiles()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.counterclockwise")
+                        .foregroundColor(Color("text-color"))
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Reset Dismissed Tiles")
+                            .foregroundColor(Color("text-color"))
+                            .font(.system(size: 17, weight: .regular))
+                        Text("Show all promo tiles again that you dismissed")
+                            .foregroundColor(Color("text-color").opacity(0.7))
+                            .font(.system(size: 14))
+                    }
+                    
+                    Spacer()
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
         }
         .foregroundColor(Color("text-color"))
     }
@@ -244,35 +294,39 @@ struct NotificationSettingsSection: View {
 
 // MARK: - Data Management Section
 struct DataManagementSection: View {
-    @State private var showingClearCacheAlert = false
-    @State private var cacheCleared = false
+    @ObservedObject var scheduleViewModel: ScheduleViewModel
+    @ObservedObject var lakeStationsViewModel: LakeStationsViewModel
+    
+    @State private var showingClearAllCacheAlert = false
+    @State private var allCacheCleared = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Data Management")
                 .font(.headline)
             
+            // Clear All Cache
             Button(action: {
-                showingClearCacheAlert = true
+                showingClearAllCacheAlert = true
             }) {
                 HStack {
-                    Image(systemName: "trash")
-                        .foregroundColor(Color("text-color"))
+                    Image(systemName: "trash.circle")
+                        .foregroundColor(.red)
                         .font(.system(size: 20))
                         .padding(.trailing, 8)
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Clear Ship Data Cache")
+                        Text("Clear All Cache")
                             .foregroundColor(Color("text-color"))
                             .font(.system(size: 17, weight: .regular))
-                        Text("Force reload ship deployment data")
+                        Text("Clear all cached data (departures, ships, weather, water temp, water level)")
                             .foregroundColor(Color("text-color").opacity(0.7))
                             .font(.system(size: 14))
                     }
                     
                     Spacer()
                     
-                    if cacheCleared {
+                    if allCacheCleared {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.green)
                             .font(.system(size: 20))
@@ -282,24 +336,53 @@ struct DataManagementSection: View {
             .buttonStyle(PlainButtonStyle())
             .padding(.vertical, 12)
             .padding(.horizontal, 16)
-            .alert("Clear Cache", isPresented: $showingClearCacheAlert) {
+            .alert("Clear All Cache", isPresented: $showingClearAllCacheAlert) {
                 Button("Cancel", role: .cancel) { }
-                Button("Clear", role: .destructive) {
+                Button("Clear All", role: .destructive) {
                     Task {
-                        await VesselAPI.shared.clearCache()
-                        cacheCleared = true
+                        // Clear all caches
+                        await clearAllCaches()
+                        allCacheCleared = true
                         
                         // Reset checkmark after 2 seconds
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            cacheCleared = false
+                            allCacheCleared = false
                         }
                     }
                 }
             } message: {
-                Text("This will clear the cached ship deployment data and force a fresh reload from the server.")
+                Text("This will clear all cached data including departures, ship names, weather data, water temperatures, water levels, and HTTP cache. All data will be freshly loaded from the server.")
             }
         }
         .foregroundColor(Color("text-color"))
+    }
+    
+    private func clearAllCaches() async {
+        // 1. Clear departures cache in LakeStationsViewModel
+        lakeStationsViewModel.clearDeparturesCache()
+        
+        // 2. Clear ship names cache in ScheduleViewModel
+        scheduleViewModel.clearShipNamesCache()
+        
+        // 3. Clear vessel API cache
+        await VesselAPI.shared.clearCache()
+        
+        // 4. Clear weather pressure history cache
+        await WeatherAPI.shared.clearCache()
+        
+        // 5. Clear water temperature cache (Alplakes)
+        await AlplakesAPI.shared.clearCache()
+        
+        // 6. Clear water level cache (MeteoNews)
+        await MeteoNewsAPI.shared.clearCache()
+        
+        // 7. Clear promo tiles cache
+        await PromoTileAPI.shared.clearCache()
+        
+        // 8. Clear URLCache (HTTP cache)
+        URLCache.shared.removeAllCachedResponses()
+        
+        print("🗑️ All caches cleared successfully")
     }
 }
 

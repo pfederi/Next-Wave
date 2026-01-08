@@ -1,7 +1,7 @@
 import Foundation
 import CoreLocation
 
-class WeatherAPI {
+actor WeatherAPI {
     static let shared = WeatherAPI()
     
     // OpenWeather API URLs
@@ -12,6 +12,12 @@ class WeatherAPI {
     private var pressureHistory: [String: [(timestamp: Date, pressure: Int)]] = [:]
     
     private init() {}
+    
+    // Clear pressure history cache
+    func clearCache() {
+        pressureHistory.removeAll()
+        print("🗑️ Weather pressure history cache cleared")
+    }
     
     // Preload Methode die beim App-Start aufgerufen wird
     func preloadData() async {

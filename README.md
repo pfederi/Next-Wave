@@ -14,6 +14,8 @@ Next Wave is an iOS app that helps wake surfers and foilers catch their perfect 
 - **[Arc42 Architecture Documentation](ARC42_DOCUMENTATION.md)** - Complete architecture documentation with diagrams and technical details
 - **[User Stories & Acceptance Criteria](USER_STORIES.md)** - All 47 user stories with acceptance criteria and release planning
 - **[API Documentation](API_DOCUMENTATION.md)** - Backend API endpoints and integration details
+- **[Promo Tiles API](PROMO_TILE_API.md)** - Dynamic promotional tiles API documentation
+- **[Promo Tiles Quick Start](PROMO_TILES_README.md)** - Quick start guide for promo tiles
 
 ## Table of Contents
 
@@ -64,6 +66,11 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
 - 📤 **Share waves** via WhatsApp, Messages, or Mail
 - 🛡️ **Safety guidelines** integrated
 - 💬 **Fun messages** with personality
+- 📢 **Dynamic promo tiles** for announcements and updates
+  - Swipe-to-dismiss with iOS-style gesture
+  - Configurable via web admin (no app update needed)
+  - Time-limited and platform-targeted display
+  - Optional images and links
 
 For complete feature details and technical specifications, see the [Arc42 Documentation](ARC42_DOCUMENTATION.md).
 
@@ -106,6 +113,7 @@ For detailed architecture and technical information, see the [Arc42 Documentatio
 - **Albis Filter**: Flip device in departure view to show only best waves
 - **Share Waves**: Tap share button to invite friends via WhatsApp, Messages, or Mail
 - **Apple Watch**: Install watch app for wrist-based departure times
+- **Cache Management**: Clear all cached data in Settings > Data Management for fresh server data
 
 For detailed usage scenarios and workflows, see the [Arc42 Documentation - Runtime View](ARC42_DOCUMENTATION.md#6-runtime-view).
 
@@ -249,12 +257,26 @@ The link above is for Switzerland. For other countries, you have to find another
 
 ### Recent Technical Improvements
 
+#### Progressive Loading Optimization (v3.5.2)
+- **Instant Departure Display**: Departures appear in < 0.1 seconds, no waiting for weather/ship names
+- **Background Data Loading**: Weather and ship names load progressively in background
+- **Smart UI Updates**: Interface updates automatically as additional data becomes available
+- **40-90x Faster**: Initial display time reduced from 4-9 seconds to < 0.1 seconds
+- **Better UX**: Users see content immediately, additional details appear seamlessly
+- **Graceful Degradation**: App remains functional even if weather API fails
+
+#### HTTP Caching Strategy (v3.5.2)
+- **URLCache Integration**: All API requests use iOS native HTTP caching
+- **Server Cache Headers**: Respects `Cache-Control` and `ETag` headers from APIs
+- **50MB Memory / 100MB Disk**: Increased cache capacity for better performance
+- **Reduced Server Load**: Significantly fewer API calls through intelligent caching
+- **15s Timeout**: Prevents hanging requests on slow connections
+
 #### Ship Data Loading Optimization (v3.3)
 - **Puppeteer-Based Scraping**: Advanced web scraping using headless Chrome to handle dynamic AJAX content
 - **Multi-Day Data Fetching**: Correctly loads ship assignments for today and next 2 days by simulating date picker clicks
 - **Intelligent Caching System**: Three-layer caching strategy (API cache, URLSession cache, in-memory cache)
 - **Zero Loading Flicker**: Ship names appear instantly from cache without "Loading..." indicators
-- **Single UI Update**: All data (weather + ship names) loaded in background before single smooth UI update
 - **Performance**: 24-hour client-side cache eliminates redundant API calls, dramatically improving app responsiveness
 
 #### Device Motion Detection

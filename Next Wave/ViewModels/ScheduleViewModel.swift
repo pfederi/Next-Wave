@@ -58,11 +58,7 @@ class ScheduleViewModel: ObservableObject {
         }
     }
     @Published var hasAttemptedLoad: Bool = false
-    @Published var nextWaves: [WaveEvent] = [] {
-        didSet {
-            loadWeatherForWaves()
-        }
-    }
+    @Published var nextWaves: [WaveEvent] = []
     @Published var albisClassFilterActive = false
     @Published var sunTimes: SunTimes?
     
@@ -72,7 +68,6 @@ class ScheduleViewModel: ObservableObject {
     
     private var midnightTimer: Timer?
     private var currentLoadingTask: Task<Void, Never>?
-    private var weatherLoadingTask: Task<Void, Never>?
     
     private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen (Key: "YYYY-MM-DD_routeNumber")
     
@@ -97,7 +92,7 @@ class ScheduleViewModel: ObservableObject {
     deinit {
         midnightTimer?.invalidate()
         currentLoadingTask?.cancel()
-        weatherLoadingTask?.cancel()
+        NotificationCenter.default.removeObserver(self)
     }
     
     private func saveSettings() {
@@ -152,9 +147,9 @@ class ScheduleViewModel: ObservableObject {
         // Set the selected station
         self.selectedStation = station
         
-        // Cancel any existing loading task
+        // Cancel any existing loading task to prevent race conditions
         currentLoadingTask?.cancel()
-        weatherLoadingTask?.cancel()
+        currentLoadingTask = nil
         
         // Leere die Liste sofort, damit die ScrollView resettet wird
         nextWaves = []
@@ -206,47 +201,41 @@ class ScheduleViewModel: ObservableObject {
             )
             }
             
-            // NICHT sofort anzeigen - warte bis alle Daten geladen sind
+            // ✅ SOFORT anzeigen - User sieht Abfahrten ohne Wartezeit
             hasAttemptedLoad = true
+            nextWaves = waves
+            print("✅ [ScheduleViewModel] Showing \(waves.count) departures immediately (without weather)")
             
-            // Erstelle eine Kopie der Wellen für die Verarbeitung
-            var updatedWaves = waves
-            
+            // Keine Koordinaten? Dann sind wir fertig
             guard let coordinates = station.coordinates else { 
-                // Keine Koordinaten - zeige Wellen sofort an (ohne Wetter)
-                nextWaves = updatedWaves
+                print("ℹ️ [ScheduleViewModel] No coordinates - skipping weather/ship names")
                 return 
             }
+            
             let location = CLLocationCoordinate2D(
                 latitude: coordinates.latitude,
                 longitude: coordinates.longitude
             )
             
-            // 1. Lade zuerst alle Wetterdaten parallel
-            let weatherData = await updatedWaves.asyncMap { wave -> WeatherAPI.WeatherInfo? in
-                guard !Task.isCancelled else { return nil }
-                // Nur für zukünftige Wellen Wetter laden und wenn Wetteranzeige aktiviert ist
-                guard wave.time > Date() && appSettings.showWeatherInfo else { return nil }
+            // Erstelle eine Kopie der Wellen für die Hintergrund-Verarbeitung
+            var updatedWaves = waves
+            
+            // 1. Lade Sun Times im Hintergrund (blockiert nicht)
+            Task {
                 do {
-                    let weather = try await WeatherAPI.shared.getWeatherForTime(
-                        location: location,
-                        time: wave.time
-                    )
-                    return weather
+                    let times = try await SunTimeService.shared.getSunTimes(date: selectedDate)
+                    if !Task.isCancelled {
+                        sunTimes = times
+                    }
                 } catch {
-                    return nil
+                    // Fehler beim Laden der Sun Times - ignorieren
+                    #if DEBUG
+                    print("Failed to load sun times: \(error)")
+                    #endif
                 }
             }
             
-            // Aktualisiere Wellen mit Wetterdaten (aber zeige noch NICHT an)
-            for i in updatedWaves.indices {
-                if let weather = weatherData[i] {
-                    updatedWaves[i].updateWeather(weather)
-                }
-            }
-            
-            // 2. Lade nur fehlende Schiffsnamen nach (wenn nicht im Cache)
-            // Die meisten sollten bereits aus dem Cache geladen worden sein
+            // 2. Lade fehlende Schiffsnamen im Hintergrund (sollten meist gecached sein)
             let shipNames = await updatedWaves.asyncMap { wave -> String? in
                 guard !Task.isCancelled else { return nil }
                 guard wave.isZurichsee else { return nil }
@@ -281,31 +270,62 @@ class ScheduleViewModel: ObservableObject {
                 return shipName
             }
             
-            // 3. Aktualisiere Wellen mit fehlenden Schiffsnamen
+            // Aktualisiere Wellen mit Schiffsnamen
+            var hasShipNameUpdates = false
             for i in updatedWaves.indices {
-                if updatedWaves[i].shipName == nil, let shipName = shipNames[i] {
-                    updatedWaves[i].updateShipName(shipName)
-                }
-            }
-            
-            // 4. Lade Sun Times für den ausgewählten Tag
-            Task {
-                do {
-                    let times = try await SunTimeService.shared.getSunTimes(date: selectedDate)
-                    if !Task.isCancelled {
-                        sunTimes = times
+                if updatedWaves[i].shipName == nil {
+                    if let shipName = shipNames[i] {
+                        updatedWaves[i].updateShipName(shipName)
+                        hasShipNameUpdates = true
+                    } else if updatedWaves[i].isZurichsee {
+                        // Wenn kein Schiffsname gefunden wurde, setze "Unknown"
+                        updatedWaves[i].updateShipName("Unknown")
+                        hasShipNameUpdates = true
                     }
-                } catch {
-                    // Fehler beim Laden der Sun Times - ignorieren und ohne Darkness Indicator fortfahren
-                    #if DEBUG
-                    print("Failed to load sun times: \(error)")
-                    #endif
                 }
             }
             
-            // 5. Aktualisiere die UI NUR EINMAL mit allen Daten (Wetter + Schiffsnamen)
-            if !Task.isCancelled {
+            // Update UI mit Schiffsnamen (falls welche geladen wurden)
+            if hasShipNameUpdates && !Task.isCancelled {
                 nextWaves = updatedWaves
+                print("✅ [ScheduleViewModel] Updated UI with ship names")
+            }
+            
+            // 3. Lade Wetterdaten im Hintergrund (nur wenn aktiviert)
+            guard appSettings.showWeatherInfo else {
+                print("ℹ️ [ScheduleViewModel] Weather info disabled - skipping")
+                return
+            }
+            
+            print("🌤️ [ScheduleViewModel] Loading weather data in background...")
+            let weatherData = await updatedWaves.asyncMap { wave -> WeatherAPI.WeatherInfo? in
+                guard !Task.isCancelled else { return nil }
+                // Nur für zukünftige Wellen Wetter laden
+                guard wave.time > Date() else { return nil }
+                do {
+                    let weather = try await WeatherAPI.shared.getWeatherForTime(
+                        location: location,
+                        time: wave.time
+                    )
+                    return weather
+                } catch {
+                    return nil
+                }
+            }
+            
+            // Aktualisiere Wellen mit Wetterdaten
+            var hasWeatherUpdates = false
+            for i in updatedWaves.indices {
+                if let weather = weatherData[i] {
+                    updatedWaves[i].updateWeather(weather)
+                    hasWeatherUpdates = true
+                }
+            }
+            
+            // Update UI mit Wetterdaten (falls welche geladen wurden)
+            if hasWeatherUpdates && !Task.isCancelled {
+                nextWaves = updatedWaves
+                print("✅ [ScheduleViewModel] Updated UI with weather data")
             }
         }
     }
@@ -471,7 +491,10 @@ class ScheduleViewModel: ObservableObject {
         return shipNamesCache[cacheKey]
     }
     
-    private func loadWeatherForWaves() {
-        // Diese Methode wird nicht mehr benötigt, da das Wetter jetzt in updateWaves geladen wird
+    // Clear ship names cache
+    func clearShipNamesCache() {
+        shipNamesCache.removeAll()
+        print("🗑️ Ship names cache cleared")
     }
 }
+

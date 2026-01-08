@@ -102,13 +102,26 @@ struct DepartureRowView: View {
                         if wave.isZurichsee && isWithinNext3Days(wave.time) {
                             // Schiffsname mit Icon (nur für die nächsten 3 Tage)
                             HStack(spacing: 4) {
-                                Text(wave.shipName ?? "No data")
-                                    .lineLimit(1)
                                 if let shipName = wave.shipName {
-                                    Image(getWaveIcon(for: shipName))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 16, height: 12)
+                                    if shipName == "Unknown" {
+                                        Text("No data")
+                                            .lineLimit(1)
+                                    } else {
+                                        Text(shipName)
+                                            .lineLimit(1)
+                                        Image(getWaveIcon(for: shipName))
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 16, height: 12)
+                                    }
+                                } else {
+                                    // Noch am Laden
+                                    HStack(spacing: 4) {
+                                        ProgressView()
+                                            .scaleEffect(0.7)
+                                        Text("Loading...")
+                                            .lineLimit(1)
+                                    }
                                 }
                             }
                             .font(.caption)
@@ -226,7 +239,7 @@ struct DepartureRowView: View {
                             }
                             
                             // Wasserpegel-Differenz (nur für heutigen Tag)
-                            if Calendar.current.isDateInToday(wave.time),
+                            if Calendar.current.isDateInToday(lakeStationsViewModel.selectedDate),
                                let selectedStation = lakeStationsViewModel.selectedStation,
                                let lake = lakeStationsViewModel.lakes.first(where: { lake in
                                    lake.stations.contains(where: { $0.name == selectedStation.name })

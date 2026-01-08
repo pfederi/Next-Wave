@@ -2,26 +2,83 @@
 
 ## [Unreleased]
 
+## Version 3.6.0 (January 8, 2026)
+
+### Added
+- **Dynamic Promo Tiles**: Promotional and informational tiles controllable via JSON API
+  - Appear after favorite stations
+  - Title, subtitle, text, and optional image
+  - Optional: Link to external URL (opens Safari)
+  - **Swipe-to-Dismiss**: Swipe left to remove tile with iOS-style pill button
+  - Dismissed tiles are persistently stored
+  - New tiles are automatically displayed again
+  - **Settings Toggle**: Can be completely disabled in Settings
+  - **Reset Dismissed Tiles**: Button in Settings to reactivate all dismissed tiles
+  - Time-limited display (validFrom/validUntil)
+  - Platform targeting (iOS, Android, both)
+  - Manageable via admin area on nextwaveapp.ch
+  - 1-hour cache, no app updates required
+  - See `PROMO_TILE_API.md` for details
+- **Clear All Cache**: New function in Settings to clear all caches
+  - Clears departures cache
+  - Clears ship names cache
+  - Clears vessel deployment cache
+  - Clears weather cache (pressure history)
+  - Clears water temperature cache (Alplakes)
+  - Clears water level cache (MeteoNews)
+  - Clears promo tiles cache
+  - Clears HTTP cache (URLCache)
+  - Useful for debugging and forcing fresh data
+- **Modern Pill Navigation for Date Selection**
+  - Horizontal scrollable pills for 7 days (today + 6 days)
+  - Swipe gestures: Swipe left/right to change days
+  - Animated selection with Matched Geometry Effect
+  - Today's date highlighted with accent color border
+  - Haptic feedback on day change
+  - Compact display: Day, date, month in one pill
+  - Auto-centering of selected pill
+
 ### Changed
-- **HTTP-Caching aktiviert**: Alle API-Aufrufe nutzen jetzt iOS HTTP-Cache
-  - `URLRequest.cachePolicy = .returnCacheDataElseLoad` für alle APIs
-  - URLCache erhöht auf 50MB Memory / 100MB Disk
-  - Server-Cache-Headers werden respektiert
-  - Deutlich schnellere Antworten bei wiederholten Aufrufen
-  - Timeout auf 15 Sekunden gesetzt
-- **Priority-basiertes Background-Loading**: Erste 2 Favoriten laden sofort, Rest mit Verzögerung
-  - Erste 2 Favoriten nach ~1 Sekunde verfügbar
-  - Restliche Favoriten nach ~2 Sekunden
-  - Reduziert Last auf API-Server
-- **Widget-Daten nur im Hintergrund**: Widget-Daten laden nur noch wenn App in Hintergrund geht
-  - Keine Widget-Daten-Ladung beim App-Start mehr
-  - 80% weniger API-Calls beim ersten Start
-  - Schnellerer App-Start
+- **Instant Departure Display**: Departures now display immediately, weather loads in background
+  - Departures appear instantly (< 0.1s)
+  - Weather data and ship names load progressively in background
+  - No more waiting until all data is loaded
+  - UI updates automatically when weather becomes available
+- **HTTP Caching Enabled**: All API calls now use iOS HTTP cache
+  - `URLRequest.cachePolicy = .returnCacheDataElseLoad` for all APIs
+  - URLCache increased to 50MB memory / 100MB disk
+  - Server cache headers are respected
+  - Significantly faster responses on repeated calls
+  - Timeout set to 15 seconds
+- **Priority-Based Background Loading**: First 2 favorites load immediately, rest with delay
+  - First 2 favorites available after ~1 second
+  - Remaining favorites after ~2 seconds
+  - Reduces load on API servers
+- **Widget Data Only in Background**: Widget data loads only when app enters background
+  - No widget data loading on app start anymore
+  - 80% fewer API calls on first start
+  - Faster app start
 
 ### Fixed
-- **Swift 6 Kompatibilität**: Timer-Erstellung in MainActor.run gewrappt
-  - Behebt "RunLoop.current unavailable from async contexts" Fehler
-  - Entfernt unnötige Captures in Closures
+- **Ship Name Loading Indicator**: Now shows "Loading..." while ship names are loading
+  - Distinguishes between "still loading" (Loading...) and "no data" (No data)
+  - ProgressView spinner during loading
+  - "No data" only when no ship name was actually found
+- **Water Level Display**: Water level now displays correctly after date change
+  - Now checks `selectedDate` instead of `wave.time` for "today" condition
+  - Water level remains visible even after switching to another day and back
+- **Memory Management**: Fixed EXC_BAD_ACCESS crashes
+  - Removed obsolete `didSet` on `nextWaves` that caused race conditions
+  - Removed unused `weatherLoadingTask`
+  - Improved task cancellation in `updateWaves()`
+  - NotificationCenter observer now correctly removed in `deinit`
+  - LocationManager now correctly stopped in `deinit`
+  - **AlplakesAPI, MeteoNewsAPI, WeatherAPI** converted to `actor` for thread-safety
+    - Prevents race conditions on parallel API calls
+    - Cache accesses are now thread-safe
+- **Swift 6 Compatibility**: Timer creation wrapped in MainActor.run
+  - Fixes "RunLoop.current unavailable from async contexts" error
+  - Removed unnecessary captures in closures
 
 ## Version 3.5.1 (November 24, 2025)
 

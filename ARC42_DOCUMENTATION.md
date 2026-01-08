@@ -182,6 +182,7 @@ graph TB
         subgraph Views["Views Layer"]
             ContentView["ContentView"]
             DeparturesListView["DeparturesListView"]
+            DateSelectionView["DateSelectionView<br/>(Pill Navigation)"]
             LocationPickerView["LocationPickerView"]
             SettingsView["SettingsView"]
             WaveAnalyticsView["WaveAnalyticsView"]
@@ -201,6 +202,7 @@ graph TB
             VesselAPI["VesselAPI<br/>(Ship names)"]
             MeteoNewsAPI["MeteoNewsAPI<br/>(Water levels & temp fallback)"]
             AlplakesAPI["AlplakesAPI<br/>(Water temperature & forecasts)"]
+            PromoTileAPI["PromoTileAPI<br/>(Dynamic promo tiles)"]
         end
         
         subgraph Models["Models Layer"]
@@ -261,6 +263,8 @@ graph TB
 - `showWeatherInfo`: Display weather information
 - `enableAlbisClassFilter`: Enable device flip gesture for Albis-Class filter (Zürichsee only)
 - `useNearestStationForWidget`: Widget mode (nearest station vs favorites)
+- `showPromoTiles`: Enable/disable dynamic promo tiles
+- `dismissedPromoTileIds`: Set of dismissed promo tile IDs
 
 **Storage**: UserDefaults
 
@@ -865,6 +869,11 @@ graph TB
             WaterTemp["/api/water-temperature<br/>Node.js"]
         end
         
+        subgraph Website["nextwaveapp.ch"]
+            PromoAPI["/api/promo-tiles.json<br/>Dynamic Promo Tiles"]
+            Admin["Admin Area<br/>(CMS for Promo Tiles)"]
+        end
+        
         subgraph External["External APIs"]
             Transport["transport.opendata.ch"]
             Weather["OpenWeather"]
@@ -875,10 +884,12 @@ graph TB
     end
     
     iPhone -->|HTTPS| Vercel
+    iPhone -->|HTTPS| Website
     iPhone -->|HTTPS| External
     Watch -->|HTTPS| Vercel
     Watch -->|HTTPS| External
     iPad -->|HTTPS| Vercel
+    iPad -->|HTTPS| Website
     iPad -->|HTTPS| External
     
     style Devices fill:#e3f2fd
@@ -898,6 +909,19 @@ graph TB
 - Automatic deployment via Git push
 - Edge caching for performance
 
+**Promo Tiles System**:
+- JSON-API hosted on `nextwaveapp.ch/api/promo-tiles.json`
+- Admin area for content management (no app updates needed)
+- Dynamic promotional and informational tiles
+- **User Controls**:
+  - Swipe-to-dismiss individual tiles (left swipe)
+  - Persistent dismissal stored in UserDefaults
+  - New tiles automatically appear
+  - Can be completely disabled in Settings
+- Time-based validity (validFrom/validUntil)
+- Optional images and external links
+- See `PROMO_TILE_API.md` for full documentation
+
 ---
 
 ## 8. Cross-Cutting Concepts
@@ -912,6 +936,7 @@ graph TB
 | Weather Data | 6h | In-Memory | Time-based |
 | Sun Times | 24h | UserDefaults | Midnight |
 | Water Temperature | 24h | UserDefaults | Midnight |
+| **Promo Tiles** | 1h | In-Memory (Actor) | Time-based / Manual |
 | Map Tiles | Unlimited | Disk Cache | Manual |
 
 **HTTP Caching**:
@@ -920,7 +945,25 @@ graph TB
 - Significantly improves performance for repeated requests
 - Reduces server load and network traffic
 
-**Note**: Ship Names cache can be manually cleared via Settings > Data Management > Clear Ship Data Cache
+**Progressive Loading Strategy**:
+- Departures are displayed **immediately** (< 0.1s)
+- Weather data and ship names load in background
+- UI updates automatically when additional data becomes available
+- User sees content instantly without waiting for all data
+
+**Cache Management**:
+- **Clear All Cache**: Löscht alle Caches auf einmal (Settings > Data Management)
+  - Departures Cache (In-Memory) - Abfahrten pro Station/Datum
+  - Ship Names Cache (In-Memory) - Schiffsnamen pro Route/Datum
+  - Vessel Deployment Cache (In-Memory, Actor) - Schiffseinsatz-Daten (3 Tage)
+  - Weather Pressure History Cache (In-Memory, Actor) - Luftdruck-Trends
+  - Water Temperature Cache (In-Memory, Actor) - Alplakes Daten (3h Gültigkeit)
+  - Water Level Cache (In-Memory, Actor) - MeteoNews Daten (24h Gültigkeit)
+  - Promo Tiles Cache (In-Memory, Actor) - Dynamische Promo-Tiles (1h Gültigkeit)
+  - HTTP Cache (URLCache - 50MB Memory / 100MB Disk) - Alle API-Responses
+- Nützlich für Debugging und zum Erzwingen frischer Daten vom Server
+- **Hinweis**: User Settings und Favoriten bleiben erhalten
+- **Thread-Safety**: APIs mit Caches sind als `actor` implementiert für sichere parallele Zugriffe
 
 ### 8.2 Error Handling
 
@@ -939,7 +982,35 @@ do {
 }
 ```
 
-### 8.3 Logging
+### 8.3 Memory Management
+
+**Task Lifecycle**:
+- All stored Tasks are cancelled in `deinit`
+- Tasks are set to `nil` after cancellation
+- Initialization tasks are tracked and properly cleaned up
+
+**Observer Cleanup**:
+- NotificationCenter observers are removed in `deinit`
+- Timer instances are invalidated in `deinit`
+- LocationManager is stopped in `deinit`
+
+**Best Practices**:
+```swift
+class ViewModel: ObservableObject {
+    private var task: Task<Void, Never>?
+    
+    init() {
+        NotificationCenter.default.addObserver(...)
+    }
+    
+    deinit {
+        task?.cancel()
+        NotificationCenter.default.removeObserver(self)
+    }
+}
+```
+
+### 8.4 Logging
 
 **Logger Component**:
 - Central logging class for structured logs
@@ -947,7 +1018,7 @@ do {
 - Output to Xcode console
 - No logs in production (DEBUG flag only)
 
-### 8.4 Privacy
+### 8.5 Privacy
 
 **Privacy by Design**:
 - No tracking SDKs
@@ -956,17 +1027,65 @@ do {
 - No data transmission to third parties (except APIs)
 - All user data in App Groups (local)
 
-### 8.5 Localization
+### 8.6 Localization
 
 **Current**: English only
 **Planned**: German, French, Italian
 
-### 8.6 Accessibility
+### 8.7 Accessibility
 
 - VoiceOver support
 - Dynamic Type for font sizes
 - High-contrast colors
 - Haptic feedback for important actions
+
+### 8.8 UI/UX Design Patterns
+
+**Modern Pill Navigation** (`DateSelectionView`):
+- **Horizontal Scrollable Pills**: 7 days (today + 6 days) displayed as pills
+- **Swipe Gestures**: Swipe left/right to navigate between days
+- **Matched Geometry Effect**: Animated selection indicator moves between pills
+- **Visual Hierarchy**:
+  - Selected day: Accent color with shadow
+  - Today: Accent color border when not selected
+  - Other days: Subtle background color
+- **Haptic Feedback**: Light vibration on day change
+- **Compact Layout**: Day (e.g., "Today", "Mon"), Date (e.g., "7"), Month (e.g., "Jan")
+- **Auto-Scroll**: Automatically scrolls to selected day with center alignment
+
+**Benefits**:
+- Intuitive operation through swipe gestures
+- Clear visual hierarchy
+- Modern, iOS-native aesthetics
+- Space-efficient through horizontal layout
+
+**Dynamic Promo Tiles** (`PromoTileView`):
+- **iOS-Style Swipe-to-Dismiss**: Native iOS swipe gesture with pill-shaped delete button
+  - Red circular button (60x60px) appears on left swipe
+  - Trash icon with white color
+  - Smooth animation (0.2s) for tile dismissal
+  - Tile collapses height immediately on dismiss
+- **Persistent Dismissal**: Dismissed tiles stored in UserDefaults
+- **Settings Control**: 
+  - Toggle to completely disable promo tiles
+  - Button to reset all dismissed tiles
+- **Styling**:
+  - Same background and shadow as favorite station tiles
+  - Blue accent border (2px) for visual distinction
+  - "Promo" chip badge in title row
+  - Optional image (100x100px, left-aligned)
+  - Text content with dynamic height
+  - Optional link button below text
+- **Platform Targeting**: Filters tiles by targetOS (iOS, Android, both)
+- **Time-Based Display**: Respects validFrom/validUntil dates
+- **1-Hour Cache**: Fresh content without app updates
+
+**Benefits**:
+- No app updates needed for promotional content
+- User control over content visibility
+- Native iOS interaction patterns
+- Consistent visual design with app
+- Flexible content management
 
 ---
 

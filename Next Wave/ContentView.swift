@@ -102,6 +102,22 @@ struct ContentView: View {
                                             FavoritesListView(viewModel: viewModel)
                                         }
                                         
+                                        // Promo tiles
+                                        if appSettings.showPromoTiles && !viewModel.promoTiles.isEmpty {
+                                            let filteredTiles = viewModel.promoTiles.filter { !appSettings.isPromoTileDismissed($0.id) }
+                                            let _ = print("🎯 Total tiles: \(viewModel.promoTiles.count), Filtered: \(filteredTiles.count)")
+                                            VStack(alignment: .leading, spacing: 8) {
+                                                ForEach(filteredTiles) { tile in
+                                                    PromoTileView(tile: tile) {
+                                                        // Dismiss callback
+                                                        appSettings.dismissPromoTile(tile.id)
+                                                    }
+                                                    .padding(.horizontal)
+                                                }
+                                            }
+                                            .padding(.top, favoritesManager.favorites.isEmpty ? 32 : 16)
+                                        }
+                                        
                                         Spacer(minLength: 32)
                                     }
                                 }
@@ -150,7 +166,9 @@ struct ContentView: View {
                                         .padding(.leading, 8)
                                 }
                                 
-                                NavigationLink(destination: SettingsView()) {
+                                NavigationLink(destination: SettingsView()
+                                    .environmentObject(viewModel)
+                                ) {
                                     Image(systemName: "gearshape")
                                         .foregroundColor(.accentColor)
                                 }

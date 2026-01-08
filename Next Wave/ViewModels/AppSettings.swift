@@ -76,6 +76,34 @@ class AppSettings: ObservableObject {
         }
     }
     
+    @Published var showPromoTiles: Bool {
+        didSet {
+            UserDefaults.standard.set(showPromoTiles, forKey: "showPromoTiles")
+        }
+    }
+    
+    // Dismissed promo tile IDs
+    private(set) var dismissedPromoTileIds: Set<String> {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(Array(dismissedPromoTileIds)) {
+                UserDefaults.standard.set(encoded, forKey: "dismissedPromoTileIds")
+            }
+        }
+    }
+    
+    func dismissPromoTile(_ id: String) {
+        dismissedPromoTileIds.insert(id)
+    }
+    
+    func isPromoTileDismissed(_ id: String) -> Bool {
+        return dismissedPromoTileIds.contains(id)
+    }
+    
+    func resetDismissedPromoTiles() {
+        dismissedPromoTileIds.removeAll()
+        print("🔄 All dismissed promo tiles reset")
+    }
+    
     var isDarkMode: Bool {
         switch theme {
         case .light:
@@ -117,6 +145,17 @@ class AppSettings: ObservableObject {
         
         // Initialize useNearestStationForWidget with default value false (favorites first)
         self.useNearestStationForWidget = UserDefaults.standard.bool(forKey: "useNearestStationForWidget", defaultValue: false)
+        
+        // Initialize showPromoTiles with default value true
+        self.showPromoTiles = UserDefaults.standard.bool(forKey: "showPromoTiles", defaultValue: true)
+        
+        // Load dismissed promo tile IDs
+        if let data = UserDefaults.standard.data(forKey: "dismissedPromoTileIds"),
+           let ids = try? JSONDecoder().decode([String].self, from: data) {
+            self.dismissedPromoTileIds = Set(ids)
+        } else {
+            self.dismissedPromoTileIds = []
+        }
     }
     
     private func loadDepartureDataForNewWidgetSettings() async {

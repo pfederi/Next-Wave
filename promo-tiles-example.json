@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "tiles": [
+    {
+      "id": "welcome-2026",
+      "title": "Welcome to NextWave!",
+      "subtitle": "Version 2.0",
+      "text": "Discover the new features in NextWave 2.0! Faster loading, better performance, and more accurate wave predictions.",
+      "imageUrl": null,
+      "linkUrl": "https://nextwaveapp.ch",
+      "isActive": true,
+      "priority": 1,
+      "validFrom": null,
+      "validUntil": null
+    }
+  ]
+}

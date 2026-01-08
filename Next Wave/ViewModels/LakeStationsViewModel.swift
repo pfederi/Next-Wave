@@ -23,6 +23,7 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     @Published var hasAttemptedLoad = false
     @Published var scrolledToNext = false
     @Published var error: String?
+    @Published var promoTiles: [PromoTile] = []
     private var isInitialLoad = true
     
     private let transportAPI = TransportAPI()
@@ -43,17 +44,25 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     // Background loading state for favorites
     private var isBackgroundLoadingFavorites = false
     private var backgroundLoadingTask: Task<Void, Never>?
+    private var initializationTask: Task<Void, Never>?
     
     init(scheduleViewModel: ScheduleViewModel? = nil) {
         self.scheduleViewModel = scheduleViewModel
-        Task {
+        initializationTask = Task {
             await loadLakes()
             // Start loading favorite stations in background immediately after lakes are loaded
             // (don't wait for water temperatures)
             loadFavoriteStationsInBackground()
             
-            // Load water temperatures in parallel
-            await loadWaterTemperatures()
+            // Load water temperatures and promo tiles in parallel
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    await self.loadWaterTemperatures()
+                }
+                group.addTask {
+                    await self.loadPromoTiles()
+                }
+            }
         }
         scheduleMidnightRefresh()
         
@@ -68,6 +77,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     
     deinit {
         midnightTimer?.invalidate()
+        backgroundLoadingTask?.cancel()
+        initializationTask?.cancel()
+        locationManager.stopUpdatingLocation()
     }
     
     private func scheduleMidnightRefresh() {
@@ -109,6 +121,15 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             let response = try decoder.decode(LakesResponse.self, from: data)
             self.lakes = response.lakes
         } catch {
+        }
+    }
+    
+    func loadPromoTiles() async {
+        do {
+            let tiles = try await PromoTileAPI.shared.getPromoTiles()
+            self.promoTiles = tiles
+        } catch {
+            self.promoTiles = []
         }
     }
     
@@ -640,5 +661,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     // Check if background loading is in progress
     func isBackgroundLoadingInProgress() -> Bool {
         return isBackgroundLoadingFavorites
+    }
+    
+    // Clear departures cache
+    func clearDeparturesCache() {
+        departuresCache.removeAll()
+        print("🗑️ Departures cache cleared")
     }
 } 

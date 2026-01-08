@@ -2,7 +2,7 @@ import Foundation
 
 /// Alplakes API für Wassertemperatur und Vorhersagen
 /// API Dokumentation: https://alplakes-api.eawag.ch/docs
-class AlplakesAPI {
+actor AlplakesAPI {
     static let shared = AlplakesAPI()
     
     private let baseURL = "https://alplakes-api.eawag.ch"
@@ -259,6 +259,12 @@ class AlplakesAPI {
         cachedTemperatures.removeAll()
         lastFetchTime = nil
         print("🌊 [Alplakes] Cache invalidated")
+    }
+    
+    /// Clear cache
+    func clearCache() {
+        invalidateCache()
+        print("🗑️ [Alplakes] Water temperature cache cleared")
     }
 }
 

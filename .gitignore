@@ -17,7 +17,7 @@ build/
 .swiftpm/
 
 # Config files with sensitive data
-# Next Wave/Config.swift - Now tracked with placeholder, overwritten by CI
+Next Wave/Config.swift
 
 # Fastlane
 fastlane/report.xml

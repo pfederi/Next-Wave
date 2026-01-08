@@ -89,13 +89,20 @@ For complete feature details and technical specifications, see the [Arc42 Docume
    git clone https://github.com/pfederi/Next-Wave.git
    ```
 2. Open `Next Wave.xcodeproj` in Xcode
-3. Create a `Config.swift` file with your API keys:
+3. Create `Config.swift` from the example file:
+   ```bash
+   cp "Next Wave/Config.example.swift" "Next Wave/Config.swift"
+   ```
+4. Add your API keys to `Config.swift`:
    ```swift
    struct Config {
-       static let openWeatherApiKey = "YOUR_API_KEY"
+       static let openWeatherApiKey = "YOUR_API_KEY_HERE"
    }
    ```
-4. Build and run the project
+   Get your free API key from [OpenWeather](https://openweathermap.org/api)
+5. Build and run the project
+
+**Note**: `Config.swift` is ignored by Git to protect API keys.
 
 For detailed architecture and technical information, see the [Arc42 Documentation](ARC42_DOCUMENTATION.md).
 

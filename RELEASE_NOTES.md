@@ -4,531 +4,395 @@
 
 ## Version 3.6.0 (January 8, 2026)
 
-### Added
-- **Dynamic Promo Tiles**: Promotional and informational tiles controllable via JSON API
-  - Appear after favorite stations
-  - Title, subtitle, text, and optional image
-  - Optional: Link to external URL (opens Safari)
-  - **Swipe-to-Dismiss**: Swipe left to remove tile with iOS-style pill button
-  - Dismissed tiles are persistently stored
-  - New tiles are automatically displayed again
-  - **Settings Toggle**: Can be completely disabled in Settings
-  - **Reset Dismissed Tiles**: Button in Settings to reactivate all dismissed tiles
-  - Time-limited display (validFrom/validUntil)
-  - Platform targeting (iOS, Android, both)
-  - Manageable via admin area on nextwaveapp.ch
-  - 1-hour cache, no app updates required
-  - See `PROMO_TILE_API.md` for details
-- **Clear All Cache**: New function in Settings to clear all caches
-  - Clears departures cache
-  - Clears ship names cache
-  - Clears vessel deployment cache
-  - Clears weather cache (pressure history)
-  - Clears water temperature cache (Alplakes)
-  - Clears water level cache (MeteoNews)
-  - Clears promo tiles cache
-  - Clears HTTP cache (URLCache)
-  - Useful for debugging and forcing fresh data
-- **Modern Pill Navigation for Date Selection**
-  - Horizontal scrollable pills for 7 days (today + 6 days)
-  - Swipe gestures: Swipe left/right to change days
-  - Animated selection with Matched Geometry Effect
-  - Today's date highlighted with accent color border
-  - Haptic feedback on day change
-  - Compact display: Day, date, month in one pill
-  - Auto-centering of selected pill
+### What's New
+- **Announcements & Updates**: Stay informed with in-app notifications
+  - Important announcements appear on your home screen
+  - Swipe left to dismiss notifications you've seen
+  - Optional: Tap links to learn more in Safari
+  - Turn off in Settings if you prefer not to see them
+  - Reset dismissed messages anytime in Settings
 
-### Changed
-- **Instant Departure Display**: Departures now display immediately, weather loads in background
-  - Departures appear instantly (< 0.1s)
-  - Weather data and ship names load progressively in background
-  - No more waiting until all data is loaded
-  - UI updates automatically when weather becomes available
-- **HTTP Caching Enabled**: All API calls now use iOS HTTP cache
-  - `URLRequest.cachePolicy = .returnCacheDataElseLoad` for all APIs
-  - URLCache increased to 50MB memory / 100MB disk
-  - Server cache headers are respected
-  - Significantly faster responses on repeated calls
-  - Timeout set to 15 seconds
-- **Priority-Based Background Loading**: First 2 favorites load immediately, rest with delay
-  - First 2 favorites available after ~1 second
-  - Remaining favorites after ~2 seconds
-  - Reduces load on API servers
-- **Widget Data Only in Background**: Widget data loads only when app enters background
-  - No widget data loading on app start anymore
-  - 80% fewer API calls on first start
-  - Faster app start
+- **Modern Date Navigation**: Easier way to browse upcoming days
+  - Swipe left or right to quickly switch between days
+  - Today's date is highlighted with a blue border
+  - Smooth animations and haptic feedback
+  - See the next 7 days at a glance
 
-### Fixed
-- **Ship Name Loading Indicator**: Now shows "Loading..." while ship names are loading
-  - Distinguishes between "still loading" (Loading...) and "no data" (No data)
-  - ProgressView spinner during loading
-  - "No data" only when no ship name was actually found
-- **Water Level Display**: Water level now displays correctly after date change
-  - Now checks `selectedDate` instead of `wave.time` for "today" condition
-  - Water level remains visible even after switching to another day and back
-- **Memory Management**: Fixed EXC_BAD_ACCESS crashes
-  - Removed obsolete `didSet` on `nextWaves` that caused race conditions
-  - Removed unused `weatherLoadingTask`
-  - Improved task cancellation in `updateWaves()`
-  - NotificationCenter observer now correctly removed in `deinit`
-  - LocationManager now correctly stopped in `deinit`
-  - **AlplakesAPI, MeteoNewsAPI, WeatherAPI** converted to `actor` for thread-safety
-    - Prevents race conditions on parallel API calls
-    - Cache accesses are now thread-safe
-- **Swift 6 Compatibility**: Timer creation wrapped in MainActor.run
-  - Fixes "RunLoop.current unavailable from async contexts" error
-  - Removed unnecessary captures in closures
+- **Clear All Cache**: Fresh start when you need it
+  - New option in Settings to clear all cached data
+  - Helpful if the app shows outdated information
+  - Forces the app to reload everything fresh
+
+### Improvements
+- **Faster App Experience**: Departures now appear instantly
+  - No more waiting for weather data to load
+  - Ship names and weather load smoothly in the background
+  - Everything updates automatically when ready
+
+- **Better Loading Indicators**: Know what's happening
+  - "Loading..." shown while ship names are being fetched
+  - "No data" only appears when information is truly unavailable
+  - Clear distinction between loading and missing data
+
+- **More Reliable**: Fixed several crashes and bugs
+  - App is more stable and responsive
+  - Better memory management
+  - Improved performance on all devices
 
 ## Version 3.5.1 (November 24, 2025)
 
-### Added
-- **Parallel API Loading**: Water temperature data for all lakes now loads simultaneously
-  - ~10-15x faster initial data loading (1-2 seconds instead of 15-30 seconds)
-  - All 15 Swiss lakes load in parallel instead of sequentially
-  - Significantly improved app start performance
-  - Performance timing included in debug logs
-
-### Fixed
-- **Improved Station Loading**: Eliminated screen flicker when switching between stations
-  - Loading state now appears instantly before data clearing
-  - Smoother transitions with optimized state management
-  - Fixed race condition in cached data handling
-  - Removed unnecessary delays for cached departures
-- **Enhanced Debugging**: Added comprehensive logging for better troubleshooting
-  - View model state tracking (station selection, API calls, cache hits)
-  - UI state visibility tracking (loading, errors, data display)
-  - Better error messages and state information
-
-### Changed
-- **Optimized Cache Performance**: Cache hits now display instantly without artificial delays
-- **Better Error Handling**: More informative error states and fallback UI
+### Improvements
+- **Much Faster Loading**: Water temperature data loads 10-15x faster
+  - App starts in 1-2 seconds instead of 15-30 seconds
+  - All Swiss lakes load at the same time
+  
+- **Smoother Station Switching**: No more flickering when changing stations
+  - Instant loading state
+  - Smoother transitions between stations
+  - Better handling of cached data
 
 ---
 
 ## Version 3.5.0 (November 19, 2025)
 
-### Added
-- **Alplakes API Integration**: Integration of Eawag's Alplakes API for precise water temperatures
-  - Water temperatures for all major Swiss lakes
-  - Temperature forecasts for the next 2 days (3-hour intervals)
-  - Scientifically validated data from Eawag (Swiss Federal Institute of Aquatic Science and Technology)
-  - Automatic updates every 3 hours
-  - Supports 15+ Swiss lakes: Lake Zurich, Lake Lucerne, Lake Constance, Lake Geneva, Lake Thun, Lake Brienz, Lake Maggiore, Lake Lugano, Lake Biel, Lake Neuchâtel, Lake Murten, Lake Zug, Lake Walen, Lake Hallwil, Lake Aegeri
-
-- **Precise Temperature Display**: Water temperature now with one decimal place (e.g. 18.5°C)
-  - More accurate temperature values in all lists (departures, favorites, nearest station)
-  - Temperature forecasts automatically used for future days
-  - **Time-specific temperature**: For departures, temperature is shown for the exact departure time (not daily average)
-  - Share function includes precise temperature values
-
-### Changed
-- **Data Source Optimization**: Intelligent temperature queries with fallback strategy
-  - **Primary**: Alplakes API (Eawag) for temperature + 2-day forecast
-  - **Fallback**: MeteoNews for lakes without Alplakes data (without forecast)
-  - More accurate temperature values through hydrodynamic models
-  - Maximum coverage through fallback strategy
-  - Water levels still from MeteoNews (stable and proven)
+### What's New
+- **More Accurate Water Temperatures**: Scientific data from Eawag research institute
+  - Precise temperatures with one decimal place (e.g. 18.5°C)
+  - Temperature forecasts for the next 2 days
+  - Shows temperature at your exact departure time
+  - Covers 15+ Swiss lakes including Zurich, Lucerne, Constance, Geneva, and more
+  - Updates automatically every 3 hours
 
 ---
 
 ## Version 3.4.4 (November 2025)
 
-### Added
-- **Clear Ship Data Cache**: New settings option to manually clear ship deployment data cache
-  - Force reload of ship assignments from Vercel API
-  - Accessible in Settings > Data Management
-  - Helpful for troubleshooting or forcing immediate updates
-  - Confirmation dialog to prevent accidental clearing
-- **Albis-Class Filter Settings**: New toggle to enable/disable the Albis-Class filter feature
-  - Located in Settings > Display Options
+### What's New
+- **Albis-Class Filter**: Find the best waves on Lake Zurich
+  - Flip your device 180° in departure view to see only the best ships
+  - Shows MS Albis, EMS Uetliberg, and EMS Pfannenstiel
+  - Turn on/off in Settings
   - Enabled by default
-  - When enabled, flip device 180° in departure view to filter for best waves on Zürichsee
-  - Shows only Albis-Class ships (MS Albis, EMS Uetliberg, EMS Pfannenstiel)
-  - Includes helpful description in settings
 
-### Changed
-- **Ship Data Display**: Changed "Loading..." to "No data" when ship information is unavailable
-  - More accurate representation after background loading completes
-- **URLSession Cache**: Improved cache handling for vessel data API
-  - Changed cache policy to always fetch fresh data
-  - Clear Ship Data Cache now also clears URLSession cache
-  - Fixes issue where old ship deployment data was being displayed
+### Improvements
+- **Better Ship Information**: Clearer when ship data is unavailable
+- **More Reliable Data**: Improved loading of ship assignments
 
 ---
 
 ## Version 3.4.3 (November 2025)
 
 ### Improvements
-- **Wetsuit thickness**: Updated winter wetsuit recommendation from 6/5/4mm to 6/5mm for better clarity and accuracy
+- **Wetsuit Recommendations**: Updated winter wetsuit thickness for better clarity
 
 ---
 
 ## Version 3.4.2 (November 2025)
 
-### Daylight Phase Icons
-- **Time-of-day indicators**: New icon system showing current daylight phase for each departure
-- **Sun icon**: Displayed during full daylight hours
-- **Twilight icon**: Shown during civil twilight (dawn and dusk)
-- **Moon icon**: Displayed during nighttime hours
-- **Smart positioning**: Icons appear next to departure time for instant recognition
-- **Session planning**: Quickly identify which departures occur during optimal daylight conditions
-- **Consistent experience**: Icons integrated throughout the app (departure list, favorites, search)
+### What's New
+- **Daylight Indicators**: See at a glance when departures occur
+  - Sun icon for daytime departures
+  - Twilight icon for dawn and dusk
+  - Moon icon for nighttime departures
+  - Plan your sessions around daylight hours
 
 ---
 
 ## Version 3.4.1 (November 2025)
 
-### Water Level Icon Improvement
-- **Dynamic water level icons**: Icons now show direction based on whether water is higher or lower than average
-- **Arrow up (↑)**: Displayed when water level is above average (e.g., +15 cm)
-- **Arrow down (↓)**: Displayed when water level is below average (e.g., -5 cm)
-- **Visual clarity**: Instantly see if water level is high or low without reading the number
-- **Consistent across app**: Updated in departure list, favorite stations, and nearest station tiles
+### Improvements
+- **Better Water Level Icons**: Arrows show if water is high or low
+  - Arrow up (↑) when water level is above average
+  - Arrow down (↓) when water level is below average
+  - Instantly see conditions without reading numbers
 
 ---
 
 ## Version 3.4 (November 2025)
 
-### Smart Wetsuit Thickness Recommendations
-- **Intelligent calculator**: Get personalized wetsuit thickness recommendations based on water temperature and wind chill
-- **30°C rule**: If air + water temperature < 30°C, the app recommends one size thicker for optimal comfort
-- **Temperature ranges**: From 0.5-2mm shorties to 6/5mm winter wetsuits
-- **Wind chill integration**: Uses "feels like" temperature for more accurate recommendations
-- **Visual display**: Shows thickness in millimeters (e.g., 3/2mm, 4/3mm) with intuitive icon
+### What's New
+- **Smart Wetsuit Recommendations**: Know what to wear before you go
+  - Get personalized wetsuit thickness suggestions
+  - Based on water temperature and wind chill
+  - From 0.5-2mm shorties to 6/5mm winter wetsuits
+  - Uses the 30°C rule for optimal comfort
 
-### Interactive Weather Legend
-- **Tap to learn**: Tap on any weather line to see detailed explanations of all weather data
-- **Comprehensive information**: Learn what each weather icon and value means
-- **Weather conditions guide**: Understand different weather conditions (clear, cloudy, rainy, etc.)
-- **Professional design**: Clean, organized modal with easy-to-read information
-- **Always accessible**: Available on every departure with weather data
+- **Weather Help**: Tap to learn what everything means
+  - Tap any weather line to see detailed explanations
+  - Understand all weather icons and values
+  - Learn about different weather conditions
+  - Always available when you need it
 
-### Enhanced Weather Display
-- **Improved layout**: Weather data now spans full width for better readability
-- **Consistent ordering**: Air Temp | Water Temp | Wind | Wetsuit | Water Level
-- **Better spacing**: Increased vertical spacing for improved visual hierarchy
-- **Clear separators**: Pipe separators (|) between data points for easy scanning
-- **Icon consistency**: Each data point has its own descriptive icon
-- **Today-only water level**: Water level difference only shown for current day departures
+- **Share Your Sessions**: Invite friends to join you
+  - Share wave details via WhatsApp, Messages, or Mail
+  - Includes all important info: time, ship, weather, and more
+  - Fun intro messages for each share
+  - One-tap sharing
 
-### Share Wave Feature
-- **Share with friends**: Share wave details via WhatsApp, Messages, or Mail
-- **Fun intro messages**: 5 randomized intro texts like "🥳 Let's share the next wave for a party wave!"
-- **Complete information**: Includes station, date, time, route, ship name, and all weather data
-- **Weather details**: Air temperature, water temperature, wind, wetsuit recommendation, and water level
-- **One-click sharing**: Direct integration with WhatsApp, Messages, and Mail apps
-- **Smart formatting**: Proper emoji support and formatting for each platform
-- **App promotion**: Includes link to NextWave on App Store
-- **Future waves only**: Share button only visible for upcoming departures
+### Improvements
+- **Better Weather Layout**: Easier to read at a glance
+  - Full-width weather display
+  - Clear icons for each data point
+  - Better spacing and organization
 
 ---
 
 ## Version 3.3.1 (October 2025)
 
 ### Bug Fixes
-- **Ship names loading**: Fixed issue where ship names weren't loading for all 3 days
-- **Scroll behavior**: Improved scroll behavior in departures list
-- **Date change handling**: Better handling of date changes and scroll position
+- Fixed ship names not loading for all 3 days
+- Improved scrolling in departures list
+- Better handling when changing dates
 
 ---
 
 ## Version 3.3 (October 2025)
 
-### Ship Data Loading Optimization
-- **Puppeteer-based scraping**: Advanced web scraping using headless Chrome to handle dynamic AJAX content
-- **Multi-day data fetching**: Correctly loads ship assignments for today and next 2 days
-- **Intelligent caching system**: Three-layer caching strategy (API cache, URLSession cache, in-memory cache)
-- **Zero loading flicker**: Ship names appear instantly from cache without "Loading..." indicators
-- **Single UI update**: All data (weather + ship names) loaded in background before single smooth UI update
-- **Performance**: 24-hour client-side cache eliminates redundant API calls
+### What's New
+- **Water Level Information**: Know the current water conditions
+  - See current water level for all major Swiss lakes
+  - Shows difference from average (e.g., "+7 cm" or "-5 cm")
+  - Helpful for foilers to assess depth
+  - Updates automatically once per day
 
-### Water Level Display
-- **Real-time data**: Current water level for all major Swiss lakes
-- **Difference from average**: Shows how much the current water level differs from the average (e.g., "+7 cm" or "-5 cm")
-- **Meteonews integration**: Water level data sourced from meteonews.ch
-- **Daily updates**: Automatic refresh once per day
-- **Visual integration**: Displayed with chart icon alongside weather data
-- **Foiler-friendly**: Helps foilers assess water conditions and depth
-
-### UI Improvements
-- **Prevent UI flicker**: View updates only once with all data loaded
-- **Better caching**: Avoid redundant API calls with improved caching strategy
-- **Enhanced debugging**: Better error handling and logging
+### Improvements
+- **Faster Ship Information**: Ship names appear instantly
+  - No more "Loading..." indicators
+  - Smart caching for better performance
+  - Shows ship assignments for the next 3 days
+- **Smoother Experience**: Less flickering and better loading
 
 ---
 
 ## Version 3.0 (September 2025)
 
-### Water Temperature Display
-- **Real-time data**: Current water temperature for all major Swiss lakes
-- **Meteonews integration**: Data sourced from meteonews.ch
-- **Daily updates**: Automatic refresh once per day
-- **Smart caching**: 24-hour cache to minimize API calls
-- **Visual integration**: Displayed alongside weather data with consistent UI
-- **Coverage**: Available for 30+ Swiss lakes
+### What's New
+- **Water Temperature**: See how cold (or warm!) the water is
+  - Real-time temperatures for 30+ Swiss lakes
+  - Updates automatically every day
+  - Displayed alongside weather information
 
-### Best Surf Sessions Analytics
-- **Quality-first scoring**: Sessions prioritize large ships (3-wave ships) over quantity
-- **Smart scoring system**: 
-  - 3-wave ships: 10 points
-  - 2-wave ships: 5 points
-  - 1-wave ships: 2 points
-- **Frequency bonus**: Additional scoring for higher wave frequency
-- **Daylight optimization**: 
-  - Sessions in complete darkness automatically excluded
-  - Twilight sessions receive reduced scores (80% penalty)
-  - Best sessions during full daylight hours
-- **Session parameters**: 
-  - Maximum duration: 2 hours
-  - Minimum duration: 1 hour
-  - Maximum gap between waves: 1 hour
+- **Best Session Finder**: Find the best times to go out
+  - Prioritizes ships that make the biggest waves
+  - Focuses on daylight hours
+  - Shows you 1-2 hour session windows
+  - Smart scoring based on wave quality and frequency
 
 ---
 
 ## Version 3.2 (September 2025)
 
-### Widget Enhancements
-- **Multi-day logic**: Intelligent widget functionality with better multi-day support
-- **Improved UX**: Enhanced user experience for widgets
-- **Auto-refresh**: Widgets automatically update departure data when app launches
-- **Data synchronization**: Better sync between app, widgets, and watch
-- **Settings improvements**: Enhanced widget settings UI
+### Improvements
+- **Better Widgets**: Smarter widgets with multi-day support
+  - Automatic updates when you open the app
+  - Better sync between app, widgets, and watch
+  - Improved settings
 
 ---
 
 ## Version 3.1 (September 2025)
 
-### Dependency Updates
-- **Security fixes**: Updated dependencies to fix security vulnerabilities
-  - path-to-regexp: ^8.0.0 (fixes high severity CVE)
-  - undici: ^7.0.0 (fixes moderate severity CVE)
-  - esbuild: ^0.24.2
-- **Vercel updates**: Updated @vercel/node from 3.2.0 to 4.0.0
-- **Build improvements**: Updated vercel from 37.0.0 to 48.0.0
-
-### UI Improvements
-- **Enhanced departure view**: Improved ship icon handling and debugging
-- **Better error handling**: More robust error handling throughout the app
+### Improvements
+- **Security Updates**: Latest security fixes
+- **Better Reliability**: Improved error handling throughout the app
 
 ---
 
 ## Version 2.9.1 (August 2025)
 
-### Watch App Improvements
-- **Location refresh**: Implement location refresh on app appearance
-- **Nearest station detection**: Improved logic for finding nearest station
-- **UI updates**: Better reflection of station availability
-- **Responsive location**: More responsive distance filter for location updates
-- **watchOS compatibility**: Adjusted deployment target to 11.0
+### Improvements
+- **Better Watch App**: More accurate nearest station detection
+  - Improved location updates
+  - Better station availability display
+  - More responsive
 
 ---
 
 ## Version 2.9 (August 2025)
 
-### Apple Watch App & Widgets
-- **Watch app**: Full-featured Apple Watch app with complications and widgets
-- **Two usage modes**: Favorite stations OR automatic nearest station
-- **Complications**: Support for all watch faces
-- **Real-time sync**: WatchConnectivity for data synchronization
-- **Widget support**: Home screen and lock screen widgets for both iPhone and Watch
-- **Smart fallback**: Automatically falls back to favorites if nearest station has no departures
+### What's New
+- **Apple Watch App**: NextWave on your wrist!
+  - Full-featured watch app with complications
+  - Use favorite stations or nearest station automatically
+  - Works on all watch faces
+  - Home screen and lock screen widgets
+  - Syncs with your iPhone in real-time
 
 ---
 
 ## Version 2.8.5 (July 2025)
 
-### Time Zone Fixes
-- **Zurich time zone**: Fixed time zone handling for sunrise and sunset times
-- **DST handling**: Proper handling of daylight saving time changes
-- **Calendar adjustments**: Enhanced AppDateFormatter with better calendar handling
-- **Consistent time display**: All times now properly displayed in Swiss time zone
-
-### Station Updates
-- **New stations**: Added additional ferry stations across Swiss lakes
-- **Configuration improvements**: Better station data structure
-- **Settings UI**: Enhanced settings view layout
+### Improvements
+- **Better Time Display**: Fixed time zone handling
+  - Correct sunrise and sunset times
+  - Proper daylight saving time support
+  - All times in Swiss time zone
+- **More Stations**: Added additional ferry stations
 
 ---
 
 ## Version 2.8.4 (July 2025)
 
-### Date & Time Improvements
-- **Improved date handling**: Refactored AppDateFormatter for better date handling
-- **Time zone consistency**: All date/time operations now use Zurich time zone
-- **Wave time slot formatting**: Enhanced time string formatting
+### Improvements
+- **Better Date Handling**: More reliable date and time operations
 
 ---
 
 ## Version 2.8 (July 2025)
 
-### App Rebranding
-- **Name change**: Rebranded from "Next Wave" to "NextWave" (one word)
-- **Consistent branding**: Updated all references throughout the app
-- **Configuration updates**: Updated bundle identifiers and project settings
-
-### Weather Improvements
-- **Weather data in favorites**: Added weather information to favorite station tiles
-- **API improvements**: Enhanced weather API integration
-- **Bug fixes**: Fixed various weather data display issues
+### What's New
+- **New Name**: "NextWave" (one word) - fresh look, same great app!
+- **Weather in Favorites**: See weather info on your favorite station tiles
 
 ---
 
 ## Version 2.7.1 (June 2025)
 
-### Bug Fixes & Improvements
-- **Date behavior**: Fixed consistent date behavior when selecting stations
-- **No waves messages**: Added more variety to "no waves" messages
-- **Duplicate messages**: Fixed issue where same message could appear twice
-- **Drag & drop**: Improved drag & drop functionality for favorites
-- **Edit mode**: Dedicated EditableFavouritesListView with long press gesture
+### Improvements
+- **Better Date Behavior**: More consistent when selecting stations
+- **More Fun Messages**: Added variety to "no waves" messages
+- **Easier Reordering**: Improved drag & drop for favorites
 
 ---
 
 ## Version 2.7 (June 2025)
 
-### Favorite Stations
-- **Up to 5 favorites**: Store up to 5 frequently used stations
-- **Drag & drop reordering**: Easily reorder your favorite stations
-- **Quick access**: Fast access to your most-used stations
-- **Persistent storage**: Favorites saved across app launches
+### What's New
+- **Favorite Stations**: Save your go-to spots
+  - Store up to 5 favorite stations
+  - Drag & drop to reorder
+  - Quick access from home screen
+  - Saved automatically
 
-### Nearest Station Feature
-- **Auto-detection**: Automatically find the nearest ferry station
-- **Location-based**: Uses CoreLocation for precise positioning
-- **Toggle option**: Can be enabled/disabled in settings
-- **Widget support**: Works with both iPhone and Watch widgets
+- **Nearest Station**: Find the closest spot automatically
+  - Uses your location to find nearby stations
+  - Turn on/off in settings
+  - Works with widgets
 
-### iPad Support
-- **All orientations**: Support for all device orientations on iPad
-- **Optimized layout**: UI optimized for larger screens
+- **iPad Support**: Optimized for larger screens
+  - All orientations supported
+  - Better layout on iPad
 
 ---
 
 ## Version 2.6 (May 2025)
 
-### Sunrise & Sunset Integration
-- **Sun times**: Display sunrise and sunset times for each day
-- **Twilight phases**: Show civil twilight begin and end times
-- **Daylight duration**: Calculate total daylight hours
-- **Visual gradients**: Beautiful gradient visualization of daylight phases
-- **Session planning**: Plan your sessions based on available daylight
+### What's New
+- **Sunrise & Sunset Times**: Plan your sessions around daylight
+  - See sunrise and sunset for each day
+  - Twilight times included
+  - Beautiful gradient visualization
+  - Know exactly how much daylight you have
 
-### Wave Analytics Enhancements
-- **Auto-scroll to current time**: Wave timeline automatically scrolls to current time
-- **Line chart updates**: Improved wave frequency visualization
-- **Better time slots**: Enhanced time slot calculations for wave analysis
+### Improvements
+- **Better Wave Timeline**: Automatically scrolls to current time
+- **Improved Charts**: Better wave frequency visualization
 
 ---
 
 ## Version 2.5 (May 2025)
 
-### Schedule Period Management
-- **Automatic detection**: App automatically detects summer and winter schedule periods
-- **Smart notifications**: Get notified about upcoming schedule changes
-- **30-day advance notice**: Countdown messages appear when schedule transitions are within 31 days
-- **Season-specific messages**: Different witty messages for summer, winter, spring, and autumn transitions
-- **All Swiss lakes**: Works for all 15+ major Swiss lakes with boat services
-- **Schedule footer**: Display countdown messages in departure list footer
+### What's New
+- **Schedule Change Alerts**: Never miss a schedule update
+  - Automatic detection of summer/winter schedules
+  - 30-day advance notice
+  - Fun seasonal messages
+  - Works for all Swiss lakes
 
 ---
 
 ## Version 2.4 (May 2025)
 
-### Ship Data Display Extension
-- **3-day ship forecast**: Extended ship name display from 1 day to 3 days
-- **Date format fix**: Corrected date format for ZSG API (DD.MM.YYYY)
-- **Better logging**: Added detailed logging for ship data fetching
-- **Cache improvements**: Force cache update if less than 3 days of data available
+### Improvements
+- **3-Day Ship Forecast**: See which ships are coming for the next 3 days
+- **Better Caching**: More reliable ship information
 
 ---
 
 ## Version 2.3 (May 2025)
 
-### Ship Names & Wave Ratings
-- **Real-time ship identification**: Displays actual ship name for each departure on Lake Zurich
-- **Wave rating icons**: Visual indicators showing expected wave quality (1-3 waves)
-- **Automatic updates**: Ship assignments fetched daily from ZSG
-- **Smart caching**: Efficient caching system to minimize API calls
-- **Web scraping**: Custom API for scraping ZSG ship deployment data
+### What's New
+- **Ship Names**: Know which ship is coming (Lake Zurich)
+  - See the actual ship name for each departure
+  - Wave rating icons (1-3 waves)
+  - Updates automatically every day
+  - Know which ships make the best waves
 
 ---
 
 ## Version 2.2 (April 2025)
 
-### Map Integration
-- **OpenStreetMap**: Detailed water navigation maps
-- **Shipping routes**: Overlay showing ferry routes
-- **Station clustering**: Better overview with clustered stations
-- **Offline caching**: Automatic map caching for offline use
-- **Light & dark mode**: Optimized for both themes
-- **Location tracking**: Show your position on the map
-- **Failsafe**: Fallback to Apple Maps if needed
+### What's New
+- **Interactive Map**: See all stations on a map
+  - Detailed water navigation maps
+  - Ferry routes overlay
+  - Clustered stations for better overview
+  - Works offline with automatic caching
+  - Shows your current location
+  - Light and dark mode support
 
 ---
 
 ## Version 2.1 (March 2025)
 
-### Notification Improvements
-- **Better notification management**: Improved handling of notification lifecycle
-- **Notification cleanup**: Notifications properly removed after being played
-- **Background notifications**: Enhanced background notification delivery
-- **Notification text**: Improved notification text formatting with route direction
+### Improvements
+- **Better Notifications**: More reliable notification delivery
+  - Improved notification management
+  - Better cleanup after notifications
+  - Enhanced background delivery
 
 ### Bug Fixes
-- **Timer fixes**: Fixed timer-related bugs
-- **Date change at midnight**: Fixed issue where date wasn't updated at midnight
-- **Browser link crash**: Fixed crash when swiping back from browser
-- **Scroll behavior**: Improved scroll-to-time functionality
+- Fixed date not updating at midnight
+- Fixed crash when swiping back from browser
+- Improved scrolling behavior
 
 ---
 
 ## Version 2.0 (March 2025)
 
-### Major UI Overhaul
-- **Light & Dark Mode**: Full support for both color schemes
-- **Device flip gesture**: Flip device 180° to toggle between light and dark mode
-- **Modern design**: Clean, intuitive interface with improved navigation
-- **Theme switch**: Smooth transitions between themes
+### Major Update
+- **Light & Dark Mode**: Choose your preferred look
+  - Full support for both themes
+  - Flip device 180° to switch themes
+  - Modern, clean design
+  - Smooth transitions
 
-### Notifications & Settings
-- **Custom notification times**: Choose 3, 5, 10, or 15 minutes before waves
-- **Sound settings**: Select from multiple notification sounds
-- **Notification management**: Better handling of notification lifecycle
-- **Background notifications**: Notifications work even when app is closed
+- **Custom Notifications**: Get notified your way
+  - Choose 3, 5, 10, or 15 minutes before waves
+  - Multiple notification sounds
+  - Works even when app is closed
 
-### Safety Features
-- **Safety rules modal**: Comprehensive wakethieving safety guidelines
-- **First launch display**: Safety rules shown automatically on first app launch
-- **Easy access**: Safety rules accessible anytime via orange shield icon
-- **Community integration**: Direct link to Swiss Pumpfoilers Code of Conduct
+- **Safety First**: Important safety information
+  - Comprehensive safety guidelines
+  - Shown on first launch
+  - Always accessible via orange shield icon
+  - Link to Swiss Pumpfoilers Code of Conduct
 
-### Weather Integration
-- **OpenWeather API**: Real-time weather data for all stations
-- **Temperature display**: Current temperature with min/max values
-- **Wind information**: Wind speed in knots with direction
-- **Pressure trends**: Atmospheric pressure with 6-hour trend tracking
-- **Weather icons**: Visual condition indicators with SF Symbols
-- **Per-departure weather**: Individual weather data for each departure time
+- **Weather Information**: Know the conditions
+  - Real-time weather for all stations
+  - Temperature with min/max values
+  - Wind speed and direction
+  - Atmospheric pressure trends
+  - Weather for each departure time
 
-### Performance Improvements
-- **Auto-refresh**: Automatic data refresh at optimal intervals
-- **Better caching**: Improved caching strategy for faster loading
-- **Background loading**: Data loaded in background for smoother experience
-- **Error handling**: Enhanced error handling and user feedback
+### Improvements
+- **Faster Loading**: Better caching and background loading
+- **More Reliable**: Enhanced error handling
 
 ---
 
 ## Version 1.0 (February 2025)
 
 ### Initial Release
-- **Real-time schedules**: Live boat departure times for Swiss lakes
-- **Station selection**: Browse and select from all Swiss ferry stations
-- **Departure list**: Clear overview of upcoming departures
-- **Route information**: Route numbers and destination stations
-- **Date navigation**: Browse departures for different days
-- **Basic notifications**: Get notified before wave arrivals
-- **Swiss lakes coverage**: Support for major Swiss lakes (Zürichsee, Vierwaldstättersee, etc.)
+Welcome to NextWave! Your companion for wakethieving on Swiss lakes.
+
+- **Real-Time Schedules**: Live boat departure times
+- **All Swiss Lakes**: Coverage of major Swiss lakes
+- **Station Selection**: Browse all ferry stations
+- **Departure List**: Clear overview of upcoming departures
+- **Route Information**: See route numbers and destinations
+- **Date Navigation**: Browse different days
+- **Notifications**: Get notified before waves arrive
 
 ---
 

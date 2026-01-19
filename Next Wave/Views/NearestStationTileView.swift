@@ -203,9 +203,8 @@ struct NearestStationTileView: View {
                                     .font(.system(size: 11))
                                     .foregroundColor(Color("text-color"))
                             }
-                            
-                            Spacer()
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.top, 4)
                 } else if appSettings.showWeatherInfo && isLoadingWeather {

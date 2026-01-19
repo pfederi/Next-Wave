@@ -1,13 +1,13 @@
-What's New in Version 3.4.4:
+What's New in Version 3.6.0:
 
 New Features
-• Clear Ship Data Cache: Manually refresh ship deployment data in Settings > Data Management
-• Albis-Class Filter Settings: Enable/disable the device flip filter in Settings (enabled by default)
-• Flip your device 180° in the departure view to filter for the best waves on Zürichsee (Albis-Class ships only)
+• Announcements & Updates: Stay informed with in-app notifications on your home screen - swipe left to dismiss
+• Modern Date Navigation: Swipe left or right to quickly browse upcoming days with smooth animations
+• Clear All Cache: Fresh start option in Settings to clear all cached data when needed
 
 Improvements
-• Changed "Loading..." to "No data" for more accurate ship information display
-• Improved cache handling for ship deployment data - always fetches fresh data from server
-• Better troubleshooting options with manual cache clearing
+• Faster App Experience: Departures now appear instantly - weather and ship names load smoothly in the background
+• Better Loading Indicators: Clear distinction between "Loading..." and "No data" for ship information
+• More Reliable: Fixed several crashes and improved overall stability
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

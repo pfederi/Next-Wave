@@ -48,8 +48,8 @@ struct DateSelectionView: View {
                 .onChange(of: selectedDate) { oldValue, newValue in
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         proxy.scrollTo(selectedIndex, anchor: .center)
-                    }
                 }
+            }
                 .onAppear {
                     // Initial scroll to selected date
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -81,9 +81,9 @@ struct DateSelectionView: View {
                             if selectedIndex > 0 {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     selectDate(availableDates[selectedIndex - 1])
-                                }
-                            }
-                        }
+                }
+            }
+        }
                         
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
                             dragOffset = 0

@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## Version 3.6.1 (January 19, 2026)
+
+### Improvements
+- **Better Scrolling**: Fixed scrolling issue with announcement tiles
+  - You can now scroll up and down freely on the home screen
+  - Swipe left still works to dismiss announcements
+  - Improved gesture detection for smoother interaction
+
+- **Supporters Page**: New link to view our amazing supporters
+  - Find it in Settings under Links
+  - Thank you to everyone who helps keep this app running!
+
 ## Version 3.6.0 (January 8, 2026)
 
 ### What's New

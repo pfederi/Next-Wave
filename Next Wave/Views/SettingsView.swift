@@ -664,8 +664,32 @@ struct LinksSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            // Supporters Section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("A big thank you to all our amazing supporters who help keep this app running!")
+                    .font(.subheadline)
+                    .foregroundColor(Color("text-color"))
+                    .opacity(0.8)
+                
+                Button(action: {
+                    if let url = URL(string: "https://www.nextwaveapp.ch/supporters") {
+                        openURL(url)
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(.accentColor)
+                        Text("View Our Supporters")
+                            .font(.body)
+                            .foregroundColor(.accentColor)
+                            .underline(true, color: .accentColor)
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+            
             Button(action: {
-                if let url = URL(string: "https://nextwaveapp.ch/release-notes.html") {
+                if let url = URL(string: "https://www.nextwaveapp.ch/release-notes") {
                     openURL(url)
                 }
             }) {
@@ -680,7 +704,7 @@ struct LinksSection: View {
             }
             
             Button(action: {
-                if let url = URL(string: "https://nextwaveapp.ch/privacy.html") {
+                if let url = URL(string: "https://www.nextwaveapp.ch/privacy") {
                     openURL(url)
                 }
             }) {
@@ -688,21 +712,6 @@ struct LinksSection: View {
                     Image(systemName: "hand.raised")
                         .foregroundColor(.accentColor)
                     Text("Privacy Policy")
-                        .font(.body)
-                        .foregroundColor(.accentColor)
-                        .underline(true, color: .accentColor)
-                }
-            }
-
-            Button(action: {
-                if let url = URL(string: "https://pumpfoiling.community") {
-                    openURL(url)
-                }
-            }) {
-                HStack {
-                    Image(systemName: "person.3")
-                        .foregroundColor(.accentColor)
-                    Text("Visit pumpfoiling.community")
                         .font(.body)
                         .foregroundColor(.accentColor)
                         .underline(true, color: .accentColor)

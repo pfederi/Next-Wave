@@ -109,10 +109,10 @@ struct DepartureRowView: View {
                                     } else {
                                         Text(shipName)
                                             .lineLimit(1)
-                                        Image(getWaveIcon(for: shipName))
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 16, height: 12)
+                                    Image(getWaveIcon(for: shipName))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 12)
                                     }
                                 } else {
                                     // Noch am Laden

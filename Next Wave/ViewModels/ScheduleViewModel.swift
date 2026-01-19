@@ -275,7 +275,7 @@ class ScheduleViewModel: ObservableObject {
             for i in updatedWaves.indices {
                 if updatedWaves[i].shipName == nil {
                     if let shipName = shipNames[i] {
-                        updatedWaves[i].updateShipName(shipName)
+                    updatedWaves[i].updateShipName(shipName)
                         hasShipNameUpdates = true
                     } else if updatedWaves[i].isZurichsee {
                         // Wenn kein Schiffsname gefunden wurde, setze "Unknown"

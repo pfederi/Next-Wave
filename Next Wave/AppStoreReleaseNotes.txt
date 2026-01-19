@@ -1,4 +1,4 @@
-What's New in Version 3.6.0:
+What's New in Version 3.6.1:
 
 New Features
 • Announcements & Updates: Stay informed with in-app notifications on your home screen - swipe left to dismiss

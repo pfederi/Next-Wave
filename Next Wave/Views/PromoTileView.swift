@@ -8,6 +8,7 @@ struct PromoTileView: View {
     @State private var offset: CGFloat = 0
     @State private var isSwiping = false
     @State private var isDismissed = false
+    @State private var dragStartLocation: CGPoint?
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -128,28 +129,45 @@ struct PromoTileView: View {
             .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
             .offset(x: offset)
             .gesture(
-                DragGesture()
+                DragGesture(minimumDistance: 20)
                     .onChanged { gesture in
-                        if gesture.translation.width < 0 {
-                            // Nur nach links swipen erlauben, mit Widerstand
+                        // Prüfen ob die Bewegung eher horizontal oder vertikal ist
+                        let horizontalMovement = abs(gesture.translation.width)
+                        let verticalMovement = abs(gesture.translation.height)
+                        
+                        // Nur reagieren wenn die Bewegung deutlich horizontaler ist
+                        if horizontalMovement > verticalMovement * 1.5 && gesture.translation.width < 0 {
+                            // Nur nach links swipen erlauben
                             let translation = gesture.translation.width
                             offset = translation
                             isSwiping = true
                         }
                     }
                     .onEnded { gesture in
-                        isSwiping = false
-                        if gesture.translation.width < -80 {
-                            // Dismiss wenn mehr als 80px geswiped
-                            withAnimation(.easeOut(duration: 0.2)) {
-                                offset = -500
-                                isDismissed = true
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                onDismiss()
+                        let horizontalMovement = abs(gesture.translation.width)
+                        let verticalMovement = abs(gesture.translation.height)
+                        
+                        // Nur als Swipe behandeln wenn es eine horizontale Bewegung war
+                        if horizontalMovement > verticalMovement * 1.5 {
+                            isSwiping = false
+                            if gesture.translation.width < -80 {
+                                // Dismiss wenn mehr als 80px geswiped
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    offset = -500
+                                    isDismissed = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    onDismiss()
+                                }
+                            } else {
+                                // Zurück schnappen
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    offset = 0
+                                }
                             }
                         } else {
-                            // Zurück schnappen
+                            // Bei vertikaler Bewegung einfach zurücksetzen
+                            isSwiping = false
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                 offset = 0
                             }

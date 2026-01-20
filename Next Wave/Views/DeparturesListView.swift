@@ -146,7 +146,7 @@ struct DeparturesListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
+                HStack(spacing: 12) {
                     if let station = selectedStation {
                         Button(action: {
                             if favoritesManager.isFavorite(station) {
@@ -159,6 +159,7 @@ struct DeparturesListView: View {
                         }) {
                             Image(systemName: favoritesManager.isFavorite(station) ? "heart.fill" : "heart")
                                 .foregroundColor(.accentColor)
+                                .padding(.leading, 8)
                         }
                     }
                     
@@ -175,6 +176,7 @@ struct DeparturesListView: View {
                         }) {
                             Image(systemName: showingAnalytics ? "list.bullet" : "chart.bar")
                                 .foregroundColor(.accentColor)
+                                .padding(.trailing, 8)
                         }
                     }
                 }

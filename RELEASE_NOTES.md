@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## Version 3.6.2 (January 20, 2026)
+
+### Improvements
+- **Better Icon Spacing**: Improved toolbar icon alignment
+  - Icons in the navigation bar now have consistent spacing
+  - Better visual balance on both home and station views
+  - More comfortable tap targets for all toolbar buttons
+
+### Fixed
+- **Consistent UI**: Toolbar icons now have uniform padding across all screens
+
 ## Version 3.6.1 (January 19, 2026)
 
 ### Improvements

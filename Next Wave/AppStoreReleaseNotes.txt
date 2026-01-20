@@ -1,13 +1,11 @@
-What's New in Version 3.6.1:
+What's New in Version 3.6.2:
 
-New Features
-• Announcements & Updates: Stay informed with in-app notifications on your home screen - swipe left to dismiss
-• Modern Date Navigation: Swipe left or right to quickly browse upcoming days with smooth animations
-• Clear All Cache: Fresh start option in Settings to clear all cached data when needed
+UI Improvements
+• Better Icon Spacing: Improved toolbar icon alignment for a cleaner, more balanced look
+• Consistent Design: Uniform spacing and padding across all screens for a more polished experience
+• Improved tap targets for all navigation buttons
 
-Improvements
-• Faster App Experience: Departures now appear instantly - weather and ship names load smoothly in the background
-• Better Loading Indicators: Clear distinction between "Loading..." and "No data" for ship information
-• More Reliable: Fixed several crashes and improved overall stability
+Bug Fixes
+• Fixed toolbar icon alignment issues
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

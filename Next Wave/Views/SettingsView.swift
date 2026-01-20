@@ -748,7 +748,7 @@ struct FooterSection: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 4)
             
-            Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"))")
+            Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
                 .font(.caption2)
                 .foregroundColor(Color("text-color"))
                 .opacity(0.6)

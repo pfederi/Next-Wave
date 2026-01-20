@@ -437,12 +437,8 @@ struct DepartureRowView: View {
             text += "🤸 Wetsuit: \(thickness)mm\n"
         }
         
-        // 5. Wasserpegel-Differenz (nur für heutigen Tag)
-        let calendar = Calendar.current
-        let isToday = calendar.isDateInToday(wave.time)
-        
-        if isToday,
-           let selectedStation = lakeStationsViewModel.selectedStation,
+        // 5. Wasserpegel-Differenz
+        if let selectedStation = lakeStationsViewModel.selectedStation,
            let lake = lakeStationsViewModel.lakes.first(where: { lake in
                lake.stations.contains(where: { $0.name == selectedStation.name })
            }), let waterLevelDiff = lake.waterLevelDifference {

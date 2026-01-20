@@ -1,11 +1,13 @@
 What's New in Version 3.6.2:
 
-UI Improvements
+Improvements
 • Better Icon Spacing: Improved toolbar icon alignment for a cleaner, more balanced look
 • Consistent Design: Uniform spacing and padding across all screens for a more polished experience
+• Share Feature Enhancement: Water level information now included when sharing waves with friends via WhatsApp, Messages, or Mail
 • Improved tap targets for all navigation buttons
 
 Bug Fixes
 • Fixed toolbar icon alignment issues
+• Fixed water level not showing in shared messages for future departures
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

@@ -10,6 +10,11 @@
   - Better visual balance on both home and station views
   - More comfortable tap targets for all toolbar buttons
 
+- **Share Feature Enhancement**: Water level now included in shared messages
+  - Water level information is now shown when sharing waves via WhatsApp, Messages, or Mail
+  - Previously only available for today's departures, now included for all future departures
+  - Helps friends see complete wave conditions when planning sessions together
+
 ### Fixed
 - **Consistent UI**: Toolbar icons now have uniform padding across all screens
 

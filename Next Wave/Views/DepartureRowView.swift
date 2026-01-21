@@ -279,7 +279,12 @@ struct DepartureRowView: View {
             }
         }
         .sheet(isPresented: $showShareSheet) {
-            CustomShareSheet(text: generateShareText(), isPresented: $showShareSheet)
+            CustomShareSheet(
+                wave: wave,
+                formattedTime: formattedTime,
+                lakeStationsViewModel: lakeStationsViewModel,
+                isPresented: $showShareSheet
+            )
         }
         .sheet(isPresented: $showWeatherLegend) {
             WeatherLegendView(isPresented: $showWeatherLegend)
@@ -377,79 +382,6 @@ struct DepartureRowView: View {
         return (departureMinutes >= twilightBeginMinutes && departureMinutes < sunriseMinutes) ||
                (departureMinutes > sunsetMinutes && departureMinutes <= twilightEndMinutes)
     }
-    
-    private func generateShareText() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEEE, d. MMMM yyyy"
-        dateFormatter.locale = Locale(identifier: "de_CH")
-        dateFormatter.timeZone = TimeZone(identifier: "Europe/Zurich")
-        
-        let dateString = dateFormatter.string(from: wave.time)
-        let stationName = lakeStationsViewModel.selectedStation?.name ?? ""
-        
-        // Zufälliger Intro-Text
-        let introTexts = [
-            "🥳 Let's share the next wave for a party wave!",
-            "🌊 Catch the wave with me!",
-            "🌊 Ready to ride the next wave together?",
-            "🚢 All aboard for the next adventure!",
-            "🌊 Join me on this wave - it's going to be epic!"
-        ]
-        let randomIntro = introTexts.randomElement() ?? introTexts[0]
-        
-        var text = "\(randomIntro)\n\n"
-        text += "📍 \(stationName) → \(wave.neighborStopName)\n"
-        text += "📅 \(dateString)\n"
-        text += "🕐 \(formattedTime) Uhr\n"
-        text += "🚢 Route \(wave.routeNumber)\n"
-        
-        // Schiffsname hinzufügen wenn vorhanden
-        if let shipName = wave.shipName {
-            text += "⛴️ \(shipName)\n"
-        }
-        
-        // Wetterdaten in der Reihenfolge der Wetterzeile
-        // 1. Lufttemperatur
-        if let weather = wave.weather {
-            text += "🌡️ \(String(format: "%.1f°C", weather.temperature))\n"
-        }
-        
-        // 2. Wassertemperatur
-        if let selectedStation = lakeStationsViewModel.selectedStation,
-           let lake = lakeStationsViewModel.lakes.first(where: { lake in
-               lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
-            text += "💧 Water Temperature: \(String(format: "%.1f°C", waterTemp))\n"
-        }
-        
-        // 3. Wind
-        if let weather = wave.weather {
-            text += "💨 \(Int(weather.windSpeedKnots)) kn \(weather.windDirectionText)\n"
-        }
-        
-        // 4. Neoprenanzug-Dicke
-        if let selectedStation = lakeStationsViewModel.selectedStation,
-           let lake = lakeStationsViewModel.lakes.first(where: { lake in
-               lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterTemp = getWaterTemperatureForWave(lake: lake),
-           let weather = wave.weather,
-           let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
-            text += "🤸 Wetsuit: \(thickness)mm\n"
-        }
-        
-        // 5. Wasserpegel-Differenz
-        if let selectedStation = lakeStationsViewModel.selectedStation,
-           let lake = lakeStationsViewModel.lakes.first(where: { lake in
-               lake.stations.contains(where: { $0.name == selectedStation.name })
-           }), let waterLevelDiff = lake.waterLevelDifference {
-            text += "📊 Water Level: \(waterLevelDiff) cm\n"
-        }
-        
-        text += "\n📱 Shared via NextWave App\n"
-        text += "🔗 apps.apple.com/ch/app/nextwave/id6739363035"
-        
-        return text
-    }
 }
 
 private struct RemainingTimeView: View {
@@ -542,7 +474,9 @@ private struct NotificationButton: View {
 
 // Custom Share Sheet
 struct CustomShareSheet: View {
-    let text: String
+    let wave: WaveEvent
+    let formattedTime: String
+    @ObservedObject var lakeStationsViewModel: LakeStationsViewModel
     @Binding var isPresented: Bool
     @State private var showMessageComposer = false
     
@@ -613,7 +547,7 @@ struct CustomShareSheet: View {
         .presentationDetents([.height(220)])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showMessageComposer) {
-            MessageComposeView(text: text, isPresented: $showMessageComposer)
+            MessageComposeView(text: generateShareText(forMail: false), isPresented: $showMessageComposer)
                 .onDisappear {
                     isPresented = false
                 }
@@ -626,6 +560,7 @@ struct CustomShareSheet: View {
     }
     
     private func shareToWhatsApp() {
+        let text = generateShareText(forMail: false)
         if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let whatsappURL = URL(string: "whatsapp://send?text=\(encodedText)") {
             UIApplication.shared.open(whatsappURL)
@@ -634,10 +569,134 @@ struct CustomShareSheet: View {
     
     
     private func shareToMail() {
+        let text = generateShareText(forMail: true)
         if let encodedText = text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
            let mailURL = URL(string: "mailto:?subject=Next%20Wave&body=\(encodedText)") {
             UIApplication.shared.open(mailURL)
         }
+    }
+    
+    // Helper: Gibt die richtige Wassertemperatur für das Datum und die Uhrzeit der Wave zurück
+    private func getWaterTemperatureForWave(lake: Lake) -> Double? {
+        let waveDate = wave.time
+        let calendar = Calendar.current
+        
+        // Für heute: Aktuelle Temperatur verwenden
+        if calendar.isDateInToday(waveDate) {
+            return lake.waterTemperature
+        }
+        
+        // Für zukünftige Tage: Vorhersage-Temperatur zur Abfahrtszeit verwenden
+        guard let forecasts = lake.temperatureForecast, !forecasts.isEmpty else {
+            return nil
+        }
+        
+        let closestForecast = forecasts.min(by: { forecast1, forecast2 in
+            let diff1 = abs(forecast1.time.timeIntervalSince(waveDate))
+            let diff2 = abs(forecast2.time.timeIntervalSince(waveDate))
+            return diff1 < diff2
+        })
+        
+        if let forecast = closestForecast,
+           abs(forecast.time.timeIntervalSince(waveDate)) < 12 * 3600 {
+            return forecast.temperature
+        }
+        
+        return nil
+    }
+    
+    private func getWetsuitThickness(for waterTemp: Double, airTemp: Double? = nil) -> String? {
+        var adjustedWaterTemp = waterTemp
+        
+        if let air = airTemp, (air + waterTemp) < 30 {
+            adjustedWaterTemp = waterTemp - 3
+        }
+        
+        switch adjustedWaterTemp {
+        case 23...:
+            return nil
+        case 18..<23:
+            return "0.5-2"
+        case 15..<18:
+            return "3/2"
+        case 12..<15:
+            return "4/3"
+        case 10..<12:
+            return "5/4"
+        case 1..<10:
+            return "6/5"
+        default:
+            return "6/5"
+        }
+    }
+    
+    private func generateShareText(forMail: Bool) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "EEEE, d. MMMM yyyy"
+        dateFormatter.locale = Locale(identifier: "de_CH")
+        dateFormatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        
+        let dateString = dateFormatter.string(from: wave.time)
+        let stationName = lakeStationsViewModel.selectedStation?.name ?? ""
+        
+        // Zufälliger Intro-Text
+        let introTexts = [
+            "🥳 Let's share the next wave for a party wave!",
+            "🌊 Catch the wave with me!",
+            "🌊 Ready to ride the next wave together?",
+            "🚢 All aboard for the next adventure!",
+            "🌊 Join me on this wave - it's going to be epic!"
+        ]
+        let randomIntro = introTexts.randomElement() ?? introTexts[0]
+        
+        var text = "\(randomIntro)\n\n"
+        text += "📍 \(stationName) → \(wave.neighborStopName)\n"
+        text += "📅 \(dateString)\n"
+        text += "🕐 \(formattedTime) Uhr\n"
+        text += "🚢 Route \(wave.routeNumber)\n"
+        
+        if let shipName = wave.shipName {
+            text += "⛴️ \(shipName)\n"
+        }
+        
+        if let weather = wave.weather {
+            text += "🌡️ \(String(format: "%.1f°C", weather.temperature))\n"
+        }
+        
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake) {
+            text += "💧 Water Temperature: \(String(format: "%.1f°C", waterTemp))\n"
+        }
+        
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterTemp = getWaterTemperatureForWave(lake: lake),
+           let weather = wave.weather,
+           let thickness = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike) {
+            text += "🤸 Wetsuit: \(thickness)mm\n"
+        }
+        
+        if let selectedStation = lakeStationsViewModel.selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selectedStation.name })
+           }), let waterLevelDiff = lake.waterLevelDifference {
+            text += "📊 Water Level: \(waterLevelDiff) cm\n"
+        }
+        
+        text += "\n📱 Shared via NextWave App\n"
+        
+        // Für Mail: voller Link mit https://
+        // Für WhatsApp/Messages: Link ohne https:// um Preview zu vermeiden
+        if forMail {
+            text += "https://apps.apple.com/ch/app/nextwave/id6739363035"
+        } else {
+            text += "🔗 apps.apple.com/ch/app/nextwave/id6739363035"
+        }
+        
+        return text
     }
 }
 

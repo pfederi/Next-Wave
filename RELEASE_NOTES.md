@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## Version 3.6.2 (January 20, 2026)
+## Version 3.6.2 (January 21, 2026)
 
 ### Improvements
 - **Better Icon Spacing**: Improved toolbar icon alignment
@@ -10,13 +10,16 @@
   - Better visual balance on both home and station views
   - More comfortable tap targets for all toolbar buttons
 
-- **Share Feature Enhancement**: Water level now included in shared messages
-  - Water level information is now shown when sharing waves via WhatsApp, Messages, or Mail
+- **Share Feature Enhancements**: Improved sharing experience
+  - Water level information now included when sharing waves via WhatsApp, Messages, or Mail
   - Previously only available for today's departures, now included for all future departures
+  - Platform-optimized links: Full link in Mail, compact link in WhatsApp/Messages
+  - No more large preview cards in Messages/WhatsApp for cleaner sharing
   - Helps friends see complete wave conditions when planning sessions together
 
 ### Fixed
 - **Consistent UI**: Toolbar icons now have uniform padding across all screens
+- **Link Previews**: Removed unwanted App Store preview cards in shared messages
 
 ## Version 3.6.1 (January 19, 2026)
 

@@ -38,6 +38,7 @@ actor MeteoNewsAPI {
     // Cache für Wasserpegel
     private var cachedData: WaterLevelResponse?
     private var lastFetchTime: Date?
+    private var lastFetchDay: Date? // Speichert den Tag des letzten Abrufs
     private let cacheValidityDuration: TimeInterval = 86400 // 24 Stunden (1 Tag)
     
     // Mock-Daten für lokale Tests
@@ -86,11 +87,20 @@ actor MeteoNewsAPI {
             return getMockData()
         }
         
+        // Prüfe, ob ein neuer Tag begonnen hat - wenn ja, Cache invalidieren
+        if let lastDay = lastFetchDay {
+            let calendar = Calendar.current
+            if !calendar.isDate(lastDay, inSameDayAs: Date()) {
+                print("🌊 [MeteoNews] New day detected - invalidating cache")
+                invalidateCache()
+            }
+        }
+        
         // Prüfe, ob wir gecachte Daten haben, die noch gültig sind
         if let cached = cachedData,
            let lastFetch = lastFetchTime,
            Date().timeIntervalSince(lastFetch) < cacheValidityDuration {
-            print("🌊 [MeteoNews] Using cached water level data")
+            print("🌊 [MeteoNews] Using cached water level data (age: \(String(format: "%.1f", Date().timeIntervalSince(lastFetch) / 3600))h)")
             return cached.lakes
         }
         
@@ -100,11 +110,11 @@ actor MeteoNewsAPI {
         
         // Configure URLRequest with HTTP caching
         var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
+        request.cachePolicy = .reloadIgnoringLocalCacheData // Immer frische Daten vom Server holen
         request.timeoutInterval = 15.0
         
         do {
-            print("🌊 [MeteoNews] Fetching water levels from API...")
+            print("🌊 [MeteoNews] Fetching fresh water levels from API...")
             let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -121,6 +131,7 @@ actor MeteoNewsAPI {
             // Cache die Daten
             cachedData = result
             lastFetchTime = Date()
+            lastFetchDay = Date()
             
             print("✅ [MeteoNews] Successfully fetched water levels for \(result.lakes.count) lakes")
             return result.lakes
@@ -152,6 +163,7 @@ actor MeteoNewsAPI {
     func invalidateCache() {
         cachedData = nil
         lastFetchTime = nil
+        lastFetchDay = nil
         print("🌊 [MeteoNews] Water level cache invalidated")
     }
     

@@ -326,6 +326,10 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     func appWillEnterForeground() {
         scheduleMidnightRefresh()
         Task {
+            // Invalidate water caches to ensure fresh data
+            await MeteoNewsAPI.shared.invalidateCache()
+            await AlplakesAPI.shared.invalidateCache()
+            
             // Always reload water temperatures when app enters foreground
             await loadWaterTemperatures()
             

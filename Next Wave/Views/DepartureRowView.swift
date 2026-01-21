@@ -446,7 +446,7 @@ struct DepartureRowView: View {
         }
         
         text += "\n📱 Shared via NextWave App\n"
-        text += "apps.apple.com/ch/app/nextwave/id6739363035"
+        text += "🔗 apps.apple.com/ch/app/nextwave/id6739363035"
         
         return text
     }

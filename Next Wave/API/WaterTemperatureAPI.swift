@@ -138,6 +138,9 @@ class WaterLevelAPI {
     
     // Preload Methode die beim App-Start aufgerufen werden kann
     func preloadData() async {
+        // Immer Cache invalidieren bei App-Start/Foreground
+        invalidateCache()
+        
         print("🌊 [MeteoNews] Preloading water level data...")
         do {
             _ = try await getWaterLevels()

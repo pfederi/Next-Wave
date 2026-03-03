@@ -19,9 +19,18 @@ actor WeatherAPI {
         print("🗑️ Weather pressure history cache cleared")
     }
     
+    // Invalidate cache (called when app enters foreground)
+    func invalidateCache() {
+        pressureHistory.removeAll()
+        print("🌤️ [Weather] Cache invalidated")
+    }
+    
     // Preload Methode die beim App-Start aufgerufen wird
     func preloadData() async {
-        print("🌤️ Preloading weather data for favorite stations...")
+        // Immer Cache invalidieren bei App-Start/Foreground
+        invalidateCache()
+        
+        print("🌤️ [Weather] Preloading weather data for favorite stations...")
         
         // Lade Wetter für alle Favoriten-Stationen parallel
         let favorites = FavoriteStationsManager.shared.favorites
@@ -42,7 +51,7 @@ actor WeatherAPI {
             }
         }
         
-        print("✅ Weather data preload completed")
+        print("✅ [Weather] Weather data preload completed")
     }
     
     struct WeatherInfo {

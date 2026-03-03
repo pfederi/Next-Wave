@@ -10,7 +10,6 @@ actor AlplakesAPI {
     // Cache für Temperaturdaten
     private var cachedTemperatures: [String: LakeTemperatureData] = [:]
     private var lastFetchTime: Date?
-    private var lastFetchDay: Date? // Speichert den Tag des letzten Abrufs
     private let cacheValidityDuration: TimeInterval = 10800 // 3 Stunden
     
     private init() {}
@@ -106,16 +105,7 @@ actor AlplakesAPI {
     
     /// Holt aktuelle Temperatur und Vorhersage für einen See
     func getTemperature(for lakeName: String) async throws -> LakeTemperatureData? {
-        // Prüfe, ob ein neuer Tag begonnen hat - wenn ja, Cache invalidieren
-        if let lastDay = lastFetchDay {
-            let calendar = Calendar.current
-            if !calendar.isDate(lastDay, inSameDayAs: Date()) {
-                print("🌊 [Alplakes] New day detected - invalidating cache")
-                invalidateCache()
-            }
-        }
-        
-        // Prüfe Cache
+        // Prüfe Cache - keine Cache-Validierung mehr, da wir bei jedem App-Start neu laden
         if let cached = cachedTemperatures[lakeName],
            let lastFetch = lastFetchTime,
            Date().timeIntervalSince(lastFetch) < cacheValidityDuration {
@@ -147,7 +137,6 @@ actor AlplakesAPI {
             // Cache speichern
             cachedTemperatures[lakeName] = data
             lastFetchTime = Date()
-            lastFetchDay = Date()
             
             print("✅ [Alplakes] Successfully fetched temperature for \(lakeName): \(currentTemp ?? 0)°C")
             return data
@@ -257,6 +246,9 @@ actor AlplakesAPI {
     
     /// Preload Methode die beim App-Start aufgerufen werden kann
     func preloadData() async {
+        // Immer Cache invalidieren bei App-Start/Foreground
+        invalidateCache()
+        
         print("🌊 [Alplakes] Preloading temperature data...")
         do {
             _ = try await getAllTemperatures()
@@ -270,7 +262,6 @@ actor AlplakesAPI {
     func invalidateCache() {
         cachedTemperatures.removeAll()
         lastFetchTime = nil
-        lastFetchDay = nil
         print("🌊 [Alplakes] Cache invalidated")
     }
     

@@ -38,7 +38,6 @@ actor MeteoNewsAPI {
     // Cache für Wasserpegel
     private var cachedData: WaterLevelResponse?
     private var lastFetchTime: Date?
-    private var lastFetchDay: Date? // Speichert den Tag des letzten Abrufs
     private let cacheValidityDuration: TimeInterval = 86400 // 24 Stunden (1 Tag)
     
     // Mock-Daten für lokale Tests
@@ -87,15 +86,6 @@ actor MeteoNewsAPI {
             return getMockData()
         }
         
-        // Prüfe, ob ein neuer Tag begonnen hat - wenn ja, Cache invalidieren
-        if let lastDay = lastFetchDay {
-            let calendar = Calendar.current
-            if !calendar.isDate(lastDay, inSameDayAs: Date()) {
-                print("🌊 [MeteoNews] New day detected - invalidating cache")
-                invalidateCache()
-            }
-        }
-        
         // Prüfe, ob wir gecachte Daten haben, die noch gültig sind
         if let cached = cachedData,
            let lastFetch = lastFetchTime,
@@ -131,7 +121,6 @@ actor MeteoNewsAPI {
             // Cache die Daten
             cachedData = result
             lastFetchTime = Date()
-            lastFetchDay = Date()
             
             print("✅ [MeteoNews] Successfully fetched water levels for \(result.lakes.count) lakes")
             return result.lakes
@@ -150,6 +139,9 @@ actor MeteoNewsAPI {
     
     // Preload Methode die beim App-Start aufgerufen werden kann
     func preloadData() async {
+        // Immer Cache invalidieren bei App-Start/Foreground
+        invalidateCache()
+        
         print("🌊 [MeteoNews] Preloading water level data...")
         do {
             _ = try await getWaterLevels()
@@ -163,7 +155,6 @@ actor MeteoNewsAPI {
     func invalidateCache() {
         cachedData = nil
         lastFetchTime = nil
-        lastFetchDay = nil
         print("🌊 [MeteoNews] Water level cache invalidated")
     }
     

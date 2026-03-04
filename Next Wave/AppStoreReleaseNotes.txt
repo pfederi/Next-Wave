@@ -1,15 +1,8 @@
-What's New in Version 3.6.2:
-
-Improvements
-• Better Icon Spacing: Improved toolbar icon alignment for a cleaner, more balanced look
-• Consistent Design: Uniform spacing and padding across all screens for a more polished experience
-• Enhanced Sharing: Water level now included when sharing waves with friends
-• Cleaner Share Messages: Optimized links for each platform - no more large preview cards in Messages/WhatsApp
-• Improved tap targets for all navigation buttons
+What's New in Version 3.6.3:
 
 Bug Fixes
-• Fixed toolbar icon alignment issues
-• Fixed water level not showing in shared messages for future departures
-• Removed unwanted App Store preview cards in shared messages
+• Fixed weather data not reloading properly when switching between stations
+• Weather information now updates correctly and reliably
+• Ensures you always see the latest weather conditions
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## Version 3.6.3 (March 4, 2026)
+
+### Fixed
+- **Weather Data Loading**: Fixed an issue where weather data wouldn't reload properly
+  - Weather information now updates correctly when switching between stations
+  - Ensures you always see the latest weather conditions
+  - Improved reliability of weather data display
+
 ## Version 3.6.2 (January 21, 2026)
 
 ### Improvements

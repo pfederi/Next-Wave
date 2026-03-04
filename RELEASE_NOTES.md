@@ -7,6 +7,7 @@
 ### Fixed
 - **Weather Data in Production**: Fixed critical issue where weather data wasn't displayed in production builds
   - Simplified API key configuration to use Config.swift directly
+  - Resolved compiler conflicts with Config struct declarations
   - Weather information now works reliably in both development and production
   - Ensures consistent weather data display across all build configurations
 

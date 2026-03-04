@@ -5,10 +5,10 @@
 ## Version 3.6.3 (March 4, 2026)
 
 ### Fixed
-- **Weather Data Loading**: Fixed an issue where weather data wouldn't reload properly
-  - Weather information now updates correctly when switching between stations
-  - Ensures you always see the latest weather conditions
-  - Improved reliability of weather data display
+- **Weather Data in Production**: Fixed critical issue where weather data wasn't displayed in production builds
+  - Simplified API key configuration to use Config.swift directly
+  - Weather information now works reliably in both development and production
+  - Ensures consistent weather data display across all build configurations
 
 ## Version 3.6.2 (January 21, 2026)
 

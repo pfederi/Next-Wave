@@ -1,8 +1,8 @@
 What's New in Version 3.6.3:
 
 Bug Fixes
-• Fixed weather data not reloading properly when switching between stations
-• Weather information now updates correctly and reliably
-• Ensures you always see the latest weather conditions
+• Fixed critical issue where weather data wasn't displayed in the App Store version
+• Weather information now works reliably in all versions of the app
+• Simplified configuration ensures consistent weather data display
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

@@ -7,19 +7,8 @@ actor WeatherAPI {
     // OpenWeather API URLs
     private let baseURL = "https://api.openweathermap.org/data/2.5"
     
-    // Get API key from environment variable or Config file
-    private let apiKey: String = {
-        // First try to get from environment variable (for Xcode Cloud)
-        if let envKey = ProcessInfo.processInfo.environment["OPENWEATHER_API_KEY"], !envKey.isEmpty {
-            return envKey
-        }
-        // Fall back to Config file (for local development)
-        #if DEBUG
-        return "06de570cc7607ea17842332e0be7a605" // Development key
-        #else
-        return ProcessInfo.processInfo.environment["OPENWEATHER_API_KEY"] ?? ""
-        #endif
-    }()
+    // API key from Config.swift (managed by ci_post_clone.sh in Xcode Cloud)
+    private let apiKey = Config.openWeatherApiKey
     
     // Speichert historische Luftdruckwerte für jede Station
     private var pressureHistory: [String: [(timestamp: Date, pressure: Int)]] = [:]
@@ -489,3 +478,4 @@ actor WeatherAPI {
         }
     }
 } 
+

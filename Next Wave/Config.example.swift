@@ -3,10 +3,11 @@
 // 
 // To use this:
 // 1. Copy this file to Config.swift: cp "Next Wave/Config.example.swift" "Next Wave/Config.swift"
-// 2. Add your actual API key below
-// 3. Never commit Config.swift to git (it's in .gitignore)
+// 2. Replace "ExampleConfig" with "Config" in the struct name below
+// 3. Add your actual API key
+// 4. Never commit Config.swift to git (it's in .gitignore)
 
-struct Config {
+struct ExampleConfig {
     // Get your API key from https://openweathermap.org/api
     static let openWeatherApiKey: String = "YOUR_API_KEY_HERE"
 } 

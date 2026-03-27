@@ -71,21 +71,39 @@ actor VesselAPI {
         }
     }
     
+    /// Returns true if the cache is still valid. Cache is invalidated at 04:00 each day
+    /// so the app picks up the 03:00 cron scrape within one hour.
+    private func isCacheValid(lastFetch: Date) -> Bool {
+        let calendar = Calendar.current
+        let now = Date()
+
+        // Different day → always invalid
+        guard calendar.isDate(lastFetch, inSameDayAs: now) else { return false }
+
+        // Both on same day: invalid if it's past 04:00 and the fetch happened before 04:00
+        let refreshHour = 4
+        let currentHour = calendar.component(.hour, from: now)
+        let fetchHour = calendar.component(.hour, from: lastFetch)
+
+        if currentHour >= refreshHour && fetchHour < refreshHour {
+            return false // crossed the 04:00 boundary → re-fetch
+        }
+
+        return true
+    }
+
     func fetchShipData() async throws -> VesselResponse {
-        // Prüfe ob wir bereits aktuelle 3-Tages-Daten vom heutigen Tag haben
         if let cached = cachedResponse,
            let lastFetch = lastFetchDate,
-           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           isCacheValid(lastFetch: lastFetch),
            cached.isDataCurrent {
             print("📦 Using cached vessel data: \(cached.dailyDeployments.count) days")
             return cached
         }
-        
-        // Wenn wir hier sind, ist entweder kein Cache vorhanden oder es ist ein neuer Tag
-        if let lastFetch = lastFetchDate,
-           !Calendar.current.isDate(lastFetch, inSameDayAs: Date()) {
-            print("📅 New day detected, invalidating cache and fetching fresh data")
-            // Invalidiere den alten Task und Cache
+
+        // Cache invalid (new day or crossed 04:00 boundary)
+        if let lastFetch = lastFetchDate, !isCacheValid(lastFetch: lastFetch) {
+            print("📅 Cache invalidated, fetching fresh data")
             initialFetchTask = nil
             cachedResponse = nil
         }
@@ -170,7 +188,7 @@ actor VesselAPI {
         // Prüfe dann die gecachte Response
         if let cached = cachedResponse,
            let lastFetch = lastFetchDate,
-           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           isCacheValid(lastFetch: lastFetch),
            cached.isDataCurrent {
             if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {
                 if let match = deployment.routes.first(where: { 
@@ -200,7 +218,7 @@ actor VesselAPI {
         // Prüfe ob wir bereits gecachte Response-Daten haben
         if let cached = cachedResponse,
            let lastFetch = lastFetchDate,
-           Calendar.current.isDate(lastFetch, inSameDayAs: Date()),
+           isCacheValid(lastFetch: lastFetch),
            cached.isDataCurrent {
             // Suche direkt in den gecachten Daten ohne neuen API-Call
             if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {

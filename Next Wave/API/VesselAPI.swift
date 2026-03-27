@@ -24,7 +24,7 @@ struct VesselResponse: Codable {
     var isDataCurrent: Bool {
         // Daten sind aktuell wenn wir mindestens 3 Tage haben
         // Der Server cached die Daten bereits für 6 Stunden, also vertrauen wir darauf
-        let hasEnoughDays = dailyDeployments.count >= 3
+        let hasEnoughDays = dailyDeployments.count >= 1
         
         // Optional: Prüfe ob lastUpdated parsebar ist
         let formatter = ISO8601DateFormatter()
@@ -42,7 +42,7 @@ struct VesselResponse: Codable {
 
 actor VesselAPI {
     static let shared = VesselAPI()
-    private let baseURL = "https://vesseldata-api.vercel.app/api"
+    private let baseURL = "https://api.nextwaveapp.ch"
     
     private var cachedResponse: VesselResponse?
     private var lastFetchDate: Date?

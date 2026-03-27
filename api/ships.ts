@@ -150,11 +150,11 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
     const processedDates: string[] = []
     const detailedStats: Array<{date: string, routesFound: number, shipsFound: number, htmlLength: number}> = []
     
-    console.log('Starting to fetch ship data for 3 days...')
-    
-    // Fetch data for today and the next 2 days (total 3 days)
+    console.log('Starting to fetch ship data for 7 days...')
+
+    // Fetch data for today and the next 6 days (total 7 days)
     // We now use a single browser session and click through the days
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 7; i++) {
       // Calculate target date properly in Swiss timezone
       const targetDate = new Date(today.getTime())
       targetDate.setDate(today.getDate() + i)
@@ -168,7 +168,7 @@ async function parseZSGWebsite(): Promise<{dailyDeployments: DailyDeployment[], 
       // Also keep YYYY-MM-DD format for storage/debugging
       const dateString = `${year}-${month}-${day}`
       
-      console.log(`Fetching day ${i + 1}/3: ${dateStringForAPI} (stored as ${dateString}, offset=${i})`)
+      console.log(`Fetching day ${i + 1}/7: ${dateStringForAPI} (stored as ${dateString}, offset=${i})`)
       
       try {
         // Pass the day offset (0 for today, 1 for tomorrow, 2 for day after)
@@ -240,18 +240,18 @@ function needsUpdate(lastUpdated: string, cachedData?: CachedData): boolean {
     return true
   }
   
-  // Also update if we don't have 3 days of data (old cache format)
-  if (cachedData && cachedData.dailyDeployments.length < 3) {
-    console.log('Cache has less than 3 days, forcing update')
+  // Also update if we don't have 7 days of data (old cache format)
+  if (cachedData && cachedData.dailyDeployments.length < 7) {
+    console.log('Cache has less than 7 days, forcing update')
     return true
   }
   
   return false
 }
 
-// Cache key for the current day (v2 for 3-day support)
+// Cache key for the current day (v3 for 7-day support)
 function getCacheKey(): string {
-  return `vessel-data-v2-${getCurrentSwissDate().toISOString().split('T')[0]}`
+  return `vessel-data-v3-${getCurrentSwissDate().toISOString().split('T')[0]}`
 }
 
 export default async function handler(

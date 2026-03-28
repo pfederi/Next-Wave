@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## Version 3.7.0 (March 28, 2026)
+
+### Verbesserungen
+- **Schiffsanzeige**: Schiffname-Chip wird nicht mehr angezeigt, wenn keine Daten verfügbar sind
+  - Kein "No data"-Chip mehr bei unbekannten Schiffen
+  - Saubereres UI ohne leere Platzhalter
+- **Neue Schiff-Abfrage**: Überarbeitetes Scraping-Konzept für Schiffsdaten
+- **Server-Update**: Schiffs-API auf neuen Coolify-Server migriert
+- **Fetch-Optimierung**: Verbesserte Abrufzeiten für Schiffsdaten
+
 ## Version 3.6.4 (March 4, 2026)
 
 ### Fixed

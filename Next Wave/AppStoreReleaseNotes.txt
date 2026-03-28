@@ -1,9 +1,9 @@
-What's New in Version 3.6.3:
+What's New in Version 3.7.0:
 
-Bug Fixes
-• Fixed critical issue where weather data wasn't displayed in the App Store version
-• Resolved build configuration conflicts that prevented weather data loading
-• Weather information now works reliably in all versions of the app
-• Improved stability and consistency across all build configurations
+Improvements
+• Ship name chip is no longer shown when no data is available – cleaner UI without empty placeholders
+• Improved ship data fetching with updated scraping concept
+• Ships API migrated to new server for better reliability
+• Optimized fetch times for ship data
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

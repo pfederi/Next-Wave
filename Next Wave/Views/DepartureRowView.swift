@@ -100,35 +100,35 @@ struct DepartureRowView: View {
                             .cornerRadius(12)
                         
                         if wave.isZurichsee && isWithinNext7Days(wave.time) {
-                            // Schiffsname mit Icon (nur für die nächsten 7 Tage)
-                            HStack(spacing: 4) {
-                                if let shipName = wave.shipName {
-                                    if shipName == "Unknown" {
-                                        Text("No data")
-                                            .lineLimit(1)
-                                    } else {
-                                        Text(shipName)
-                                            .lineLimit(1)
+                            if let shipName = wave.shipName, shipName != "Unknown" {
+                                // Schiffsname mit Icon (nur für die nächsten 7 Tage)
+                                HStack(spacing: 4) {
+                                    Text(shipName)
+                                        .lineLimit(1)
                                     Image(getWaveIcon(for: shipName))
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 16, height: 12)
-                                    }
-                                } else {
-                                    // Noch am Laden
-                                    HStack(spacing: 4) {
-                                        ProgressView()
-                                            .scaleEffect(0.7)
-                                        Text("Loading...")
-                                            .lineLimit(1)
-                                    }
                                 }
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(12)
+                            } else if wave.shipName == nil {
+                                // Noch am Laden
+                                HStack(spacing: 4) {
+                                    ProgressView()
+                                        .scaleEffect(0.7)
+                                    Text("Loading...")
+                                        .lineLimit(1)
+                                }
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(12)
                             }
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(12)
                         }
                         
                         Text("→")

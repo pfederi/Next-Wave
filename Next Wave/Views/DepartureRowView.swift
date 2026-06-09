@@ -440,15 +440,7 @@ private struct RemainingTimeView: View {
     }
     
     private func getWaveIcon(for shipName: String) -> String {
-        let cleanName = shipName.trimmingCharacters(in: .whitespaces)
-        switch cleanName {
-        case "MS Panta Rhei", "MS Albis", "EMS Uetliberg", "EMS Pfannenstiel", "EM Uetliberg", "EM Pfannenstiel":
-            return "waves3"
-        case "MS Wädenswil", "MS Limmat", "MS Helvetia", "MS Linth", "DS Stadt Zürich", "DS Stadt Rapperswil":
-            return "waves2"
-        default:
-            return "waves1"
-        }
+        WaveIcon.name(for: shipName)
     }
 
 private struct NotificationButton: View {

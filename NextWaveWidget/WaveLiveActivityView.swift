@@ -17,7 +17,7 @@ struct WaveLiveActivity: Widget {
                     Label {
                         Text(context.attributes.stationName).font(.caption).lineLimit(1)
                     } icon: {
-                        waveGlyph(context.attributes.waveIconName)
+                        waveGlyph
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -36,7 +36,11 @@ struct WaveLiveActivity: Widget {
                     .font(.caption)
                 }
             } compactLeading: {
-                waveGlyph(context.attributes.waveIconName)
+                // Compact view: show the departure station.
+                Text(context.attributes.stationName)
+                    .font(.caption2)
+                    .lineLimit(1)
+                    .frame(maxWidth: 80)
             } compactTrailing: {
                 countdown(to: context.attributes.waveTime)
                     .frame(maxWidth: 56)
@@ -58,13 +62,8 @@ private func countdown(to date: Date) -> some View {
         .multilineTextAlignment(.trailing)
 }
 
-@ViewBuilder
-private func waveGlyph(_ iconName: String?) -> some View {
-    if let iconName {
-        Image(iconName).resizable().scaledToFit().frame(width: 18, height: 14)
-    } else {
-        Image(systemName: "water.waves").foregroundStyle(.blue)
-    }
+private var waveGlyph: some View {
+    Image(systemName: "water.waves").foregroundStyle(.blue)
 }
 
 @available(iOS 16.2, *)
@@ -81,12 +80,7 @@ struct WaveLockScreenView: View {
                 Text("→ \(attributes.destinationName)")
                     .font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
                 if let ship = attributes.shipName {
-                    HStack(spacing: 4) {
-                        if let icon = attributes.waveIconName {
-                            Image(icon).resizable().scaledToFit().frame(width: 16, height: 12)
-                        }
-                        Text(ship).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    }
+                    Text(ship).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
             Spacer()

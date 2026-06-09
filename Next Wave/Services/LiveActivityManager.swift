@@ -49,11 +49,9 @@ final class LiveActivityManager {
 
         let stationName = station?.name ?? ""
         var shipName: String? = nil
-        var iconName: String? = nil
         if wave.isZurichsee, isWithinNext7Days(wave.time),
            let name = wave.shipName, name != "Unknown" {
             shipName = name
-            iconName = WaveIcon.name(for: name)
         }
 
         let attributes = WaveActivityAttributes(
@@ -61,7 +59,6 @@ final class LiveActivityManager {
             destinationName: wave.neighborStopName,
             waveTime: wave.time,
             shipName: shipName,
-            waveIconName: iconName,
             deepLinkURL: Self.deepLink(stationName: stationName, date: wave.time)
         )
 
@@ -100,21 +97,16 @@ final class LiveActivityManager {
 #if DEBUG
     /// Starts a sample Live Activity with a fake wave ~11 minutes out, so the Lock Screen
     /// and Dynamic Island can be verified without a real upcoming departure.
-    /// Defaults show a strong-wake ship (waves3); pass a different station/ship to check the
-    /// other wave-strength icons.
-    func debugStartSampleActivity(station: String = "Thalwil",
-                                  destination: String = "Zürich",
-                                  ship: String = "MS Panta Rhei") {
+    func debugStartSampleActivity() {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         endCurrent()
         let waveTime = Date().addingTimeInterval(11 * 60)
         let attributes = WaveActivityAttributes(
-            stationName: station,
-            destinationName: destination,
+            stationName: "Thalwil",
+            destinationName: "Zürich",
             waveTime: waveTime,
-            shipName: ship,
-            waveIconName: WaveIcon.name(for: ship),
-            deepLinkURL: Self.deepLink(stationName: station, date: waveTime)
+            shipName: "MS Panta Rhei",
+            deepLinkURL: Self.deepLink(stationName: "Thalwil", date: waveTime)
         )
         do {
             let activity = try Activity.request(

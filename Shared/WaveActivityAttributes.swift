@@ -11,7 +11,6 @@ struct WaveActivityAttributes: ActivityAttributes {
     let destinationName: String
     let waveTime: Date
     let shipName: String?
-    let waveIconName: String?
     /// Deep link opened when the activity is tapped, e.g.
     /// nextwave://station?name=Thalwil&date=2026-06-09
     let deepLinkURL: URL

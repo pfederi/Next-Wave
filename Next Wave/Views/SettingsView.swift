@@ -86,41 +86,30 @@ struct SettingsView: View {
 #if DEBUG
 // MARK: - Live Activity Debug Section (DEBUG only)
 struct LiveActivityDebugSection: View {
-    @ViewBuilder
-    private func sampleButton(title: String, station: String, destination: String, ship: String) -> some View {
-        Button(action: {
-            if #available(iOS 16.2, *) {
-                LiveActivityManager.shared.debugStartSampleActivity(
-                    station: station, destination: destination, ship: ship)
-            }
-        }) {
-            HStack {
-                Image(systemName: "play.circle.fill")
-                    .foregroundColor(.green)
-                    .font(.system(size: 20))
-                    .padding(.trailing, 8)
-                Text(title)
-                    .foregroundColor(Color("text-color"))
-                Spacer()
-            }
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Debug: Live Activity")
                 .font(.headline)
 
-            Text("Starts a sample countdown (~11 min) so you can check the Lock Screen and Dynamic Island without a real departure. Each button uses a different ship so you can verify all three wave icons. Requires Live Activities enabled for NextWave in iOS Settings.")
+            Text("Starts a sample countdown (~11 min) so you can check the Lock Screen and Dynamic Island without a real departure. Requires Live Activities enabled for NextWave in iOS Settings.")
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            sampleButton(title: "Strong wave (waves3)",
-                         station: "Thalwil", destination: "Zürich", ship: "MS Panta Rhei")
-            sampleButton(title: "Medium wave (waves2)",
-                         station: "Wädenswil", destination: "Rapperswil", ship: "MS Wädenswil")
-            sampleButton(title: "Light wave (waves1)",
-                         station: "Horgen", destination: "Meilen", ship: "MS Etzel")
+            Button(action: {
+                if #available(iOS 16.2, *) {
+                    LiveActivityManager.shared.debugStartSampleActivity()
+                }
+            }) {
+                HStack {
+                    Image(systemName: "play.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    Text("Start sample Live Activity")
+                        .foregroundColor(Color("text-color"))
+                    Spacer()
+                }
+            }
 
             Button(action: {
                 if #available(iOS 16.2, *) {

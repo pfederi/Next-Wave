@@ -479,7 +479,8 @@ struct CustomShareSheet: View {
     @ObservedObject var lakeStationsViewModel: LakeStationsViewModel
     @Binding var isPresented: Bool
     @State private var showMessageComposer = false
-    
+    @State private var showCalendarEditor = false
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
@@ -540,14 +541,33 @@ struct CustomShareSheet: View {
                     }
                 )
                 .frame(maxWidth: .infinity)
+
+                // Calendar
+                ShareTileButton(
+                    icon: "calendar",
+                    iconColor: .white,
+                    backgroundColor: .red,
+                    title: "Calendar",
+                    action: {
+                        showCalendarEditor = true
+                    }
+                )
+                .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 30)
         }
-        .presentationDetents([.height(220)])
+        .presentationDetents([.height(240)])
         .presentationDragIndicator(.visible)
         .sheet(isPresented: $showMessageComposer) {
             MessageComposeView(text: generateShareText(forMail: false), isPresented: $showMessageComposer)
+                .onDisappear {
+                    isPresented = false
+                }
+        }
+        .sheet(isPresented: $showCalendarEditor) {
+            CalendarEventEditView(content: makeCalendarContent(), isPresented: $showCalendarEditor)
+                .ignoresSafeArea()
                 .onDisappear {
                     isPresented = false
                 }
@@ -630,6 +650,56 @@ struct CustomShareSheet: View {
         }
     }
     
+    private func isWithinNext7Days(_ date: Date) -> Bool {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let sevenDaysFromNow = calendar.date(byAdding: .day, value: 7, to: today)!
+        let dateDay = calendar.startOfDay(for: date)
+        return dateDay >= today && dateDay < sevenDaysFromNow
+    }
+
+    private func makeCalendarContent() -> CalendarEventContent {
+        let selectedStation = lakeStationsViewModel.selectedStation
+        let stationName = selectedStation?.name
+        let coordinates = selectedStation?.coordinates
+
+        // Ship name: only Zürichsee, within the next 7 days, and known.
+        var shipName: String? = nil
+        if wave.isZurichsee, isWithinNext7Days(wave.time),
+           let name = wave.shipName, name != "Unknown" {
+            shipName = name
+        }
+
+        // Water temperature via the lake forecast (reuses existing helper).
+        var waterTemp: Double? = nil
+        if let selected = selectedStation,
+           let lake = lakeStationsViewModel.lakes.first(where: { lake in
+               lake.stations.contains(where: { $0.name == selected.name })
+           }) {
+            waterTemp = getWaterTemperatureForWave(lake: lake)
+        }
+
+        // Wetsuit thickness (reuses existing helper).
+        var wetsuit: String? = nil
+        if let waterTemp = waterTemp, let weather = wave.weather {
+            wetsuit = getWetsuitThickness(for: waterTemp, airTemp: weather.feelsLike)
+        }
+
+        return CalendarEventContent.make(
+            waveTime: wave.time,
+            stationName: stationName,
+            destinationName: wave.neighborStopName,
+            latitude: coordinates?.latitude,
+            longitude: coordinates?.longitude,
+            shipName: shipName,
+            airTemperature: wave.weather?.temperature,
+            waterTemperature: waterTemp,
+            windKnots: wave.weather?.windSpeedKnots,
+            windDirection: wave.weather?.windDirectionText,
+            wetsuitThickness: wetsuit
+        )
+    }
+
     private func generateShareText(forMail: Bool) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "EEEE, d. MMMM yyyy"

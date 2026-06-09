@@ -493,7 +493,7 @@ struct CustomShareSheet: View {
             }
             
             // Erklärungstext
-            Text("Share your next wave with friends")
+            Text("Share or save your next wave")
                 .font(.headline)
                 .foregroundColor(.primary)
                 .padding(.bottom, 25)

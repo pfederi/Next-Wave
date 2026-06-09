@@ -23,7 +23,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
-	<string>Next Wave adds your selected wave to your calendar so you can plan your session.</string>
+	<string>NextWave adds your selected wave to your calendar so you can plan your session.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>

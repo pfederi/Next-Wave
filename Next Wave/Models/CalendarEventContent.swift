@@ -51,7 +51,7 @@ struct CalendarEventContent {
             lines.append("🤸 Wetsuit: \(wetsuit)mm")
         }
         lines.append("")
-        lines.append("📱 Created with Next Wave")
+        lines.append("📱 Created with NextWave")
 
         return CalendarEventContent(
             title: title,

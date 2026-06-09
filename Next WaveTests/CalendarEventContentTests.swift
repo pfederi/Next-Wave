@@ -65,7 +65,7 @@ struct CalendarEventContentTests {
         )
         #expect(!content.notes.contains("⛴️"))
         #expect(!content.notes.contains("🌡️"))
-        #expect(content.notes.contains("Created with Next Wave"))
+        #expect(content.notes.contains("Created with NextWave"))
     }
 
     @Test func notesIncludeAllAvailableData() {

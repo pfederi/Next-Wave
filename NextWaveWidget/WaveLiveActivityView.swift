@@ -39,11 +39,9 @@ struct WaveLiveActivity: Widget {
                 waveGlyph(context.attributes.waveIconName)
             } compactTrailing: {
                 countdown(to: context.attributes.waveTime)
-                    .monospacedDigit()
                     .frame(maxWidth: 56)
             } minimal: {
                 countdown(to: context.attributes.waveTime)
-                    .monospacedDigit()
                     .frame(maxWidth: 44)
             }
             .widgetURL(context.attributes.deepLinkURL)
@@ -56,6 +54,7 @@ private func countdown(to date: Date) -> some View {
     // Self-updating, clamped so it never shows negative time.
     Text(timerInterval: Date()...max(date, Date().addingTimeInterval(1)),
          countsDown: true)
+        .monospacedDigit()
         .multilineTextAlignment(.trailing)
 }
 

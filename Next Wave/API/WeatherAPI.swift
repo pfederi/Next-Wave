@@ -448,6 +448,73 @@ actor WeatherAPI {
         )
     }
     
+    // Lädt die 5-Tage-Vorhersage EINMAL und ordnet jeder übergebenen Zeit den
+    // nächstgelegenen Forecast-Eintrag zu. Ersetzt den bisherigen Ansatz, der pro
+    // Abfahrt einen separaten (identischen) Netzwerkaufruf machte – das war die
+    // Quelle für lange, abbruch-anfällige Ladeschleifen und mögliche Rate-Limits.
+    // Verhalten pro Zeit ist identisch zu getWeatherForTime(location:time:).
+    func getWeatherForTimes(location: CLLocationCoordinate2D, times: [Date]) async throws -> [WeatherInfo?] {
+        guard !times.isEmpty else { return [] }
+
+        var components = URLComponents(string: "\(baseURL)/forecast")
+        components?.queryItems = [
+            URLQueryItem(name: "lat", value: String(location.latitude)),
+            URLQueryItem(name: "lon", value: String(location.longitude)),
+            URLQueryItem(name: "appid", value: apiKey),
+            URLQueryItem(name: "units", value: "metric")
+        ]
+
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        request.timeoutInterval = 15.0
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        if httpResponse.statusCode != 200 {
+            throw URLError(.badServerResponse)
+        }
+
+        let forecast = try JSONDecoder().decode(ForecastResponse.self, from: data)
+        guard !forecast.list.isEmpty else {
+            return times.map { _ in nil }
+        }
+
+        return times.map { time -> WeatherInfo? in
+            let targetTimestamp = time.timeIntervalSince1970
+            guard let closest = forecast.list.min(by: { item1, item2 in
+                abs(Double(item1.dt) - targetTimestamp) < abs(Double(item2.dt) - targetTimestamp)
+            }), let weather = closest.weather.first else {
+                return nil
+            }
+
+            let (weatherDescription, weatherIcon) = weatherDescriptionAndIcon(from: weather.id)
+
+            return WeatherInfo(
+                temperature: closest.main.temp,
+                feelsLike: closest.main.feels_like,
+                tempMin: closest.main.temp_min,
+                tempMax: closest.main.temp_max,
+                morningTemp: nil,
+                afternoonTemp: nil,
+                windSpeed: closest.wind.speed,
+                maxWindSpeed: nil,
+                windDirection: closest.wind.deg,
+                windGust: closest.wind.gust,
+                pressure: closest.main.pressure,
+                weatherDescription: weatherDescription,
+                weatherIcon: weatherIcon,
+                forecastDate: Date(timeIntervalSince1970: Double(closest.dt))
+            )
+        }
+    }
+
     private func findClosestHourIndex(for date: Date, in times: [Double]) -> Int {
         let calendar = Calendar.current
         let hour = calendar.component(.hour, from: date)

@@ -107,10 +107,12 @@ struct DeparturesListView: View {
                         }
                         .id(viewModel.selectedDate) // ScrollView komplett neu erstellen bei Datumswechsel
                         .onChange(of: viewModel.selectedDate) { oldDate, newDate in
-                            if let station = viewModel.selectedStation {
-                                scheduleViewModel.updateWaves(from: departures, station: station)
-                            }
-                            // Reset scroll state für neues Datum
+                            // updateWaves wird zentral nach dem Laden der departures
+                            // ausgelöst (refreshDepartures -> updateWaves) sowie via
+                            // onAppear bei der durch .id(selectedDate) neu erstellten Liste.
+                            // Hier KEIN zusätzlicher updateWaves-Aufruf, sonst entstehen
+                            // konkurrierende Tasks, die sich gegenseitig abbrechen.
+                            // Nur Scroll-State für neues Datum zurücksetzen.
                             lastScrolledDate = nil
                         }
                     }

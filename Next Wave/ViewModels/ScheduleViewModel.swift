@@ -297,35 +297,39 @@ class ScheduleViewModel: ObservableObject {
                 return
             }
             
-            print("🌤️ [ScheduleViewModel] Loading weather data in background...")
-            let weatherData = await updatedWaves.asyncMap { wave -> WeatherAPI.WeatherInfo? in
-                guard !Task.isCancelled else { return nil }
-                // Nur für zukünftige Wellen Wetter laden
-                guard wave.time > Date() else { return nil }
+            print("🌤️ [ScheduleViewModel] Loading weather data (single fetch)...")
+
+            // Nur zukünftige Wellen brauchen Wetter. Indizes merken, damit wir die
+            // Ergebnisse exakt zurückordnen können.
+            let weatherCutoff = Date()
+            let futureIndices = updatedWaves.indices.filter { updatedWaves[$0].time > weatherCutoff }
+
+            if !futureIndices.isEmpty && !Task.isCancelled {
                 do {
-                    let weather = try await WeatherAPI.shared.getWeatherForTime(
+                    // EIN Netzwerkaufruf für alle Zeiten statt einer pro Welle.
+                    // Dadurch ist das Abbruch-Fenster winzig und es gibt kein
+                    // partielles "halb geladenes" Wetter mehr beim Datumswechsel.
+                    let weatherInfos = try await WeatherAPI.shared.getWeatherForTimes(
                         location: location,
-                        time: wave.time
+                        times: futureIndices.map { updatedWaves[$0].time }
                     )
-                    return weather
+
+                    var hasWeatherUpdates = false
+                    for (offset, waveIndex) in futureIndices.enumerated() {
+                        if offset < weatherInfos.count, let weather = weatherInfos[offset] {
+                            updatedWaves[waveIndex].updateWeather(weather)
+                            hasWeatherUpdates = true
+                        }
+                    }
+
+                    // Update UI mit Wetterdaten (falls welche geladen wurden)
+                    if hasWeatherUpdates && !Task.isCancelled {
+                        nextWaves = updatedWaves
+                        print("✅ [ScheduleViewModel] Updated UI with weather data (\(futureIndices.count) future waves)")
+                    }
                 } catch {
-                    return nil
+                    print("⚠️ [ScheduleViewModel] Weather load failed: \(error)")
                 }
-            }
-            
-            // Aktualisiere Wellen mit Wetterdaten
-            var hasWeatherUpdates = false
-            for i in updatedWaves.indices {
-                if let weather = weatherData[i] {
-                    updatedWaves[i].updateWeather(weather)
-                    hasWeatherUpdates = true
-                }
-            }
-            
-            // Update UI mit Wetterdaten (falls welche geladen wurden)
-            if hasWeatherUpdates && !Task.isCancelled {
-                nextWaves = updatedWaves
-                print("✅ [ScheduleViewModel] Updated UI with weather data")
             }
         }
     }

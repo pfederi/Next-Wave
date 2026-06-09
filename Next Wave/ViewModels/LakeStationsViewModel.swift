@@ -252,13 +252,17 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             self.isLoading = false
             self.isInitialLoad = false
             self.hasAttemptedLoad = true
+            // Waves zentral mit den frischen departures neu aufbauen.
+            scheduleViewModel?.updateWaves(from: cachedDepartures, station: station)
             return
         }
         
         // Fetch fresh data
         do {
             print("🌐 [ViewModel] Fetching fresh departures from API...")
-            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
+            // No limit in the main app list: request a high limit so the API returns
+            // all departures of the day (default 30 would cap the in-app list).
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate, limit: 420)
             
             // Small delay only for non-initial loads to avoid jarring UI updates
             if !isInitialLoad {
@@ -276,6 +280,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             self.isInitialLoad = false
             self.hasAttemptedLoad = true
             self.error = nil
+            // Waves zentral mit den frischen departures neu aufbauen.
+            scheduleViewModel?.updateWaves(from: journeys, station: station)
         } catch let apiError as TransportAPI.APIError {
             print("❌ [ViewModel] API Error: \(apiError.userMessage)")
             self.error = apiError.userMessage
@@ -382,11 +388,12 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         do {
-            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: now)
-            
+            // High limit: this writes the shared today-cache the in-app list reads from.
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: now, limit: 420)
+
             // Update cache
             departuresCache[cacheKey] = journeys
-            
+
             // Find next departure from fresh data
             if let nextDeparture = journeys
                 .compactMap({ journey -> Date? in
@@ -419,11 +426,12 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         }
         
         do {
-            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow)
-            
+            // High limit: shared tomorrow-cache the in-app list reads when navigating to tomorrow.
+            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: tomorrow, limit: 420)
+
             // Update cache
             departuresCache[cacheKey] = journeys
-            
+
             return !journeys.isEmpty
         } catch {
             // Silently handle error
@@ -458,8 +466,10 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             }
             
             do {
-                let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate)
-                
+                // Use the same high limit as refreshDepartures so the shared cache
+                // is never populated with a truncated (30-item) departure list.
+                let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: selectedDate, limit: 420)
+
                 // Update cache if it's today
                 if Calendar.current.isDateInToday(selectedDate) {
                     departuresCache[cacheKey] = journeys
@@ -573,7 +583,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                     // Only load if not already cached
                     if departuresCache[cacheKey] == nil {
                         print("🔄 [Background] Loading departures for favorite: \(favorite.name)")
-                        let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today)
+                        // High limit: shared today-cache the in-app list reads from.
+                        let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today, limit: 420)
                         
                         // Cache the data
                         departuresCache[cacheKey] = journeys
@@ -627,7 +638,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                         // Only load if not already cached
                         if departuresCache[cacheKey] == nil {
                             print("🔄 [Background] Loading departures for: \(favorite.name)")
-                            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today)
+                            // High limit: shared today-cache the in-app list reads from.
+                            let journeys = try await transportAPI.getStationboard(stationId: uicRef, for: today, limit: 420)
                             
                             // Cache the data
                             departuresCache[cacheKey] = journeys

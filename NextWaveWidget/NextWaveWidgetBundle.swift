@@ -14,8 +14,5 @@ struct NextWaveWidgetBundle: WidgetBundle {
         // Only iOS widgets in this bundle
         NextWaveiPhoneWidget()
         NextWaveiPhoneMultipleWidget()
-        if #available(iOS 16.2, *) {
-            WaveLiveActivity()
-        }
     }
 } 

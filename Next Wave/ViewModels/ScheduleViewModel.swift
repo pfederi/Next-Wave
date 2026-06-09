@@ -408,15 +408,23 @@ class ScheduleViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self?.notifiedJourneys.insert(wave.id)
                 self?.saveNotifications()
+                if #available(iOS 16.2, *) {
+                    LiveActivityManager.shared.startOrRetarget(for: wave, station: self?.selectedStation)
+                }
                 self?.objectWillChange.send()
             }
         }
     }
-    
+
     func removeNotification(for wave: WaveEvent) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [wave.id])
         notifiedJourneys.remove(wave.id)
         saveNotifications()
+        if #available(iOS 16.2, *) {
+            LiveActivityManager.shared.end(for: wave)
+            let belled = nextWaves.filter { notifiedJourneys.contains($0.id) }
+            LiveActivityManager.shared.syncToSoonestBelledWave(among: belled, station: selectedStation)
+        }
         objectWillChange.send()
     }
     
@@ -426,6 +434,10 @@ class ScheduleViewModel: ObservableObject {
     
     func appWillEnterForeground() {
         loadNotifications()
+        if #available(iOS 16.2, *) {
+            let belled = nextWaves.filter { notifiedJourneys.contains($0.id) }
+            LiveActivityManager.shared.syncToSoonestBelledWave(among: belled, station: selectedStation)
+        }
     }
     
     func reset() {

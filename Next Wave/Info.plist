@@ -24,6 +24,8 @@
 	<false/>
 	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
 	<string>NextWave adds your selected wave to your calendar so you can plan your session.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>

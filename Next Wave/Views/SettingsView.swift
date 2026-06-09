@@ -47,7 +47,14 @@ struct SettingsView: View {
                 )
                 
                 Divider()
-                
+
+                #if DEBUG
+                // Debug: Live Activity (DEBUG builds only)
+                LiveActivityDebugSection()
+
+                Divider()
+                #endif
+
                 // Data Management section
                 DataManagementSection(
                     scheduleViewModel: scheduleViewModel,
@@ -75,6 +82,54 @@ struct SettingsView: View {
         .navigationTitle("Settings")
     }
 }
+
+#if DEBUG
+// MARK: - Live Activity Debug Section (DEBUG only)
+struct LiveActivityDebugSection: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Debug: Live Activity")
+                .font(.headline)
+
+            Text("Starts a sample countdown (~11 min) so you can check the Lock Screen and Dynamic Island without a real departure. Requires Live Activities enabled for NextWave in iOS Settings.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+
+            Button(action: {
+                if #available(iOS 16.2, *) {
+                    LiveActivityManager.shared.debugStartSampleActivity()
+                }
+            }) {
+                HStack {
+                    Image(systemName: "play.circle.fill")
+                        .foregroundColor(.green)
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    Text("Start sample Live Activity")
+                        .foregroundColor(Color("text-color"))
+                    Spacer()
+                }
+            }
+
+            Button(action: {
+                if #available(iOS 16.2, *) {
+                    LiveActivityManager.shared.debugEndAll()
+                }
+            }) {
+                HStack {
+                    Image(systemName: "stop.circle.fill")
+                        .foregroundColor(.red)
+                        .font(.system(size: 20))
+                        .padding(.trailing, 8)
+                    Text("End Live Activity")
+                        .foregroundColor(Color("text-color"))
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+#endif
 
 // MARK: - iPhone Widget Settings Section
 struct iPhoneWidgetSettingsSection: View {

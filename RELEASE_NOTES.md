@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## Version 3.7.1 (June 10, 2026)
+
+### Improvements
+- **Add to Calendar**: New "Add to Calendar" option in the wave share sheet
+  - Save a wave departure directly to your calendar as an event
+  - Event notes include water level info and "Created with Next Wave"
+  - Plan your sessions without leaving the app
+
+### Fixed
+- **Complete Departures List**: Departures are no longer cut off after 30 entries
+  - The list now shows all departures of the day, not just the first 30
+  - Fixes a bug where later departures were missing
+
 ## Version 3.7.0 (March 28, 2026)
 
 ### Improvements

@@ -1,9 +1,11 @@
-What's New in Version 3.7.0:
+What's New in Version 3.7.1:
 
 Improvements
-• Ship name chip is no longer shown when no data is available – cleaner UI without empty placeholders
-• Improved ship data fetching with updated scraping concept
-• Ships API migrated to new server for better reliability
-• Optimized fetch times for ship data
+• New "Add to Calendar" option in the wave share sheet – save a wave departure straight to your calendar
+• Event includes water level info so you have everything you need at a glance
+• Plan your sessions without leaving the app
+
+Fixed
+• Departures list no longer stops after 30 entries – you now see all departures of the day
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

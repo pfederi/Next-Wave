@@ -5,8 +5,6 @@ struct DateSelectionView: View {
     let viewModel: LakeStationsViewModel
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
     
-    @State private var dragOffset: CGFloat = 0
-    @State private var isDragging: Bool = false
     @Namespace private var animation
     
     // Verfügbare Tage (heute + 6 Tage)
@@ -35,6 +33,7 @@ struct DateSelectionView: View {
                             )
                             .id(index)
                             .onTapGesture {
+                                print("👆 [DateSelection] Pill tapped at \(CFAbsoluteTimeGetCurrent())")
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     selectDate(date)
                                 }
@@ -58,38 +57,10 @@ struct DateSelectionView: View {
                 }
             }
             .frame(height: 88)
-            .gesture(
-                DragGesture(minimumDistance: 30)
-                    .onChanged { value in
-                        isDragging = true
-                        dragOffset = value.translation.width
-                    }
-                    .onEnded { value in
-                        isDragging = false
-                        
-                        let threshold: CGFloat = 50
-                        
-                        if value.translation.width < -threshold {
-                            // Swipe left -> next day
-                            if selectedIndex < availableDates.count - 1 {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    selectDate(availableDates[selectedIndex + 1])
-                                }
-                            }
-                        } else if value.translation.width > threshold {
-                            // Swipe right -> previous day
-                            if selectedIndex > 0 {
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    selectDate(availableDates[selectedIndex - 1])
-                }
-            }
-        }
-                        
-                        withAnimation(.spring(response: 0.2, dampingFraction: 0.8)) {
-                            dragOffset = 0
-                        }
-                    }
-            )
+            // Kein DragGesture mehr auf dem Pillen-Balken: ein DragGesture über der
+            // horizontalen ScrollView + den Pillen-Taps blockierte jeden Tap durch
+            // Gesten-Arbitrierung ("System gesture gate timed out", ~1,5 s, bis die Pille
+            // umsprang). Tag-Auswahl erfolgt jetzt per Tippen; Durchblättern via ScrollView.
         }
         .onChange(of: viewModel.selectedDate) { oldValue, newValue in
             if selectedDate != newValue {
@@ -102,11 +73,24 @@ struct DateSelectionView: View {
         selectedDate = date
         viewModel.selectedDate = date
         scheduleViewModel.selectedDate = date
-        
+
+        // Wenn die Daten für diesen Tag noch NICHT im Cache liegen, sofort (synchron,
+        // noch im Tap) in den Lade-Zustand wechseln: die Pille springt sofort um und
+        // der Loader erscheint, statt dass die alte, schwere Abfahrtsliste während des
+        // Wechsels neu gerendert wird (das blockierte den Main-Thread → "stuck"-Gefühl).
+        // Gecachte Tage bleiben sofort ohne Loader-Flackern.
+        if let stationId = viewModel.selectedStation?.id {
+            let cacheKey = viewModel.getCacheKey(for: stationId, date: date)
+            if !viewModel.hasCachedData(for: cacheKey) {
+                viewModel.isLoading = true
+                viewModel.departures = []
+            }
+        }
+
         // Haptic Feedback
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()
-        
+
         Task {
             await viewModel.refreshDepartures()
         }

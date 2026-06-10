@@ -70,7 +70,15 @@ class ScheduleViewModel: ObservableObject {
     private var currentLoadingTask: Task<Void, Never>?
     
     private var shipNamesCache: [String: String] = [:] // Cache für Schiffsnamen (Key: "YYYY-MM-DD_routeNumber")
-    
+
+    // Ein einziger, wiederverwendeter Formatter für die Cache-Keys. DateFormatter()-Init
+    // ist teuer; ihn pro Abfahrt zu erzeugen blockierte den Main-Actor beim Tageswechsel.
+    private static let cacheDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+
     init(appSettings: AppSettings) {
         self.appSettings = appSettings
         if let data = userDefaults.data(forKey: settingsKey),
@@ -156,25 +164,30 @@ class ScheduleViewModel: ObservableObject {
         
         // Starte Task für das Erstellen der Wellen
         currentLoadingTask = Task { @MainActor in
+            // dateString hängt NUR von selectedDate ab und ist über die ganze Schleife
+            // konstant. Früher wurde pro Zürichsee-Abfahrt ein neuer DateFormatter()
+            // allokiert (~1-5 ms je Init) – bei limit=420 Abfahrten blockierte das den
+            // Main-Actor mehrere hundert ms und der Tageswechsel "hing" sichtbar.
+            // Jetzt: einmal berechnen, in beiden Schleifen wiederverwenden.
+            let dateString = Self.cacheDateFormatter.string(from: selectedDate)
+            let mapStart = CFAbsoluteTimeGetCurrent()
+
             // Erstelle Wellen OHNE sie sofort anzuzeigen
             let waves = await departures.asyncMap { journey -> WaveEvent in
             let routeNumber = (journey.name ?? "Unknown")
                 .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
-            
+
             let departureTime = AppDateFormatter.parseFullTime(journey.stop.departure ?? "") ?? Date()
             let nextStation = journey.passList?.dropFirst().first?.station
-            
+
             // Nur ZSG Stationen (85036 prefix)
             let isZurichsee = journey.stop.station.id.hasPrefix("85036")
-            
+
             // Versuche Schiffsnamen synchron aus dem Cache zu holen
             var shipName: String? = nil
             if isZurichsee {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                let dateString = dateFormatter.string(from: selectedDate)
                 let cacheKey = "\(dateString)_\(routeNumber)"
-                
+
                 // Prüfe zuerst den lokalen Cache
                 if let cachedName = shipNamesCache[cacheKey] {
                     shipName = cachedName
@@ -204,7 +217,7 @@ class ScheduleViewModel: ObservableObject {
             // ✅ SOFORT anzeigen - User sieht Abfahrten ohne Wartezeit
             hasAttemptedLoad = true
             nextWaves = waves
-            print("✅ [ScheduleViewModel] Showing \(waves.count) departures immediately (without weather)")
+            print("✅ [ScheduleViewModel] Showing \(waves.count) departures immediately (without weather) – built in \(Int((CFAbsoluteTimeGetCurrent() - mapStart) * 1000))ms")
             
             // Keine Koordinaten? Dann sind wir fertig
             guard let coordinates = station.coordinates else { 
@@ -245,10 +258,7 @@ class ScheduleViewModel: ObservableObject {
                     return wave.shipName
                 }
                 
-                // Cache-Key mit Datum und Kursnummer erstellen
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd"
-                let dateString = dateFormatter.string(from: selectedDate)
+                // Cache-Key mit Datum und Kursnummer erstellen (dateString siehe oben)
                 let cacheKey = "\(dateString)_\(wave.routeNumber)"
                 
                 // Prüfe zuerst den Cache
@@ -462,11 +472,9 @@ class ScheduleViewModel: ObservableObject {
         let selectedDate = self.selectedDate
         
         Task { @MainActor in
-            // Date formatter für Cache-Key
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yyyy-MM-dd"
-            let dateString = dateFormatter.string(from: selectedDate)
-            
+            // Date formatter für Cache-Key (wiederverwendeter statischer Formatter)
+            let dateString = Self.cacheDateFormatter.string(from: selectedDate)
+
             for journey in departures {
                 let routeNumber = (journey.name ?? "Unknown")
                     .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
@@ -486,10 +494,8 @@ class ScheduleViewModel: ObservableObject {
     }
 
     func getShipName(for routeNumber: String) -> String? {
-        // Erstelle Cache-Key mit aktuellem Datum
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = dateFormatter.string(from: selectedDate)
+        // Erstelle Cache-Key mit aktuellem Datum (wiederverwendeter statischer Formatter)
+        let dateString = Self.cacheDateFormatter.string(from: selectedDate)
         let cacheKey = "\(dateString)_\(routeNumber)"
         
         return shipNamesCache[cacheKey]

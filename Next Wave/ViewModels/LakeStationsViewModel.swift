@@ -29,6 +29,10 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     private let transportAPI = TransportAPI()
     
     private var departuresCache: [String: [Journey]] = [:]
+    // Verhindert doppelte Refreshes für dieselbe Station+Datum. Ein Tap auf einen Tag
+    // löst über mehrere Pfade (ContentView.didSet, selectDate-Task, onReceive) bis zu
+    // 2-3 parallele refreshDepartures() aus → bei Cache-Miss mehrere Netzwerk-Requests.
+    private var inFlightRefreshKey: String?
     private let cacheFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -238,15 +242,27 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             return 
         }
         
+        let cacheKey = getCacheKey(for: station, date: selectedDate)
+
+        // Skip if an identical refresh (same station + date) is already running.
+        // The duplicate trigger paths would otherwise fire a second network request
+        // for the very same day, doubling the wait on the first visit to a date.
+        guard inFlightRefreshKey != cacheKey else {
+            print("⏭️ [ViewModel] Skipping duplicate refresh for \(cacheKey)")
+            return
+        }
+        inFlightRefreshKey = cacheKey
+        defer { inFlightRefreshKey = nil }
+
         print("🔄 [ViewModel] Starting refresh for station: \(station.name), date: \(selectedDate)")
         isLoading = true
         error = nil
-        
-        let cacheKey = getCacheKey(for: station, date: selectedDate)
-        
-        // Check cache for today's data
-        if Calendar.current.isDateInToday(selectedDate),
-           let cachedDepartures = departuresCache[cacheKey] {
+
+        // Serve from cache for ANY date. The timetable for a given calendar day is
+        // static within a session, and the cache key already includes the date.
+        // Previously only today was cached, so every visit to a future date re-hit
+        // the slow stationboard API (limit=420) and the loader stayed up each time.
+        if let cachedDepartures = departuresCache[cacheKey] {
             print("✅ [ViewModel] Using cached departures (\(cachedDepartures.count) items)")
             self.departures = cachedDepartures
             self.isLoading = false
@@ -269,10 +285,8 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                 try? await Task.sleep(nanoseconds: 250_000_000)
             }
             
-            // Cache today's data
-            if Calendar.current.isDateInToday(selectedDate) {
-                departuresCache[cacheKey] = journeys
-            }
+            // Cache for ANY date so re-visiting a date is instant (key includes date).
+            departuresCache[cacheKey] = journeys
             
             print("✅ [ViewModel] Successfully loaded \(journeys.count) departures")
             self.departures = journeys

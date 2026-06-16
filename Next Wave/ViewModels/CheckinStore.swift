@@ -45,6 +45,9 @@ final class CheckinStore: ObservableObject {
         guard !didSubscribe else { return }
         didSubscribe = true
 
+        // Ensure an (anonymous) session so Realtime is authorized before joining.
+        _ = try? await SupabaseManager.shared.ensureSession()
+
         let client = SupabaseManager.shared.client
         let channel = client.channel("wave_checkins_live")
         // Register the postgres-change callback BEFORE subscribing.
@@ -56,6 +59,10 @@ final class CheckinStore: ObservableObject {
             try await channel.subscribeWithError()
         } catch {
             print("⚠️ Checkin realtime subscribe failed: \(error)")
+            // Remove the cached channel so a later attempt starts from a fresh,
+            // unsubscribed channel (channel(_:) is cached per topic).
+            await client.removeChannel(channel)
+            realtimeChannel = nil
             didSubscribe = false
             return
         }

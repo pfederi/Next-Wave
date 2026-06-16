@@ -11,11 +11,12 @@ final class CheckinStore: ObservableObject {
 
     private var realtimeChannel: RealtimeChannelV2?
     private var realtimeTask: Task<Void, Never>?
+    private var didSubscribe = false
     private var subscribedWaveIds: [String] = []
 
     private init() {}
 
-    /// Load counts + my-state for the visible waves and (re)subscribe to Realtime.
+    /// Load counts + my-state for the visible waves and ensure a Realtime subscription.
     func refresh(waveIds: [String]) async {
         subscribedWaveIds = waveIds
         await reloadCounts()
@@ -24,7 +25,7 @@ final class CheckinStore: ObservableObject {
         } catch {
             print("⚠️ Checkin myCheckins failed: \(error)")
         }
-        await subscribeRealtime()
+        await ensureSubscribed()
     }
 
     private func reloadCounts() async {
@@ -38,18 +39,26 @@ final class CheckinStore: ObservableObject {
         }
     }
 
-    private func subscribeRealtime() async {
-        realtimeTask?.cancel()
-        if let channel = realtimeChannel {
-            await channel.unsubscribe()
-        }
+    /// Subscribe exactly once. The channel listens table-wide; on any change we
+    /// reload counts for whatever waves are currently visible.
+    private func ensureSubscribed() async {
+        guard !didSubscribe else { return }
+        didSubscribe = true
+
         let client = SupabaseManager.shared.client
         let channel = client.channel("wave_checkins_live")
+        // Register the postgres-change callback BEFORE subscribing.
         let changes = channel.postgresChange(AnyAction.self,
                                              schema: "public",
                                              table: "wave_checkins")
-        await channel.subscribe()
         realtimeChannel = channel
+        do {
+            try await channel.subscribeWithError()
+        } catch {
+            print("⚠️ Checkin realtime subscribe failed: \(error)")
+            didSubscribe = false
+            return
+        }
         realtimeTask = Task { [weak self] in
             for await _ in changes {
                 guard let self else { return }

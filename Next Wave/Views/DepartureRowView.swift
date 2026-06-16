@@ -10,8 +10,32 @@ struct DepartureRowView: View {
     @ObservedObject var scheduleViewModel: ScheduleViewModel
     @EnvironmentObject var appSettings: AppSettings
     @EnvironmentObject var lakeStationsViewModel: LakeStationsViewModel
+    @EnvironmentObject var checkinStore: CheckinStore
     @State private var showShareSheet = false
     @State private var showWeatherLegend = false
+    @State private var showCheckinIdentitySheet = false
+
+    /// Deterministic, cross-device id for this wave, based on the selected station.
+    private var waveId: String? {
+        guard let station = scheduleViewModel.selectedStation else { return nil }
+        return WaveCheckin.makeWaveId(
+            stationUicRef: station.uic_ref,
+            stationName: station.name,
+            departure: wave.time,
+            routeNumber: wave.routeNumber)
+    }
+
+    private func handleCheckinTap(waveId: String) {
+        if appSettings.hasCheckinIdentity {
+            Task {
+                await checkinStore.toggle(waveId: waveId,
+                                          departureAt: wave.time,
+                                          identity: appSettings.checkinIdentity)
+            }
+        } else {
+            showCheckinIdentitySheet = true
+        }
+    }
     
     // Helper: Gibt die richtige Wassertemperatur für das Datum und die Uhrzeit der Wave zurück
     private func getWaterTemperatureForWave(lake: Lake) -> Double? {
@@ -70,12 +94,22 @@ struct DepartureRowView: View {
                         Spacer()
                         
                         if !isPast {
+                            if appSettings.enableWaveCheckIn, let waveId = waveId {
+                                let info = checkinStore.counts[waveId]
+                                WaveCheckinBadge(
+                                    count: info?.count ?? 0,
+                                    names: info?.names ?? [],
+                                    isMine: checkinStore.mine.contains(waveId),
+                                    onTap: { handleCheckinTap(waveId: waveId) }
+                                )
+                            }
+
                             if scheduleViewModel.hasNotification(for: wave) {
                                 Image(systemName: "bell.fill")
                                     .foregroundColor(.blue)
                                     .font(.system(size: 16))
                             }
-                            
+
                             // Share Button
                             Button(action: {
                                 print("🔵 Share button tapped")
@@ -288,6 +322,18 @@ struct DepartureRowView: View {
         }
         .sheet(isPresented: $showWeatherLegend) {
             WeatherLegendView(isPresented: $showWeatherLegend)
+        }
+        .sheet(isPresented: $showCheckinIdentitySheet) {
+            CheckinIdentitySheet(onSave: {
+                if let waveId = waveId {
+                    Task {
+                        await checkinStore.toggle(waveId: waveId,
+                                                  departureAt: wave.time,
+                                                  identity: appSettings.checkinIdentity)
+                    }
+                }
+            })
+            .environmentObject(appSettings)
         }
     }
     

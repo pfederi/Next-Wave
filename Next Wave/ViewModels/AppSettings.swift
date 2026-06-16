@@ -81,6 +81,34 @@ class AppSettings: ObservableObject {
             UserDefaults.standard.set(showPromoTiles, forKey: "showPromoTiles")
         }
     }
+
+    @Published var enableWaveCheckIn: Bool {
+        didSet {
+            UserDefaults.standard.set(enableWaveCheckIn, forKey: "enableWaveCheckIn")
+        }
+    }
+
+    @Published var checkinName: String {
+        didSet {
+            UserDefaults.standard.set(checkinName, forKey: "checkinName")
+        }
+    }
+
+    @Published var checkinAnonymous: Bool {
+        didSet {
+            UserDefaults.standard.set(checkinAnonymous, forKey: "checkinAnonymous")
+        }
+    }
+
+    /// The local check-in identity assembled from the stored name + anonymous flag.
+    var checkinIdentity: CheckinIdentity {
+        CheckinIdentity(name: checkinName, isAnonymous: checkinAnonymous)
+    }
+
+    /// Whether the user has chosen how they appear (a name, or explicitly anonymous).
+    var hasCheckinIdentity: Bool {
+        checkinAnonymous || !checkinName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
     
     // Dismissed promo tile IDs
     private(set) var dismissedPromoTileIds: Set<String> {
@@ -148,6 +176,11 @@ class AppSettings: ObservableObject {
         
         // Initialize showPromoTiles with default value true
         self.showPromoTiles = UserDefaults.standard.bool(forKey: "showPromoTiles", defaultValue: true)
+
+        // Wave check-in feature (default on); identity defaults to not-yet-set
+        self.enableWaveCheckIn = UserDefaults.standard.bool(forKey: "enableWaveCheckIn", defaultValue: true)
+        self.checkinName = UserDefaults.standard.string(forKey: "checkinName") ?? ""
+        self.checkinAnonymous = UserDefaults.standard.bool(forKey: "checkinAnonymous", defaultValue: false)
         
         // Load dismissed promo tile IDs
         if let data = UserDefaults.standard.data(forKey: "dismissedPromoTileIds"),

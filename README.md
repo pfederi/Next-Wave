@@ -60,6 +60,12 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
 - 💧 **Water level** indicators
 - 🤸 **Wetsuit recommendations** based on conditions
 
+### Community
+- 👥 **Wave Check-in** — see who plans to ride each wave and join in
+  - Live counter per departure, updated across devices in real time
+  - See who's going by name, or join anonymously
+  - Set your display name once in Settings; optional and can be turned off
+
 ### User Experience
 - 🗺️ **Interactive map** with OpenStreetMap
 - 📱 **Light & Dark Mode** with device flip gesture

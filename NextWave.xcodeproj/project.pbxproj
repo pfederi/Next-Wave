@@ -15,6 +15,7 @@
 		8AFF99642DFB163800F3E1FB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */; };
 		8AFF99652DFB163800F3E1FB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8AFF996E2DFB163900F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AAFEED0000000000000A0003 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AAFEED0000000000000A0002 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,6 +175,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAFEED0000000000000A0003 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +294,7 @@
 			);
 			name = "Next Wave";
 			packageProductDependencies = (
+				AAFEED0000000000000A0002 /* Supabase */,
 			);
 			productName = "Next Wave";
 			productReference = 8A225F312D0ABC6F008BA92B /* Next Wave.app */;
@@ -451,6 +454,9 @@
 			);
 			mainGroup = 8A225F282D0ABC6F008BA92B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8A225F322D0ABC6F008BA92B /* Products */;
 			projectDirPath = "";
@@ -722,7 +728,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Next Wave/Next Wave.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Next Wave/Preview Content\"";
 				DEVELOPMENT_TEAM = CD7648W7NV;
 				ENABLE_APP_SANDBOX = YES;
@@ -746,7 +752,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -769,7 +775,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Next Wave/Next Wave.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = "\"Next Wave/Preview Content\"";
 				DEVELOPMENT_TEAM = CD7648W7NV;
 				ENABLE_APP_SANDBOX = YES;
@@ -792,7 +798,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -812,7 +818,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				MARKETING_VERSION = 1.0;
@@ -830,7 +836,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
 				MARKETING_VERSION = 1.0;
@@ -848,7 +854,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-WaveUITests";
@@ -867,7 +873,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-WaveUITests";
@@ -887,7 +893,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = NextWaveWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NextWaveWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NextWaveWidget;
@@ -898,7 +904,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.NextWaveWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -916,7 +922,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = NextWaveWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NextWaveWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NextWaveWidget;
@@ -927,7 +933,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.NextWaveWidget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -945,7 +951,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Next Wave Watch Watch App/Next Wave Watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Next Wave Watch";
@@ -956,7 +962,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -975,7 +981,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Next Wave Watch Watch App/Next Wave Watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Next Wave Watch";
@@ -986,7 +992,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1006,7 +1012,7 @@
 				CODE_SIGN_ENTITLEMENTS = NextWaveWatchWidgetExtensionExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = CD7648W7NV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NextWaveWatchWidgetExtension/Info.plist;
@@ -1018,7 +1024,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.watchkitapp.widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1039,7 +1045,7 @@
 				CODE_SIGN_ENTITLEMENTS = NextWaveWatchWidgetExtensionExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = CD7648W7NV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NextWaveWatchWidgetExtension/Info.plist;
@@ -1051,7 +1057,7 @@
 					"@executable_path/../../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MARKETING_VERSION = 3.7.1;
+				MARKETING_VERSION = 3.8.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.watchkitapp.widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1131,6 +1137,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AAFEED0000000000000A0002 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8A225F292D0ABC6F008BA92B /* Project object */;
 }

@@ -172,8 +172,14 @@ struct NextWaveApp: App {
                 .environmentObject(viewModel)
                 .environmentObject(appSettings)
                 .environmentObject(lakeStationsViewModel)
+                .environmentObject(CheckinStore.shared)
                 .preferredColorScheme(appSettings.theme == .system ? nil : (appSettings.isDarkMode ? .dark : .light))
                 .task {
+                    // Establish anonymous Supabase session for wave check-ins (best effort)
+                    if appSettings.enableWaveCheckIn {
+                        Task { try? await SupabaseManager.shared.ensureSession() }
+                    }
+
                     // Preload weather data first (faster, more important for users)
                     await WeatherAPI.shared.preloadData()
                     

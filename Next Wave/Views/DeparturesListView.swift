@@ -83,9 +83,12 @@ struct DeparturesListView: View {
                             }
                             .listStyle(.plain)
                             .onAppear {
-                                if let station = viewModel.selectedStation {
-                                    scheduleViewModel.updateWaves(from: departures, station: station)
-                                }
+                                // Do NOT rebuild waves here. refreshDepartures() is the single
+                                // source that builds waves with the correct journeys for the
+                                // selected date. A rebuild here ran with a stale `departures`
+                                // prop (a render behind viewModel.departures) and clobbered the
+                                // fresh waves, showing the previous day on date switch.
+                                refreshCheckins(for: scheduleViewModel.nextWaves)
                                 // Nur für heute scrollen
                                 if isCurrentDay {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -94,11 +97,14 @@ struct DeparturesListView: View {
                                 }
                             }
                             .onChange(of: scheduleViewModel.nextWaves) { oldWaves, newWaves in
+                                // Refresh shared check-in counts for the now-visible waves
+                                refreshCheckins(for: newWaves)
+
                                 // Nur für HEUTE scrollen zur nächsten Abfahrt
                                 guard isCurrentDay else { return }
                                 guard !newWaves.isEmpty else { return }
                                 guard lastScrolledDate != viewModel.selectedDate else { return }
-                                
+
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     scrollToNextWave(proxy: proxy)
                                     lastScrolledDate = viewModel.selectedDate
@@ -197,6 +203,21 @@ struct DeparturesListView: View {
         }
     }
     
+    /// Loads shared check-in counts (and subscribes to realtime) for the visible future waves.
+    private func refreshCheckins(for waves: [WaveEvent]) {
+        guard appSettings.enableWaveCheckIn,
+              let station = viewModel.selectedStation else { return }
+        let now = Date()
+        let ids = waves
+            .filter { $0.time >= now }
+            .map { WaveCheckin.makeWaveId(stationUicRef: station.uic_ref,
+                                          stationName: station.name,
+                                          departure: $0.time,
+                                          routeNumber: $0.routeNumber) }
+        guard !ids.isEmpty else { return }
+        Task { await CheckinStore.shared.refresh(waveIds: ids) }
+    }
+
     private func scrollToNextWave(proxy: ScrollViewProxy) {
         // Diese Funktion wird nur für heute aufgerufen
         let now = Date()

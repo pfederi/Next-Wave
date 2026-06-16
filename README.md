@@ -60,6 +60,12 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
 - 💧 **Water level** indicators
 - 🤸 **Wetsuit recommendations** based on conditions
 
+### Community
+- 👥 **Wave Check-in** — see who plans to ride each wave and join in
+  - Live counter per departure, updated across devices in real time
+  - See who's going by name, or join anonymously
+  - Set your display name once in Settings; optional and can be turned off
+
 ### User Experience
 - 🗺️ **Interactive map** with OpenStreetMap
 - 📱 **Light & Dark Mode** with device flip gesture
@@ -127,10 +133,11 @@ For detailed usage scenarios and workflows, see the [Arc42 Documentation - Runti
 ## Privacy
 
 - No tracking or analytics
-- No personal data collection
-- All data stays on device
+- No account, email, or login required
 - Location data is only used to show nearest station and your position on the map and is never stored or shared
 - Location access can be denied without losing core app functionality
+- **Wave Check-in (optional):** when you check in to a wave, your chosen display name (or "anonymous") and an anonymous device identifier are shared with other users so the group can see who plans to ride. Check-ins are stored only until the departure has passed, then deleted automatically. The feature can be turned off in Settings, and you can join anonymously.
+- All other data stays on device
 
 ## Data Sources & Attribution
 

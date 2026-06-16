@@ -26,9 +26,14 @@ struct SettingsView: View {
                 
                 // Display options section
                 DisplayOptionsSection(appSettings: appSettings)
-                
+
                 Divider()
-                
+
+                // Wave check-in section
+                CheckinSettingsSection(appSettings: appSettings)
+
+                Divider()
+
                 // Widget section
                 WidgetSettingsSection(appSettings: appSettings)
                 

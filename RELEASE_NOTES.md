@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## Version 3.8.0 (June 16, 2026)
+
+### New
+- **Wave Check-in**: See who's riding each wave and let others know you're coming
+  - Tap the check-in badge on any upcoming wave to join — or leave again
+  - The badge shows how many foilers plan to ride that departure
+  - Open it to see who's going by name, plus anyone joining anonymously
+  - Set your display name once (or stay anonymous) in Settings; change it any time
+  - Updates live across devices, so the lineup stays current
+  - Fully optional and can be turned off in Settings
+
+### Fixed
+- **Date Switching**: Switching from today to the next day no longer showed the previous day's departures
+
 ## Version 3.7.1 (June 10, 2026)
 
 ### Improvements

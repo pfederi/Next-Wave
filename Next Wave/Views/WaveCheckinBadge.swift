@@ -31,7 +31,7 @@ struct WaveCheckinBadge: View {
     private var detailContent: some View {
         let anonymous = max(0, count - names.count)
         return VStack(alignment: .leading, spacing: 10) {
-            Text(count == 0 ? "No one going yet" : "\(count) going")
+            Text(count == 0 ? "No one yet — be the first!" : "\(count) riding this wave 🌊")
                 .font(.headline)
 
             if !names.isEmpty || anonymous > 0 {
@@ -54,7 +54,7 @@ struct WaveCheckinBadge: View {
                 showDetails = false
                 onToggle()
             }) {
-                Label(isMine ? "Leave this wave" : "I'm going",
+                Label(isMine ? "Maybe next wave" : "I'm in! 🤙",
                       systemImage: isMine ? "person.badge.minus" : "person.badge.plus")
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(isMine ? .red : .blue)

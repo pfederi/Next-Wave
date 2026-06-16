@@ -1,17 +1,17 @@
 import SwiftUI
 
-/// Compact, tappable check-in indicator shown in a departure row.
-/// Tap toggles the user's own check-in; long-press reveals the names.
+/// Compact check-in indicator shown in a departure row.
+/// Tapping opens a popover that lists who's going and lets you join/leave.
 struct WaveCheckinBadge: View {
     let count: Int
     let names: [String]
     let isMine: Bool
-    let onTap: () -> Void
+    let onToggle: () -> Void
 
-    @State private var showNames = false
+    @State private var showDetails = false
 
     var body: some View {
-        Button(action: onTap) {
+        Button(action: { showDetails = true }) {
             HStack(spacing: 4) {
                 Image(systemName: isMine ? "person.2.fill" : "person.2")
                 if count > 0 {
@@ -22,26 +22,46 @@ struct WaveCheckinBadge: View {
             .foregroundColor(isMine ? .blue : (count > 0 ? .primary : .gray))
         }
         .buttonStyle(PlainButtonStyle())
-        .onLongPressGesture {
-            if count > 0 { showNames = true }
+        .popover(isPresented: $showDetails) {
+            detailContent
+                .presentationCompactAdaptation(.popover)
         }
-        .popover(isPresented: $showNames) {
-            let anonymous = max(0, count - names.count)
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(names, id: \.self) { name in
-                    Text(name)
-                }
-                if anonymous > 0 {
-                    Text("+\(anonymous) anonymous")
-                        .foregroundColor(.gray)
-                }
-                if names.isEmpty && anonymous == 0 {
-                    Text("No one yet")
-                        .foregroundColor(.gray)
+    }
+
+    private var detailContent: some View {
+        let anonymous = max(0, count - names.count)
+        return VStack(alignment: .leading, spacing: 10) {
+            Text(count == 0 ? "No one going yet" : "\(count) going")
+                .font(.headline)
+
+            if !names.isEmpty || anonymous > 0 {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(names, id: \.self) { name in
+                        Label(name, systemImage: "person.fill")
+                            .font(.subheadline)
+                    }
+                    if anonymous > 0 {
+                        Label("\(anonymous) anonymous", systemImage: "person.fill.questionmark")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
                 }
             }
-            .padding()
-            .presentationCompactAdaptation(.popover)
+
+            Divider()
+
+            Button(action: {
+                showDetails = false
+                onToggle()
+            }) {
+                Label(isMine ? "Leave this wave" : "I'm going",
+                      systemImage: isMine ? "person.badge.minus" : "person.badge.plus")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundColor(isMine ? .red : .blue)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
+        .padding()
+        .frame(minWidth: 200, alignment: .leading)
     }
 }

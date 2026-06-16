@@ -100,7 +100,7 @@ struct DepartureRowView: View {
                                     count: info?.count ?? 0,
                                     names: info?.names ?? [],
                                     isMine: checkinStore.mine.contains(waveId),
-                                    onTap: { handleCheckinTap(waveId: waveId) }
+                                    onToggle: { handleCheckinTap(waveId: waveId) }
                                 )
                             }
 

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AAFEED0000000000000A0003 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AAFEED0000000000000A0002 /* Supabase */; };
 		8A5C5B002DF0CFD500569B58 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */; };
 		8A5C5B012DF0CFD500569B58 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8A5C5B0A2DF0CFD600569B58 /* NextWaveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8A5C5AFF2DF0CFD500569B58 /* NextWaveWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -16,6 +15,7 @@
 		8AFF99642DFB163800F3E1FB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */; };
 		8AFF99652DFB163800F3E1FB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8AFF996E2DFB163900F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AAFEED0000000000000A0003 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = AAFEED0000000000000A0002 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -471,25 +471,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/supabase/supabase-swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		AAFEED0000000000000A0002 /* Supabase */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
-			productName = Supabase;
-		};
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8A225F2F2D0ABC6F008BA92B /* Resources */ = {
@@ -1156,6 +1137,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AAFEED0000000000000A0002 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAFEED0000000000000A0001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8A225F292D0ABC6F008BA92B /* Project object */;
 }

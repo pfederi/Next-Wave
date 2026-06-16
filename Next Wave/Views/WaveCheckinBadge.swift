@@ -28,10 +28,19 @@ struct WaveCheckinBadge: View {
         }
     }
 
+    /// Spells a small count as a capitalized word ("One", "Two", …); falls back to digits.
+    private func spelledOut(_ n: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .spellOut
+        formatter.locale = Locale(identifier: "en_US")
+        guard let word = formatter.string(from: NSNumber(value: n)) else { return "\(n)" }
+        return word.prefix(1).uppercased() + word.dropFirst()
+    }
+
     private var detailContent: some View {
         let anonymous = max(0, count - names.count)
         return VStack(alignment: .leading, spacing: 10) {
-            Text(count == 0 ? "No one yet — be the first!" : "\(count) riding this wave 🌊")
+            Text(count == 0 ? "No one yet — be the first!" : "\(spelledOut(count)) riding this wave 🌊")
                 .font(.headline)
 
             if !names.isEmpty || anonymous > 0 {
@@ -41,7 +50,7 @@ struct WaveCheckinBadge: View {
                             .font(.subheadline)
                     }
                     if anonymous > 0 {
-                        Label("\(anonymous) anonymous", systemImage: "person.fill.questionmark")
+                        Label("\(spelledOut(anonymous)) anonymous", systemImage: "person.fill.questionmark")
                             .font(.subheadline)
                             .foregroundColor(.gray)
                     }

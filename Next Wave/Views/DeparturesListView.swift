@@ -83,7 +83,13 @@ struct DeparturesListView: View {
                             }
                             .listStyle(.plain)
                             .onAppear {
-                                if let station = viewModel.selectedStation {
+                                // refreshDepartures() is the single source that rebuilds waves
+                                // with the correct journeys for the selected date. Only rebuild
+                                // here as a fallback when nothing is loaded yet — otherwise a
+                                // stale `departures` prop (a render behind viewModel.departures)
+                                // can clobber the fresh waves and show the previous day.
+                                if scheduleViewModel.nextWaves.isEmpty,
+                                   let station = viewModel.selectedStation {
                                     scheduleViewModel.updateWaves(from: departures, station: station)
                                 }
                                 refreshCheckins(for: scheduleViewModel.nextWaves)

@@ -153,7 +153,7 @@ as $$
         from h) ss),
     coalesce((select len from runs
               where last_w >= (date_trunc('week', (now() at time zone 'Europe/Zurich'))::date - 7)
-              order by len desc limit 1), 0)::int,
+              order by last_w desc limit 1), 0)::int,
     coalesce((select max(len) from runs), 0)::int;
 $$;
 

@@ -18,8 +18,9 @@ captured at the moment the existing daily cleanup job would otherwise delete the
 ## Goals
 
 - Permanently track which waves each user (device) has ridden.
-- Show collectible achievement badges across four categories: milestones, distinct
-  stations, first/last ship of the day (per station), and weekly streaks.
+- Show collectible achievement badges across five categories: milestones, distinct
+  stations, first/last ship of the day (per station), time-of-day (early bird / lunch ship /
+  night owl), and weekly streaks.
 - Show a personal stats screen (total count, badge gallery with progress, own rank).
 - Show a global leaderboard and a per-station leaderboard.
 - Reuse the existing anonymous-auth identity and Supabase infrastructure.
@@ -98,7 +99,7 @@ and a local counter is lost on reinstall / new device and is trivially manipulab
 ### Rejected alternative — counter columns only
 
 A `user_stats` table of plain integer counters cannot retroactively compute streaks,
-distinct stations, or first/last-ship badges. The slim raw-row history is required.
+distinct stations, time-of-day, or first/last-ship badges. The slim raw-row history is required.
 
 ### Privacy & RLS
 
@@ -123,8 +124,14 @@ distinct stations, or first/last-ship badges. The slim raw-row history is requir
 | `distinct_stations`    | count of distinct `station_id`                      |
 | `first_of_day_count`   | rows with `is_first_of_day = true`                  |
 | `last_of_day_count`    | rows with `is_last_of_day = true`                   |
+| `early_bird_count`     | rows with local departure time before 08:00         |
+| `lunch_count`          | rows with local departure time in [11:30, 13:30)    |
+| `night_owl_count`      | rows with local departure time at/after 19:00       |
 | `current_streak_weeks` | consecutive ISO weeks (up to current) with ≥1 wave  |
 | `longest_streak_weeks` | longest run of consecutive ISO weeks with ≥1 wave   |
+
+> Time-of-day is evaluated in local time (`departure_at at time zone 'Europe/Zurich'`), not
+> UTC: early bird = before 08:00, lunch = 11:30–13:30, night owl = at/after 19:00.
 
 > Streak weeks are computed from `date_trunc('week', departure_at at time zone 'Europe/Zurich')`.
 
@@ -173,6 +180,7 @@ First-release badge catalog:
 | Stations    | 3 · 5 · 10 distinct stations                                     |
 | First ship  | ≥1 first-ship-of-the-day · 10× first-ship-of-the-day            |
 | Last ship   | ≥1 last-ship-of-the-day · 10× last-ship-of-the-day              |
+| Time-of-day | ≥1 before 08:00 ("Early Bird") · ≥1 in 11:30–13:30 ("Lunch Ship") · ≥1 at/after 19:00 ("Night Owl") |
 | Streak      | 3 · 6 consecutive weeks with ≥1 wave                            |
 
 Each badge defines: id, category, threshold, title (localized), description (localized), SF
@@ -262,9 +270,10 @@ animation/highlight, then updates the stored set.
 ## 7. Testing
 
 - **SQL:** unit-test the cleanup job idempotency (re-run → same `wave_history`, flags
-  preserved), `first_of_day_count` / `last_of_day_count` aggregation, streak computation
-  (consecutive vs. gap weeks), and per-station vs. global leaderboard counts. RLS: a user
-  cannot read another's `wave_history`.
+  preserved), `first_of_day_count` / `last_of_day_count` aggregation, the time-of-day
+  boundaries in local time (07:59 vs 08:00; 11:29/11:30/13:29/13:30; 18:59 vs 19:00), streak
+  computation (consecutive vs. gap weeks), and per-station vs. global leaderboard counts.
+  RLS: a user cannot read another's `wave_history`.
 - **Swift:** test the client-side first/last-of-day determination from a station schedule
   (single departure counts as both; earliest/latest boundaries; day rollover in local time).
 - **Swift:** `BadgeEvaluator` tests for each badge threshold (just-below / exactly-at /

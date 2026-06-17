@@ -124,7 +124,7 @@ as $$
   ),
   wk  as (select distinct date_trunc('week', local_dt)::date as w from h),
   wko as (select w, row_number() over (order by w) as rn from wk),
-  wkg as (select w, (w - (rn * 7))::date as g from wko),
+  wkg as (select w, (w - (rn * 7)::int)::date as g from wko),
   runs as (select g, count(*)::int as len, max(w) as last_w from wkg group by g)
   select
     (select count(*) from h)::int,

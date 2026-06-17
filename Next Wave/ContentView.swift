@@ -165,7 +165,14 @@ struct ContentView: View {
                                         .foregroundColor(.orange)
                                         .padding(.leading, 8)
                                 }
-                                
+
+                                NavigationLink(destination: StatsView()
+                                    .environmentObject(appSettings)
+                                ) {
+                                    Image(systemName: "trophy")
+                                        .foregroundColor(.accentColor)
+                                }
+
                                 NavigationLink(destination: SettingsView()
                                     .environmentObject(viewModel)
                                 ) {

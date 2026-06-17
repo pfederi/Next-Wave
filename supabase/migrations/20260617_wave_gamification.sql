@@ -56,3 +56,47 @@ create policy "user_profiles_update_own"
   on public.user_profiles for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- 4. Archive expired check-ins into wave_history, then delete them.
+create or replace function public.wave_checkins_archive_and_cleanup()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  with expired as (
+    select c.*,
+           count(*)        over (partition by c.wave_id)                as peer_count,
+           (c.created_at = min(c.created_at) over (partition by c.wave_id)) as was_first_checkin
+    from public.wave_checkins c
+    where c.departure_at < now()
+      and c.station_id is not null   -- skip legacy rows lacking gamification fields
+      and c.lake_id is not null
+  )
+  insert into public.wave_history
+    (user_id, wave_id, station_id, lake_id, departure_at,
+     is_first_of_day, is_last_of_day, peer_count, was_first_checkin)
+    select user_id, wave_id, station_id, lake_id, departure_at,
+           is_first_of_day, is_last_of_day, peer_count, was_first_checkin
+    from expired
+  on conflict (user_id, wave_id) do nothing;
+
+  delete from public.wave_checkins where departure_at < now();
+end;
+$$;
+
+-- Replace the old delete-only cron job with the archive job.
+do $$
+begin
+  perform cron.unschedule('wave_checkins_cleanup');
+exception when others then
+  -- job did not exist yet; ignore
+  null;
+end $$;
+
+select cron.schedule(
+  'wave_checkins_cleanup',
+  '0 3 * * *',
+  $$select public.wave_checkins_archive_and_cleanup()$$
+);

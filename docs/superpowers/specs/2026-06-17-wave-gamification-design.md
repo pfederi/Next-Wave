@@ -18,9 +18,11 @@ captured at the moment the existing daily cleanup job would otherwise delete the
 ## Goals
 
 - Permanently track which waves each user (device) has ridden.
-- Show collectible achievement badges across five categories: milestones, distinct
-  stations, first/last ship of the day (per station), time-of-day (early bird / lunch ship /
-  night owl), and weekly streaks.
+- Show collectible achievement badges across these categories: milestones, distinct
+  stations, Swiss lakes explored, station loyalty, first/last ship of the day (per station),
+  time-of-day (early bird / lunch ship / night owl), weekday (weekend warrior), seasons,
+  same-day multi-ride, loyalty (anniversary), social (solo / crowd / trendsetter), and weekly
+  streaks.
 - Show a personal stats screen (total count, badge gallery with progress, own rank).
 - Show a global leaderboard and a per-station leaderboard.
 - Reuse the existing anonymous-auth identity and Supabase infrastructure.
@@ -51,10 +53,13 @@ permanent table, then deletes them from `wave_checkins` as before.
 create table wave_history (
   user_id        uuid not null,
   wave_id        text not null,
-  station_id     text not null,        -- for "distinct stations" + per-station leaderboard
-  departure_at   timestamptz not null, -- for streak
+  station_id     text not null,        -- distinct-stations, loyalty + per-station leaderboard
+  lake_id        text not null,        -- Swiss Explorer (distinct lakes)
+  departure_at   timestamptz not null, -- streak, weekday, season, time-of-day, same-day, anniversary
   is_first_of_day boolean not null default false, -- first departure of the day at this station
   is_last_of_day  boolean not null default false, -- last departure of the day at this station
+  peer_count     int not null default 1,          -- total check-ins on this wave (incl. self)
+  was_first_checkin boolean not null default false,-- this user was the earliest check-in
   recorded_at    timestamptz default now(),
   primary key (user_id, wave_id)       -- idempotent; a wave is recorded at most once
 );
@@ -63,19 +68,32 @@ create index wave_history_user_idx on wave_history (user_id);
 create index wave_history_station_idx on wave_history (station_id);
 ```
 
-The `is_first_of_day` / `is_last_of_day` flags **cannot** be derived server-side — Supabase
-does not know the ferry schedule. The app (which has the station schedule from the transport
-API) computes them at check-in time and stores them on the `wave_checkins` row; the cleanup
-job carries them into `wave_history`. "First/last of the day" is scoped **per station** — the
-earliest / latest departure at that station on that calendar day.
+Two classes of derived data:
+
+- **Client-supplied flags** (`is_first_of_day`, `is_last_of_day`, `lake_id`): Supabase does
+  not know the ferry schedule or station→lake mapping, so the app computes these at check-in
+  time and stores them on the `wave_checkins` row. "First/last of the day" is scoped **per
+  station** — the earliest / latest departure at that station on that calendar day.
+- **Cleanup-computed fields** (`peer_count`, `was_first_checkin`): at cleanup time every
+  check-in for a given `wave_id` still exists, so the job computes how many people rode that
+  wave and whether this user had the earliest `created_at`.
 
 Updated cleanup job (runs daily, replaces the current delete-only job):
 
 ```sql
-insert into wave_history (user_id, wave_id, station_id, departure_at, is_first_of_day, is_last_of_day)
-  select user_id, wave_id, station_id, departure_at, is_first_of_day, is_last_of_day
+with expired as (
+  select *,
+         count(*)        over (partition by wave_id)                    as peer_count,
+         (created_at = min(created_at) over (partition by wave_id))     as was_first_checkin
   from wave_checkins
   where departure_at < now()
+)
+insert into wave_history
+  (user_id, wave_id, station_id, lake_id, departure_at,
+   is_first_of_day, is_last_of_day, peer_count, was_first_checkin)
+  select user_id, wave_id, station_id, lake_id, departure_at,
+         is_first_of_day, is_last_of_day, peer_count, was_first_checkin
+  from expired
 on conflict (user_id, wave_id) do nothing;
 
 delete from wave_checkins where departure_at < now();
@@ -88,8 +106,8 @@ cleanup time) enter the history. A user who checks out before departure never ap
 > is encoded inside `wave_id` (`{stationId}_{departureISO}_{routeNumber}`). The implementation
 > plan must either (a) add a `station_id` column to `wave_checkins` populated on check-in, or
 > (b) parse it from `wave_id` in the cleanup SQL. Option (a) is preferred for robustness. The
-> `is_first_of_day` / `is_last_of_day` columns must also be added to `wave_checkins` and set
-> by the client on check-in.
+> `is_first_of_day`, `is_last_of_day`, and `lake_id` columns must also be added to
+> `wave_checkins` and set by the client on check-in.
 
 ### Rejected alternative — local-only tracking
 
@@ -99,7 +117,8 @@ and a local counter is lost on reinstall / new device and is trivially manipulab
 ### Rejected alternative — counter columns only
 
 A `user_stats` table of plain integer counters cannot retroactively compute streaks,
-distinct stations, time-of-day, or first/last-ship badges. The slim raw-row history is required.
+distinct stations/lakes, time-of-day, seasons, social, or first/last-ship badges. The slim
+raw-row history is required.
 
 ### Privacy & RLS
 
@@ -122,13 +141,25 @@ distinct stations, time-of-day, or first/last-ship badges. The slim raw-row hist
 |------------------------|-----------------------------------------------------|
 | `total_waves`          | count of `wave_history` rows                        |
 | `distinct_stations`    | count of distinct `station_id`                      |
+| `distinct_lakes`       | count of distinct `lake_id` (Swiss Explorer)        |
+| `max_waves_one_station`| max rows sharing a single `station_id` (loyalty)    |
 | `first_of_day_count`   | rows with `is_first_of_day = true`                  |
 | `last_of_day_count`    | rows with `is_last_of_day = true`                   |
 | `early_bird_count`     | rows with local departure time before 08:00         |
 | `lunch_count`          | rows with local departure time in [11:30, 13:30)    |
 | `night_owl_count`      | rows with local departure time at/after 19:00       |
+| `weekend_count`        | rows on Saturday/Sunday (local)                     |
+| `seasons_ridden`       | distinct seasons present (spring/summer/autumn/winter) |
+| `max_waves_one_day`    | max rows sharing a single local calendar date       |
+| `has_anniversary`      | any wave ≥365 days after the user's first-ever wave |
+| `solo_count`           | rows with `peer_count = 1` (Lone Wolf)              |
+| `max_peer_count`       | highest `peer_count` across rows (Crowd Surfer)     |
+| `trendsetter_count`    | rows with `was_first_checkin = true` and `peer_count ≥ 3` |
 | `current_streak_weeks` | consecutive ISO weeks (up to current) with ≥1 wave  |
 | `longest_streak_weeks` | longest run of consecutive ISO weeks with ≥1 wave   |
+
+> Seasons (meteorological, local time): spring = Mar–May, summer = Jun–Aug, autumn = Sep–Nov,
+> winter = Dec–Feb.
 
 > Time-of-day is evaluated in local time (`departure_at at time zone 'Europe/Zurich'`), not
 > UTC: early bird = before 08:00, lunch = 11:30–13:30, night owl = at/after 19:00.
@@ -174,14 +205,21 @@ numeric metrics from `user_wave_stats()` to earned/unearned badges and per-badge
 
 First-release badge catalog:
 
-| Category    | Badges (thresholds)                                              |
-|-------------|------------------------------------------------------------------|
-| Milestones  | First Wave · 10 · 25 · 50 · 100 waves                            |
-| Stations    | 3 · 5 · 10 distinct stations                                     |
-| First ship  | ≥1 first-ship-of-the-day · 10× first-ship-of-the-day            |
-| Last ship   | ≥1 last-ship-of-the-day · 10× last-ship-of-the-day              |
-| Time-of-day | ≥1 before 08:00 ("Early Bird") · ≥1 in 11:30–13:30 ("Lunch Ship") · ≥1 at/after 19:00 ("Night Owl") |
-| Streak      | 3 · 6 consecutive weeks with ≥1 wave                            |
+| Category      | Badges (thresholds)                                                |
+|---------------|--------------------------------------------------------------------|
+| Milestones    | First Wave · 10 · 25 · 50 · 100 waves                              |
+| Stations      | 3 · 5 · 10 distinct stations                                       |
+| Swiss Explorer| 2 · 3 · all distinct lakes                                         |
+| Loyalty       | Regular: 10 · 25 waves at one single station                      |
+| First ship    | ≥1 first-ship-of-the-day · 10× first-ship-of-the-day              |
+| Last ship     | ≥1 last-ship-of-the-day · 10× last-ship-of-the-day                |
+| Time-of-day   | ≥1 before 08:00 ("Early Bird") · ≥1 in 11:30–13:30 ("Lunch Ship") · ≥1 at/after 19:00 ("Night Owl") |
+| Weekend       | "Weekend Warrior": 10 waves on Sat/Sun                            |
+| Seasons       | one per season (Spring/Summer/Autumn/Winter) · "Four Seasons": all 4 |
+| Same day      | "Double": 2 waves in one day · "Triple": 3 in one day             |
+| Anniversary   | "One Year": a wave ≥1 year after your first-ever wave             |
+| Social        | "Lone Wolf": solo wave · "Crowd Surfer": wave with ≥5 riders · "Trendsetter": first check-in on a wave that reached ≥3 |
+| Streak        | 3 · 6 consecutive weeks with ≥1 wave                              |
 
 Each badge defines: id, category, threshold, title (localized), description (localized), SF
 Symbol icon, and the metric it reads. Progress for unearned badges shown as `current/target`.
@@ -250,9 +288,10 @@ animation/highlight, then updates the stored set.
 ## 5. Data Flow
 
 1. User checks in (existing flow). The app computes `is_first_of_day` / `is_last_of_day` from
-   the station's schedule and stores them plus `station_id` on the check-in; `user_profiles`
-   upserted with the non-anonymous name.
-2. Daily cleanup job copies expired check-ins into `wave_history`, then deletes them.
+   the station's schedule and stores them plus `station_id` and `lake_id` on the check-in;
+   `user_profiles` upserted with the non-anonymous name.
+2. Daily cleanup job copies expired check-ins into `wave_history` (computing `peer_count` and
+   `was_first_checkin` from the co-checked-in rows), then deletes them.
 3. User opens Stats screen → `StatsStore` calls `user_wave_stats()` and `wave_leaderboard()`.
 4. `BadgeEvaluator` maps metrics to earned badges + progress; `StatsView` renders gallery.
 5. Newly earned badges (vs. local "last seen") get a celebration highlight.
@@ -270,10 +309,13 @@ animation/highlight, then updates the stored set.
 ## 7. Testing
 
 - **SQL:** unit-test the cleanup job idempotency (re-run → same `wave_history`, flags
-  preserved), `first_of_day_count` / `last_of_day_count` aggregation, the time-of-day
-  boundaries in local time (07:59 vs 08:00; 11:29/11:30/13:29/13:30; 18:59 vs 19:00), streak
-  computation (consecutive vs. gap weeks), and per-station vs. global leaderboard counts.
-  RLS: a user cannot read another's `wave_history`.
+  preserved), `peer_count` / `was_first_checkin` computation at cleanup (solo vs. multi-rider
+  waves; earliest `created_at` wins), `first_of_day_count` / `last_of_day_count` aggregation,
+  the time-of-day boundaries in local time (07:59 vs 08:00; 11:29/11:30/13:29/13:30; 18:59 vs
+  19:00), season bucketing (month boundaries), `max_waves_one_day` / `max_waves_one_station`,
+  `distinct_lakes`, anniversary (364 vs 365 days), streak computation (consecutive vs. gap
+  weeks), and per-station vs. global leaderboard counts. RLS: a user cannot read another's
+  `wave_history`.
 - **Swift:** test the client-side first/last-of-day determination from a station schedule
   (single departure counts as both; earliest/latest boundaries; day rollover in local time).
 - **Swift:** `BadgeEvaluator` tests for each badge threshold (just-below / exactly-at /
@@ -288,3 +330,7 @@ animation/highlight, then updates the stored set.
   `wave_id` in SQL.
 - Stats entry: confirmed as the **global header** icon (not a new tab) per discussion.
 - Exact SF Symbols for the two new toolbar icons (`rosette` vs `trophy` vs `medal`).
+- `lake_id` source: confirm the station→lake mapping the app already uses, and the total lake
+  count constant needed for the Swiss Explorer "all lakes" badge (lives in Swift `BadgeCatalog`).
+- Social badge thresholds (`Crowd Surfer` ≥5, `Trendsetter` reached ≥3) — tune after seeing
+  real check-in volumes.

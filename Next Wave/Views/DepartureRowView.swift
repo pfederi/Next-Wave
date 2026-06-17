@@ -25,12 +25,29 @@ struct DepartureRowView: View {
             routeNumber: wave.routeNumber)
     }
 
+    /// Gamification fields for the current wave, derived from the selected station + the day's schedule.
+    private var checkinContext: CheckinContext? {
+        guard let station = scheduleViewModel.selectedStation else { return nil }
+        let lakeName = lakeStationsViewModel.lakes.first(where: { lake in
+            lake.stations.contains(where: { $0.name == station.name })
+        })?.name ?? station.name
+        let dayTimes = scheduleViewModel.nextWaves.map { $0.time }
+        return CheckinContext(
+            stationId: station.id,
+            lakeId: lakeName,
+            isFirstOfDay: WaveCheckin.isFirstOfDay(wave.time, amongDepartures: dayTimes),
+            isLastOfDay: WaveCheckin.isLastOfDay(wave.time, amongDepartures: dayTimes)
+        )
+    }
+
     private func handleCheckinTap(waveId: String) {
         if appSettings.hasCheckinIdentity {
+            guard let context = checkinContext else { return }
             Task {
                 await checkinStore.toggle(waveId: waveId,
                                           departureAt: wave.time,
-                                          identity: appSettings.checkinIdentity)
+                                          identity: appSettings.checkinIdentity,
+                                          context: context)
             }
         } else {
             showCheckinIdentitySheet = true
@@ -325,11 +342,12 @@ struct DepartureRowView: View {
         }
         .sheet(isPresented: $showCheckinIdentitySheet) {
             CheckinIdentitySheet(onSave: {
-                if let waveId = waveId {
+                if let waveId = waveId, let context = checkinContext {
                     Task {
                         await checkinStore.toggle(waveId: waveId,
                                                   departureAt: wave.time,
-                                                  identity: appSettings.checkinIdentity)
+                                                  identity: appSettings.checkinIdentity,
+                                                  context: context)
                     }
                 }
             })

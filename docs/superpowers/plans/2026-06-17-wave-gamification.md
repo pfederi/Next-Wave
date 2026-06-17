@@ -463,7 +463,7 @@ struct WaveDayContextTests {
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `xcodebuild test -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:"Next WaveTests/WaveDayContextTests"`
+Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/WaveDayContextTests"`
 Expected: FAIL — `isFirstOfDay` / `isLastOfDay` are not members of `WaveCheckin`.
 
 - [ ] **Step 3: Implement the helpers**
@@ -497,7 +497,7 @@ Append to `Next Wave/Models/WaveCheckin.swift` (before the closing brace of `str
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
-Run: `xcodebuild test -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:"Next WaveTests/WaveDayContextTests"`
+Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/WaveDayContextTests"`
 Expected: PASS (4 tests).
 
 - [ ] **Step 5: Commit**
@@ -673,7 +673,7 @@ And update the identity-sheet `onSave` toggle call (lines 326-337) to pass the c
 
 - [ ] **Step 4: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED (no other call sites reference the old `toggle`/`checkIn` signatures — confirm with `grep -rn "\.toggle(waveId" "Next Wave"` showing only the two updated call sites).
 
 - [ ] **Step 5: Commit**
@@ -814,7 +814,7 @@ actor StatsAPI {
 
 - [ ] **Step 3: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 4: Commit**
@@ -913,7 +913,7 @@ struct BadgeEvaluatorTests {
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `xcodebuild test -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:"Next WaveTests/BadgeEvaluatorTests"`
+Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/BadgeEvaluatorTests"`
 Expected: FAIL — `BadgeEvaluator` / `BadgeCatalog` undefined.
 
 - [ ] **Step 3: Implement the catalog + evaluator**
@@ -1052,7 +1052,7 @@ enum BadgeEvaluator {
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
-Run: `xcodebuild test -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16' -only-testing:"Next WaveTests/BadgeEvaluatorTests"`
+Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/BadgeEvaluatorTests"`
 Expected: PASS (6 tests).
 
 - [ ] **Step 5: Commit**
@@ -1142,7 +1142,7 @@ final class StatsStore: ObservableObject {
 
 - [ ] **Step 3: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 4: Commit**
@@ -1210,7 +1210,7 @@ struct LeaderboardView: View {
 
 - [ ] **Step 2: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 3: Commit**
@@ -1328,7 +1328,7 @@ struct StatsView: View {
 
 - [ ] **Step 2: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 3: Commit**
@@ -1432,7 +1432,7 @@ Then add the presenting sheet next to the existing `.alert` (after line 192's to
 
 - [ ] **Step 3: Build to verify it compiles**
 
-Run: `xcodebuild build -scheme "Next Wave" -destination 'platform=iOS Simulator,name=iPhone 16'`
+Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
 Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 4: Manually verify the flow in the simulator**

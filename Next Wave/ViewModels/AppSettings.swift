@@ -100,6 +100,12 @@ class AppSettings: ObservableObject {
         }
     }
 
+    @Published var seenBadgeIds: Set<String> {
+        didSet {
+            UserDefaults.standard.set(Array(seenBadgeIds), forKey: "seenBadgeIds")
+        }
+    }
+
     /// The local check-in identity assembled from the stored name + anonymous flag.
     var checkinIdentity: CheckinIdentity {
         CheckinIdentity(name: checkinName, isAnonymous: checkinAnonymous)
@@ -181,7 +187,9 @@ class AppSettings: ObservableObject {
         self.enableWaveCheckIn = UserDefaults.standard.bool(forKey: "enableWaveCheckIn", defaultValue: true)
         self.checkinName = UserDefaults.standard.string(forKey: "checkinName") ?? ""
         self.checkinAnonymous = UserDefaults.standard.bool(forKey: "checkinAnonymous", defaultValue: false)
-        
+        let savedBadgeIds = UserDefaults.standard.array(forKey: "seenBadgeIds") as? [String] ?? []
+        self.seenBadgeIds = Set(savedBadgeIds)
+
         // Load dismissed promo tile IDs
         if let data = UserDefaults.standard.data(forKey: "dismissedPromoTileIds"),
            let ids = try? JSONDecoder().decode([String].self, from: data) {

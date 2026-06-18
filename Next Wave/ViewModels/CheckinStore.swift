@@ -2,6 +2,14 @@ import Foundation
 import SwiftUI
 import Supabase
 
+/// Extra gamification fields captured at check-in time.
+struct CheckinContext {
+    let stationId: String
+    let lakeId: String
+    let isFirstOfDay: Bool
+    let isLastOfDay: Bool
+}
+
 @MainActor
 final class CheckinStore: ObservableObject {
     static let shared = CheckinStore()
@@ -74,7 +82,7 @@ final class CheckinStore: ObservableObject {
         }
     }
 
-    func toggle(waveId: String, departureAt: Date, identity: CheckinIdentity) async {
+    func toggle(waveId: String, departureAt: Date, identity: CheckinIdentity, context: CheckinContext) async {
         do {
             if mine.contains(waveId) {
                 try await CheckinAPI.shared.checkOut(waveId: waveId)
@@ -83,7 +91,8 @@ final class CheckinStore: ObservableObject {
                 try await CheckinAPI.shared.checkIn(
                     waveId: waveId,
                     displayName: identity.displayName,
-                    departureAt: departureAt)
+                    departureAt: departureAt,
+                    context: context)
                 mine.insert(waveId)
             }
             await reloadCounts()

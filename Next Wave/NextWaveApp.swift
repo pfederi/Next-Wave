@@ -19,9 +19,41 @@ class BackgroundTaskManager {
                 self.handleWidgetRefreshTask(task)
             }
         }
-        
+
+        // Register badge-check task (notify when new badges are earned)
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.nextwave.badge-check", using: nil) { task in
+            if let task = task as? BGProcessingTask {
+                self.handleBadgeCheckTask(task)
+            }
+        }
+
         scheduleMidnightTask()
         scheduleWidgetRefreshTask()
+        scheduleBadgeCheckTask()
+    }
+
+    func scheduleBadgeCheckTask() {
+        let request = BGProcessingTaskRequest(identifier: "com.nextwave.badge-check")
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60) // ~30 min
+        request.requiresNetworkConnectivity = true
+        request.requiresExternalPower = false
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            print("📱 Could not schedule badge-check task: \(error)")
+        }
+    }
+
+    private func handleBadgeCheckTask(_ task: BGProcessingTask) {
+        task.expirationHandler = {
+            task.setTaskCompleted(success: false)
+        }
+        // Reschedule the next run first, then do the work.
+        scheduleBadgeCheckTask()
+        Task {
+            await BadgeNotifier.shared.checkAndNotify()
+            task.setTaskCompleted(success: true)
+        }
     }
     
     private func scheduleMidnightTask() {
@@ -152,6 +184,8 @@ struct NextWaveApp: App {
         let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity)
         URLCache.shared = cache
         
+        // Set the delegate first so a launch-from-notification tap is handled.
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
         requestNotificationPermissions()
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.backgroundColor = UIColor(Color("background-color"))
@@ -202,6 +236,10 @@ struct NextWaveApp: App {
                                 viewModel.appWillEnterForeground()
                                 lakeStationsViewModel.appWillEnterForeground()
                             }
+                        }
+                        // Notify about any badges earned while away.
+                        if appSettings.enableWaveCheckIn {
+                            Task { await BadgeNotifier.shared.checkAndNotify() }
                         }
                     } else if newPhase == .background {
                         // Load widget data when app goes to background
@@ -300,7 +338,7 @@ struct NextWaveApp: App {
     }
     
     private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in
         }
     }
 }

@@ -25,12 +25,33 @@ struct DepartureRowView: View {
             routeNumber: wave.routeNumber)
     }
 
+    /// Gamification fields for the current wave, derived from the selected station + the day's schedule.
+    private var checkinContext: CheckinContext? {
+        guard let station = scheduleViewModel.selectedStation else { return nil }
+        let lakeName = lakeStationsViewModel.lakes.first(where: { lake in
+            lake.stations.contains(where: { $0.name == station.name })
+        })?.name ?? "unknown"   // avoid a phantom per-station "lake" if no lake matches
+        let dayTimes = scheduleViewModel.nextWaves.map { $0.time }
+        // Only trust first/last-of-day when the full day's schedule is loaded
+        // (i.e. it actually contains this wave); otherwise don't award the flag
+        // rather than mis-flag from an empty/stale list.
+        let dayLoaded = dayTimes.contains(wave.time)
+        return CheckinContext(
+            stationId: station.id,
+            lakeId: lakeName,
+            isFirstOfDay: dayLoaded && WaveCheckin.isFirstOfDay(wave.time, amongDepartures: dayTimes),
+            isLastOfDay: dayLoaded && WaveCheckin.isLastOfDay(wave.time, amongDepartures: dayTimes)
+        )
+    }
+
     private func handleCheckinTap(waveId: String) {
         if appSettings.hasCheckinIdentity {
+            guard let context = checkinContext else { return }
             Task {
                 await checkinStore.toggle(waveId: waveId,
                                           departureAt: wave.time,
-                                          identity: appSettings.checkinIdentity)
+                                          identity: appSettings.checkinIdentity,
+                                          context: context)
             }
         } else {
             showCheckinIdentitySheet = true
@@ -325,11 +346,12 @@ struct DepartureRowView: View {
         }
         .sheet(isPresented: $showCheckinIdentitySheet) {
             CheckinIdentitySheet(onSave: {
-                if let waveId = waveId {
+                if let waveId = waveId, let context = checkinContext {
                     Task {
                         await checkinStore.toggle(waveId: waveId,
                                                   departureAt: wave.time,
-                                                  identity: appSettings.checkinIdentity)
+                                                  identity: appSettings.checkinIdentity,
+                                                  context: context)
                     }
                 }
             })

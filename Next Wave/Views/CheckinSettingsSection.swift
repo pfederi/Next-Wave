@@ -60,10 +60,11 @@ struct CheckinSettingsSection: View {
                             .foregroundColor(Color("text-color").opacity(0.5))
                             .font(.system(size: 14))
                     }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(PlainButtonStyle())
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
                 .sheet(isPresented: $showIdentitySheet) {
                     CheckinIdentitySheet().environmentObject(appSettings)
                 }
@@ -116,6 +117,9 @@ struct CheckinIdentitySheet: View {
                     Button("Save") {
                         appSettings.checkinName = name
                         appSettings.checkinAnonymous = anonymous
+                        // Sync the leaderboard name immediately (sets nil when anonymous/blank).
+                        let displayName = CheckinIdentity(name: name, isAnonymous: anonymous).displayName
+                        Task { await CheckinAPI.shared.syncProfileName(displayName) }
                         onSave?()
                         dismiss()
                     }

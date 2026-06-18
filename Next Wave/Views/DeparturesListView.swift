@@ -12,6 +12,7 @@ struct DeparturesListView: View {
     @State private var errorMessage: String?
     @ObservedObject private var favoritesManager = FavoriteStationsManager.shared
     @State private var showingMaxFavoritesAlert = false
+    @State private var showingStationLeaderboard = false
     @State private var noServiceMessage: String = NoWavesMessageService.shared.getNoServiceMessage()
     @State private var hasTomorrowDepartures: Bool = true
     @State private var lastScrolledDate: Date?
@@ -156,6 +157,12 @@ struct DeparturesListView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 12) {
                     if let station = selectedStation {
+                        Button(action: { showingStationLeaderboard = true }) {
+                            Image(systemName: "trophy")
+                                .foregroundColor(.accentColor)
+                                .padding(.leading, 8)
+                        }
+
                         Button(action: {
                             if favoritesManager.isFavorite(station) {
                                 favoritesManager.removeFavorite(station)
@@ -167,7 +174,6 @@ struct DeparturesListView: View {
                         }) {
                             Image(systemName: favoritesManager.isFavorite(station) ? "heart.fill" : "heart")
                                 .foregroundColor(.accentColor)
-                                .padding(.leading, 8)
                         }
                     }
                     
@@ -194,6 +200,17 @@ struct DeparturesListView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text("You can have a maximum of \(FavoriteStation.maxFavorites) favorite spots. Please remove one before adding another.")
+        }
+        .sheet(isPresented: $showingStationLeaderboard) {
+            NavigationView {
+                LeaderboardView(stationId: selectedStation?.id,
+                                title: selectedStation?.name ?? "Leaderboard")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") { showingStationLeaderboard = false }
+                        }
+                    }
+            }
         }
         .onFlip {
             // Toggle Albis-Klasse Filter (nur in der Stationview, und nur wenn aktiviert)

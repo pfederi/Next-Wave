@@ -25,7 +25,7 @@ that includes rides behind a scheduled boat."
 - Import a `.gpx` into the app via iOS Share (no extra extension target).
 - Accept only genuine **Foilmotion** files (creator check).
 - Parse GPX robustly (with or without `<extensions>` speed/distance).
-- Reconstruct nearby Kursschiff trajectories from the timetable and keep only the track segments ridden within `wakeRadius` of a moving boat ("wake-thieving" rides).
+- Reconstruct nearby Kursschiff trajectories from the timetable; a boat passing within `wakeProximity` opens a `wakeWindow` during which the foiler's moving track counts ("wake-thieving" rides).
 - Compute metrics over the matched rides only (speed/distance derived from the raw GPS points): longest ride distance, max speed, total distance, plus the count of detected wake-thieving rides.
 - Persist verified sessions in Supabase (cross-device, idempotent re-import).
 - Award verified badges (longest ride, top speed, total distance, session count),
@@ -71,12 +71,16 @@ gate, not real proof. Accepted for v1.
   captures the boat **approaching and leaving every stop** along its route — i.e.
   both arriving and departing boats are handled without a separate arrival query.
 - **`WaveMatcher`** (`Services/WaveMatcher.swift`): `FerryTrajectory.position(at:)`
-  linearly interpolates the boat's position over time between waypoints. A track
-  point counts as "behind a boat" when the foiler is **moving** and within
-  `wakeRadius = 200 m` of some boat's interpolated position **at that point's
-  time**. Contiguous behind-boat points form a `MatchedRide` (route + start +
-  points). Speed is derived from the **raw GPS points** (`distance/Δt`); Foilmotion's
-  recorded speed is only a fallback when `Δt = 0`.
+  linearly interpolates the boat's position over time between waypoints. A boat
+  passing within `wakeProximity = 300 m` of the foiler **opens a wake window** of
+  `wakeWindow = 90 s`: the boat races off but its wake lingers and is ridden after
+  it has moved on. A track point counts as "behind a boat" when it falls inside an
+  open wake window **and** the foiler is moving (`speed >= FOIL_SPEED_THRESHOLD`).
+  Contiguous such points form a `MatchedRide` (route + start + points). Speed is
+  derived from the **raw GPS points** (`distance/Δt`); Foilmotion's recorded speed
+  is only a fallback when `Δt = 0`. (Instantaneous proximity was tried first but
+  credited almost nothing — the boat is only co-located with the foiler for a few
+  seconds; the wake window reflects the physics of wake-thieving.)
 - **`SessionMetrics`** (pure, unit-testable) computed **per matched ride** then
   aggregated by `GPXImportCoordinator`: `totalDistance` = Σ over matched rides,
   `longestRideDistance` = max single matched ride, `maxSpeed` = max over matched
@@ -171,8 +175,9 @@ verified badges recompute from `user_verified_stats()`.
 - **`SessionMetrics`**: synthetic points → `totalDistance`, `maxSpeed`,
   `longestRideDistance` incl. threshold boundaries and a slow point splitting two ride segments.
 - **`WaveMatcher`** / **`FerryTrajectory`**: position interpolation (midpoint, out
-  of span); synthetic track following a moving boat → matched ride; no match when
-  too far (>200 m), wrong time, or stationary. Speed derived from coordinates.
+  of span); synthetic track following a moving boat → matched ride; wake window
+  keeps crediting after the boat has raced off; no match when too far (>300 m),
+  wrong time, or stationary. Speed derived from coordinates.
 - **`VerifiedBadge`**: threshold boundaries for longest ride / top speed (km/h conversion) / total distance / sessions.
 - **SQL**: RLS owner-only; `user_verified_stats` aggregation; upsert idempotency.
 

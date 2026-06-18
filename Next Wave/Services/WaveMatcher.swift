@@ -38,26 +38,28 @@ struct MatchedRide: Equatable {
 }
 
 enum WaveMatcher {
-    /// How close (m) the foiler must be to the interpolated ferry position to
-    /// count as riding its wake. Generous, to absorb straight-line and timing error.
-    static let wakeRadius = 200.0
+    /// How close (m) a boat must pass to the foiler to create a rideable wake.
+    static let wakeProximity = 300.0
+    /// How long (s) the wake stays rideable after a boat passes near — the boat
+    /// races off at ~11 m/s, but its wake lingers and is ridden well after it has
+    /// moved on. A point counts while it falls inside an open wake window.
+    static let wakeWindow = 90.0
 
-    /// Returns the contiguous rides where the foiler was moving AND within
-    /// `wakeRadius` of a ferry that was underway at that moment. Speed is derived
-    /// from the raw GPS points (coordinates + Δt); Foilmotion's own speed is only a
-    /// fallback when Δt is zero.
+    /// Returns the contiguous rides where the foiler was moving while inside an
+    /// open wake window — i.e. within `wakeWindow` seconds of a boat passing within
+    /// `wakeProximity`. Speed is derived from the raw GPS points (coordinates + Δt);
+    /// Foilmotion's own speed is only a fallback when Δt is zero.
     static func matchedRides(points: [GPXPoint], trajectories: [FerryTrajectory]) -> [MatchedRide] {
         guard points.count >= 2, !trajectories.isEmpty else { return [] }
 
-        // The closest ferry route within wakeRadius at this point's time, or nil.
-        func behindShip(_ p: GPXPoint, speed: Double) -> String? {
-            guard speed >= FoilConstants.foilSpeedThreshold else { return nil }
+        // Closest boat route within wakeProximity of point `p` at its time, or nil.
+        func boatPassingNear(_ p: GPXPoint) -> String? {
             let t = p.time.timeIntervalSince1970
             var best: (route: String, d: Double)?
             for traj in trajectories {
                 guard let pos = traj.position(at: t) else { continue }
                 let d = GeoMath.distance(lat1: p.lat, lon1: p.lon, lat2: pos.lat, lon2: pos.lon)
-                if d <= wakeRadius, best == nil || d < best!.d {
+                if d <= wakeProximity, best == nil || d < best!.d {
                     best = (traj.routeNumber, d)
                 }
             }
@@ -67,6 +69,8 @@ enum WaveMatcher {
         var rides: [MatchedRide] = []
         var current: [GPXPoint] = []
         var currentRoute = ""
+        var windowRoute = ""
+        var openUntil = -Double.greatestFiniteMagnitude
         func flush() {
             if current.count >= 2 {
                 rides.append(MatchedRide(routeNumber: currentRoute,
@@ -76,9 +80,17 @@ enum WaveMatcher {
         }
 
         for i in points.indices {
-            if let route = behindShip(points[i], speed: derivedSpeed(points, i)) {
-                if current.isEmpty { currentRoute = route }
-                current.append(points[i])
+            let p = points[i]
+            let t = p.time.timeIntervalSince1970
+            // A boat passing near (re)opens the wake window.
+            if let route = boatPassingNear(p) {
+                openUntil = t + wakeWindow
+                windowRoute = route
+            }
+            let inWake = t <= openUntil
+            if inWake, derivedSpeed(points, i) >= FoilConstants.foilSpeedThreshold {
+                if current.isEmpty { currentRoute = windowRoute }
+                current.append(p)
             } else {
                 flush()
             }

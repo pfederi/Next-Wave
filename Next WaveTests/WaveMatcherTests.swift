@@ -9,6 +9,11 @@ struct WaveMatcherTests {
         CandidateDeparture(stationId: "S_1", stationName: "S", stationUicRef: "1",
                            stationLat: stationLat, stationLon: stationLon, departure: t, routeNumber: "10")
     }
+    private func arr(_ t: Date) -> CandidateDeparture {
+        CandidateDeparture(stationId: "S_1", stationName: "S", stationUicRef: "1",
+                           stationLat: stationLat, stationLon: stationLon, departure: t,
+                           routeNumber: "10", isArrival: true)
+    }
     private func pt(_ t: TimeInterval, _ lat: Double, _ lon: Double, _ speed: Double) -> GPXPoint {
         GPXPoint(time: Date(timeIntervalSince1970: t), lat: lat, lon: lon, ele: nil,
                  speed: speed, cumulativeDistance: nil)
@@ -63,6 +68,22 @@ struct WaveMatcherTests {
         // exactly T - windowBefore (1000 - 120 = 880) → inclusive lower bound
         let pts = [pt(880, 47.30, 8.55, 5), pt(885, 47.30, 8.55, 5)]
         #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
+    }
+
+    // MARK: arrivals (mirrored window: wake builds while approaching)
+
+    @Test func matchesArrivalWhileApproaching() {
+        let T = Date(timeIntervalSince1970: 1000)
+        // 5 min BEFORE arrival (ship approaching) → within [-windowAfter, +windowBefore]
+        let pts = [pt(700, 47.30, 8.55, 5), pt(705, 47.301, 8.55, 5)]
+        #expect(WaveMatcher.matchedRides(points: pts, departures: [arr(T)]).count == 1)
+    }
+
+    @Test func excludesArrivalLongAfterDocking() {
+        let T = Date(timeIntervalSince1970: 1000)
+        // 5 min AFTER arrival → outside the short +windowBefore (120s) settle side
+        let pts = [pt(1300, 47.30, 8.55, 5), pt(1305, 47.30, 8.55, 5)]
+        #expect(WaveMatcher.matchedRides(points: pts, departures: [arr(T)]).isEmpty)
     }
 
     @Test func picksFirstMatchingDepartureNoDoubleCount() {

@@ -24,15 +24,17 @@ class TransportAPI {
         }
     }
     
-    func getStationboard(stationId: String, for date: Date = Date(), limit: Int = 30) async throws -> [Journey] {
+    func getStationboard(stationId: String, for date: Date = Date(), limit: Int = 30,
+                         type: String = "departure") async throws -> [Journey] {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let dateString = dateFormatter.string(from: date)
-        
+
         // Use a smaller limit by default (30 instead of 100) to reduce API response time
         // This is especially important for the first API call of the day when the API builds its cache
         // For widgets or special cases, a higher limit can be passed
-        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=\(limit)&date=\(dateString)"
+        // type=departure (default) or type=arrival — arriving ferries make rideable waves too.
+        let urlString = "https://transport.opendata.ch/v1/stationboard?id=\(stationId)&limit=\(limit)&date=\(dateString)&type=\(type)"
         guard let url = URL(string: urlString) else {
             throw APIError.invalidURL
         }

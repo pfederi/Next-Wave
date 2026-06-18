@@ -1,14 +1,18 @@
 import Foundation
 
-/// One ferry departure to test the track against (built from the schedule).
+/// One ferry wave event (departure or arrival) to test the track against,
+/// built from the schedule.
 struct CandidateDeparture: Equatable {
     let stationId: String
     let stationName: String
     let stationUicRef: String?
     let stationLat: Double
     let stationLon: Double
+    /// The scheduled event time — the departure time, or the arrival time when `isArrival`.
     let departure: Date
     let routeNumber: String
+    /// true → this is an arriving ferry (wake builds while approaching, dies after docking).
+    let isArrival: Bool = false
 }
 
 /// A contiguous "behind a ship" ride: the moving run of track points that was
@@ -22,8 +26,18 @@ struct MatchedRide: Equatable {
 
 enum WaveMatcher {
     static let matchRadius = 250.0   // meters
-    static let windowBefore = 120.0  // seconds (wake builds just before departure)
-    static let windowAfter = 360.0   // seconds (wake arrives shortly after)
+    static let windowBefore = 120.0  // seconds (short side of the wake window)
+    static let windowAfter = 360.0   // seconds (long side of the wake window)
+
+    /// The wake window for an event, relative to its scheduled time.
+    /// Departure: wake builds just before leaving, biggest shortly after → [-before, +after].
+    /// Arrival: wake builds while the ferry approaches, dies after docking → [-after, +before] (mirrored).
+    static func window(for candidate: CandidateDeparture) -> (lo: TimeInterval, hi: TimeInterval) {
+        let t = candidate.departure.timeIntervalSince1970
+        return candidate.isArrival
+            ? (t - windowAfter, t + windowBefore)
+            : (t - windowBefore, t + windowAfter)
+    }
 
     /// Returns the moving runs of the track that qualify as ferry-wave rides:
     /// a contiguous run of points with speed ≥ threshold that contains at least
@@ -47,10 +61,10 @@ enum WaveMatcher {
         var rides: [MatchedRide] = []
         for run in runs where run.count >= 2 {
             guard let dep = departures.first(where: { d in
-                let t = d.departure.timeIntervalSince1970
+                let (lo, hi) = window(for: d)
                 return run.contains { p in
                     let pt = p.time.timeIntervalSince1970
-                    return pt >= t - windowBefore && pt <= t + windowAfter
+                    return pt >= lo && pt <= hi
                         && GeoMath.distance(lat1: p.lat, lon1: p.lon,
                                             lat2: d.stationLat, lon2: d.stationLon) <= matchRadius
                 }

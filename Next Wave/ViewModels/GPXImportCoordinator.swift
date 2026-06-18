@@ -81,7 +81,7 @@ final class GPXImportCoordinator: ObservableObject {
         report(.imported, metrics: metrics, rideCount: rideCount)
     }
 
-    /// Stations within 400 m of any track point → that day's ferry departures.
+    /// Stations within 400 m of any track point → that day's ferry departures AND arrivals.
     private func candidateDepartures(for session: GPXSession, stations: [Lake.Station]) async -> [CandidateDeparture] {
         let candidates = stations.filter { station in
             guard let c = station.coordinates else { return false }
@@ -91,20 +91,37 @@ final class GPXImportCoordinator: ObservableObject {
         }
         let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
         let api = TransportAPI()
-        var departures: [CandidateDeparture] = []
+        var events: [CandidateDeparture] = []
         for station in candidates {
             guard let c = station.coordinates, let uic = station.uic_ref else { continue }
-            let journeys = (try? await api.getStationboard(stationId: uic, for: date, limit: 200)) ?? []
-            for j in journeys {
+
+            let departures = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
+                                                             type: "departure")) ?? []
+            for j in departures {
                 guard let ts = j.stop.departureTimestamp else { continue }
-                let route = (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
-                departures.append(CandidateDeparture(
+                events.append(CandidateDeparture(
                     stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
                     stationLat: c.latitude, stationLon: c.longitude,
-                    departure: Date(timeIntervalSince1970: TimeInterval(ts)), routeNumber: route))
+                    departure: Date(timeIntervalSince1970: TimeInterval(ts)),
+                    routeNumber: routeNumber(j), isArrival: false))
+            }
+
+            let arrivals = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
+                                                           type: "arrival")) ?? []
+            for j in arrivals {
+                guard let ts = j.stop.arrivalTimestamp else { continue }
+                events.append(CandidateDeparture(
+                    stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
+                    stationLat: c.latitude, stationLon: c.longitude,
+                    departure: Date(timeIntervalSince1970: TimeInterval(ts)),
+                    routeNumber: routeNumber(j), isArrival: true))
             }
         }
-        return departures
+        return events
+    }
+
+    private func routeNumber(_ j: Journey) -> String {
+        (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
     }
 
     /// Aggregate session metrics over ONLY the matched (behind-a-ship) rides.

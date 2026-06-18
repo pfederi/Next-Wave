@@ -63,11 +63,15 @@ gate, not real proof. Accepted for v1.
   (case-insensitive). Otherwise the import is rejected with a clear message.
 - **`WaveMatcher`** (`Services/WaveMatcher.swift`): splits the track into
   contiguous moving runs (`speed >= FOIL_SPEED_THRESHOLD`) and keeps only runs
-  containing a point within `matchRadius = 250 m` of a candidate ferry station
-  inside that departure's wake window `[-120 s, +360 s]`. Returns `[MatchedRide]`
-  (each with the schedule `waveId`, station, departure, and its run of points).
-  Candidate departures come from `TransportAPI.getStationboard` for every station
-  within 400 m of any track point on the session's day.
+  containing a point within `matchRadius = 250 m` of a candidate ferry event
+  inside its wake window. Both **departures and arrivals** count (an arriving
+  ferry makes a rideable wave while approaching). Wake window relative to the
+  scheduled time: departure → `[-120 s, +360 s]` (wake biggest just after
+  leaving); arrival → mirrored `[-360 s, +120 s]` (wake builds while approaching,
+  dies after docking). Returns `[MatchedRide]` (each with the schedule `waveId`,
+  station, event time, and its run of points). Candidate events come from
+  `TransportAPI.getStationboard` (`type=departure` and `type=arrival`) for every
+  station within 400 m of any track point on the session's day.
 - **`SessionMetrics`** (pure, unit-testable) computed **per matched ride** then
   aggregated by `GPXImportCoordinator`: `totalDistance` = Σ over matched rides,
   `longestRideDistance` = max single matched ride, `maxSpeed` = max over matched

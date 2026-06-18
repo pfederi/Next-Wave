@@ -8,17 +8,7 @@ struct StatsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // Hero: total waves
-                VStack(spacing: 4) {
-                    Text("\(store.stats?.totalWaves ?? 0)")
-                        .font(.system(size: 56, weight: .bold))
-                    Text("waves ridden")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 8)
-
+            VStack(alignment: .leading, spacing: 28) {
                 // Newly earned celebration
                 if !store.newlyEarned.isEmpty {
                     VStack(spacing: 6) {
@@ -33,45 +23,63 @@ struct StatsView: View {
                     .frame(maxWidth: .infinity)
                     .background(Color.accentColor.opacity(0.12))
                     .cornerRadius(12)
-                    .padding(.horizontal)
                 }
 
-                // Own rank + link to full leaderboard
-                NavigationLink(destination: LeaderboardView(stationId: nil, title: "Leaderboard")) {
-                    HStack {
-                        Label("Leaderboard", systemImage: "trophy")
-                        Spacer()
-                        if let me = store.leaderboard.first(where: { $0.isMe }) {
-                            Text("You — #\(me.rank)").foregroundColor(.secondary)
-                        }
-                        Image(systemName: "chevron.right").foregroundColor(.secondary)
+                // MARK: Stats section
+                VStack(alignment: .leading, spacing: 12) {
+                    sectionHeader("Stats")
+
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text("\(store.stats?.totalWaves ?? 0)")
+                            .font(.system(size: 44, weight: .bold))
+                        Text("waves ridden")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
                     }
-                    .padding(.horizontal)
-                }
-                .buttonStyle(.plain)
 
-                // Badge gallery — medallion with title + subtitle
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(badges) { item in
-                        VStack(spacing: 14) {
-                            BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
-                            VStack(spacing: 2) {
-                                Text(item.badge.title)
-                                    .font(.caption.weight(.semibold))
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(item.isEarned ? .primary : .secondary)
-                                Text(item.badge.detail)
-                                    .font(.caption2)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(.secondary)
+                    NavigationLink(destination: LeaderboardView(stationId: nil, title: "Leaderboard")) {
+                        HStack {
+                            Label("Leaderboard", systemImage: "trophy")
+                            Spacer()
+                            if let me = store.leaderboard.first(where: { $0.isMe }) {
+                                Text("You — #\(me.rank)").foregroundColor(.secondary)
                             }
+                            Image(systemName: "chevron.right").foregroundColor(.secondary)
                         }
-                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 14)
+                        .background(Color.secondary.opacity(0.08))
+                        .cornerRadius(12)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                // MARK: Badges section
+                VStack(alignment: .leading, spacing: 16) {
+                    sectionHeader("Badges")
+
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(badges) { item in
+                            VStack(spacing: 14) {
+                                BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
+                                VStack(spacing: 2) {
+                                    Text(item.badge.title)
+                                        .font(.caption.weight(.semibold))
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(item.isEarned ? .primary : .secondary)
+                                    Text(item.badge.detail)
+                                        .font(.caption2)
+                                        .multilineTextAlignment(.center)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
                     }
                 }
-                .padding(.horizontal)
             }
-            .padding(.bottom, 24)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .navigationTitle("My Badges")
         .navigationBarTitleDisplayMode(.inline)
@@ -80,6 +88,12 @@ struct StatsView: View {
                 appSettings.seenBadgeIds = updated
             }
         }
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.title3.weight(.bold))
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var badges: [EvaluatedBadge] {

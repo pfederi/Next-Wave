@@ -111,7 +111,19 @@ struct StatsView: View {
 
     private var verifiedSection: some View {
         VStack(alignment: .leading, spacing: 28) {
-            sectionHeader("Verified")
+            HStack(spacing: 10) {
+                sectionHeader("Verified")
+                if UIImage(named: "foilmotion_logo") != nil {
+                    Image("foilmotion_logo").resizable().scaledToFit().frame(height: 22)
+                }
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Verified from your Foilmotion sessions. Record a session in Foilmotion, then share the GPX file to Next Wave.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Link("Open Foilmotion →", destination: URL(string: "https://foilmotion.webchoice.ch/")!)
+                    .font(.caption.weight(.semibold))
+            }
             HStack(alignment: .firstTextBaseline, spacing: 16) {
                 stat("\(store.verifiedStats.sessionCount)", "sessions")
                 stat(String(format: "%.0f km", store.verifiedStats.totalDistanceM / 1000), "total")

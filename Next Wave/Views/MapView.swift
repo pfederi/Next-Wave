@@ -248,13 +248,24 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
+        // Keep the coordinator's closures fresh across SwiftUI re-creations.
+        context.coordinator.parent = self
+
         let currentAnnotations = mapView.annotations.compactMap { $0 as? StationAnnotation }
         let currentStationIds = Set(currentAnnotations.map { $0.station.id })
         let newStationIds = Set(stations.map { $0.id })
-        
-        if currentStationIds != newStationIds {
-            mapView.removeAnnotations(mapView.annotations)
-            let annotations = stations.compactMap { station -> StationAnnotation? in
+
+        guard currentStationIds != newStationIds else { return }
+
+        // Diff station annotations only — never touch the user-location or cluster annotations.
+        let toRemove = currentAnnotations.filter { !newStationIds.contains($0.station.id) }
+        if !toRemove.isEmpty {
+            mapView.removeAnnotations(toRemove)
+        }
+
+        let toAdd = stations
+            .filter { !currentStationIds.contains($0.id) }
+            .compactMap { station -> StationAnnotation? in
                 guard let coordinates = station.coordinates else { return nil }
                 return StationAnnotation(
                     station: station,
@@ -264,7 +275,8 @@ struct MapViewRepresentable: UIViewRepresentable {
                     )
                 )
             }
-            mapView.addAnnotations(annotations)
+        if !toAdd.isEmpty {
+            mapView.addAnnotations(toAdd)
         }
     }
     

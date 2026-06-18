@@ -167,6 +167,7 @@ struct NextWaveApp: App {
     @StateObject private var appSettings: AppSettings
     @StateObject private var viewModel: ScheduleViewModel
     @StateObject private var lakeStationsViewModel = LakeStationsViewModel()
+    @StateObject private var importCoordinator = GPXImportCoordinator.shared
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var systemColorScheme
     
@@ -250,7 +251,19 @@ struct NextWaveApp: App {
                     }
                 }
                 .onOpenURL { url in
-                    handleDeepLink(url)
+                    if url.isFileURL && url.pathExtension.lowercased() == "gpx" {
+                        let didAccess = url.startAccessingSecurityScopedResource()
+                        let temp = FileManager.default.temporaryDirectory
+                            .appendingPathComponent(UUID().uuidString).appendingPathExtension("gpx")
+                        try? FileManager.default.copyItem(at: url, to: temp)
+                        if didAccess { url.stopAccessingSecurityScopedResource() }
+                        Task { await importCoordinator.handleFile(temp) }
+                    } else {
+                        handleDeepLink(url)
+                    }
+                }
+                .sheet(item: $importCoordinator.summary) { summary in
+                    GPXImportSummaryView(summary: summary) { importCoordinator.summary = nil }
                 }
         }
     }

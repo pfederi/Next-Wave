@@ -193,7 +193,7 @@ actor VesselAPI {
             if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {
                 if let match = deployment.routes.first(where: { 
                     $0.courseNumber.trimmingCharacters(in: .whitespaces)
-                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber 
+                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
                 }) {
                     // Cache für nächstes Mal
                     shipNameCache[cacheKey] = match.shipName
@@ -224,7 +224,7 @@ actor VesselAPI {
             if let deployment = cached.dailyDeployments.first(where: { $0.date == dateString }) {
                 if let match = deployment.routes.first(where: { 
                     $0.courseNumber.trimmingCharacters(in: .whitespaces)
-                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber 
+                        .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
                 }) {
                     // Im Cache speichern für schnelleren Zugriff
                     shipNameCache[cacheKey] = match.shipName
@@ -246,7 +246,7 @@ actor VesselAPI {
             
             if let match = deployment.routes.first(where: { 
                 $0.courseNumber.trimmingCharacters(in: .whitespaces)
-                    .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber 
+                    .replacingOccurrences(of: "^0+", with: "", options: .regularExpression) == courseNumber.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
             }) {
                 // Im Cache speichern
                 shipNameCache[cacheKey] = match.shipName

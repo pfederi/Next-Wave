@@ -299,7 +299,9 @@ actor WeatherAPI {
                 // Versuche, Daten für Morgen (8-10 Uhr) und Nachmittag (14-16 Uhr) zu finden
                 var morningTemp: Double? = nil
                 var afternoonTemp: Double? = nil
-                
+                var bestMorningDiff = Double.greatestFiniteMagnitude
+                var bestAfternoonDiff = Double.greatestFiniteMagnitude
+
                 // Maximale Windgeschwindigkeit für morgen finden
                 var maxWindSpeed: Double = tomorrowForecast.wind.speed
                 
@@ -325,13 +327,15 @@ actor WeatherAPI {
                         let morningDiff = abs(itemDate.timeIntervalSince(morningDate))
                         let afternoonDiff = abs(itemDate.timeIntervalSince(afternoonDate))
                         
-                        // Wenn die Differenz weniger als 3 Stunden beträgt, verwende diese Daten
-                        if morningDiff < 3 * 3600 && (morningTemp == nil || morningDiff < abs(morningDate.timeIntervalSince(itemDate))) {
+                        // Innerhalb von 3h die jeweils NÄCHSTGELEGENE Vorhersage wählen
+                        if morningDiff < 3 * 3600 && morningDiff < bestMorningDiff {
                             morningTemp = item.main.temp
+                            bestMorningDiff = morningDiff
                         }
-                        
-                        if afternoonDiff < 3 * 3600 && (afternoonTemp == nil || afternoonDiff < abs(afternoonDate.timeIntervalSince(itemDate))) {
+
+                        if afternoonDiff < 3 * 3600 && afternoonDiff < bestAfternoonDiff {
                             afternoonTemp = item.main.temp
+                            bestAfternoonDiff = afternoonDiff
                         }
                         
                         // Prüfe, ob die Windgeschwindigkeit höher ist als die bisher höchste

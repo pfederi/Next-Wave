@@ -456,7 +456,7 @@ private struct RemainingTimeView: View {
     let targetDate: Date
     @State private var currentTime = Date()
     
-    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    @State private var timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         let timeInterval = targetDate.timeIntervalSince(currentTime)

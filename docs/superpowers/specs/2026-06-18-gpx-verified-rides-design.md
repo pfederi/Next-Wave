@@ -71,11 +71,11 @@ so it is **not tamper-proof** (a crafted GPX could fake rides). Accepted for v1.
 Orchestrated by `GPXImportCoordinator`:
 1. Determine session date (from `metadata.startTime` / first point) + bounding box.
 2. **Candidate stations:** from the app's station list, those within
-   `STATION_NEARBY_RADIUS = 300 m` of any track point.
+   `STATION_NEARBY_RADIUS = 400 m` of any track point.
 3. For each candidate station, fetch that day's ferry departures via
    `TransportAPI.getStationboard(stationId: uic_ref, for: date)`.
 4. For each departure at time `T`, mark a **verified ride** when the track has a
-   point within `STATION_MATCH_RADIUS = 150 m` of the station inside
+   point within `STATION_MATCH_RADIUS = 250 m` of the station inside
    `[T − 120 s, T + 360 s]` with `speed >= FOIL_SPEED_THRESHOLD`.
 5. For each match, compute ride metrics from the in-window track segment
    (`ride_distance`, `ride_max_speed`).

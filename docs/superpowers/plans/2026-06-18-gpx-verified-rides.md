@@ -11,11 +11,12 @@
 ## Global Constraints
 
 - Foil/motion speed threshold: `FOIL_SPEED_THRESHOLD = 3.0` m/s (~11 km/h).
-- Wave match: station radius `150` m; candidate-station radius `300` m; time window `[T − 120 s, T + 360 s]`; point must have speed ≥ threshold.
+- Wave match: station radius `250` m; candidate-station radius `400` m; time window `[T − 120 s, T + 360 s]`; point must have speed ≥ threshold.
 - `wave_id` format must equal the check-in format: `"{stationId}_{departureISO}_{routeNumber}"` (UTC ISO-8601, via `WaveCheckin.makeWaveId`).
 - Verified data is client-computed and not tamper-proof (accepted).
 - Distance metric for badges = **longest continuous ride distance** (one go), not total.
 - Badge thresholds: verified waves 1/10/25; longest ride (m) 50/100/250/500/1000/5000/10000; top speed (km/h) 15/20/25/30/35.
+- Note: longest-ride badge `250` (m) and station match radius `250` (m) are unrelated values that happen to coincide.
 - New Swift files in `Next Wave/...` and tests in `Next WaveTests/` are auto-included (file-system-synchronized groups).
 - Build/test: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"…"` (or ⌘U in Xcode).
 - Migrations: `supabase/migrations/YYYYMMDD_<name>.sql`; apply with `supabase db push`.
@@ -433,7 +434,7 @@ struct WaveMatcherTests {
 
     @Test func rejectsWhenTooFar() {
         let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1060, 47.30, 8.553, 5.0)]   // ~225 m east of station (> 150 m)
+        let pts = [pt(1060, 47.30, 8.556, 5.0)]   // ~455 m east of station (> 250 m)
         #expect(WaveMatcher.match(points: pts, departures: [dep(T)]).isEmpty)
     }
 }
@@ -469,7 +470,7 @@ struct VerifiedRide: Equatable {
 }
 
 enum WaveMatcher {
-    static let matchRadius = 150.0   // meters
+    static let matchRadius = 250.0   // meters
     static let windowBefore = 120.0  // seconds
     static let windowAfter = 360.0   // seconds
 
@@ -1045,11 +1046,11 @@ final class GPXImportCoordinator: ObservableObject {
             return
         }
 
-        // Candidate stations within 300 m of any track point.
+        // Candidate stations within 400 m of any track point.
         let candidates = stations.filter { station in
             guard let c = station.coordinates else { return false }
             return session.points.contains {
-                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude) <= 300
+                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude) <= 400
             }
         }
 

@@ -168,6 +168,7 @@ struct ContentView: View {
 
                                 NavigationLink(destination: StatsView()
                                     .environmentObject(appSettings)
+                                    .environmentObject(viewModel)
                                 ) {
                                     Image(systemName: "trophy")
                                         .foregroundColor(.accentColor)

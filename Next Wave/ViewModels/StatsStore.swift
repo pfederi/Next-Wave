@@ -6,6 +6,7 @@ final class StatsStore: ObservableObject {
     @Published private(set) var stats: WaveStats?
     @Published private(set) var leaderboard: [LeaderboardEntry] = []
     @Published private(set) var newlyEarned: [Badge] = []
+    @Published private(set) var stationCounts: [StationWaveCount] = []
     @Published private(set) var loadFailed = false
 
     /// Load global stats + global leaderboard. `seenIds` drives the newly-earned diff;
@@ -19,6 +20,7 @@ final class StatsStore: ObservableObject {
             let earnedNow = Set(BadgeEvaluator.evaluate(fetched).filter { $0.isEarned }.map { $0.badge.id })
             onSeen(seenIds.union(earnedNow))
             leaderboard = try await StatsAPI.shared.leaderboard(stationId: nil)
+            stationCounts = try await StatsAPI.shared.stationCounts()
         } catch {
             print("⚠️ Stats refresh failed: \(error)")
             loadFailed = true

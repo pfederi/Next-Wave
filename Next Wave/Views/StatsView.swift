@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StatsView: View {
     @EnvironmentObject var appSettings: AppSettings
+    @EnvironmentObject var lakeVM: LakeStationsViewModel
     @StateObject private var store = StatsStore()
 
     private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
@@ -43,6 +44,22 @@ struct StatsView: View {
                             Spacer()
                             if let me = store.leaderboard.first(where: { $0.isMe }) {
                                 Text("You — #\(me.rank)").foregroundColor(.secondary)
+                            }
+                            Image(systemName: "chevron.right").foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 14)
+                        .background(Color.secondary.opacity(0.08))
+                        .cornerRadius(12)
+                    }
+                    .buttonStyle(.plain)
+
+                    NavigationLink(destination: MyStationsView(counts: store.stationCounts, nameFor: stationName)) {
+                        HStack {
+                            Label("My Stations", systemImage: "mappin.and.ellipse")
+                            Spacer()
+                            if !store.stationCounts.isEmpty {
+                                Text("\(store.stationCounts.count)").foregroundColor(.secondary)
                             }
                             Image(systemName: "chevron.right").foregroundColor(.secondary)
                         }
@@ -112,4 +129,19 @@ struct StatsView: View {
 
     private var earnedBadges: [EvaluatedBadge] { badges.filter { $0.isEarned } }
     private var lockedBadges: [EvaluatedBadge] { badges.filter { !$0.isEarned } }
+
+    /// station_id (= "name_uicref" or "name") → human-readable station name.
+    private func stationName(_ stationId: String) -> String {
+        for lake in lakeVM.lakes {
+            if let s = lake.stations.first(where: { $0.id == stationId }) { return s.name }
+        }
+        // Fallback: strip a trailing "_<uicref>" if present.
+        if let r = stationId.range(of: "_", options: .backwards) {
+            let suffix = stationId[r.upperBound...]
+            if !suffix.isEmpty && suffix.allSatisfy({ $0.isNumber }) {
+                return String(stationId[..<r.lowerBound])
+            }
+        }
+        return stationId
+    }
 }

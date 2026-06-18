@@ -49,6 +49,18 @@ struct WaveStats: Decodable, Equatable {
         currentStreakWeeks: 0, longestStreakWeeks: 0)
 }
 
+struct StationWaveCount: Decodable, Identifiable, Equatable {
+    let stationId: String
+    let waves: Int
+
+    var id: String { stationId }
+
+    enum CodingKeys: String, CodingKey {
+        case stationId = "station_id"
+        case waves
+    }
+}
+
 struct LeaderboardEntry: Decodable, Identifiable, Equatable {
     let rank: Int
     let displayName: String

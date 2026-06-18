@@ -21,6 +21,17 @@ actor StatsAPI {
         return rows.first ?? .empty
     }
 
+    /// The caller's wave count per station, most-ridden first.
+    func stationCounts() async throws -> [StationWaveCount] {
+        _ = try await SupabaseManager.shared.ensureSession()
+        let client = SupabaseManager.shared.client
+        let rows: [StationWaveCount] = try await client
+            .rpc("user_station_counts")
+            .execute()
+            .value
+        return rows
+    }
+
     /// Global (stationId == nil) or per-station leaderboard, top `limit` named users + own row.
     func leaderboard(stationId: String?, limit: Int = 50) async throws -> [LeaderboardEntry] {
         _ = try await SupabaseManager.shared.ensureSession()

@@ -26,6 +26,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

@@ -102,7 +102,8 @@ final class GPXImportCoordinator: ObservableObject {
             let journeys = (try? await api.getStationboard(stationId: uic, for: date, limit: 200)) ?? []
             for j in journeys {
                 guard let traj = Self.trajectory(from: j) else { continue }
-                let key = "\(traj.routeNumber)_\(Int(traj.waypoints.first?.t ?? 0))"
+                // Identify a journey by its trip number (falls back to route + origin time).
+                let key = "\(j.number ?? j.name ?? "")_\(traj.routeNumber)_\(Int(traj.waypoints.first?.t ?? 0))"
                 if seen.insert(key).inserted { trajectories.append(traj) }
             }
         }

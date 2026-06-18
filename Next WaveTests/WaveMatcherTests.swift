@@ -52,8 +52,8 @@ struct WaveMatcherTests {
     }
 
     @Test func excludesTrackNearBoatPositionButWrongTime() {
-        // Sits right where the boat will be, but 1 h later → boat already gone.
-        let pts = (0...4).map { i in pt(4600.0 + Double(i) * 25, 47.31, 8.55) }
+        // Moving along the boat's path, but 1 h later → boat already gone (out of span).
+        let pts = (0...4).map { i in pt(4600.0 + Double(i) * 25, 47.31 + 0.0025 * Double(i), 8.55) }
         #expect(WaveMatcher.matchedRides(points: pts, trajectories: [boat()]).isEmpty)
     }
 

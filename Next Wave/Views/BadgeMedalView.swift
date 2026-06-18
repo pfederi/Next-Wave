@@ -67,6 +67,8 @@ struct BadgeMedalView: View {
         }
         .frame(width: size, height: size)
         .shadow(color: .black.opacity(0.18), radius: size * 0.04, x: 0, y: size * 0.02)
+        .accessibilityElement()
+        .accessibilityLabel(Text(verified ? "Verified badge" : (isEarned ? "Earned badge" : "Locked badge")))
     }
 
     @ViewBuilder

@@ -41,7 +41,7 @@ actor VerifiedRidesAPI {
             total_distance: metrics.totalDistance, duration: Int(metrics.duration),
             moving_time: Int(metrics.movingTime), max_speed: metrics.maxSpeed,
             longest_ride: metrics.longestRideDistance)
-        try await client.from("verified_sessions").upsert(row, onConflict: "user_id,session_key").execute()
+        try await client.from("verified_sessions").upsert(row, onConflict: "user_id,session_key", ignoreDuplicates: true).execute()
     }
 
     func verifiedStats() async throws -> VerifiedStats {

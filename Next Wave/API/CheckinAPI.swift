@@ -33,6 +33,23 @@ actor CheckinAPI {
         let display_name: String
     }
 
+    private struct ProfileUpsert: Encodable {
+        let user_id: String
+        let display_name: String?   // nil → stored as null (anonymous: hidden from public leaderboard)
+    }
+
+    /// Sync the leaderboard display name immediately when the identity changes in Settings.
+    /// Pass the resolved display name (nil when anonymous or blank) to set it — or clear it.
+    func syncProfileName(_ displayName: String?) async {
+        guard let userId = try? await SupabaseManager.shared.ensureSession() else { return }
+        let client = SupabaseManager.shared.client
+        _ = try? await client
+            .from("user_profiles")
+            .upsert(ProfileUpsert(user_id: userId.uuidString.lowercased(), display_name: displayName),
+                    onConflict: "user_id")
+            .execute()
+    }
+
     private struct CountParams: Encodable {
         let wave_ids: [String]
     }

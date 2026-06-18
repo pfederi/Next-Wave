@@ -116,6 +116,9 @@ struct CheckinIdentitySheet: View {
                     Button("Save") {
                         appSettings.checkinName = name
                         appSettings.checkinAnonymous = anonymous
+                        // Sync the leaderboard name immediately (sets nil when anonymous/blank).
+                        let displayName = CheckinIdentity(name: name, isAnonymous: anonymous).displayName
+                        Task { await CheckinAPI.shared.syncProfileName(displayName) }
                         onSave?()
                         dismiss()
                     }

@@ -146,8 +146,13 @@ struct StatsView: View {
             Text("Verified badges come from your Foilmotion sessions. Record a session in Foilmotion, then share the GPX file to Next Wave.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            Link("Open Foilmotion →", destination: URL(string: "https://foilmotion.webchoice.ch/")!)
-                .font(.caption.weight(.semibold))
+            Button {
+                openFoilmotion()
+            } label: {
+                Text("Open Foilmotion →").font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
             if store.verifiedStats.sessionCount > 0 {
                 HStack(alignment: .firstTextBaseline, spacing: 16) {
                     stat("\(store.verifiedStats.sessionCount)", "sessions")
@@ -157,6 +162,16 @@ struct StatsView: View {
                 }
                 .padding(.top, 4)
             }
+        }
+    }
+
+    /// Open Foilmotion: the App Store product page (shows "Open" if installed,
+    /// "Get" otherwise), falling back to the website if the App Store can't open.
+    private func openFoilmotion() {
+        let appStore = URL(string: "itms-apps://apps.apple.com/app/id6737276093")!
+        let web = URL(string: "https://foilmotion.webchoice.ch/")!
+        UIApplication.shared.open(appStore, options: [:]) { ok in
+            if !ok { UIApplication.shared.open(web) }
         }
     }
 

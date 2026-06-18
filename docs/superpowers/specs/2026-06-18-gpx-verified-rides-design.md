@@ -150,9 +150,11 @@ create table public.verified_sessions (
   imported". A session with no matched rides → **"No ferry waves"** (`.noWaves`).
   Non-Foilmotion file → "Only Foilmotion GPX files are supported."
 - **"My Badges"**: verified badges are mixed into the shared **Earned/Locked**
-  grids (no separate section), distinguished only by a green verified shield. A
-  Foilmotion attribution block (logo + how-to + link) shows the verified figures
-  when present.
+  grids (no separate section), distinguished by a **Foilmotion-logo marker** (falls
+  back to a green seal if the asset is missing). A Foilmotion attribution block
+  (logo + how-to + an "Open Foilmotion" button) shows the verified figures when
+  present. The button opens the Foilmotion **App Store page** (`itms-apps://…id6737276093`
+  → "Open" if installed, else "Get"), falling back to the website.
 
 ## 6. Components & boundaries
 

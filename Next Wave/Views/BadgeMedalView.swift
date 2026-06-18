@@ -58,10 +58,8 @@ struct BadgeMedalView: View {
                 }
             }
             if verified {
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: size * 0.24))
-                    .foregroundColor(.white)
-                    .background(Circle().fill(Color.green).frame(width: size * 0.24, height: size * 0.24))
+                verifiedBadge
+                    .frame(width: size * 0.30, height: size * 0.30)
                     .position(x: size * 0.84, y: size * 0.16)
             }
         }
@@ -69,6 +67,26 @@ struct BadgeMedalView: View {
         .shadow(color: .black.opacity(0.18), radius: size * 0.04, x: 0, y: size * 0.02)
         .accessibilityElement()
         .accessibilityLabel(Text(verified ? "Verified badge" : (isEarned ? "Earned badge" : "Locked badge")))
+    }
+
+    /// Verified marker: the Foilmotion logo (falls back to a green seal if missing).
+    @ViewBuilder
+    private var verifiedBadge: some View {
+        if UIImage(named: "foilmotion_logo") != nil {
+            Image("foilmotion_logo")
+                .resizable()
+                .scaledToFit()
+                .clipShape(Circle())
+                .background(Circle().fill(Color.white))
+                .overlay(Circle().stroke(Color.white, lineWidth: size * 0.02))
+                .shadow(color: .black.opacity(0.25), radius: size * 0.02)
+        } else {
+            Image(systemName: "checkmark.seal.fill")
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(.white)
+                .background(Circle().fill(Color.green))
+        }
     }
 
     @ViewBuilder

@@ -60,15 +60,15 @@ struct StatsView: View {
 
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(badges) { item in
-                            VStack(spacing: 14) {
+                            VStack(spacing: 20) {
                                 BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
-                                VStack(spacing: 2) {
+                                VStack(spacing: 3) {
                                     Text(item.badge.title)
-                                        .font(.caption.weight(.semibold))
+                                        .font(.headline)
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(item.isEarned ? .primary : .secondary)
                                     Text(item.badge.detail)
-                                        .font(.caption2)
+                                        .font(.subheadline)
                                         .multilineTextAlignment(.center)
                                         .foregroundColor(.secondary)
                                 }

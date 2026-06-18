@@ -44,6 +44,14 @@ Verified data is computed from a client-supplied GPX and uploaded by the client,
 so it is **not tamper-proof**. The Foilmotion creator check is a light authenticity
 gate, not real proof. Accepted for v1.
 
+**Timetable horizon:** `transport.opendata.ch` only serves the **current Swiss
+timetable period** (~mid-December to mid-December). A session whose date falls
+outside it (an old export, or far future) returns zero schedule events, so it
+cannot be verified. The import distinguishes this case ("no timetable available
+for this date — verified rides only work for recent sessions") from "no dock
+nearby" and "no wave rides detected", so the user isn't told they rode nothing
+when the real cause is missing schedule data.
+
 ---
 
 ## 1. Import (Approach A — document type)

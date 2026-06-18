@@ -63,10 +63,18 @@ final class GPXImportCoordinator: ObservableObject {
         }
 
         // Collect scheduled-boat (Kursschiff) events at nearby docks, then match by time.
-        let events = await boatEvents(for: session, stations: stations)
+        let docks = nearbyDocks(for: session, stations: stations)
+        let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
+        let events = await boatEvents(docks: docks, date: date)
         let rides = WaveMatcher.matchedRides(points: session.points, events: events)
         guard let (metrics, rideCount) = Self.metrics(for: rides) else {
-            report(.noWaves, message: "No scheduled-boat waves found in this session — only rides behind a boat count.")
+            if docks.isEmpty {
+                report(.noWaves, message: "No boat dock near your track — verified rides need a scheduled-boat (Kursschiff) wave.")
+            } else if events.isEmpty {
+                report(.noWaves, message: "No boat timetable available for \(Self.dayString(date)). Verified rides only work for recent sessions (the current timetable period).")
+            } else {
+                report(.noWaves, message: "No wave rides detected behind a boat in this session.")
+            }
             return
         }
 
@@ -81,20 +89,28 @@ final class GPXImportCoordinator: ObservableObject {
         report(.imported, metrics: metrics, rideCount: rideCount)
     }
 
-    /// Scheduled-boat events (departures + arrivals) at every dock within
-    /// `WaveMatcher.dockRadius` of any track point, on the session's day.
-    private func boatEvents(for session: GPXSession, stations: [Lake.Station]) async -> [BoatEvent] {
-        let candidates = stations.filter { station in
+    /// Docks (boat stations) within `WaveMatcher.dockRadius` of any track point.
+    private func nearbyDocks(for session: GPXSession, stations: [Lake.Station]) -> [Lake.Station] {
+        stations.filter { station in
             guard let c = station.coordinates else { return false }
             return session.points.contains {
                 GeoMath.distance(lat1: $0.lat, lon1: $0.lon,
                                  lat2: c.latitude, lon2: c.longitude) <= WaveMatcher.dockRadius
             }
         }
-        let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
+    }
+
+    private static func dayString(_ date: Date) -> String {
+        let f = DateFormatter()
+        f.dateStyle = .medium; f.timeStyle = .none
+        return f.string(from: date)
+    }
+
+    /// Scheduled-boat events (departures + arrivals) at the given docks on `date`.
+    private func boatEvents(docks: [Lake.Station], date: Date) async -> [BoatEvent] {
         let api = TransportAPI()
         var events: [BoatEvent] = []
-        for station in candidates {
+        for station in docks {
             guard let uic = station.uic_ref else { continue }
 
             let departures = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,

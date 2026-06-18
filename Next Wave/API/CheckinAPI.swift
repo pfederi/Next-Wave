@@ -69,7 +69,7 @@ actor CheckinAPI {
 
         // Persist the latest non-anonymous name for the leaderboard.
         if let name = displayName {
-            try? await client
+            _ = try? await client
                 .from("user_profiles")
                 .upsert(ProfileRow(user_id: uid, display_name: name), onConflict: "user_id")
                 .execute()

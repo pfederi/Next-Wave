@@ -26,3 +26,18 @@ struct MyStationsView: View {
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+#if DEBUG
+#Preview {
+    NavigationStack {
+        MyStationsView(
+            counts: [
+                StationWaveCount(stationId: "Thalwil_8503001", waves: 12),
+                StationWaveCount(stationId: "Küsnacht ZH (See)_8503657", waves: 7),
+                StationWaveCount(stationId: "Zürich Bürkliplatz_8503591", waves: 3)
+            ],
+            nameFor: { id in String(id.split(separator: "_").first ?? Substring(id)) }
+        )
+    }
+}
+#endif

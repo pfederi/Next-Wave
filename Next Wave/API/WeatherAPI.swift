@@ -474,44 +474,29 @@ actor WeatherAPI {
     /// temperatures instead of the nearest 3-hour value). Categorical fields
     /// (icon, wind direction) come from the nearer step.
     private func interpolatedWeather(at time: Date, from sorted: [ForecastResponse.ForecastItem]) -> WeatherInfo? {
-        guard let first = sorted.first, let last = sorted.last else { return nil }
-        let t = time.timeIntervalSince1970
+        let timestamps = sorted.map { TimeInterval($0.dt) }
+        guard let interp = WeatherInterpolation.locate(time.timeIntervalSince1970, in: timestamps) else { return nil }
 
-        let lower: ForecastResponse.ForecastItem
-        let upper: ForecastResponse.ForecastItem
-        let fraction: Double
-        if t <= Double(first.dt) {
-            lower = first; upper = first; fraction = 0
-        } else if t >= Double(last.dt) {
-            lower = last; upper = last; fraction = 0
-        } else {
-            var lo = first, up = last
-            for i in 1..<sorted.count where Double(sorted[i].dt) >= t {
-                lo = sorted[i - 1]; up = sorted[i]; break
-            }
-            lower = lo; upper = up
-            let span = Double(upper.dt - lower.dt)
-            fraction = span > 0 ? (t - Double(lower.dt)) / span : 0
-        }
+        let lower = sorted[interp.lowerIndex]
+        let upper = sorted[interp.upperIndex]
+        let nearest = sorted[interp.nearestIndex]
 
-        func lerp(_ a: Double, _ b: Double) -> Double { a + (b - a) * fraction }
-        let nearest = fraction < 0.5 ? lower : upper
         let (desc, icon) = weatherDescriptionAndIcon(from: nearest.weather.first?.id ?? 800)
         let gust: Double?
-        if let lg = lower.wind.gust, let ug = upper.wind.gust { gust = lerp(lg, ug) } else { gust = nearest.wind.gust }
+        if let lg = lower.wind.gust, let ug = upper.wind.gust { gust = interp.lerp(lg, ug) } else { gust = nearest.wind.gust }
 
         return WeatherInfo(
-            temperature: lerp(lower.main.temp, upper.main.temp),
-            feelsLike: lerp(lower.main.feels_like, upper.main.feels_like),
+            temperature: interp.lerp(lower.main.temp, upper.main.temp),
+            feelsLike: interp.lerp(lower.main.feels_like, upper.main.feels_like),
             tempMin: min(lower.main.temp_min, upper.main.temp_min),
             tempMax: max(lower.main.temp_max, upper.main.temp_max),
             morningTemp: nil,
             afternoonTemp: nil,
-            windSpeed: lerp(lower.wind.speed, upper.wind.speed),
+            windSpeed: interp.lerp(lower.wind.speed, upper.wind.speed),
             maxWindSpeed: nil,
             windDirection: nearest.wind.deg,
             windGust: gust,
-            pressure: Int(lerp(Double(lower.main.pressure), Double(upper.main.pressure)).rounded()),
+            pressure: Int(interp.lerp(Double(lower.main.pressure), Double(upper.main.pressure)).rounded()),
             weatherDescription: desc,
             weatherIcon: icon,
             forecastDate: time

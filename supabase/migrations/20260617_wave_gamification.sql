@@ -97,7 +97,7 @@ end $$;
 
 select cron.schedule(
   'wave_checkins_cleanup',
-  '0 3 * * *',
+  '*/15 * * * *',   -- every 15 minutes: rides land in wave_history shortly after departure
   $$select public.wave_checkins_archive_and_cleanup()$$
 );
 

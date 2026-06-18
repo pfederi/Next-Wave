@@ -31,9 +31,10 @@ struct StatsView: View {
                     sectionHeader("Stats")
 
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text("\(store.stats?.totalWaves ?? 0)")
+                        let total = store.stats?.totalWaves ?? 0
+                        Text("\(total)")
                             .font(.system(size: 44, weight: .bold))
-                        Text("waves ridden")
+                        Text(total == 1 ? "wave ridden" : "waves ridden")
                             .font(.headline)
                             .foregroundColor(.secondary)
                     }

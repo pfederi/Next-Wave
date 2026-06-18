@@ -12,7 +12,7 @@ struct CandidateDeparture: Equatable {
     let departure: Date
     let routeNumber: String
     /// true → this is an arriving ferry (wake builds while approaching, dies after docking).
-    let isArrival: Bool = false
+    var isArrival: Bool = false
 }
 
 /// A contiguous "behind a ship" ride: the moving run of track points that was

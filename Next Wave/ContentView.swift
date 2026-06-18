@@ -26,7 +26,8 @@ struct ContentView: View {
     @State private var canGoBack = false
     @EnvironmentObject var scheduleViewModel: ScheduleViewModel
     @State private var editMode: EditMode = .inactive
-    
+    @ObservedObject private var router = AppRouter.shared
+
     var body: some View {
         ZStack {
             NavigationStack {
@@ -188,6 +189,11 @@ struct ContentView: View {
                 .toolbarBackground(Color("nav-background"), for: .navigationBar)
                 .toolbarBackground(.visible, for: .navigationBar)
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationDestination(isPresented: $router.openBadges) {
+                    StatsView()
+                        .environmentObject(appSettings)
+                        .environmentObject(viewModel)
+                }
             }
         }
         .onReceive(viewModel.$selectedDate) { newDate in

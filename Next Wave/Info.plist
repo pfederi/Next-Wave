@@ -6,24 +6,23 @@
 	<array>
 		<string>com.nextwave.midnight</string>
 		<string>com.nextwave.widget-refresh</string>
+		<string>com.nextwave.badge-check</string>
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>NextWave</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.federi.Next-Wave</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>nextwave</string>
 			</array>
-			<key>CFBundleURLName</key>
-			<string>com.federi.Next-Wave</string>
 		</dict>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
-	<string>NextWave adds your selected wave to your calendar so you can plan your session.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
@@ -33,6 +32,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>NextWave adds your selected wave to your calendar so you can plan your session.</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.federi.Next-Wave</string>

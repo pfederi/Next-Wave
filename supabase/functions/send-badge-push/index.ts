@@ -8,7 +8,7 @@
 //                          (use https://api.push.apple.com for production/TestFlight)
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY  (provided automatically)
 
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 function b64url(bytes: Uint8Array): string {
   let s = btoa(String.fromCharCode(...bytes));

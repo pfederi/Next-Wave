@@ -257,7 +257,11 @@ struct NextWaveApp: App {
                             .appendingPathComponent(UUID().uuidString).appendingPathExtension("gpx")
                         try? FileManager.default.copyItem(at: url, to: temp)
                         if didAccess { url.stopAccessingSecurityScopedResource() }
-                        Task { await importCoordinator.handleFile(temp) }
+                        Task {
+                            if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
+                            let stations = lakeStationsViewModel.lakes.flatMap { $0.stations }
+                            await importCoordinator.handleFile(temp, stations: stations)
+                        }
                     } else {
                         handleDeepLink(url)
                     }

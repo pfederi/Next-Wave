@@ -13,9 +13,10 @@ struct GPXImportSummaryView: View {
 
             Text(title).font(.title2.bold())
 
-            if summary.outcome == .imported || summary.outcome == .alreadyImported {
+            if summary.outcome == .imported {
                 VStack(spacing: 8) {
-                    row("Distance", String(format: "%.2f km", summary.totalDistanceM / 1000))
+                    row("Wake-thieving rides", "\(summary.rideCount)")
+                    row("Distance (behind ships)", String(format: "%.2f km", summary.totalDistanceM / 1000))
                     row("Longest ride", String(format: "%.0f m", summary.longestRideM))
                     row("Top speed", String(format: "%.1f km/h", summary.topSpeedKmh))
                 }
@@ -36,6 +37,7 @@ struct GPXImportSummaryView: View {
         switch summary.outcome {
         case .imported: return "checkmark.seal.fill"
         case .alreadyImported: return "tray.full"
+        case .noWaves: return "ferry"
         case .notFoilmotion, .failed: return "exclamationmark.triangle"
         }
     }
@@ -43,6 +45,7 @@ struct GPXImportSummaryView: View {
         switch summary.outcome {
         case .imported: return "Session imported! 🏄"
         case .alreadyImported: return "Already imported"
+        case .noWaves: return "No ferry waves"
         case .notFoilmotion: return "Unsupported file"
         case .failed: return "Import failed"
         }

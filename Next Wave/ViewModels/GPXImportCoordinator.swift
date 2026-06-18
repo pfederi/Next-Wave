@@ -3,11 +3,12 @@ import CryptoKit
 
 struct GPXImportSummary: Identifiable {
     let id = UUID()
-    enum Outcome { case imported, alreadyImported, notFoilmotion, failed }
+    enum Outcome { case imported, alreadyImported, notFoilmotion, noWaves, failed }
     let outcome: Outcome
     let totalDistanceM: Double
     let longestRideM: Double
     let topSpeedKmh: Double
+    let rideCount: Int
     let message: String?
 }
 
@@ -27,17 +28,18 @@ final class GPXImportCoordinator: ObservableObject {
         return SHA256.hash(data: Data(raw.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    private func fail(_ outcome: GPXImportSummary.Outcome, _ message: String,
-                      _ metrics: SessionMetrics? = nil) {
+    private func report(_ outcome: GPXImportSummary.Outcome, message: String? = nil,
+                        metrics: SessionMetrics? = nil, rideCount: Int = 0) {
         summary = GPXImportSummary(
             outcome: outcome,
             totalDistanceM: metrics?.totalDistance ?? 0,
             longestRideM: metrics?.longestRideDistance ?? 0,
             topSpeedKmh: (metrics?.maxSpeed ?? 0) * 3.6,
+            rideCount: rideCount,
             message: message)
     }
 
-    func handleFile(_ url: URL) async {
+    func handleFile(_ url: URL, stations: [Lake.Station]) async {
         isBusy = true
         defer { isBusy = false }
 
@@ -45,34 +47,83 @@ final class GPXImportCoordinator: ObservableObject {
         do {
             session = try await Task.detached { try GPXParser.parse(url: url) }.value
         } catch {
-            fail(.failed, "Couldn't read the GPX file."); return
+            report(.failed, message: "Couldn't read the GPX file."); return
         }
 
-        // Foilmotion authenticity gate.
         guard (session.metadata.creator ?? "").lowercased().contains("foilmotion") else {
-            fail(.notFoilmotion, "Only Foilmotion GPX files are supported."); return
+            report(.notFoilmotion, message: "Only Foilmotion GPX files are supported."); return
         }
-
-        guard let metrics = SessionMetrics.compute(from: session.points) else {
-            fail(.failed, "The track has too few points."); return
+        guard session.points.count >= 2 else {
+            report(.failed, message: "The track has too few points."); return
         }
 
         let key = Self.sessionKey(session)
         if (try? await VerifiedRidesAPI.shared.sessionExists(key: key)) == true {
-            summary = GPXImportSummary(outcome: .alreadyImported, totalDistanceM: metrics.totalDistance,
-                                       longestRideM: metrics.longestRideDistance,
-                                       topSpeedKmh: metrics.maxSpeed * 3.6, message: "Already imported.")
+            report(.alreadyImported, message: "Already imported."); return
+        }
+
+        // Build candidate departures from stations near the track, then match.
+        let departures = await candidateDepartures(for: session, stations: stations)
+        let rides = WaveMatcher.matchedRides(points: session.points, departures: departures)
+        guard let metrics = Self.metrics(for: rides) else {
+            report(.noWaves, message: "No ferry waves found in this session — only rides behind a ship count.")
             return
         }
 
         do {
             try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key)
         } catch {
-            fail(.failed, "Couldn't upload — check your connection and try again.", metrics); return
+            report(.failed, message: "Couldn't upload — check your connection and try again.",
+                   metrics: metrics, rideCount: rides.count)
+            return
         }
 
-        summary = GPXImportSummary(outcome: .imported, totalDistanceM: metrics.totalDistance,
-                                   longestRideM: metrics.longestRideDistance,
-                                   topSpeedKmh: metrics.maxSpeed * 3.6, message: nil)
+        report(.imported, metrics: metrics, rideCount: rides.count)
+    }
+
+    /// Stations within 400 m of any track point → that day's ferry departures.
+    private func candidateDepartures(for session: GPXSession, stations: [Lake.Station]) async -> [CandidateDeparture] {
+        let candidates = stations.filter { station in
+            guard let c = station.coordinates else { return false }
+            return session.points.contains {
+                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude) <= 400
+            }
+        }
+        let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
+        let api = TransportAPI()
+        var departures: [CandidateDeparture] = []
+        for station in candidates {
+            guard let c = station.coordinates, let uic = station.uic_ref else { continue }
+            let journeys = (try? await api.getStationboard(stationId: uic, for: date, limit: 200)) ?? []
+            for j in journeys {
+                guard let ts = j.stop.departureTimestamp else { continue }
+                let route = (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
+                departures.append(CandidateDeparture(
+                    stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
+                    stationLat: c.latitude, stationLon: c.longitude,
+                    departure: Date(timeIntervalSince1970: TimeInterval(ts)), routeNumber: route))
+            }
+        }
+        return departures
+    }
+
+    /// Aggregate session metrics over ONLY the matched (behind-a-ship) rides.
+    /// Returns nil when there are no matched rides.
+    private static func metrics(for rides: [MatchedRide]) -> SessionMetrics? {
+        let perRide = rides.compactMap { SessionMetrics.compute(from: $0.points) }
+        guard !perRide.isEmpty else { return nil }
+
+        let total = perRide.map(\.totalDistance).reduce(0, +)
+        let longest = perRide.map(\.totalDistance).max() ?? 0
+        let maxSpeed = perRide.map(\.maxSpeed).max() ?? 0
+        let moving = perRide.map(\.movingTime).reduce(0, +)
+        let starts = perRide.map(\.start)
+        let ends = perRide.map(\.end)
+        let start = starts.min() ?? Date()
+        let end = ends.max() ?? start
+        let duration = perRide.map { $0.end.timeIntervalSince($0.start) }.reduce(0, +)
+
+        return SessionMetrics(start: start, end: end, duration: duration, movingTime: moving,
+                              totalDistance: total, maxSpeed: maxSpeed, longestRideDistance: longest)
     }
 }

@@ -57,6 +57,41 @@ struct WaveMatcherTests {
         #expect(WaveMatcher.matchedRides(points: pts, events: [dep(1000)]).isEmpty)
     }
 
+    private func p(_ t: TimeInterval, _ lat: Double) -> GPXPoint {
+        GPXPoint(time: Date(timeIntervalSince1970: t), lat: lat, lon: 8.55,
+                 ele: nil, speed: nil, cumulativeDistance: nil)
+    }
+
+    @Test func creditsWholeRunPastWindowEnd() {
+        // Run starts at 1040 (inside dep window [1030,1210]) and keeps going far past
+        // the window's end — the whole run is credited (foiler rides until it ends).
+        let pts = movingTrack(from: 1040, count: 40)   // 1040…1430
+        let rides = WaveMatcher.matchedRides(points: pts, events: [dep(1000)])
+        #expect(rides.count == 1)
+        #expect(rides[0].points.count == 40)
+    }
+
+    @Test func toleratesBriefDipMidRun() {
+        // One slow point in the middle should not split the ride into two.
+        var pts = (0...4).map { p(1040 + Double($0) * 5, 47.300 + 0.0003 * Double($0)) }
+        pts.append(p(1065, 47.3012))                       // ~tiny move → a dip
+        pts += (0...4).map { p(1070 + Double($0) * 5, 47.3015 + 0.0003 * Double($0)) }
+        let rides = WaveMatcher.matchedRides(points: pts, events: [dep(1000)])
+        #expect(rides.count == 1)
+        #expect(rides[0].points.count == 11)
+    }
+
+    @Test func picksOneRunPerDeparture() {
+        // Two separate runs both start inside the window; only the earliest counts.
+        var pts = [p(1040, 47.300), p(1045, 47.3005), p(1050, 47.3010)]  // run A (start 1040)
+        pts.append(p(1075, 47.3010))                                      // long-ish stop (>slowTol via gap)
+        pts.append(p(1095, 47.3010))
+        pts += [p(1100, 47.320), p(1105, 47.3205), p(1110, 47.3210)]      // run B (start 1100)
+        let rides = WaveMatcher.matchedRides(points: pts, events: [dep(1000)])
+        #expect(rides.count == 1)
+        #expect(rides[0].startAt == Date(timeIntervalSince1970: 1040))
+    }
+
     @Test func noEventsNoRides() {
         #expect(WaveMatcher.matchedRides(points: movingTrack(from: 1040), events: []).isEmpty)
     }

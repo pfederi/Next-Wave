@@ -27,15 +27,48 @@ enum WaveMatcher {
     static let chaseLead = 30.0
     /// How long (s) the wake stays rideable — the length of the matching window.
     static let rideWindow = 180.0
+    /// A time gap (s) larger than this ends the current foiling run (a real break).
+    static let runGapSeconds = 10.0
+    /// Brief sub-threshold dips this many points long are tolerated mid-run (a
+    /// pumpfoiler's speed oscillates between pumps; don't shatter a ride on each dip).
+    static let slowTolerance = 4
 
-    /// Returns the contiguous rides where the foiler was moving inside a boat
-    /// event's wake window. Speed is derived from the raw GPS points (coordinates +
-    /// Δt); Foilmotion's own speed is only a fallback when Δt is zero.
+    /// Matches the foiler's continuous moving runs against boat events. The model:
+    /// once a foiling run **starts** inside a boat's wake window, the foiler is
+    /// assumed to ride that wake until the run ends — so the **whole run** counts.
+    /// Each event credits only the single most logical run (the one starting soonest
+    /// within its window), not every run that happens to overlap. Speed is derived
+    /// from the raw GPS points (coordinates + Δt); Foilmotion's own speed is only a
+    /// fallback when Δt is zero.
     static func matchedRides(points: [GPXPoint], events: [BoatEvent]) -> [MatchedRide] {
         guard points.count >= 2, !events.isEmpty else { return [] }
 
-        // Each event → a [lo, hi] wake window. Departure: foiler chases just after;
-        // arrival: foiler rides the incoming wake just before docking.
+        // 1. Split the track into foiling runs: a run is on-foil motion that ends
+        //    on a real break (a >runGapSeconds time gap, or sustained slow). Brief
+        //    sub-threshold dips while pumping are tolerated so a ride isn't shattered.
+        var runs: [[GPXPoint]] = []
+        var current: [GPXPoint] = []
+        var slowStreak = 0
+        func endRun() { if current.count >= 2 { runs.append(current) }; current = []; slowStreak = 0 }
+        for i in points.indices {
+            if i > 0, points[i].time.timeIntervalSince(points[i - 1].time) > runGapSeconds { endRun() }
+            if derivedSpeed(points, i) >= FoilConstants.foilSpeedThreshold {
+                slowStreak = 0
+                current.append(points[i])
+            } else {
+                slowStreak += 1
+                if slowStreak <= slowTolerance, !current.isEmpty {
+                    current.append(points[i])   // brief dip mid-run
+                } else {
+                    endRun()
+                }
+            }
+        }
+        if current.count >= 2 { runs.append(current) }
+        guard !runs.isEmpty else { return [] }
+
+        // 2. Each event → a [lo, hi] wake window. Departure: foiler chases just
+        //    after; arrival: foiler rides the incoming wake just before docking.
         let windows: [(lo: TimeInterval, hi: TimeInterval, route: String)] = events.map { e in
             let t = e.time.timeIntervalSince1970
             return e.isArrival
@@ -43,33 +76,25 @@ enum WaveMatcher {
                 : (t + chaseLead, t + chaseLead + rideWindow, e.routeNumber)
         }
 
-        func windowRoute(at t: TimeInterval) -> String? {
-            for w in windows where t >= w.lo && t <= w.hi { return w.route }
-            return nil
+        // 3. For each window, pick the run whose start falls soonest within it.
+        var chosen: [Int: String] = [:]   // run index → route (first event wins)
+        for w in windows {
+            var best: Int?
+            var bestDelta = Double.greatestFiniteMagnitude
+            for (idx, run) in runs.enumerated() {
+                let st = run[0].time.timeIntervalSince1970
+                if st >= w.lo, st <= w.hi, st - w.lo < bestDelta {
+                    bestDelta = st - w.lo
+                    best = idx
+                }
+            }
+            if let b = best, chosen[b] == nil { chosen[b] = w.route }
         }
 
-        var rides: [MatchedRide] = []
-        var current: [GPXPoint] = []
-        var currentRoute = ""
-        func flush() {
-            if current.count >= 2 {
-                rides.append(MatchedRide(routeNumber: currentRoute,
-                                         startAt: current[0].time, points: current))
-            }
-            current = []
+        // 4. Emit the chosen whole runs, in track order.
+        return chosen.keys.sorted().map { i in
+            MatchedRide(routeNumber: chosen[i]!, startAt: runs[i][0].time, points: runs[i])
         }
-
-        for i in points.indices {
-            let t = points[i].time.timeIntervalSince1970
-            if let route = windowRoute(at: t), derivedSpeed(points, i) >= FoilConstants.foilSpeedThreshold {
-                if current.isEmpty { currentRoute = route }
-                current.append(points[i])
-            } else {
-                flush()
-            }
-        }
-        flush()
-        return rides
     }
 
     /// Speed (m/s) at index `i` from the neighbouring point (coordinates + Δt),

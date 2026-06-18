@@ -70,14 +70,21 @@ gate, not real proof. Accepted for v1.
   within `dockRadius = 500 m` of any track point, fetch that day's departures
   (`type=departure`, `departureTimestamp`) and arrivals (`type=arrival`,
   `arrivalTimestamp`) → a list of `BoatEvent { time, isArrival, routeNumber }`.
+- **Run derivation.** Foilmotion's "full session" GPX has **no per-run markers**
+  (only an aggregate "N runs" in the description) — one `<trkseg>` of ~0.5 s points
+  with `speed/distance/cad/power` extensions. `WaveMatcher` therefore derives the
+  foiling runs itself: a run is on-foil motion (`speed >= FOIL_SPEED_THRESHOLD`,
+  speed from raw `distance/Δt`) that ends on a real break — a time gap larger than
+  `runGapSeconds = 10 s` or a sustained stop. Brief sub-threshold dips (≤
+  `slowTolerance = 4` points) are tolerated so a pumping ride isn't shattered.
 - **`WaveMatcher`** (`Services/WaveMatcher.swift`): each event opens a wake window —
   departure → `[T + chaseLead, T + chaseLead + rideWindow]`; arrival → mirrored
   `[T − chaseLead − rideWindow, T − chaseLead]` — with `chaseLead = 30 s` (a foiler
-  is underway ~30 s before catching the wake) and `rideWindow = 180 s`. A track
-  point counts when it falls inside any window **and** the foiler is moving
-  (`speed >= FOIL_SPEED_THRESHOLD`). Contiguous such points form a `MatchedRide`.
-  Speed is derived from the **raw GPS points** (`distance/Δt`); Foilmotion's recorded
-  speed is only a fallback when `Δt = 0`. (An earlier boat-trajectory-interpolation
+  is underway ~30 s before catching the wake) and `rideWindow = 180 s`. **Once a run
+  starts inside a window, the whole run is credited** (the foiler is assumed to ride
+  that wake until the run ends). Each event credits only the **single most logical
+  run** — the one whose start falls soonest within its window — not every run that
+  overlaps; a run is credited at most once. (An earlier boat-trajectory-interpolation
   model was tried but added complexity for little gain; this time+dock heuristic is
   simpler and robust.)
 - **`SessionMetrics`** (pure, unit-testable) computed **per matched ride** then

@@ -420,36 +420,11 @@ actor WeatherAPI {
         }
         
         let forecast = try JSONDecoder().decode(ForecastResponse.self, from: data)
-        
-        // Finde den nächstgelegenen Zeitpunkt
-        let targetTimestamp = time.timeIntervalSince1970
-        let closestForecast = forecast.list.min { item1, item2 in
-            abs(Double(item1.dt) - targetTimestamp) < abs(Double(item2.dt) - targetTimestamp)
-        }
-        
-        guard let forecast = closestForecast,
-              let weather = forecast.weather.first else {
+        let sorted = forecast.list.sorted { $0.dt < $1.dt }
+        guard let info = interpolatedWeather(at: time, from: sorted) else {
             throw URLError(.cannotParseResponse)
         }
-        
-        let (weatherDescription, weatherIcon) = weatherDescriptionAndIcon(from: weather.id)
-        
-        return WeatherInfo(
-            temperature: forecast.main.temp,
-            feelsLike: forecast.main.feels_like,
-            tempMin: forecast.main.temp_min,
-            tempMax: forecast.main.temp_max,
-            morningTemp: nil,
-            afternoonTemp: nil,
-            windSpeed: forecast.wind.speed,
-            maxWindSpeed: nil,
-            windDirection: forecast.wind.deg,
-            windGust: forecast.wind.gust,
-            pressure: forecast.main.pressure,
-            weatherDescription: weatherDescription,
-            weatherIcon: weatherIcon,
-            forecastDate: Date(timeIntervalSince1970: Double(forecast.dt))
-        )
+        return info
     }
     
     // Lädt die 5-Tage-Vorhersage EINMAL und ordnet jeder übergebenen Zeit den
@@ -490,33 +465,57 @@ actor WeatherAPI {
             return times.map { _ in nil }
         }
 
-        return times.map { time -> WeatherInfo? in
-            let targetTimestamp = time.timeIntervalSince1970
-            guard let closest = forecast.list.min(by: { item1, item2 in
-                abs(Double(item1.dt) - targetTimestamp) < abs(Double(item2.dt) - targetTimestamp)
-            }), let weather = closest.weather.first else {
-                return nil
+        let sorted = forecast.list.sorted { $0.dt < $1.dt }
+        return times.map { interpolatedWeather(at: $0, from: sorted) }
+    }
+
+    /// Linearly interpolates a `WeatherInfo` for `time` between the two surrounding
+    /// 3-hour forecast steps (so departures between steps get smoothly varying
+    /// temperatures instead of the nearest 3-hour value). Categorical fields
+    /// (icon, wind direction) come from the nearer step.
+    private func interpolatedWeather(at time: Date, from sorted: [ForecastResponse.ForecastItem]) -> WeatherInfo? {
+        guard let first = sorted.first, let last = sorted.last else { return nil }
+        let t = time.timeIntervalSince1970
+
+        let lower: ForecastResponse.ForecastItem
+        let upper: ForecastResponse.ForecastItem
+        let fraction: Double
+        if t <= Double(first.dt) {
+            lower = first; upper = first; fraction = 0
+        } else if t >= Double(last.dt) {
+            lower = last; upper = last; fraction = 0
+        } else {
+            var lo = first, up = last
+            for i in 1..<sorted.count where Double(sorted[i].dt) >= t {
+                lo = sorted[i - 1]; up = sorted[i]; break
             }
-
-            let (weatherDescription, weatherIcon) = weatherDescriptionAndIcon(from: weather.id)
-
-            return WeatherInfo(
-                temperature: closest.main.temp,
-                feelsLike: closest.main.feels_like,
-                tempMin: closest.main.temp_min,
-                tempMax: closest.main.temp_max,
-                morningTemp: nil,
-                afternoonTemp: nil,
-                windSpeed: closest.wind.speed,
-                maxWindSpeed: nil,
-                windDirection: closest.wind.deg,
-                windGust: closest.wind.gust,
-                pressure: closest.main.pressure,
-                weatherDescription: weatherDescription,
-                weatherIcon: weatherIcon,
-                forecastDate: Date(timeIntervalSince1970: Double(closest.dt))
-            )
+            lower = lo; upper = up
+            let span = Double(upper.dt - lower.dt)
+            fraction = span > 0 ? (t - Double(lower.dt)) / span : 0
         }
+
+        func lerp(_ a: Double, _ b: Double) -> Double { a + (b - a) * fraction }
+        let nearest = fraction < 0.5 ? lower : upper
+        let (desc, icon) = weatherDescriptionAndIcon(from: nearest.weather.first?.id ?? 800)
+        let gust: Double?
+        if let lg = lower.wind.gust, let ug = upper.wind.gust { gust = lerp(lg, ug) } else { gust = nearest.wind.gust }
+
+        return WeatherInfo(
+            temperature: lerp(lower.main.temp, upper.main.temp),
+            feelsLike: lerp(lower.main.feels_like, upper.main.feels_like),
+            tempMin: min(lower.main.temp_min, upper.main.temp_min),
+            tempMax: max(lower.main.temp_max, upper.main.temp_max),
+            morningTemp: nil,
+            afternoonTemp: nil,
+            windSpeed: lerp(lower.wind.speed, upper.wind.speed),
+            maxWindSpeed: nil,
+            windDirection: nearest.wind.deg,
+            windGust: gust,
+            pressure: Int(lerp(Double(lower.main.pressure), Double(upper.main.pressure)).rounded()),
+            weatherDescription: desc,
+            weatherIcon: icon,
+            forecastDate: time
+        )
     }
 
     private func findClosestHourIndex(for date: Date, in times: [Double]) -> Int {

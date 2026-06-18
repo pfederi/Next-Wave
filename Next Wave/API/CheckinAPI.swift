@@ -36,6 +36,20 @@ actor CheckinAPI {
     private struct ProfileUpsert: Encodable {
         let user_id: String
         let display_name: String?   // nil → stored as null (anonymous: hidden from public leaderboard)
+
+        enum CodingKeys: String, CodingKey { case user_id, display_name }
+
+        // Force an explicit JSON null for nil (synthesized Encodable would omit the key,
+        // which would leave the old name in place instead of clearing it).
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(user_id, forKey: .user_id)
+            if let display_name {
+                try c.encode(display_name, forKey: .display_name)
+            } else {
+                try c.encodeNil(forKey: .display_name)
+            }
+        }
     }
 
     /// Sync the leaderboard display name immediately when the identity changes in Settings.

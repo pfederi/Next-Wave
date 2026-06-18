@@ -15,7 +15,7 @@ struct LeaderboardView: View {
                 Text("Couldn't load the leaderboard. Pull to retry.")
                     .foregroundColor(.red)
             }
-            ForEach(store.leaderboard.sorted { $0.rank < $1.rank }) { entry in
+            ForEach(Array(store.leaderboard.sorted { $0.rank < $1.rank }.enumerated()), id: \.offset) { _, entry in
                 HStack {
                     Text("#\(entry.rank)")
                         .font(.headline.monospacedDigit())

@@ -99,10 +99,14 @@ extension BadgeCategory {
 }
 
 private extension Color {
+    /// Parses a 6-digit "#RRGGBB" hex. Falls back to a neutral gray on malformed input.
     init(badgeHex hex: String) {
         let s = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
         var v: UInt64 = 0
-        Scanner(string: s).scanHexInt64(&v)
+        guard s.count == 6, Scanner(string: s).scanHexInt64(&v) else {
+            self = .gray
+            return
+        }
         self.init(
             red: Double((v & 0xFF0000) >> 16) / 255,
             green: Double((v & 0x00FF00) >> 8) / 255,

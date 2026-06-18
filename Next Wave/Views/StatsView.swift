@@ -50,11 +50,21 @@ struct StatsView: View {
                 }
                 .buttonStyle(.plain)
 
-                // Badge gallery — medallions only, no text
+                // Badge gallery — medallion with title + subtitle
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(badges) { item in
-                        BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 96)
-                            .frame(maxWidth: .infinity)
+                        VStack(spacing: 6) {
+                            BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 96)
+                            Text(item.badge.title)
+                                .font(.caption.weight(.semibold))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(item.isEarned ? .primary : .secondary)
+                            Text(item.badge.detail)
+                                .font(.caption2)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .padding(.horizontal)

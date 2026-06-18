@@ -1,54 +1,33 @@
 import SwiftUI
 
-/// Untappd-style circular badge medallion: a category-colored ring, a cream rim,
-/// the category illustration, and a greyscale + lock treatment when not yet earned.
-/// Renders only the badge graphic — no title or caption.
 struct BadgeMedalView: View {
-    let badge: Badge
+    let imageName: String
+    let ringColor: Color
     let isEarned: Bool
+    let verified: Bool
     var size: CGFloat = 96
 
     private static let cream = Color(badgeHex: "#F3E6C9")
 
-    var body: some View {
-        ZStack {
-            // Category-colored ring
-            Circle().fill(badge.category.ringColor)
-
-            // Cream rim
-            Circle()
-                .fill(Self.cream)
-                .padding(size * 0.045)
-
-            // Illustration (greyscaled when locked)
-            illustration
-                .scaledToFill()
-                .frame(width: size, height: size)
-                .clipShape(Circle())
-                .padding(size * 0.075)
-                .grayscale(isEarned ? 0 : 1)
-
-            // Locked overlay
-            if !isEarned {
-                ZStack {
-                    Circle()
-                        .fill(Color.white.opacity(0.72))
-                        .frame(width: size * 0.44, height: size * 0.44)
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: size * 0.22, weight: .bold))
-                        .foregroundColor(Color(white: 0.23))
-                }
-            }
-        }
-        .frame(width: size, height: size)
-        .shadow(color: .black.opacity(0.18), radius: size * 0.04, x: 0, y: size * 0.02)
-        .accessibilityElement()
-        .accessibilityLabel(Text(isEarned ? badge.title : "\(badge.title), locked"))
+    /// Unverified badge (existing call sites).
+    init(badge: Badge, isEarned: Bool, size: CGFloat = 96) {
+        self.imageName = BadgeMedalView.assetName(for: badge)
+        self.ringColor = badge.category.ringColor
+        self.isEarned = isEarned
+        self.verified = false
+        self.size = size
     }
 
-    /// Asset name for this badge's illustration. Season badges have individual
-    /// images; every other badge uses its category image.
-    private var assetName: String {
+    /// Verified badge.
+    init(imageName: String, ringColor: Color, isEarned: Bool, verified: Bool = true, size: CGFloat = 96) {
+        self.imageName = imageName
+        self.ringColor = ringColor
+        self.isEarned = isEarned
+        self.verified = verified
+        self.size = size
+    }
+
+    private static func assetName(for badge: Badge) -> String {
         switch badge.id {
         case "season_spring": return "badge_spring"
         case "season_summer": return "badge_summer"
@@ -60,16 +39,43 @@ struct BadgeMedalView: View {
         }
     }
 
+    var body: some View {
+        ZStack {
+            Circle().fill(ringColor)
+            Circle().fill(Self.cream).padding(size * 0.045)
+            illustration
+                .scaledToFill()
+                .frame(width: size, height: size)
+                .clipShape(Circle())
+                .padding(size * 0.075)
+                .grayscale(isEarned ? 0 : 1)
+            if !isEarned {
+                ZStack {
+                    Circle().fill(Color.white.opacity(0.72)).frame(width: size * 0.44, height: size * 0.44)
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: size * 0.22, weight: .bold))
+                        .foregroundColor(Color(white: 0.23))
+                }
+            }
+            if verified {
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: size * 0.24))
+                    .foregroundColor(.white)
+                    .background(Circle().fill(Color.green).frame(width: size * 0.24, height: size * 0.24))
+                    .position(x: size * 0.84, y: size * 0.16)
+            }
+        }
+        .frame(width: size, height: size)
+        .shadow(color: .black.opacity(0.18), radius: size * 0.04, x: 0, y: size * 0.02)
+    }
+
     @ViewBuilder
     private var illustration: some View {
-        if UIImage(named: assetName) != nil {
-            Image(assetName)
-                .resizable()
+        if UIImage(named: imageName) != nil {
+            Image(imageName).resizable()
         } else {
-            // Placeholder until the category artwork is added to the asset catalog.
-            LinearGradient(
-                colors: [badge.category.ringColor.opacity(0.22), badge.category.ringColor.opacity(0.55)],
-                startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [ringColor.opacity(0.22), ringColor.opacity(0.55)],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
         }
     }
 }

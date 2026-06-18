@@ -18,4 +18,9 @@ struct CheckinIdentityTests {
         let identity = CheckinIdentity(name: "   ", isAnonymous: false)
         #expect(identity.displayName == nil)
     }
+
+    @Test func longNameIsCappedAt40Chars() {
+        let identity = CheckinIdentity(name: String(repeating: "a", count: 60), isAnonymous: false)
+        #expect(identity.displayName?.count == 40)
+    }
 }

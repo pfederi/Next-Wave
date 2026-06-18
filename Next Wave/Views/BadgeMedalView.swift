@@ -113,3 +113,33 @@ private extension Color {
             blue: Double(v & 0x0000FF) / 255)
     }
 }
+
+#if DEBUG
+#Preview("Badges — earned") {
+    ScrollView {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 24) {
+            ForEach(BadgeCatalog.all.prefix(8).map { $0 }) { badge in
+                VStack(spacing: 10) {
+                    BadgeMedalView(badge: badge, isEarned: true, size: 120)
+                    Text(badge.title).font(.headline)
+                }
+            }
+        }
+        .padding()
+    }
+}
+
+#Preview("Badges — locked") {
+    ScrollView {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 24) {
+            ForEach(BadgeCatalog.all.prefix(8).map { $0 }) { badge in
+                VStack(spacing: 10) {
+                    BadgeMedalView(badge: badge, isEarned: false, size: 120)
+                    Text(badge.title).font(.headline).foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+    }
+}
+#endif

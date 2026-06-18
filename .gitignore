@@ -34,3 +34,6 @@ Gemfile.lock
 *.log
 .env
 *.env.local
+
+# Supabase CLI local state
+supabase/.temp/

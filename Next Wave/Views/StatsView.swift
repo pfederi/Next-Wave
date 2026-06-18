@@ -44,7 +44,8 @@ struct StatsView: View {
                             Label("Leaderboard", systemImage: "trophy")
                             Spacer()
                             if let me = store.leaderboard.first(where: { $0.isMe }) {
-                                Text("You — #\(me.rank)").foregroundColor(.secondary)
+                                Text(me.totalWaves > 0 ? "You — #\(me.rank)" : "Not ranked yet")
+                                    .foregroundColor(.secondary)
                             }
                             Image(systemName: "chevron.right").foregroundColor(.secondary)
                         }
@@ -124,12 +125,8 @@ struct StatsView: View {
         }
     }
 
-    private var badges: [EvaluatedBadge] {
-        BadgeEvaluator.evaluate(store.stats ?? .empty)
-    }
-
-    private var earnedBadges: [EvaluatedBadge] { badges.filter { $0.isEarned } }
-    private var lockedBadges: [EvaluatedBadge] { badges.filter { !$0.isEarned } }
+    private var earnedBadges: [EvaluatedBadge] { store.badges.filter { $0.isEarned } }
+    private var lockedBadges: [EvaluatedBadge] { store.badges.filter { !$0.isEarned } }
 
     /// station_id (= "name_uicref" or "name") → human-readable station name.
     private func stationName(_ stationId: String) -> String {

@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class StatsStore: ObservableObject {
     @Published private(set) var stats: WaveStats?
+    @Published private(set) var badges: [EvaluatedBadge] = BadgeEvaluator.evaluate(.empty)
     @Published private(set) var leaderboard: [LeaderboardEntry] = []
     @Published private(set) var newlyEarned: [Badge] = []
     @Published private(set) var stationCounts: [StationWaveCount] = []
@@ -16,8 +17,10 @@ final class StatsStore: ObservableObject {
         do {
             let fetched = try await StatsAPI.shared.stats()
             stats = fetched
+            let evaluated = BadgeEvaluator.evaluate(fetched)
+            badges = evaluated
             newlyEarned = BadgeEvaluator.newlyEarned(fetched, seenIds: seenIds)
-            let earnedNow = Set(BadgeEvaluator.evaluate(fetched).filter { $0.isEarned }.map { $0.badge.id })
+            let earnedNow = Set(evaluated.filter { $0.isEarned }.map { $0.badge.id })
             onSeen(seenIds.union(earnedNow))
             leaderboard = try await StatsAPI.shared.leaderboard(stationId: nil)
         } catch {

@@ -2,17 +2,21 @@ import Foundation
 import UserNotifications
 
 /// Detects newly-earned badges and sends a local notification that deep-links
-/// to "My Badges". State is kept in UserDefaults so it works from both the
-/// foreground and a background task (independently of the in-app celebration,
-/// which uses `seenBadgeIds`).
-enum BadgeNotifier {
-    private static let notifiedKey = "notifiedBadgeIds"
-    private static let initKey = "badgeNotifierInitialized"
+/// to "My Badges". Implemented as an actor so the read-modify-write of the
+/// "notified" state is serialized across the foreground and background callers.
+/// State is kept in UserDefaults so it survives relaunches (independently of the
+/// in-app celebration, which uses `seenBadgeIds`).
+actor BadgeNotifier {
+    static let shared = BadgeNotifier()
+    private init() {}
+
+    private let notifiedKey = "notifiedBadgeIds"
+    private let initKey = "badgeNotifierInitialized"
 
     /// Fetch stats, compare earned badges against the last-notified set, and
     /// notify about any newly earned ones. On first run it only establishes a
     /// baseline (no retroactive notification for already-earned badges).
-    static func checkAndNotify() async {
+    func checkAndNotify() async {
         guard let stats = try? await StatsAPI.shared.stats() else { return }
         let earnedIds = Set(BadgeEvaluator.evaluate(stats).filter { $0.isEarned }.map { $0.badge.id })
 
@@ -30,11 +34,17 @@ enum BadgeNotifier {
         guard !freshIds.isEmpty else { return }
 
         let fresh = BadgeCatalog.all.filter { freshIds.contains($0.id) }
-        send(fresh)
-        defaults.set(Array(notified.union(earnedIds)), forKey: notifiedKey)
+        do {
+            try await send(fresh)
+            // Only record as notified once the notification was actually scheduled,
+            // so a failure is retried on the next check rather than lost.
+            defaults.set(Array(notified.union(earnedIds)), forKey: notifiedKey)
+        } catch {
+            print("⚠️ Badge notification failed: \(error)")
+        }
     }
 
-    private static func send(_ badges: [Badge]) {
+    private func send(_ badges: [Badge]) async throws {
         guard !badges.isEmpty else { return }
         let content = UNMutableNotificationContent()
         content.title = "Next Wave 🏅"
@@ -51,6 +61,6 @@ enum BadgeNotifier {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         let request = UNNotificationRequest(identifier: "badge_earned_\(UUID().uuidString)",
                                             content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request)
+        try await UNUserNotificationCenter.current().add(request)
     }
 }

@@ -30,13 +30,17 @@ struct DepartureRowView: View {
         guard let station = scheduleViewModel.selectedStation else { return nil }
         let lakeName = lakeStationsViewModel.lakes.first(where: { lake in
             lake.stations.contains(where: { $0.name == station.name })
-        })?.name ?? station.name
+        })?.name ?? "unknown"   // avoid a phantom per-station "lake" if no lake matches
         let dayTimes = scheduleViewModel.nextWaves.map { $0.time }
+        // Only trust first/last-of-day when the full day's schedule is loaded
+        // (i.e. it actually contains this wave); otherwise don't award the flag
+        // rather than mis-flag from an empty/stale list.
+        let dayLoaded = dayTimes.contains(wave.time)
         return CheckinContext(
             stationId: station.id,
             lakeId: lakeName,
-            isFirstOfDay: WaveCheckin.isFirstOfDay(wave.time, amongDepartures: dayTimes),
-            isLastOfDay: WaveCheckin.isLastOfDay(wave.time, amongDepartures: dayTimes)
+            isFirstOfDay: dayLoaded && WaveCheckin.isFirstOfDay(wave.time, amongDepartures: dayTimes),
+            isLastOfDay: dayLoaded && WaveCheckin.isLastOfDay(wave.time, amongDepartures: dayTimes)
         )
     }
 

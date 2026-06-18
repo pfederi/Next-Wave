@@ -51,7 +51,7 @@ class BackgroundTaskManager {
         // Reschedule the next run first, then do the work.
         scheduleBadgeCheckTask()
         Task {
-            await BadgeNotifier.checkAndNotify()
+            await BadgeNotifier.shared.checkAndNotify()
             task.setTaskCompleted(success: true)
         }
     }
@@ -184,8 +184,9 @@ struct NextWaveApp: App {
         let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity)
         URLCache.shared = cache
         
-        requestNotificationPermissions()
+        // Set the delegate first so a launch-from-notification tap is handled.
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+        requestNotificationPermissions()
         let coloredAppearance = UINavigationBarAppearance()
         coloredAppearance.backgroundColor = UIColor(Color("background-color"))
         
@@ -238,7 +239,7 @@ struct NextWaveApp: App {
                         }
                         // Notify about any badges earned while away.
                         if appSettings.enableWaveCheckIn {
-                            Task { await BadgeNotifier.checkAndNotify() }
+                            Task { await BadgeNotifier.shared.checkAndNotify() }
                         }
                     } else if newPhase == .background {
                         // Load widget data when app goes to background

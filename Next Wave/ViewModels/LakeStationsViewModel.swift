@@ -72,7 +72,9 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         
         // Setup location updates
         locationManager.onLocationUpdate = { [weak self] _ in
-            self?.updateNearestStation()
+            // CLLocationManager callbacks may arrive off the main actor; hop to it
+            // before touching @Published state.
+            Task { @MainActor in self?.updateNearestStation() }
         }
         locationManager.requestLocationPermission()
         locationManager.startUpdatingLocation()

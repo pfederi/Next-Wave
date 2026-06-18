@@ -54,28 +54,14 @@ struct StatsView: View {
                     .buttonStyle(.plain)
                 }
 
-                // MARK: Badges section
-                VStack(alignment: .leading, spacing: 28) {
-                    sectionHeader("Badges")
+                // MARK: Earned badges
+                if !earnedBadges.isEmpty {
+                    badgeSection("Earned (\(earnedBadges.count))", earnedBadges)
+                }
 
-                    LazyVGrid(columns: columns, spacing: 32) {
-                        ForEach(badges) { item in
-                            VStack(spacing: 20) {
-                                BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
-                                VStack(spacing: 3) {
-                                    Text(item.badge.title)
-                                        .font(.headline)
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(item.isEarned ? .primary : .secondary)
-                                    Text(item.badge.detail)
-                                        .font(.subheadline)
-                                        .multilineTextAlignment(.center)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                    }
+                // MARK: Locked badges
+                if !lockedBadges.isEmpty {
+                    badgeSection("Locked (\(lockedBadges.count))", lockedBadges)
                 }
             }
             .padding(.horizontal, 20)
@@ -96,7 +82,34 @@ struct StatsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private func badgeSection(_ title: String, _ items: [EvaluatedBadge]) -> some View {
+        VStack(alignment: .leading, spacing: 28) {
+            sectionHeader(title)
+            LazyVGrid(columns: columns, spacing: 32) {
+                ForEach(items) { item in
+                    VStack(spacing: 20) {
+                        BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
+                        VStack(spacing: 3) {
+                            Text(item.badge.title)
+                                .font(.headline)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(item.isEarned ? .primary : .secondary)
+                            Text(item.badge.detail)
+                                .font(.subheadline)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+    }
+
     private var badges: [EvaluatedBadge] {
         BadgeEvaluator.evaluate(store.stats ?? .empty)
     }
+
+    private var earnedBadges: [EvaluatedBadge] { badges.filter { $0.isEarned } }
+    private var lockedBadges: [EvaluatedBadge] { badges.filter { !$0.isEarned } }
 }

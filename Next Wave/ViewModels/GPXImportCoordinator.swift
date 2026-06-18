@@ -62,9 +62,9 @@ final class GPXImportCoordinator: ObservableObject {
             report(.alreadyImported, message: "Already imported."); return
         }
 
-        // Reconstruct nearby scheduled-boat (Kursschiff) trajectories, then match.
-        let trajectories = await ferryTrajectories(for: session, stations: stations)
-        let rides = WaveMatcher.matchedRides(points: session.points, trajectories: trajectories)
+        // Collect scheduled-boat (Kursschiff) events at nearby docks, then match by time.
+        let events = await boatEvents(for: session, stations: stations)
+        let rides = WaveMatcher.matchedRides(points: session.points, events: events)
         guard let (metrics, rideCount) = Self.metrics(for: rides) else {
             report(.noWaves, message: "No scheduled-boat waves found in this session — only rides behind a boat count.")
             return
@@ -81,55 +81,43 @@ final class GPXImportCoordinator: ObservableObject {
         report(.imported, metrics: metrics, rideCount: rideCount)
     }
 
-    /// Reconstruct the trajectories of scheduled boats whose route passes near the
-    /// track: for every station within 400 m of any track point, fetch that day's
-    /// departures and turn each boat journey into a time-stamped path (the journey's
-    /// `passList` covers all its downstream legs, so a single trajectory captures the
-    /// boat approaching and leaving every stop along its route).
-    private func ferryTrajectories(for session: GPXSession, stations: [Lake.Station]) async -> [FerryTrajectory] {
+    /// Scheduled-boat events (departures + arrivals) at every dock within
+    /// `WaveMatcher.dockRadius` of any track point, on the session's day.
+    private func boatEvents(for session: GPXSession, stations: [Lake.Station]) async -> [BoatEvent] {
         let candidates = stations.filter { station in
             guard let c = station.coordinates else { return false }
             return session.points.contains {
-                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude) <= 400
+                GeoMath.distance(lat1: $0.lat, lon1: $0.lon,
+                                 lat2: c.latitude, lon2: c.longitude) <= WaveMatcher.dockRadius
             }
         }
         let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
         let api = TransportAPI()
-        var trajectories: [FerryTrajectory] = []
-        var seen = Set<String>()   // dedupe journeys seen from several stations
+        var events: [BoatEvent] = []
         for station in candidates {
             guard let uic = station.uic_ref else { continue }
-            let journeys = (try? await api.getStationboard(stationId: uic, for: date, limit: 200)) ?? []
-            for j in journeys {
-                guard let traj = Self.trajectory(from: j) else { continue }
-                // Identify a journey by its trip number (falls back to route + origin time).
-                let key = "\(j.number ?? j.name ?? "")_\(traj.routeNumber)_\(Int(traj.waypoints.first?.t ?? 0))"
-                if seen.insert(key).inserted { trajectories.append(traj) }
+
+            let departures = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
+                                                             type: "departure")) ?? []
+            for j in departures where j.category == "BAT" {
+                guard let ts = j.stop.departureTimestamp else { continue }
+                events.append(BoatEvent(time: Date(timeIntervalSince1970: TimeInterval(ts)),
+                                        isArrival: false, routeNumber: routeNumber(j)))
+            }
+
+            let arrivals = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
+                                                           type: "arrival")) ?? []
+            for j in arrivals where j.category == "BAT" {
+                guard let ts = j.stop.arrivalTimestamp else { continue }
+                events.append(BoatEvent(time: Date(timeIntervalSince1970: TimeInterval(ts)),
+                                        isArrival: true, routeNumber: routeNumber(j)))
             }
         }
-        return trajectories
+        return events
     }
 
-    /// Build a time-ordered trajectory from a boat journey's origin stop + passList.
-    /// (The first passList entry repeats the origin without coordinates, so the origin
-    /// comes from `j.stop`.) Returns nil if fewer than two usable waypoints.
-    static func trajectory(from j: Journey) -> FerryTrajectory? {
-        var pts: [FerryWaypoint] = []
-        if let c = j.stop.station.coordinate, let x = c.x, let y = c.y,
-           let ts = j.stop.departureTimestamp ?? j.stop.arrivalTimestamp {
-            pts.append(FerryWaypoint(lat: x, lon: y, t: TimeInterval(ts)))
-        }
-        for s in j.passList ?? [] {
-            guard let c = s.station.coordinate, let x = c.x, let y = c.y,
-                  let ts = s.arrivalTimestamp ?? s.departureTimestamp else { continue }
-            pts.append(FerryWaypoint(lat: x, lon: y, t: TimeInterval(ts)))
-        }
-        pts.sort { $0.t < $1.t }
-        var clean: [FerryWaypoint] = []
-        for w in pts where clean.last.map({ w.t > $0.t }) ?? true { clean.append(w) }
-        guard clean.count >= 2 else { return nil }
-        let route = (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
-        return FerryTrajectory(routeNumber: route, waypoints: clean)
+    private func routeNumber(_ j: Journey) -> String {
+        (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
     }
 
     /// Aggregate session metrics over ONLY the matched (behind-a-ship) rides.

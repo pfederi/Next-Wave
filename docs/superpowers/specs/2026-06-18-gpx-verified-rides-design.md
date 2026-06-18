@@ -25,7 +25,7 @@ that includes rides behind a scheduled boat."
 - Import a `.gpx` into the app via iOS Share (no extra extension target).
 - Accept only genuine **Foilmotion** files (creator check).
 - Parse GPX robustly (with or without `<extensions>` speed/distance).
-- Reconstruct nearby Kursschiff trajectories from the timetable; a boat passing within `wakeProximity` opens a `wakeWindow` during which the foiler's moving track counts ("wake-thieving" rides).
+- Match the track against scheduled Kursschiff departures/arrivals at nearby docks (≤500 m): each event opens a time window during which the foiler's moving track counts ("wake-thieving" rides).
 - Compute metrics over the matched rides only (speed/distance derived from the raw GPS points): longest ride distance, max speed, total distance, plus the count of detected wake-thieving rides.
 - Persist verified sessions in Supabase (cross-device, idempotent re-import).
 - Award verified badges (longest ride, top speed, total distance, session count),
@@ -62,25 +62,24 @@ gate, not real proof. Accepted for v1.
   missing `<extensions>` (derive speed/distance from positions + Δt).
 - **Foilmotion gate:** accept only when `metadata.creator` contains "foilmotion"
   (case-insensitive). Otherwise the import is rejected with a clear message.
-- **Boat trajectory reconstruction:** the rideable boats are **Kursschiffe**
-  (scheduled lake passenger boats, category `BAT`), not ferries. For every station
-  within 400 m of any track point, fetch that day's `TransportAPI.getStationboard`
-  departures. Each boat journey's `stop` + `passList` gives a time-stamped path
-  (stop `coordinate.x = lat`, `y = lon`; `arrival/departureTimestamp`). A single
-  journey's passList covers all its downstream legs, so one `FerryTrajectory`
-  captures the boat **approaching and leaving every stop** along its route — i.e.
-  both arriving and departing boats are handled without a separate arrival query.
-- **`WaveMatcher`** (`Services/WaveMatcher.swift`): `FerryTrajectory.position(at:)`
-  linearly interpolates the boat's position over time between waypoints. A boat
-  passing within `wakeProximity = 300 m` of the foiler **opens a wake window** of
-  `wakeWindow = 90 s`: the boat races off but its wake lingers and is ridden after
-  it has moved on. A track point counts as "behind a boat" when it falls inside an
-  open wake window **and** the foiler is moving (`speed >= FOIL_SPEED_THRESHOLD`).
-  Contiguous such points form a `MatchedRide` (route + start + points). Speed is
-  derived from the **raw GPS points** (`distance/Δt`); Foilmotion's recorded speed
-  is only a fallback when `Δt = 0`. (Instantaneous proximity was tried first but
-  credited almost nothing — the boat is only co-located with the foiler for a few
-  seconds; the wake window reflects the physics of wake-thieving.)
+- **Simplified time-based matching.** The rideable boats are **Kursschiffe**
+  (scheduled lake passenger boats, category `BAT`), not ferries. The model: a boat
+  departs from / arrives at a dock near the foiler; the foiler launches shortly
+  after a departure (chasing the wake) or shortly before an arrival, and rides it.
+  We mainly match on **time** — no boat-position interpolation. For every station
+  within `dockRadius = 500 m` of any track point, fetch that day's departures
+  (`type=departure`, `departureTimestamp`) and arrivals (`type=arrival`,
+  `arrivalTimestamp`) → a list of `BoatEvent { time, isArrival, routeNumber }`.
+- **`WaveMatcher`** (`Services/WaveMatcher.swift`): each event opens a wake window —
+  departure → `[T + chaseLead, T + chaseLead + rideWindow]`; arrival → mirrored
+  `[T − chaseLead − rideWindow, T − chaseLead]` — with `chaseLead = 30 s` (a foiler
+  is underway ~30 s before catching the wake) and `rideWindow = 180 s`. A track
+  point counts when it falls inside any window **and** the foiler is moving
+  (`speed >= FOIL_SPEED_THRESHOLD`). Contiguous such points form a `MatchedRide`.
+  Speed is derived from the **raw GPS points** (`distance/Δt`); Foilmotion's recorded
+  speed is only a fallback when `Δt = 0`. (An earlier boat-trajectory-interpolation
+  model was tried but added complexity for little gain; this time+dock heuristic is
+  simpler and robust.)
 - **`SessionMetrics`** (pure, unit-testable) computed **per matched ride** then
   aggregated by `GPXImportCoordinator`: `totalDistance` = Σ over matched rides,
   `longestRideDistance` = max single matched ride, `maxSpeed` = max over matched
@@ -147,8 +146,8 @@ create table public.verified_sessions (
 | `GPXParser` | `.gpx` XML → `GPXSession`. |
 | `GeoMath` | haversine distance (m). |
 | `SessionMetrics` | pure points → metrics. Unit-tested. |
-| `WaveMatcher` / `FerryTrajectory` | interpolate boat positions over time; track → behind-boat (wake-thieving) rides. Unit-tested. |
-| `GPXImportCoordinator` | import → parse → Foilmotion check → build boat trajectories → match rides → aggregate metrics → upload → summary. |
+| `WaveMatcher` / `BoatEvent` | schedule events → wake windows; track → behind-boat (wake-thieving) rides. Unit-tested. |
+| `GPXImportCoordinator` | import → parse → Foilmotion check → collect boat events → match rides → aggregate metrics → upload → summary. |
 | `VerifiedRidesAPI` | upsert session + read `user_verified_stats` + `sessionExists`. |
 | `VerifiedBadgeCatalog` / evaluator | verified badge definitions + evaluation. |
 | `GPXImportSummaryView` | post-import summary. |
@@ -157,8 +156,8 @@ create table public.verified_sessions (
 ## 7. Data flow
 
 GPX (Share) → `onOpenURL` (file) → copy to temp → `GPXParser` → Foilmotion check →
-boat trajectories (`TransportAPI.getStationboard` for nearby stations → `passList`) →
-`WaveMatcher.matchedRides` (position interpolation) → aggregate `SessionMetrics` over matched rides →
+boat events (`TransportAPI.getStationboard` departures+arrivals at nearby docks) →
+`WaveMatcher.matchedRides` (time windows) → aggregate `SessionMetrics` over matched rides →
 `VerifiedRidesAPI.upload` (`verified_sessions`) → summary sheet (incl. ride count) →
 verified badges recompute from `user_verified_stats()`.
 
@@ -174,10 +173,9 @@ verified badges recompute from `user_verified_stats()`.
 - **`GPXParser`**: inline sample (with/without `<extensions>`) → points + metadata.
 - **`SessionMetrics`**: synthetic points → `totalDistance`, `maxSpeed`,
   `longestRideDistance` incl. threshold boundaries and a slow point splitting two ride segments.
-- **`WaveMatcher`** / **`FerryTrajectory`**: position interpolation (midpoint, out
-  of span); synthetic track following a moving boat → matched ride; wake window
-  keeps crediting after the boat has raced off; no match when too far (>300 m),
-  wrong time, or stationary. Speed derived from coordinates.
+- **`WaveMatcher`**: moving track inside a departure/arrival window → matched ride;
+  no match before the chase lead, outside the window, with no events, or while
+  stationary. Speed derived from coordinates.
 - **`VerifiedBadge`**: threshold boundaries for longest ride / top speed (km/h conversion) / total distance / sessions.
 - **SQL**: RLS owner-only; `user_verified_stats` aggregation; upsert idempotency.
 

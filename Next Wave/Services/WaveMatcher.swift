@@ -1,76 +1,56 @@
 import Foundation
 
-/// One waypoint of a ferry's scheduled path: a stop's position at a point in time.
-struct FerryWaypoint: Equatable {
-    let lat: Double
-    let lon: Double
-    let t: TimeInterval   // epoch seconds
-}
-
-/// A ferry's reconstructed path over time — straight lines between its scheduled
-/// stops. Lets us ask "where was this ferry at time t?".
-struct FerryTrajectory: Equatable {
+/// A scheduled boat event at a dock near the track: a departure or an arrival.
+struct BoatEvent: Equatable {
+    let time: Date
+    let isArrival: Bool
     let routeNumber: String
-    let waypoints: [FerryWaypoint]   // sorted by t, strictly increasing
-
-    /// Linearly interpolated ferry position at epoch time `t`,
-    /// or nil if `t` is outside the trajectory's time span.
-    func position(at t: TimeInterval) -> (lat: Double, lon: Double)? {
-        guard let first = waypoints.first, let last = waypoints.last,
-              t >= first.t, t <= last.t else { return nil }
-        for i in 1..<waypoints.count {
-            let a = waypoints[i - 1], b = waypoints[i]
-            if t <= b.t {
-                let span = b.t - a.t
-                let f = span > 0 ? (t - a.t) / span : 0
-                return (a.lat + (b.lat - a.lat) * f, a.lon + (b.lon - a.lon) * f)
-            }
-        }
-        return (last.lat, last.lon)
-    }
 }
 
-/// A contiguous "behind a ship" ride: track points that followed a moving ferry.
+/// A contiguous "behind a boat" ride: track points the foiler covered while
+/// chasing a boat's wake within the event's time window.
 struct MatchedRide: Equatable {
     let routeNumber: String
     let startAt: Date
     let points: [GPXPoint]
 }
 
+/// Simplified, time-based matching. A Kursschiff departs from (or arrives at) a
+/// dock near the foiler; the foiler launches shortly after a departure (chasing
+/// the wake) or shortly before an arrival, and rides the wave. We mainly match on
+/// **time**: the foiler's moving track within an event's wake window counts.
 enum WaveMatcher {
-    /// How close (m) a boat must pass to the foiler to create a rideable wake.
-    static let wakeProximity = 300.0
-    /// How long (s) the wake stays rideable after a boat passes near — the boat
-    /// races off at ~11 m/s, but its wake lingers and is ridden well after it has
-    /// moved on. A point counts while it falls inside an open wake window.
-    static let wakeWindow = 90.0
+    /// Max distance (m) from a dock for its schedule to be relevant to the track.
+    static let dockRadius = 500.0
+    /// Lead time (s): a foiler is underway ~30 s before catching the wake, so the
+    /// window starts 30 s after a departure (and ends 30 s before an arrival).
+    static let chaseLead = 30.0
+    /// How long (s) the wake stays rideable — the length of the matching window.
+    static let rideWindow = 180.0
 
-    /// Returns the contiguous rides where the foiler was moving while inside an
-    /// open wake window — i.e. within `wakeWindow` seconds of a boat passing within
-    /// `wakeProximity`. Speed is derived from the raw GPS points (coordinates + Δt);
-    /// Foilmotion's own speed is only a fallback when Δt is zero.
-    static func matchedRides(points: [GPXPoint], trajectories: [FerryTrajectory]) -> [MatchedRide] {
-        guard points.count >= 2, !trajectories.isEmpty else { return [] }
+    /// Returns the contiguous rides where the foiler was moving inside a boat
+    /// event's wake window. Speed is derived from the raw GPS points (coordinates +
+    /// Δt); Foilmotion's own speed is only a fallback when Δt is zero.
+    static func matchedRides(points: [GPXPoint], events: [BoatEvent]) -> [MatchedRide] {
+        guard points.count >= 2, !events.isEmpty else { return [] }
 
-        // Closest boat route within wakeProximity of point `p` at its time, or nil.
-        func boatPassingNear(_ p: GPXPoint) -> String? {
-            let t = p.time.timeIntervalSince1970
-            var best: (route: String, d: Double)?
-            for traj in trajectories {
-                guard let pos = traj.position(at: t) else { continue }
-                let d = GeoMath.distance(lat1: p.lat, lon1: p.lon, lat2: pos.lat, lon2: pos.lon)
-                if d <= wakeProximity, best == nil || d < best!.d {
-                    best = (traj.routeNumber, d)
-                }
-            }
-            return best?.route
+        // Each event → a [lo, hi] wake window. Departure: foiler chases just after;
+        // arrival: foiler rides the incoming wake just before docking.
+        let windows: [(lo: TimeInterval, hi: TimeInterval, route: String)] = events.map { e in
+            let t = e.time.timeIntervalSince1970
+            return e.isArrival
+                ? (t - chaseLead - rideWindow, t - chaseLead, e.routeNumber)
+                : (t + chaseLead, t + chaseLead + rideWindow, e.routeNumber)
+        }
+
+        func windowRoute(at t: TimeInterval) -> String? {
+            for w in windows where t >= w.lo && t <= w.hi { return w.route }
+            return nil
         }
 
         var rides: [MatchedRide] = []
         var current: [GPXPoint] = []
         var currentRoute = ""
-        var windowRoute = ""
-        var openUntil = -Double.greatestFiniteMagnitude
         func flush() {
             if current.count >= 2 {
                 rides.append(MatchedRide(routeNumber: currentRoute,
@@ -80,17 +60,10 @@ enum WaveMatcher {
         }
 
         for i in points.indices {
-            let p = points[i]
-            let t = p.time.timeIntervalSince1970
-            // A boat passing near (re)opens the wake window.
-            if let route = boatPassingNear(p) {
-                openUntil = t + wakeWindow
-                windowRoute = route
-            }
-            let inWake = t <= openUntil
-            if inWake, derivedSpeed(points, i) >= FoilConstants.foilSpeedThreshold {
-                if current.isEmpty { currentRoute = windowRoute }
-                current.append(p)
+            let t = points[i].time.timeIntervalSince1970
+            if let route = windowRoute(at: t), derivedSpeed(points, i) >= FoilConstants.foilSpeedThreshold {
+                if current.isEmpty { currentRoute = route }
+                current.append(points[i])
             } else {
                 flush()
             }

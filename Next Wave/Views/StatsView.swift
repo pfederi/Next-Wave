@@ -58,7 +58,7 @@ struct StatsView: View {
                 VStack(alignment: .leading, spacing: 28) {
                     sectionHeader("Badges")
 
-                    LazyVGrid(columns: columns, spacing: 20) {
+                    LazyVGrid(columns: columns, spacing: 32) {
                         ForEach(badges) { item in
                             VStack(spacing: 20) {
                                 BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)

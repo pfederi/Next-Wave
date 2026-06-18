@@ -247,7 +247,7 @@ actor WeatherAPI {
         
         // Configure URLRequest with HTTP caching
         var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
+        request.cachePolicy = .reloadRevalidatingCacheData
         request.timeoutInterval = 15.0
         
         do {
@@ -406,7 +406,7 @@ actor WeatherAPI {
         
         // Configure URLRequest with HTTP caching
         var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
+        request.cachePolicy = .reloadRevalidatingCacheData
         request.timeoutInterval = 15.0
         
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -473,7 +473,7 @@ actor WeatherAPI {
         }
 
         var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
+        request.cachePolicy = .reloadRevalidatingCacheData
         request.timeoutInterval = 15.0
 
         let (data, response) = try await URLSession.shared.data(for: request)

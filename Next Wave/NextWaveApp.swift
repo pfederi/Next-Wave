@@ -164,7 +164,6 @@ class BackgroundTaskManager {
 
 @main
 struct NextWaveApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var appSettings: AppSettings
     @StateObject private var viewModel: ScheduleViewModel
     @StateObject private var lakeStationsViewModel = LakeStationsViewModel()
@@ -338,11 +337,7 @@ struct NextWaveApp: App {
     }
     
     private func requestNotificationPermissions() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
-            guard granted else { return }
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in
         }
     }
 }

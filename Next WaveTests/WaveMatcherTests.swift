@@ -41,4 +41,35 @@ struct WaveMatcherTests {
         let pts = [pt(1500, 47.30, 8.55, 5), pt(1505, 47.30, 8.55, 5)]   // T+500s > +360s
         #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).isEmpty)
     }
+
+    // MARK: boundaries (inclusive comparisons)
+
+    @Test func includesSpeedExactlyAtThreshold() {
+        let T = Date(timeIntervalSince1970: 1000)
+        let s = FoilConstants.foilSpeedThreshold   // exactly 3.0 m/s → still "moving"
+        let pts = [pt(1060, 47.30, 8.55, s), pt(1065, 47.301, 8.55, s)]
+        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
+    }
+
+    @Test func includesPointAtLateWindowEdge() {
+        let T = Date(timeIntervalSince1970: 1000)
+        // second point exactly at T + windowAfter (1000 + 360 = 1360) → inclusive upper bound
+        let pts = [pt(1355, 47.30, 8.55, 5), pt(1360, 47.30, 8.55, 5)]
+        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
+    }
+
+    @Test func includesPointAtEarlyWindowEdge() {
+        let T = Date(timeIntervalSince1970: 1000)
+        // exactly T - windowBefore (1000 - 120 = 880) → inclusive lower bound
+        let pts = [pt(880, 47.30, 8.55, 5), pt(885, 47.30, 8.55, 5)]
+        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
+    }
+
+    @Test func picksFirstMatchingDepartureNoDoubleCount() {
+        let T1 = Date(timeIntervalSince1970: 1000)
+        let T2 = Date(timeIntervalSince1970: 1100)   // both windows cover the run
+        let pts = [pt(1060, 47.30, 8.55, 5), pt(1065, 47.301, 8.55, 5)]
+        let rides = WaveMatcher.matchedRides(points: pts, departures: [dep(T1), dep(T2)])
+        #expect(rides.count == 1)   // one run → one ride, not one per departure
+    }
 }

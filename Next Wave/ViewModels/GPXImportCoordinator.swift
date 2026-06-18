@@ -65,7 +65,7 @@ final class GPXImportCoordinator: ObservableObject {
         // Build candidate departures from stations near the track, then match.
         let departures = await candidateDepartures(for: session, stations: stations)
         let rides = WaveMatcher.matchedRides(points: session.points, departures: departures)
-        guard let metrics = Self.metrics(for: rides) else {
+        guard let (metrics, rideCount) = Self.metrics(for: rides) else {
             report(.noWaves, message: "No ferry waves found in this session — only rides behind a ship count.")
             return
         }
@@ -74,11 +74,11 @@ final class GPXImportCoordinator: ObservableObject {
             try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key)
         } catch {
             report(.failed, message: "Couldn't upload — check your connection and try again.",
-                   metrics: metrics, rideCount: rides.count)
+                   metrics: metrics, rideCount: rideCount)
             return
         }
 
-        report(.imported, metrics: metrics, rideCount: rides.count)
+        report(.imported, metrics: metrics, rideCount: rideCount)
     }
 
     /// Stations within 400 m of any track point → that day's ferry departures.
@@ -108,8 +108,9 @@ final class GPXImportCoordinator: ObservableObject {
     }
 
     /// Aggregate session metrics over ONLY the matched (behind-a-ship) rides.
-    /// Returns nil when there are no matched rides.
-    private static func metrics(for rides: [MatchedRide]) -> SessionMetrics? {
+    /// Returns the metrics plus the count of rides that actually contributed,
+    /// or nil when no matched ride produced metrics.
+    private static func metrics(for rides: [MatchedRide]) -> (SessionMetrics, Int)? {
         let perRide = rides.compactMap { SessionMetrics.compute(from: $0.points) }
         guard !perRide.isEmpty else { return nil }
 
@@ -123,7 +124,8 @@ final class GPXImportCoordinator: ObservableObject {
         let end = ends.max() ?? start
         let duration = perRide.map { $0.end.timeIntervalSince($0.start) }.reduce(0, +)
 
-        return SessionMetrics(start: start, end: end, duration: duration, movingTime: moving,
-                              totalDistance: total, maxSpeed: maxSpeed, longestRideDistance: longest)
+        let metrics = SessionMetrics(start: start, end: end, duration: duration, movingTime: moving,
+                                     totalDistance: total, maxSpeed: maxSpeed, longestRideDistance: longest)
+        return (metrics, perRide.count)
     }
 }

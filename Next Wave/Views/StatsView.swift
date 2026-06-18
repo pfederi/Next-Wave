@@ -55,7 +55,7 @@ struct StatsView: View {
                 }
 
                 // MARK: Badges section
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 28) {
                     sectionHeader("Badges")
 
                     LazyVGrid(columns: columns, spacing: 20) {

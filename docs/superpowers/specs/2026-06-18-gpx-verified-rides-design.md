@@ -1,36 +1,39 @@
 # GPX Verified Foil Sessions & Badges
 
 **Date:** 2026-06-18
-**Status:** Design — awaiting implementation plan (revised: session-based, no ferry matching)
+**Status:** Implemented (branch `feat/gpx-verified-rides`) — revised: metrics counted **only over ferry-matched (wake-thieving) segments**.
 **Builds on:** Wave Check-in + Gamification (badges, stats, leaderboards)
 
 ## Summary
 
 Let users import a **Foilmotion** GPX session via the iOS Share sheet / "Open in
 Next Wave". The app verifies the file is a genuine Foilmotion recording, parses
-the track, computes session metrics (longest continuous ride, top speed, total
-distance), stores the verified session in Supabase, and awards a set of
-**verified badges** shown alongside the existing unverified badges.
+the track, and matches it against the ferry schedule so that **only the segments
+ridden behind a ship (the "wake-thieving" rides) count**. Metrics (longest ride,
+top speed, total distance) are aggregated over those matched segments only, the
+verified session is stored in Supabase, and a set of **verified badges** is awarded
+alongside the existing unverified badges.
 
-The recordings are always **pump-foil sessions** (self-propelled, no ferry wave),
-so there is **no ferry-wave matching** — verification simply means "a real
-Foilmotion session happened."
+Recordings may contain both pump-foil and wake-thieving portions; only the
+wake-thieving portions are credited. A purely pump-foil session matches nothing
+and yields ~0 metrics (accepted). Verification means "a real Foilmotion session
+that includes rides behind a scheduled ferry."
 
 ## Goals
 
 - Import a `.gpx` into the app via iOS Share (no extra extension target).
 - Accept only genuine **Foilmotion** files (creator check).
 - Parse GPX robustly (with or without `<extensions>` speed/distance).
-- Compute session metrics: longest continuous ride distance, max speed, total distance, duration.
+- Match the track against ferry departures (near a station within the wake window while moving) and keep only the matched "wake-thieving" rides.
+- Compute metrics over the matched rides only: longest ride distance, max speed, total distance, plus the count of detected wake-thieving rides.
 - Persist verified sessions in Supabase (cross-device, idempotent re-import).
 - Award verified badges (longest ride, top speed, total distance, session count),
   visually distinct (verified shield) from unverified badges.
 
 ## Non-Goals (YAGNI)
 
-- Ferry-wave detection / schedule matching (data is always pump-foil — nothing to match).
 - A dedicated Share Extension target (use document-type "Open in").
-- Per-wave verified rides (no waves involved).
+- Persisting individual matched-ride / wave records (we keep only aggregate session metrics + ride count).
 - A verified leaderboard (the table could feed one later).
 - Offline upload (parsing works offline; upload needs network).
 
@@ -58,9 +61,18 @@ gate, not real proof. Accepted for v1.
   missing `<extensions>` (derive speed/distance from positions + Δt).
 - **Foilmotion gate:** accept only when `metadata.creator` contains "foilmotion"
   (case-insensitive). Otherwise the import is rejected with a clear message.
-- **`SessionMetrics`** (pure, unit-testable) from `points`:
-  `totalDistance` (m), `start/end`, `duration`, `movingTime`, `maxSpeed` (m/s),
-  `longestRideDistance` (m, longest continuous run with `speed >= FOIL_SPEED_THRESHOLD`).
+- **`WaveMatcher`** (`Services/WaveMatcher.swift`): splits the track into
+  contiguous moving runs (`speed >= FOIL_SPEED_THRESHOLD`) and keeps only runs
+  containing a point within `matchRadius = 250 m` of a candidate ferry station
+  inside that departure's wake window `[-120 s, +360 s]`. Returns `[MatchedRide]`
+  (each with the schedule `waveId`, station, departure, and its run of points).
+  Candidate departures come from `TransportAPI.getStationboard` for every station
+  within 400 m of any track point on the session's day.
+- **`SessionMetrics`** (pure, unit-testable) computed **per matched ride** then
+  aggregated by `GPXImportCoordinator`: `totalDistance` = Σ over matched rides,
+  `longestRideDistance` = max single matched ride, `maxSpeed` = max over matched
+  rides, plus `rideCount` = number of matched (wake-thieving) rides. A session
+  with no matched rides reports the `.noWaves` outcome and stores nothing.
 - **Constant:** `FOIL_SPEED_THRESHOLD = 3.0 m/s` (~11 km/h), adjustable.
 
 ## 3. Storage (Supabase — one table)
@@ -106,12 +118,14 @@ create table public.verified_sessions (
 
 ## 5. UI
 
-- **Import summary sheet** after opening a GPX: "Session imported — N km, longest
-  ride L m, top speed S km/h", plus any newly unlocked verified badges. Re-importing
-  the same file → "Already imported". Non-Foilmotion file → "Only Foilmotion GPX
-  files are supported."
-- **"My Badges"**: a new **Verified** section (in addition to Earned/Locked) showing
-  the verified figures (sessions, total distance, longest ride, top speed) + verified badges.
+- **Import summary sheet** after opening a GPX: wake-thieving ride count, distance
+  behind ships, longest ride, top speed. Re-importing the same file → "Already
+  imported". A session with no matched rides → **"No ferry waves"** (`.noWaves`).
+  Non-Foilmotion file → "Only Foilmotion GPX files are supported."
+- **"My Badges"**: verified badges are mixed into the shared **Earned/Locked**
+  grids (no separate section), distinguished only by a green verified shield. A
+  Foilmotion attribution block (logo + how-to + link) shows the verified figures
+  when present.
 
 ## 6. Components & boundaries
 
@@ -120,7 +134,8 @@ create table public.verified_sessions (
 | `GPXParser` | `.gpx` XML → `GPXSession`. |
 | `GeoMath` | haversine distance (m). |
 | `SessionMetrics` | pure points → metrics. Unit-tested. |
-| `GPXImportCoordinator` | import → parse → Foilmotion check → metrics → upload → summary. |
+| `WaveMatcher` | track → moving runs → ferry-matched (wake-thieving) rides. Unit-tested. |
+| `GPXImportCoordinator` | import → parse → Foilmotion check → fetch schedules → match rides → aggregate metrics → upload → summary. |
 | `VerifiedRidesAPI` | upsert session + read `user_verified_stats` + `sessionExists`. |
 | `VerifiedBadgeCatalog` / evaluator | verified badge definitions + evaluation. |
 | `GPXImportSummaryView` | post-import summary. |
@@ -129,7 +144,9 @@ create table public.verified_sessions (
 ## 7. Data flow
 
 GPX (Share) → `onOpenURL` (file) → copy to temp → `GPXParser` → Foilmotion check →
-`SessionMetrics` → `VerifiedRidesAPI.upload` (`verified_sessions`) → summary sheet →
+candidate departures (`TransportAPI.getStationboard` for nearby stations) →
+`WaveMatcher.matchedRides` → aggregate `SessionMetrics` over matched rides →
+`VerifiedRidesAPI.upload` (`verified_sessions`) → summary sheet (incl. ride count) →
 verified badges recompute from `user_verified_stats()`.
 
 ## 8. Error handling
@@ -144,6 +161,8 @@ verified badges recompute from `user_verified_stats()`.
 - **`GPXParser`**: inline sample (with/without `<extensions>`) → points + metadata.
 - **`SessionMetrics`**: synthetic points → `totalDistance`, `maxSpeed`,
   `longestRideDistance` incl. threshold boundaries and a slow point splitting two ride segments.
+- **`WaveMatcher`**: synthetic track + candidate departure → matched run; no match
+  when too slow, too far (>250 m), or outside the wake window.
 - **`VerifiedBadge`**: threshold boundaries for longest ride / top speed (km/h conversion) / total distance / sessions.
 - **SQL**: RLS owner-only; `user_verified_stats` aggregation; upsert idempotency.
 

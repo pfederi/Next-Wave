@@ -4,7 +4,9 @@
 
 **Goal:** Import a Foilmotion GPX via iOS Share, verify it's a genuine Foilmotion session, compute session metrics, store them in Supabase, and award session-based verified badges.
 
-**Architecture:** GPX arrives via a registered document type → parsed client-side (`GPXParser`) → Foilmotion creator gate → pure metrics (`SessionMetrics`) → uploaded to one Supabase table → verified badges computed from a metrics RPC and shown in a "Verified" section. No ferry-wave / schedule matching (recordings are always pump-foil).
+**Architecture:** GPX arrives via a registered document type → parsed client-side (`GPXParser`) → Foilmotion creator gate → ferry schedule matching (`WaveMatcher`) keeps only the wake-thieving segments → metrics (`SessionMetrics`) aggregated over those segments → uploaded to one Supabase table → verified badges computed from a metrics RPC and mixed into the shared Earned/Locked badge grids.
+
+> **Reversal note (post-plan):** the original plan computed metrics over the whole track ("no ferry matching"). Per user request, metrics are now counted **only over ferry-matched (wake-thieving) rides** via `Services/WaveMatcher.swift` (radius 250 m, wake window [-120 s, +360 s], moving-run split). `GPXImportCoordinator.handleFile(_:stations:)` fetches nearby stations' schedules, matches rides, and aggregates `SessionMetrics` over matched rides only, reporting a `.noWaves` outcome and a `rideCount` when none match. See the updated design spec for details; this supersedes the "no ferry-wave matching" statements below.
 
 **Tech Stack:** SwiftUI, `XMLParser`, Supabase (Postgres + RLS), swift-testing.
 

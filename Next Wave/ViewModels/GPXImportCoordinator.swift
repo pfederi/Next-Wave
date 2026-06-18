@@ -62,11 +62,11 @@ final class GPXImportCoordinator: ObservableObject {
             report(.alreadyImported, message: "Already imported."); return
         }
 
-        // Build candidate departures from stations near the track, then match.
-        let departures = await candidateDepartures(for: session, stations: stations)
-        let rides = WaveMatcher.matchedRides(points: session.points, departures: departures)
+        // Reconstruct nearby scheduled-boat (Kursschiff) trajectories, then match.
+        let trajectories = await ferryTrajectories(for: session, stations: stations)
+        let rides = WaveMatcher.matchedRides(points: session.points, trajectories: trajectories)
         guard let (metrics, rideCount) = Self.metrics(for: rides) else {
-            report(.noWaves, message: "No ferry waves found in this session — only rides behind a ship count.")
+            report(.noWaves, message: "No scheduled-boat waves found in this session — only rides behind a boat count.")
             return
         }
 
@@ -81,8 +81,12 @@ final class GPXImportCoordinator: ObservableObject {
         report(.imported, metrics: metrics, rideCount: rideCount)
     }
 
-    /// Stations within 400 m of any track point → that day's ferry departures AND arrivals.
-    private func candidateDepartures(for session: GPXSession, stations: [Lake.Station]) async -> [CandidateDeparture] {
+    /// Reconstruct the trajectories of scheduled boats whose route passes near the
+    /// track: for every station within 400 m of any track point, fetch that day's
+    /// departures and turn each boat journey into a time-stamped path (the journey's
+    /// `passList` covers all its downstream legs, so a single trajectory captures the
+    /// boat approaching and leaving every stop along its route).
+    private func ferryTrajectories(for session: GPXSession, stations: [Lake.Station]) async -> [FerryTrajectory] {
         let candidates = stations.filter { station in
             guard let c = station.coordinates else { return false }
             return session.points.contains {
@@ -91,37 +95,40 @@ final class GPXImportCoordinator: ObservableObject {
         }
         let date = session.metadata.startTime ?? session.points.first?.time ?? Date()
         let api = TransportAPI()
-        var events: [CandidateDeparture] = []
+        var trajectories: [FerryTrajectory] = []
+        var seen = Set<String>()   // dedupe journeys seen from several stations
         for station in candidates {
-            guard let c = station.coordinates, let uic = station.uic_ref else { continue }
-
-            let departures = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
-                                                             type: "departure")) ?? []
-            for j in departures {
-                guard let ts = j.stop.departureTimestamp else { continue }
-                events.append(CandidateDeparture(
-                    stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
-                    stationLat: c.latitude, stationLon: c.longitude,
-                    departure: Date(timeIntervalSince1970: TimeInterval(ts)),
-                    routeNumber: routeNumber(j), isArrival: false))
-            }
-
-            let arrivals = (try? await api.getStationboard(stationId: uic, for: date, limit: 200,
-                                                           type: "arrival")) ?? []
-            for j in arrivals {
-                guard let ts = j.stop.arrivalTimestamp else { continue }
-                events.append(CandidateDeparture(
-                    stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
-                    stationLat: c.latitude, stationLon: c.longitude,
-                    departure: Date(timeIntervalSince1970: TimeInterval(ts)),
-                    routeNumber: routeNumber(j), isArrival: true))
+            guard let uic = station.uic_ref else { continue }
+            let journeys = (try? await api.getStationboard(stationId: uic, for: date, limit: 200)) ?? []
+            for j in journeys {
+                guard let traj = Self.trajectory(from: j) else { continue }
+                let key = "\(traj.routeNumber)_\(Int(traj.waypoints.first?.t ?? 0))"
+                if seen.insert(key).inserted { trajectories.append(traj) }
             }
         }
-        return events
+        return trajectories
     }
 
-    private func routeNumber(_ j: Journey) -> String {
-        (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
+    /// Build a time-ordered trajectory from a boat journey's origin stop + passList.
+    /// (The first passList entry repeats the origin without coordinates, so the origin
+    /// comes from `j.stop`.) Returns nil if fewer than two usable waypoints.
+    static func trajectory(from j: Journey) -> FerryTrajectory? {
+        var pts: [FerryWaypoint] = []
+        if let c = j.stop.station.coordinate, let x = c.x, let y = c.y,
+           let ts = j.stop.departureTimestamp ?? j.stop.arrivalTimestamp {
+            pts.append(FerryWaypoint(lat: x, lon: y, t: TimeInterval(ts)))
+        }
+        for s in j.passList ?? [] {
+            guard let c = s.station.coordinate, let x = c.x, let y = c.y,
+                  let ts = s.arrivalTimestamp ?? s.departureTimestamp else { continue }
+            pts.append(FerryWaypoint(lat: x, lon: y, t: TimeInterval(ts)))
+        }
+        pts.sort { $0.t < $1.t }
+        var clean: [FerryWaypoint] = []
+        for w in pts where clean.last.map({ w.t > $0.t }) ?? true { clean.append(w) }
+        guard clean.count >= 2 else { return nil }
+        let route = (j.name ?? "").replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
+        return FerryTrajectory(routeNumber: route, waypoints: clean)
     }
 
     /// Aggregate session metrics over ONLY the matched (behind-a-ship) rides.

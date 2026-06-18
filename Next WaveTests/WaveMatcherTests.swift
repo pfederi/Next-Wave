@@ -3,94 +3,71 @@ import Foundation
 @testable import Next_Wave
 
 struct WaveMatcherTests {
-    private let stationLat = 47.30, stationLon = 8.55
-
-    private func dep(_ t: Date) -> CandidateDeparture {
-        CandidateDeparture(stationId: "S_1", stationName: "S", stationUicRef: "1",
-                           stationLat: stationLat, stationLon: stationLon, departure: t, routeNumber: "10")
+    // A boat travelling due north along lon 8.55 from lat 47.30 to 47.32,
+    // from t=1000 to t=1200 (≈2.2 km in 200 s ≈ 11 m/s).
+    private func boat() -> FerryTrajectory {
+        FerryTrajectory(routeNumber: "10", waypoints: [
+            FerryWaypoint(lat: 47.30, lon: 8.55, t: 1000),
+            FerryWaypoint(lat: 47.32, lon: 8.55, t: 1200),
+        ])
     }
-    private func arr(_ t: Date) -> CandidateDeparture {
-        CandidateDeparture(stationId: "S_1", stationName: "S", stationUicRef: "1",
-                           stationLat: stationLat, stationLon: stationLon, departure: t,
-                           routeNumber: "10", isArrival: true)
-    }
-    private func pt(_ t: TimeInterval, _ lat: Double, _ lon: Double, _ speed: Double) -> GPXPoint {
+    private func pt(_ t: TimeInterval, _ lat: Double, _ lon: Double) -> GPXPoint {
         GPXPoint(time: Date(timeIntervalSince1970: t), lat: lat, lon: lon, ele: nil,
-                 speed: speed, cumulativeDistance: nil)
+                 speed: nil, cumulativeDistance: nil)   // speed nil → derived from coords
     }
 
-    @Test func matchesMovingRunNearStationInWindow() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // One moving run; the first point is at the station, 1 min after departure.
-        let pts = [pt(1060, 47.30, 8.55, 5), pt(1065, 47.301, 8.55, 5), pt(1070, 47.302, 8.55, 5)]
-        let rides = WaveMatcher.matchedRides(points: pts, departures: [dep(T)])
+    @Test func interpolatesPositionAlongTrajectory() {
+        let pos = boat().position(at: 1100)   // halfway in time → halfway in space
+        #expect(pos != nil)
+        #expect(abs(pos!.lat - 47.31) < 1e-6)
+        #expect(abs(pos!.lon - 8.55) < 1e-6)
+    }
+
+    @Test func positionNilOutsideTimeSpan() {
+        #expect(boat().position(at: 900) == nil)
+        #expect(boat().position(at: 1300) == nil)
+    }
+
+    @Test func matchesTrackFollowingMovingBoat() {
+        // Track points shadow the boat ~50 m east, moving north, at the same times.
+        let pts = (0...4).map { i -> GPXPoint in
+            let t = 1000.0 + Double(i) * 25       // 1000…1100
+            let lat = 47.30 + 0.0025 * Double(i)  // climbs with the boat (0.0001°/s)
+            return pt(t, lat, 8.5506)             // ~45 m east of lon 8.55
+        }
+        let rides = WaveMatcher.matchedRides(points: pts, trajectories: [boat()])
         #expect(rides.count == 1)
-        #expect(rides[0].points.count == 3)
-        #expect(rides[0].stationId == "S_1")
+        #expect(rides[0].points.count == 5)
+        #expect(rides[0].routeNumber == "10")
     }
 
-    @Test func excludesNonMovingRun() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1060, 47.30, 8.55, 1), pt(1065, 47.30, 8.55, 1)]   // at station, in window, too slow
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).isEmpty)
+    @Test func excludesTrackFarFromBoat() {
+        // Same motion/time but ~800 m east of the boat → outside wakeRadius.
+        let pts = (0...4).map { i -> GPXPoint in
+            let t = 1000.0 + Double(i) * 25
+            let lat = 47.30 + 0.0025 * Double(i)
+            return pt(t, lat, 8.5606)   // ~800 m east of the boat
+        }
+        #expect(WaveMatcher.matchedRides(points: pts, trajectories: [boat()]).isEmpty)
     }
 
-    @Test func excludesRunFarFromStation() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1060, 47.30, 8.556, 5), pt(1065, 47.301, 8.556, 5)]   // ~455 m east, moving, in window
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).isEmpty)
+    @Test func excludesTrackNearBoatPositionButWrongTime() {
+        // Sits right where the boat will be, but 1 h later → boat already gone.
+        let pts = (0...4).map { i in pt(4600.0 + Double(i) * 25, 47.31, 8.55) }
+        #expect(WaveMatcher.matchedRides(points: pts, trajectories: [boat()]).isEmpty)
     }
 
-    @Test func excludesRunOutsideWindow() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1500, 47.30, 8.55, 5), pt(1505, 47.30, 8.55, 5)]   // T+500s > +360s
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).isEmpty)
+    @Test func excludesStationaryFoiler() {
+        // Close to the boat at the right time, but not moving (no position change).
+        let pts = (0...4).map { i in pt(1000.0 + Double(i) * 25, 47.30, 8.55) }
+        #expect(WaveMatcher.matchedRides(points: pts, trajectories: [boat()]).isEmpty)
     }
 
-    // MARK: boundaries (inclusive comparisons)
-
-    @Test func includesSpeedExactlyAtThreshold() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let s = FoilConstants.foilSpeedThreshold   // exactly 3.0 m/s → still "moving"
-        let pts = [pt(1060, 47.30, 8.55, s), pt(1065, 47.301, 8.55, s)]
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
-    }
-
-    @Test func includesPointAtLateWindowEdge() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // second point exactly at T + windowAfter (1000 + 360 = 1360) → inclusive upper bound
-        let pts = [pt(1355, 47.30, 8.55, 5), pt(1360, 47.30, 8.55, 5)]
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
-    }
-
-    @Test func includesPointAtEarlyWindowEdge() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // exactly T - windowBefore (1000 - 120 = 880) → inclusive lower bound
-        let pts = [pt(880, 47.30, 8.55, 5), pt(885, 47.30, 8.55, 5)]
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [dep(T)]).count == 1)
-    }
-
-    // MARK: arrivals (mirrored window: wake builds while approaching)
-
-    @Test func matchesArrivalWhileApproaching() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // 5 min BEFORE arrival (ship approaching) → within [-windowAfter, +windowBefore]
-        let pts = [pt(700, 47.30, 8.55, 5), pt(705, 47.301, 8.55, 5)]
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [arr(T)]).count == 1)
-    }
-
-    @Test func excludesArrivalLongAfterDocking() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // 5 min AFTER arrival → outside the short +windowBefore (120s) settle side
-        let pts = [pt(1300, 47.30, 8.55, 5), pt(1305, 47.30, 8.55, 5)]
-        #expect(WaveMatcher.matchedRides(points: pts, departures: [arr(T)]).isEmpty)
-    }
-
-    @Test func picksFirstMatchingDepartureNoDoubleCount() {
-        let T1 = Date(timeIntervalSince1970: 1000)
-        let T2 = Date(timeIntervalSince1970: 1100)   // both windows cover the run
-        let pts = [pt(1060, 47.30, 8.55, 5), pt(1065, 47.301, 8.55, 5)]
-        let rides = WaveMatcher.matchedRides(points: pts, departures: [dep(T1), dep(T2)])
-        #expect(rides.count == 1)   // one run → one ride, not one per departure
+    @Test func derivedSpeedFromCoordinates() {
+        // Two points 100 m apart, 10 s → 10 m/s, regardless of recorded speed.
+        let a = pt(0, 47.30, 8.55)
+        let b = pt(10, 47.300899, 8.55)   // ~100 m north
+        let s = WaveMatcher.derivedSpeed([a, b], 1)
+        #expect(abs(s - 10) < 1.5)
     }
 }

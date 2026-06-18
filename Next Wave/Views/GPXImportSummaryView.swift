@@ -45,7 +45,7 @@ struct GPXImportSummaryView: View {
         switch summary.outcome {
         case .imported: return "Session imported! 🏄"
         case .alreadyImported: return "Already imported"
-        case .noWaves: return "No ferry waves"
+        case .noWaves: return "No boat waves"
         case .notFoilmotion: return "Unsupported file"
         case .failed: return "Import failed"
         }

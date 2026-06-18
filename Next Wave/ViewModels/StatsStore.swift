@@ -20,10 +20,16 @@ final class StatsStore: ObservableObject {
             let earnedNow = Set(BadgeEvaluator.evaluate(fetched).filter { $0.isEarned }.map { $0.badge.id })
             onSeen(seenIds.union(earnedNow))
             leaderboard = try await StatsAPI.shared.leaderboard(stationId: nil)
-            stationCounts = try await StatsAPI.shared.stationCounts()
         } catch {
             print("⚠️ Stats refresh failed: \(error)")
             loadFailed = true
+        }
+
+        // Load independently so a failure here doesn't affect badges/leaderboard.
+        do {
+            stationCounts = try await StatsAPI.shared.stationCounts()
+        } catch {
+            print("⚠️ Station counts failed: \(error)")
         }
     }
 

@@ -55,6 +55,7 @@ struct BadgeMedalView: View {
         case "season_autumn": return "badge_autumn"
         case "season_winter": return "badge_winter"
         case "four_seasons":  return "badge_fourseasons"
+        case "lone_wolf":     return "badge_lonewolf"
         default:              return badge.category.imageName
         }
     }

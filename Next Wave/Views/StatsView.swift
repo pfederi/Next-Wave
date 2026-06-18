@@ -4,7 +4,7 @@ struct StatsView: View {
     @EnvironmentObject var appSettings: AppSettings
     @StateObject private var store = StatsStore()
 
-    private let columns = [GridItem(.adaptive(minimum: 90), spacing: 16)]
+    private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
 
     var body: some View {
         ScrollView {
@@ -54,7 +54,7 @@ struct StatsView: View {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(badges) { item in
                         VStack(spacing: 14) {
-                            BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 96)
+                            BadgeMedalView(badge: item.badge, isEarned: item.isEarned, size: 120)
                             VStack(spacing: 2) {
                                 Text(item.badge.title)
                                     .font(.caption.weight(.semibold))
@@ -73,7 +73,7 @@ struct StatsView: View {
             }
             .padding(.bottom, 24)
         }
-        .navigationTitle("My Waves")
+        .navigationTitle("My Badges")
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await store.refresh(seenIds: appSettings.seenBadgeIds) { updated in

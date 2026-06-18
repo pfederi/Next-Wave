@@ -46,10 +46,23 @@ struct BadgeMedalView: View {
         .accessibilityLabel(Text(isEarned ? badge.title : "\(badge.title), locked"))
     }
 
+    /// Asset name for this badge's illustration. Season badges have individual
+    /// images; every other badge uses its category image.
+    private var assetName: String {
+        switch badge.id {
+        case "season_spring": return "badge_spring"
+        case "season_summer": return "badge_summer"
+        case "season_autumn": return "badge_autumn"
+        case "season_winter": return "badge_winter"
+        case "four_seasons":  return "badge_fourseasons"
+        default:              return badge.category.imageName
+        }
+    }
+
     @ViewBuilder
     private var illustration: some View {
-        if UIImage(named: badge.category.imageName) != nil {
-            Image(badge.category.imageName)
+        if UIImage(named: assetName) != nil {
+            Image(assetName)
                 .resizable()
         } else {
             // Placeholder until the category artwork is added to the asset catalog.

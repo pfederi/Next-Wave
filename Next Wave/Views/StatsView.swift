@@ -82,6 +82,11 @@ struct StatsView: View {
                 if !lockedBadges.isEmpty {
                     badgeSection("Locked (\(lockedBadges.count))", lockedBadges)
                 }
+
+                // MARK: Verified badges
+                if store.verifiedStats.sessionCount > 0 || store.verifiedBadges.contains(where: { $0.isEarned }) {
+                    verifiedSection
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -99,6 +104,41 @@ struct StatsView: View {
         Text(title)
             .font(.title3.weight(.bold))
             .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var verifiedSection: some View {
+        VStack(alignment: .leading, spacing: 28) {
+            sectionHeader("Verified")
+            HStack(alignment: .firstTextBaseline, spacing: 16) {
+                stat("\(store.verifiedStats.sessionCount)", "sessions")
+                stat(String(format: "%.0f km", store.verifiedStats.totalDistanceM / 1000), "total")
+                stat(String(format: "%.0f m", store.verifiedStats.longestRideM), "longest")
+                stat(String(format: "%.0f", store.verifiedStats.maxSpeedMs * 3.6), "km/h top")
+            }
+            LazyVGrid(columns: columns, spacing: 32) {
+                ForEach(store.verifiedBadges) { item in
+                    VStack(spacing: 20) {
+                        BadgeMedalView(imageName: item.badge.imageName, ringColor: item.badge.ringColor,
+                                       isEarned: item.isEarned, verified: true, size: 120)
+                        VStack(spacing: 3) {
+                            Text(item.badge.title).font(.headline)
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(item.isEarned ? .primary : .secondary)
+                            Text(item.badge.detail).font(.subheadline)
+                                .multilineTextAlignment(.center).foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
+    }
+
+    private func stat(_ value: String, _ label: String) -> some View {
+        VStack(spacing: 2) {
+            Text(value).font(.title3.bold())
+            Text(label).font(.caption).foregroundColor(.secondary)
+        }
     }
 
     private func badgeSection(_ title: String, _ items: [EvaluatedBadge]) -> some View {

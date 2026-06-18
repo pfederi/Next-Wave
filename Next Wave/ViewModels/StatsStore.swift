@@ -9,6 +9,8 @@ final class StatsStore: ObservableObject {
     @Published private(set) var newlyEarned: [Badge] = []
     @Published private(set) var stationCounts: [StationWaveCount] = []
     @Published private(set) var loadFailed = false
+    @Published private(set) var verifiedStats: VerifiedStats = .empty
+    @Published private(set) var verifiedBadges: [EvaluatedVerifiedBadge] = VerifiedBadgeEvaluator.evaluate(.empty)
 
     /// Load global stats + global leaderboard. `seenIds` drives the newly-earned diff;
     /// `onSeen` is called with the full earned set so the caller can persist it.
@@ -33,6 +35,14 @@ final class StatsStore: ObservableObject {
             stationCounts = try await StatsAPI.shared.stationCounts()
         } catch {
             print("⚠️ Station counts failed: \(error)")
+        }
+
+        do {
+            let vs = try await VerifiedRidesAPI.shared.verifiedStats()
+            verifiedStats = vs
+            verifiedBadges = VerifiedBadgeEvaluator.evaluate(vs)
+        } catch {
+            print("⚠️ Verified stats failed: \(error)")
         }
     }
 

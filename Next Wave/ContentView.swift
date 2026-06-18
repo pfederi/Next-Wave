@@ -36,11 +36,15 @@ struct ContentView: View {
                         VStack(spacing: 0) {
                             if viewModel.selectedStation == nil {
                                 VStack {
-                                    Text("Ahoy Wakethief! 🏴‍☠️")
-                                        .font(.title2)
-                                        .foregroundColor(Color("text-color"))
-                                        .padding(.top, 32)
-                                    Text("Select a station to catch some waves!")
+                                    HStack(spacing: 8) {
+                                        Text("Ready to ride?")
+                                            .foregroundColor(Color("text-color"))
+                                        Image(systemName: "water.waves")
+                                            .foregroundColor(.blue)
+                                    }
+                                    .font(.title2)
+                                    .padding(.top, 32)
+                                    Text("Pick a station to catch the next wave.")
                                         .font(.body)
                                         .foregroundColor(Color("text-color"))
                                         .padding(.bottom, 16)

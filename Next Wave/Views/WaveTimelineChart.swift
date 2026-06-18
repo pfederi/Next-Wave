@@ -298,6 +298,7 @@ struct WaveTimelineChart: View {
                             // Start timer to update current time
                             DispatchQueue.main.async {
                                 currentTime = Date()
+                                timer?.invalidate()   // avoid stacking timers if the task re-runs
                                 timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
                                     currentTime = Date()
                                 }
@@ -308,6 +309,10 @@ struct WaveTimelineChart: View {
             }
         }
         .frame(height: chartHeight + 16)
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
+        }
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemBackground))

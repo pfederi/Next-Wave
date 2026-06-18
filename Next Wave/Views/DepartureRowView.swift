@@ -96,8 +96,10 @@ struct DepartureRowView: View {
                     Text(formattedTime)
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(isPast ? .gray : .primary)
-                    if isCurrentDay, let date = AppDateFormatter.parseTime(formattedTime) {
-                        RemainingTimeView(targetDate: date)
+                    if isCurrentDay {
+                        // Use the wave's actual Date (absolute time) so the countdown is
+                        // correct regardless of device timezone / day boundary.
+                        RemainingTimeView(targetDate: wave.time)
                     }
                 }
                 .frame(width: 70)
@@ -456,7 +458,7 @@ private struct RemainingTimeView: View {
     let targetDate: Date
     @State private var currentTime = Date()
     
-    let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    @State private var timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         let timeInterval = targetDate.timeIntervalSince(currentTime)

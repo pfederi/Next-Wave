@@ -5,72 +5,68 @@ class WaveAnalyticsViewModel: ObservableObject {
     private let maxWaveGap: TimeInterval = 3600 // 1 hour max between waves
     private let minSessionDuration: TimeInterval = 3600 // minimum 1 hour session
     private let maxSessionDuration: TimeInterval = 7200 // maximum 2 hour session
-    
+    private var currentTask: Task<Void, Never>?
+
     func analyzeWaves(_ waves: [WaveEvent], for spotId: String, spotName: String) {
-        Task {
-            var timeSlots: [WaveTimeSlot] = []
+        // Cancel a prior analysis so a slower, older run can't overwrite newer results.
+        currentTask?.cancel()
+        currentTask = Task { [weak self] in
+            guard let self else { return }
             let sortedWaves = waves.sorted { $0.time < $1.time }
-            
             guard !sortedWaves.isEmpty else { return }
-            
+
             // Get sun times for the day
             let sunTimes = try? await SunTimeService.shared.getSunTimes(date: sortedWaves[0].time)
-            
+            if Task.isCancelled { return }
+
             // Only analyze if we have enough time for a session
             let totalDuration = sortedWaves.last!.time.timeIntervalSince(sortedWaves[0].time)
-            guard totalDuration >= minSessionDuration else { return }
-            
+            guard totalDuration >= self.minSessionDuration else { return }
+
+            // Build candidate sessions and score each ONCE.
+            var scored: [(slot: WaveTimeSlot, score: Double)] = []
             for startWave in sortedWaves {
                 var sessionWaves: [WaveEvent] = []
                 var lastWaveTime = startWave.time
-                
-                // Find waves that form a good session starting from this wave
+
                 for wave in sortedWaves where wave.time >= startWave.time {
                     let timeSinceLastWave = wave.time.timeIntervalSince(lastWaveTime)
                     let totalSessionTime = wave.time.timeIntervalSince(startWave.time)
-                    
-                    // Stop if gap is too large or session would be too long
-                    if timeSinceLastWave > maxWaveGap || totalSessionTime > maxSessionDuration {
+                    if timeSinceLastWave > self.maxWaveGap || totalSessionTime > self.maxSessionDuration {
                         break
                     }
-                    
                     sessionWaves.append(wave)
                     lastWaveTime = wave.time
                 }
-                
-                // Only consider sessions with minimum duration and at least 3 waves
+
                 let sessionDuration = lastWaveTime.timeIntervalSince(startWave.time)
-                if sessionDuration >= minSessionDuration && sessionWaves.count >= 3 {
+                if sessionDuration >= self.minSessionDuration && sessionWaves.count >= 3 {
                     let timeSlot = WaveTimeSlot(
                         startTime: startWave.time,
                         endTime: lastWaveTime,
                         waveCount: sessionWaves.count,
                         waves: sessionWaves
                     )
-                    
-                    // Calculate session score based on waves per hour and daylight
-                    let score = calculateSessionScore(timeSlot, sunTimes: sunTimes)
+                    let score = self.calculateSessionScore(timeSlot, sunTimes: sunTimes)
                     if score > 0 {
-                        timeSlots.append(timeSlot)
+                        scored.append((timeSlot, score))
                     }
                 }
             }
-            
-            // Sort by session score
-            timeSlots.sort { slot1, slot2 in
-                calculateSessionScore(slot1, sunTimes: sunTimes) > calculateSessionScore(slot2, sunTimes: sunTimes)
-            }
-            
-            // Take top 5 best sessions
-            let bestSlots = Array(timeSlots.prefix(5))
-            
+
+            // Sort by the cached score (not recomputed in the comparator).
+            scored.sort { $0.score > $1.score }
+            let bestSlots = scored.prefix(5).map { $0.slot }
+            if Task.isCancelled { return }
+
             let analytics = SpotAnalytics(
                 spotId: spotId,
                 spotName: spotName,
-                timeSlots: bestSlots
+                timeSlots: Array(bestSlots)
             )
-            
+
             await MainActor.run {
+                guard !Task.isCancelled else { return }
                 if let index = self.spotAnalytics.firstIndex(where: { $0.spotId == spotId }) {
                     self.spotAnalytics[index] = analytics
                 } else {

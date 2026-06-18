@@ -171,7 +171,7 @@ actor AlplakesAPI {
         let timeString = formatter.string(from: now)
         
         let endpoint = "/simulations/1d/profile/simstrat/\(lake)/\(timeString)"
-        let url = URL(string: baseURL + endpoint)!
+        guard let url = URL(string: baseURL + endpoint) else { throw URLError(.badURL) }
         
         // Configure URLRequest with HTTP caching
         var request = URLRequest(url: url)
@@ -188,8 +188,15 @@ actor AlplakesAPI {
         let decoder = JSONDecoder()
         let result = try decoder.decode(AlplakesProfileResponse.self, from: data)
         
-        // Oberflächentemperatur ist die letzte im Array (tiefste Tiefe = 0m)
-        return result.variables.T.data.last ?? nil
+        // Oberflächentemperatur = Wert an der Tiefe, die am nächsten bei 0 m liegt
+        // (robust gegenüber der Array-Reihenfolge).
+        let depths = result.depth.data
+        let temps = result.variables.T.data
+        guard !depths.isEmpty, depths.count == temps.count,
+              let surfaceIndex = depths.indices.min(by: { abs(depths[$0]) < abs(depths[$1]) }) else {
+            return temps.last ?? nil
+        }
+        return temps[surfaceIndex]
     }
     
     /// Holt Temperaturvorhersage für die nächsten 2 Tage
@@ -205,7 +212,7 @@ actor AlplakesAPI {
         let endString = formatter.string(from: twoDaysLater)
         
         let endpoint = "/simulations/1d/point/simstrat/\(lake)/\(startString)/\(endString)/0"
-        let url = URL(string: baseURL + endpoint)!
+        guard let url = URL(string: baseURL + endpoint) else { throw URLError(.badURL) }
         
         // Configure URLRequest with HTTP caching
         var request = URLRequest(url: url)

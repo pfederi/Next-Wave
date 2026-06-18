@@ -67,59 +67,33 @@ class FavoriteStationsManager: ObservableObject {
         }
     }
     
+    private var widgetReloadTask: Task<Void, Never>?
+
     private func saveFavorites() {
-        print("🔍 FavoriteStationsManager.saveFavorites() called with \(favorites.count) favorites")
-        
-        if let encoded = try? JSONEncoder().encode(favorites) {
-            userDefaults?.set(encoded, forKey: favoritesKey)
-            userDefaults?.synchronize() // Force immediate synchronization
-            print("🔍 Saved to UserDefaults with key '\(favoritesKey)'")
-            
-            // DEBUG: Immediately try to read back the data to verify App Group is working
-            if let readBackData = userDefaults?.data(forKey: favoritesKey) {
-                print("🔍 VERIFICATION: Successfully read back \(readBackData.count) bytes")
-                if let readBackFavorites = try? JSONDecoder().decode([FavoriteStation].self, from: readBackData) {
-                    print("🔍 VERIFICATION: Successfully decoded \(readBackFavorites.count) favorites")
-                    for fav in readBackFavorites {
-                        print("🔍 VERIFICATION:   - \(fav.name)")
-                    }
-                } else {
-                    print("🔍 VERIFICATION: Failed to decode read-back data")
-                }
-            } else {
-                print("🔍 VERIFICATION: Failed to read back data - App Group may not be working!")
-            }
-            
-            // DEBUG: Check if standard UserDefaults works as fallback
-            let standardDefaults = UserDefaults.standard
-            standardDefaults.set(encoded, forKey: "fallback_\(favoritesKey)")
-            standardDefaults.synchronize()
-            print("🔍 FALLBACK: Also saved to standard UserDefaults as fallback")
-            
-            // ADDITIONAL FALLBACK: Save to shared file location
-            saveToSharedFile(encoded)
-            
-            // Also save via SharedDataManager for Widget Extension access
-            SharedDataManager.shared.saveFavoriteStations(favorites)
-            print("🔍 Also saved via SharedDataManager")
-            
-            // Load departure data for widgets
-            Task { @MainActor in
-                await loadDepartureDataForWidgets()
-            }
-            
-            // Send to Watch - let Watch handle widget updates
-            watchConnectivityManager.updateFavorites(favorites)
-            
-            // Also explicitly trigger widget update
-            watchConnectivityManager.triggerWidgetUpdate()
-            
-            // Reload iPhone widgets
-            WidgetCenter.shared.reloadAllTimelines()
-            print("🔍 Triggered widget reload")
-        } else {
-            print("🔍 Failed to encode favorites")
+        guard let encoded = try? JSONEncoder().encode(favorites) else { return }
+
+        // Primary store.
+        userDefaults?.set(encoded, forKey: favoritesKey)
+
+        // Widget data redundancy — all three ARE read by the widget extension
+        // (App Group UserDefaults can be unreliable):
+        UserDefaults.standard.set(encoded, forKey: "fallback_\(favoritesKey)")
+        saveToSharedFile(encoded)
+        SharedDataManager.shared.saveFavoriteStations(favorites)
+
+        // Coalesce the network-heavy widget data load across rapid mutations
+        // (e.g. several add/remove/reorder actions in quick succession).
+        widgetReloadTask?.cancel()
+        widgetReloadTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            if Task.isCancelled { return }
+            await self?.loadDepartureDataForWidgets()
         }
+
+        // Notify Watch + reload widgets (cheap).
+        watchConnectivityManager.updateFavorites(favorites)
+        watchConnectivityManager.triggerWidgetUpdate()
+        WidgetCenter.shared.reloadAllTimelines()
     }
     
     private func saveToSharedFile(_ data: Data) {

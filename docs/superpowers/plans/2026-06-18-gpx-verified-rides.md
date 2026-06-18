@@ -1,24 +1,27 @@
-# GPX Verified Rides & Badges — Implementation Plan
+# GPX Verified Foil Sessions & Badges — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Import a Foilmotion GPX via iOS Share, auto-detect verified ferry-wave rides + session metrics, store them in Supabase, and award verified badges.
+**Goal:** Import a Foilmotion GPX via iOS Share, verify it's a genuine Foilmotion session, compute session metrics, store them in Supabase, and award session-based verified badges.
 
-**Architecture:** GPX arrives via a registered document type → parsed client-side (`GPXParser`) → pure metrics (`SessionMetrics`) → matched against the day's ferry schedule (`WaveMatcher`) → uploaded to two Supabase tables → verified badges computed from a metrics RPC and shown in a "Verified" section.
+**Architecture:** GPX arrives via a registered document type → parsed client-side (`GPXParser`) → Foilmotion creator gate → pure metrics (`SessionMetrics`) → uploaded to one Supabase table → verified badges computed from a metrics RPC and shown in a "Verified" section. No ferry-wave / schedule matching (recordings are always pump-foil).
 
-**Tech Stack:** SwiftUI, `XMLParser`, Supabase (Postgres + RLS), existing `TransportAPI`, swift-testing.
+**Tech Stack:** SwiftUI, `XMLParser`, Supabase (Postgres + RLS), swift-testing.
 
 ## Global Constraints
 
 - Foil/motion speed threshold: `FOIL_SPEED_THRESHOLD = 3.0` m/s (~11 km/h).
-- Wave match: station radius `250` m; candidate-station radius `400` m; time window `[T − 120 s, T + 360 s]`; point must have speed ≥ threshold.
-- `wave_id` format must equal the check-in format: `"{stationId}_{departureISO}_{routeNumber}"` (UTC ISO-8601, via `WaveCheckin.makeWaveId`).
+- Foilmotion gate: accept only when `metadata.creator` contains "foilmotion" (case-insensitive).
+- Distance badge metric = **longest continuous ride distance** (one go), not total.
+- Badge thresholds:
+  - longest ride (m): 50 / 100 / 250 / 500 / 1000 / 5000 / 10000
+  - top speed (km/h): 15 / 20 / 25 / 30 / 35
+  - total distance (m): 5000 / 25000 / 100000 / 250000 / 500000
+  - sessions: 1 / 10 / 25 / 50 / 100
 - Verified data is client-computed and not tamper-proof (accepted).
-- Distance metric for badges = **longest continuous ride distance** (one go), not total.
-- Badge thresholds: verified waves 1/10/25; longest ride (m) 50/100/250/500/1000/5000/10000; top speed (km/h) 15/20/25/30/35.
-- Note: longest-ride badge `250` (m) and station match radius `250` (m) are unrelated values that happen to coincide.
-- New Swift files in `Next Wave/...` and tests in `Next WaveTests/` are auto-included (file-system-synchronized groups).
-- Build/test: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"…"` (or ⌘U in Xcode).
+- `session_key` = SHA256 hex of `"{creator}|{startEpochSeconds}|{pointCount}"`.
+- New Swift files in `Next Wave/...` and tests in `Next WaveTests/` are auto-included (synchronized groups).
+- Build/test: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"…"` (or ⌘U).
 - Migrations: `supabase/migrations/YYYYMMDD_<name>.sql`; apply with `supabase db push`.
 
 ## File Structure
@@ -27,15 +30,14 @@
 - `Next Wave/Models/GPXSession.swift` — `GPXPoint`, `GPXMetadata`, `GPXSession`.
 - `Next Wave/Services/GPXParser.swift` — XML → `GPXSession`.
 - `Next Wave/Services/GeoMath.swift` — haversine distance.
-- `Next Wave/Services/SessionMetrics.swift` — pure metrics + constants.
-- `Next Wave/Services/WaveMatcher.swift` — `CandidateDeparture`, `VerifiedRide`, matching.
+- `Next Wave/Services/SessionMetrics.swift` — pure metrics + constant.
 - `Next Wave/Models/VerifiedStats.swift` — `VerifiedStats` (Decodable).
 - `Next Wave/API/VerifiedRidesAPI.swift` — upload + stats + sessionExists.
 - `Next Wave/Models/VerifiedBadge.swift` — `VerifiedBadge`, `VerifiedBadgeCatalog`, `VerifiedBadgeEvaluator`, `EvaluatedVerifiedBadge`.
 - `Next Wave/ViewModels/GPXImportCoordinator.swift` — orchestration + `GPXImportSummary`.
 - `Next Wave/Views/GPXImportSummaryView.swift` — post-import sheet.
-- `supabase/migrations/20260618_verified_rides.sql` — tables + RLS + RPC.
-- Tests: `Next WaveTests/GPXParserTests.swift`, `SessionMetricsTests.swift`, `WaveMatcherTests.swift`, `VerifiedBadgeTests.swift`.
+- `supabase/migrations/20260618_verified_sessions.sql` — table + RLS + RPC.
+- Tests: `Next WaveTests/GPXParserTests.swift`, `SessionMetricsTests.swift`, `VerifiedBadgeTests.swift`.
 
 **Modify**
 - `Next Wave/Info.plist` — GPX document type.
@@ -54,7 +56,7 @@
 - Test: `Next WaveTests/GPXParserTests.swift`
 
 **Interfaces:**
-- Produces: `GPXPoint`, `GPXMetadata`, `GPXSession`; `GPXParser.parse(data:) throws -> GPXSession`.
+- Produces: `GPXPoint`, `GPXMetadata`, `GPXSession`; `GPXParser.parse(data:) throws -> GPXSession`, `GPXParser.parse(url:) throws -> GPXSession`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -165,9 +167,7 @@ enum GPXParser {
             f.formatOptions = [.withInternetDateTime]
             return f
         }()
-        static func date(_ s: String) -> Date? {
-            iso.date(from: s) ?? isoNoFrac.date(from: s)
-        }
+        static func date(_ s: String) -> Date? { iso.date(from: s) ?? isoNoFrac.date(from: s) }
 
         var creator: String?
         var metaName: String?, metaDesc: String?, metaTime: Date?
@@ -240,7 +240,7 @@ git commit -m "feat: GPX models + parser"
 
 **Interfaces:**
 - Consumes: `GPXPoint` (Task 1).
-- Produces: `GeoMath.distance(lat1:lon1:lat2:lon2:) -> Double` (meters); `FoilConstants.foilSpeedThreshold`; `SessionMetrics` + `SessionMetrics.compute(from:) -> SessionMetrics?`.
+- Produces: `GeoMath.distance(lat1:lon1:lat2:lon2:) -> Double` (m); `FoilConstants.foilSpeedThreshold`; `SessionMetrics` + `SessionMetrics.compute(from:) -> SessionMetrics?`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -256,13 +256,11 @@ struct SessionMetricsTests {
     }
 
     @Test func haversineKnownDistance() {
-        // ~111.2 m per 0.001° latitude near the equator/mid-lat.
         let d = GeoMath.distance(lat1: 47.0, lon1: 8.0, lat2: 47.001, lon2: 8.0)
-        #expect(abs(d - 111.2) < 2.0)
+        #expect(abs(d - 111.2) < 2.0)   // ~111 m per 0.001° latitude
     }
 
     @Test func longestRideResetsOnSlowPoint() {
-        // Move ~111 m north each step; speeds: fast, fast, SLOW, fast.
         let pts = [
             pt(0, 47.000, 8.0, 5.0),
             pt(1, 47.001, 8.0, 5.0),
@@ -271,8 +269,8 @@ struct SessionMetricsTests {
         ]
         let m = SessionMetrics.compute(from: pts)!
         #expect(m.maxSpeed == 5.0)
-        #expect(m.longestRideDistance > 100 && m.longestRideDistance < 130) // one ~111 m segment
-        #expect(m.totalDistance > 320 && m.totalDistance < 340)             // three ~111 m segments
+        #expect(m.longestRideDistance > 100 && m.longestRideDistance < 130)  // one ~111 m segment
+        #expect(m.totalDistance > 320 && m.totalDistance < 340)              // three ~111 m segments
     }
 
     @Test func tooFewPointsReturnsNil() {
@@ -323,19 +321,12 @@ struct SessionMetrics: Equatable {
     let totalDistance: Double       // meters
     let maxSpeed: Double            // m/s
     let longestRideDistance: Double // meters (longest continuous ride)
-    let minLat: Double, maxLat: Double, minLon: Double, maxLon: Double
 
     /// nil when fewer than 2 points.
     static func compute(from points: [GPXPoint]) -> SessionMetrics? {
         guard points.count >= 2, let first = points.first, let last = points.last else { return nil }
 
-        var total = 0.0
-        var maxSpeed = 0.0
-        var moving = 0.0
-        var currentRide = 0.0
-        var longestRide = 0.0
-        var minLat = first.lat, maxLat = first.lat, minLon = first.lon, maxLon = first.lon
-
+        var total = 0.0, maxSpeed = 0.0, moving = 0.0, currentRide = 0.0, longestRide = 0.0
         for i in 1..<points.count {
             let a = points[i - 1], b = points[i]
             let seg = GeoMath.distance(lat1: a.lat, lon1: a.lon, lat2: b.lat, lon2: b.lon)
@@ -344,9 +335,6 @@ struct SessionMetrics: Equatable {
 
             total += seg
             maxSpeed = max(maxSpeed, speed)
-            minLat = min(minLat, b.lat); maxLat = max(maxLat, b.lat)
-            minLon = min(minLon, b.lon); maxLon = max(maxLon, b.lon)
-
             if speed >= FoilConstants.foilSpeedThreshold {
                 moving += max(0, dt)
                 currentRide += seg
@@ -356,12 +344,10 @@ struct SessionMetrics: Equatable {
             }
         }
 
-        return SessionMetrics(
-            start: first.time, end: last.time,
-            duration: last.time.timeIntervalSince(first.time),
-            movingTime: moving, totalDistance: total, maxSpeed: maxSpeed,
-            longestRideDistance: longestRide,
-            minLat: minLat, maxLat: maxLat, minLon: minLon, maxLon: maxLon)
+        return SessionMetrics(start: first.time, end: last.time,
+                              duration: last.time.timeIntervalSince(first.time),
+                              movingTime: moving, totalDistance: total, maxSpeed: maxSpeed,
+                              longestRideDistance: longestRide)
     }
 }
 ```
@@ -380,162 +366,17 @@ git commit -m "feat: GeoMath + SessionMetrics"
 
 ---
 
-### Task 3: WaveMatcher
+### Task 3: Supabase migration (table + RLS + stats RPC)
 
 **Files:**
-- Create: `Next Wave/Services/WaveMatcher.swift`
-- Test: `Next WaveTests/WaveMatcherTests.swift`
+- Create: `supabase/migrations/20260618_verified_sessions.sql`
 
 **Interfaces:**
-- Consumes: `GPXPoint`, `GeoMath`, `FoilConstants`, `WaveCheckin.makeWaveId`.
-- Produces:
-  - `CandidateDeparture { stationId, stationName, stationUicRef: String?, stationLat, stationLon, departure: Date, routeNumber }`
-  - `VerifiedRide { waveId, stationId, departureAt, rideDistance, rideMaxSpeed }`
-  - `WaveMatcher.match(points:departures:) -> [VerifiedRide]`
-
-- [ ] **Step 1: Write the failing test**
-
-```swift
-import Testing
-import Foundation
-@testable import Next_Wave
-
-struct WaveMatcherTests {
-    private let station = (lat: 47.30, lon: 8.55)
-    private func dep(_ t: Date) -> CandidateDeparture {
-        CandidateDeparture(stationId: "S_1", stationName: "S", stationUicRef: "1",
-                           stationLat: station.lat, stationLon: station.lon,
-                           departure: t, routeNumber: "10")
-    }
-    private func pt(_ t: TimeInterval, _ lat: Double, _ lon: Double, _ speed: Double) -> GPXPoint {
-        GPXPoint(time: Date(timeIntervalSince1970: t), lat: lat, lon: lon, ele: nil, speed: speed, cumulativeDistance: nil)
-    }
-
-    @Test func matchesNearStationInWindowWhileMoving() {
-        let T = Date(timeIntervalSince1970: 1000)
-        // Point AT the station, 1 min after departure, moving.
-        let pts = [pt(900, 47.30, 8.55, 5.0), pt(1060, 47.30, 8.55, 5.0), pt(2000, 48.0, 9.0, 5.0)]
-        let rides = WaveMatcher.match(points: pts, departures: [dep(T)])
-        #expect(rides.count == 1)
-        #expect(rides[0].stationId == "S_1")
-    }
-
-    @Test func rejectsWhenTooSlow() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1060, 47.30, 8.55, 1.0)]   // at station, in window, but below threshold
-        #expect(WaveMatcher.match(points: pts, departures: [dep(T)]).isEmpty)
-    }
-
-    @Test func rejectsWhenOutsideTimeWindow() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1361, 47.30, 8.55, 5.0)]   // T + 361 s (> +360 s)
-        #expect(WaveMatcher.match(points: pts, departures: [dep(T)]).isEmpty)
-    }
-
-    @Test func rejectsWhenTooFar() {
-        let T = Date(timeIntervalSince1970: 1000)
-        let pts = [pt(1060, 47.30, 8.556, 5.0)]   // ~455 m east of station (> 250 m)
-        #expect(WaveMatcher.match(points: pts, departures: [dep(T)]).isEmpty)
-    }
-}
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/WaveMatcherTests"`
-Expected: FAIL — `WaveMatcher` / `CandidateDeparture` undefined.
-
-- [ ] **Step 3: Implement WaveMatcher**
-
-`Next Wave/Services/WaveMatcher.swift`:
-```swift
-import Foundation
-
-struct CandidateDeparture: Equatable {
-    let stationId: String
-    let stationName: String
-    let stationUicRef: String?
-    let stationLat: Double
-    let stationLon: Double
-    let departure: Date
-    let routeNumber: String
-}
-
-struct VerifiedRide: Equatable {
-    let waveId: String
-    let stationId: String
-    let departureAt: Date
-    let rideDistance: Double
-    let rideMaxSpeed: Double
-}
-
-enum WaveMatcher {
-    static let matchRadius = 250.0   // meters
-    static let windowBefore = 120.0  // seconds
-    static let windowAfter = 360.0   // seconds
-
-    static func match(points: [GPXPoint], departures: [CandidateDeparture]) -> [VerifiedRide] {
-        var rides: [VerifiedRide] = []
-        for dep in departures {
-            let t = dep.departure.timeIntervalSince1970
-            let inWindow = points.filter {
-                let pt = $0.time.timeIntervalSince1970
-                return pt >= t - windowBefore && pt <= t + windowAfter
-            }
-            let qualifying = inWindow.filter { p in
-                let speed = p.speed ?? 0
-                guard speed >= FoilConstants.foilSpeedThreshold else { return false }
-                return GeoMath.distance(lat1: p.lat, lon1: p.lon,
-                                        lat2: dep.stationLat, lon2: dep.stationLon) <= matchRadius
-            }
-            guard !qualifying.isEmpty else { continue }
-
-            // Ride metrics from the in-window segment.
-            var dist = 0.0
-            for i in 1..<max(inWindow.count, 1) {
-                let a = inWindow[i - 1], b = inWindow[i]
-                dist += GeoMath.distance(lat1: a.lat, lon1: a.lon, lat2: b.lat, lon2: b.lon)
-            }
-            let maxSpeed = inWindow.compactMap { $0.speed }.max() ?? 0
-
-            let waveId = WaveCheckin.makeWaveId(stationUicRef: dep.stationUicRef,
-                                                stationName: dep.stationName,
-                                                departure: dep.departure,
-                                                routeNumber: dep.routeNumber)
-            rides.append(VerifiedRide(waveId: waveId, stationId: dep.stationId,
-                                      departureAt: dep.departure, rideDistance: dist, rideMaxSpeed: maxSpeed))
-        }
-        return rides
-    }
-}
-```
-
-- [ ] **Step 4: Run test to verify it passes**
-
-Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/WaveMatcherTests"`
-Expected: PASS (4 tests).
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add "Next Wave/Services/WaveMatcher.swift" "Next WaveTests/WaveMatcherTests.swift"
-git commit -m "feat: WaveMatcher (proximity + time window + motion)"
-```
-
----
-
-### Task 4: Supabase migration (tables + RLS + stats RPC)
-
-**Files:**
-- Create: `supabase/migrations/20260618_verified_rides.sql`
-
-**Interfaces:**
-- Produces: tables `verified_sessions`, `verified_rides`; function `user_verified_stats()`.
+- Produces: table `verified_sessions`; function `user_verified_stats()`.
 
 - [ ] **Step 1: Write the migration**
 
 ```sql
--- Verified rides from imported GPX sessions.
 create table if not exists public.verified_sessions (
   user_id        uuid not null references auth.users(id) on delete cascade,
   session_key    text not null,
@@ -551,20 +392,7 @@ create table if not exists public.verified_sessions (
   primary key (user_id, session_key)
 );
 
-create table if not exists public.verified_rides (
-  user_id        uuid not null references auth.users(id) on delete cascade,
-  wave_id        text not null,
-  station_id     text not null,
-  departure_at   timestamptz not null,
-  session_key    text not null,
-  ride_distance  double precision not null,
-  ride_max_speed double precision not null,
-  recorded_at    timestamptz not null default now(),
-  primary key (user_id, wave_id)
-);
-
 alter table public.verified_sessions enable row level security;
-alter table public.verified_rides enable row level security;
 
 drop policy if exists "verified_sessions_select_own" on public.verified_sessions;
 create policy "verified_sessions_select_own" on public.verified_sessions
@@ -573,35 +401,26 @@ drop policy if exists "verified_sessions_insert_own" on public.verified_sessions
 create policy "verified_sessions_insert_own" on public.verified_sessions
   for insert with check (auth.uid() = user_id);
 
-drop policy if exists "verified_rides_select_own" on public.verified_rides;
-create policy "verified_rides_select_own" on public.verified_rides
-  for select using (auth.uid() = user_id);
-drop policy if exists "verified_rides_insert_own" on public.verified_rides;
-create policy "verified_rides_insert_own" on public.verified_rides
-  for insert with check (auth.uid() = user_id);
-
 create or replace function public.user_verified_stats()
 returns table (
-  verified_waves int, longest_ride_m double precision, max_speed_ms double precision,
-  session_count int, total_distance_m double precision
+  session_count int, total_distance_m double precision,
+  longest_ride_m double precision, max_speed_ms double precision
 )
 language sql stable security definer set search_path = public
 as $$
   select
-    (select count(*) from public.verified_rides where user_id = auth.uid())::int,
-    coalesce((select max(longest_ride) from public.verified_sessions where user_id = auth.uid()), 0),
-    coalesce((select max(max_speed)    from public.verified_sessions where user_id = auth.uid()), 0),
     (select count(*) from public.verified_sessions where user_id = auth.uid())::int,
-    coalesce((select sum(total_distance) from public.verified_sessions where user_id = auth.uid()), 0);
+    coalesce((select sum(total_distance) from public.verified_sessions where user_id = auth.uid()), 0),
+    coalesce((select max(longest_ride)   from public.verified_sessions where user_id = auth.uid()), 0),
+    coalesce((select max(max_speed)      from public.verified_sessions where user_id = auth.uid()), 0);
 $$;
 
 grant execute on function public.user_verified_stats() to authenticated;
 ```
 
-- [ ] **Step 2: Apply the migration**
+- [ ] **Step 2: Apply**
 
-Run: `supabase db push` (or paste into the Supabase SQL editor).
-Expected: no errors (idempotent).
+Run: `supabase db push` (or SQL editor). Expected: no errors (idempotent).
 
 - [ ] **Step 3: Verify with a rollback transaction**
 
@@ -609,32 +428,31 @@ Expected: no errors (idempotent).
 begin;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000001"}', true);
 insert into public.verified_sessions (user_id, session_key, start_at, end_at, total_distance, duration, moving_time, max_speed, longest_ride)
-values ('00000000-0000-0000-0000-000000000001','k1', now()-interval '1h', now(), 1400, 1000, 800, 9.5, 230);
-insert into public.verified_rides (user_id, wave_id, station_id, departure_at, session_key, ride_distance, ride_max_speed)
-values ('00000000-0000-0000-0000-000000000001','w1','S1', now(), 'k1', 120, 8.0);
+values ('00000000-0000-0000-0000-000000000001','k1', now()-interval '1h', now(), 1400, 1000, 800, 9.5, 230),
+       ('00000000-0000-0000-0000-000000000001','k2', now()-interval '2h', now(), 7200, 6000, 5000, 6.7, 410);
 select * from public.user_verified_stats();
 rollback;
 ```
-Expected: `verified_waves=1, longest_ride_m=230, max_speed_ms=9.5, session_count=1, total_distance_m=1400`.
+Expected: `session_count=2, total_distance_m=8600, longest_ride_m=410, max_speed_ms=9.5`.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add "supabase/migrations/20260618_verified_rides.sql"
-git commit -m "feat(db): verified_sessions + verified_rides tables and user_verified_stats RPC"
+git add "supabase/migrations/20260618_verified_sessions.sql"
+git commit -m "feat(db): verified_sessions table + user_verified_stats RPC"
 ```
 
 ---
 
-### Task 5: Verified models + VerifiedRidesAPI
+### Task 4: VerifiedStats model + VerifiedRidesAPI
 
 **Files:**
 - Create: `Next Wave/Models/VerifiedStats.swift`
 - Create: `Next Wave/API/VerifiedRidesAPI.swift`
 
 **Interfaces:**
-- Consumes: `SessionMetrics`, `VerifiedRide`, `SupabaseManager.shared` (`ensureSession() -> UUID`, `client`).
-- Produces: `VerifiedStats` (Decodable, `.empty`); `actor VerifiedRidesAPI` with `upload(metrics:sessionKey:rides:) async throws`, `verifiedStats() async throws -> VerifiedStats`, `sessionExists(key:) async throws -> Bool`.
+- Consumes: `SessionMetrics`, `SupabaseManager.shared` (`ensureSession() -> UUID`, `client`).
+- Produces: `VerifiedStats` (Decodable, `.empty`); `actor VerifiedRidesAPI` with `upload(metrics:sessionKey:) async throws`, `verifiedStats() async throws -> VerifiedStats`, `sessionExists(key:) async throws -> Bool`.
 
 - [ ] **Step 1: Implement VerifiedStats**
 
@@ -643,22 +461,19 @@ git commit -m "feat(db): verified_sessions + verified_rides tables and user_veri
 import Foundation
 
 struct VerifiedStats: Decodable, Equatable {
-    let verifiedWaves: Int
-    let longestRideM: Double
-    let maxSpeedMs: Double
     let sessionCount: Int
     let totalDistanceM: Double
+    let longestRideM: Double
+    let maxSpeedMs: Double
 
     enum CodingKeys: String, CodingKey {
-        case verifiedWaves = "verified_waves"
-        case longestRideM = "longest_ride_m"
-        case maxSpeedMs = "max_speed_ms"
         case sessionCount = "session_count"
         case totalDistanceM = "total_distance_m"
+        case longestRideM = "longest_ride_m"
+        case maxSpeedMs = "max_speed_ms"
     }
 
-    static let empty = VerifiedStats(verifiedWaves: 0, longestRideM: 0, maxSpeedMs: 0,
-                                     sessionCount: 0, totalDistanceM: 0)
+    static let empty = VerifiedStats(sessionCount: 0, totalDistanceM: 0, longestRideM: 0, maxSpeedMs: 0)
 }
 ```
 
@@ -686,11 +501,6 @@ actor VerifiedRidesAPI {
         let total_distance: Double, duration: Int, moving_time: Int
         let max_speed: Double, longest_ride: Double
     }
-    private struct RideRow: Encodable {
-        let user_id: String, wave_id: String, station_id: String
-        let departure_at: String, session_key: String
-        let ride_distance: Double, ride_max_speed: Double
-    }
 
     func sessionExists(key: String) async throws -> Bool {
         let userId = try await SupabaseManager.shared.ensureSession()
@@ -705,27 +515,16 @@ actor VerifiedRidesAPI {
         return !rows.isEmpty
     }
 
-    func upload(metrics: SessionMetrics, sessionKey: String, rides: [VerifiedRide]) async throws {
+    func upload(metrics: SessionMetrics, sessionKey: String) async throws {
         let userId = try await SupabaseManager.shared.ensureSession()
-        let uid = userId.uuidString.lowercased()
         let client = SupabaseManager.shared.client
-
-        let session = SessionRow(
-            user_id: uid, session_key: sessionKey, source: "foilmotion",
+        let row = SessionRow(
+            user_id: userId.uuidString.lowercased(), session_key: sessionKey, source: "foilmotion",
             start_at: Self.iso.string(from: metrics.start), end_at: Self.iso.string(from: metrics.end),
             total_distance: metrics.totalDistance, duration: Int(metrics.duration),
             moving_time: Int(metrics.movingTime), max_speed: metrics.maxSpeed,
             longest_ride: metrics.longestRideDistance)
-        try await client.from("verified_sessions").upsert(session, onConflict: "user_id,session_key").execute()
-
-        if !rides.isEmpty {
-            let rows = rides.map {
-                RideRow(user_id: uid, wave_id: $0.waveId, station_id: $0.stationId,
-                        departure_at: Self.iso.string(from: $0.departureAt), session_key: sessionKey,
-                        ride_distance: $0.rideDistance, ride_max_speed: $0.rideMaxSpeed)
-            }
-            try await client.from("verified_rides").upsert(rows, onConflict: "user_id,wave_id").execute()
-        }
+        try await client.from("verified_sessions").upsert(row, onConflict: "user_id,session_key").execute()
     }
 
     func verifiedStats() async throws -> VerifiedStats {
@@ -746,12 +545,12 @@ Expected: BUILD SUCCEEDED.
 
 ```bash
 git add "Next Wave/Models/VerifiedStats.swift" "Next Wave/API/VerifiedRidesAPI.swift"
-git commit -m "feat: VerifiedStats model + VerifiedRidesAPI (upload + stats)"
+git commit -m "feat: VerifiedStats model + VerifiedRidesAPI"
 ```
 
 ---
 
-### Task 6: Verified badges + BadgeMedalView verified support
+### Task 5: Verified badges + BadgeMedalView verified support
 
 **Files:**
 - Create: `Next Wave/Models/VerifiedBadge.swift`
@@ -759,7 +558,7 @@ git commit -m "feat: VerifiedStats model + VerifiedRidesAPI (upload + stats)"
 - Test: `Next WaveTests/VerifiedBadgeTests.swift`
 
 **Interfaces:**
-- Consumes: `VerifiedStats`, `Color(badgeHex:)` pattern.
+- Consumes: `VerifiedStats`.
 - Produces: `VerifiedBadge`, `EvaluatedVerifiedBadge`, `VerifiedBadgeCatalog.all`, `VerifiedBadgeEvaluator.evaluate(_:)`; `BadgeMedalView(imageName:ringColor:isEarned:verified:size:)`.
 
 - [ ] **Step 1: Write the failing test**
@@ -770,26 +569,26 @@ import Foundation
 @testable import Next_Wave
 
 struct VerifiedBadgeTests {
-    private func stats(waves: Int = 0, longest: Double = 0, speedMs: Double = 0) -> VerifiedStats {
-        VerifiedStats(verifiedWaves: waves, longestRideM: longest, maxSpeedMs: speedMs,
-                      sessionCount: 0, totalDistanceM: 0)
+    private func stats(sessions: Int = 0, total: Double = 0, longest: Double = 0, speedMs: Double = 0) -> VerifiedStats {
+        VerifiedStats(sessionCount: sessions, totalDistanceM: total, longestRideM: longest, maxSpeedMs: speedMs)
     }
 
-    @Test func firstVerifiedWaveUnlocksAtOne() {
-        let none = VerifiedBadgeEvaluator.evaluate(stats(waves: 0)).first { $0.badge.id == "vwave_1" }!
-        let one = VerifiedBadgeEvaluator.evaluate(stats(waves: 1)).first { $0.badge.id == "vwave_1" }!
-        #expect(none.isEarned == false)
-        #expect(one.isEarned == true)
+    @Test func firstSessionUnlocks() {
+        #expect(VerifiedBadgeEvaluator.evaluate(stats(sessions: 0)).first { $0.badge.id == "sessions_1" }!.isEarned == false)
+        #expect(VerifiedBadgeEvaluator.evaluate(stats(sessions: 1)).first { $0.badge.id == "sessions_1" }!.isEarned == true)
     }
 
     @Test func longestRide500m() {
-        let e = VerifiedBadgeEvaluator.evaluate(stats(longest: 500)).first { $0.badge.id == "dist_500" }!
-        #expect(e.isEarned == true)
+        #expect(VerifiedBadgeEvaluator.evaluate(stats(longest: 500)).first { $0.badge.id == "dist_500" }!.isEarned == true)
+    }
+
+    @Test func totalDistance25km() {
+        #expect(VerifiedBadgeEvaluator.evaluate(stats(total: 25000)).first { $0.badge.id == "total_25000" }!.isEarned == true)
+        #expect(VerifiedBadgeEvaluator.evaluate(stats(total: 24999)).first { $0.badge.id == "total_25000" }!.isEarned == false)
     }
 
     @Test func topSpeedUsesKmh() {
-        // 8.4 m/s = 30.24 km/h → earns the 30 badge, not 35.
-        let e = VerifiedBadgeEvaluator.evaluate(stats(speedMs: 8.4))
+        let e = VerifiedBadgeEvaluator.evaluate(stats(speedMs: 8.4))   // 30.24 km/h
         #expect(e.first { $0.badge.id == "speed_30" }!.isEarned == true)
         #expect(e.first { $0.badge.id == "speed_35" }!.isEarned == false)
     }
@@ -829,16 +628,12 @@ struct EvaluatedVerifiedBadge: Identifiable {
 }
 
 enum VerifiedBadgeCatalog {
-    private static let waveColor = Color(verifiedHex: "#00897B")
     private static let distColor = Color(verifiedHex: "#1E88E5")
     private static let speedColor = Color(verifiedHex: "#E53935")
+    private static let totalColor = Color(verifiedHex: "#43A047")
+    private static let sessionColor = Color(verifiedHex: "#00897B")
 
     static let all: [VerifiedBadge] = {
-        func wave(_ n: Int) -> VerifiedBadge {
-            VerifiedBadge(id: "vwave_\(n)", title: n == 1 ? "Verified Ride" : "\(n) Verified",
-                          detail: "\(n) verified ferry wave\(n == 1 ? "" : "s")",
-                          imageName: "badge_verified_wave", ringColor: waveColor, target: n) { $0.verifiedWaves }
-        }
         func dist(_ m: Int, _ label: String) -> VerifiedBadge {
             VerifiedBadge(id: "dist_\(m)", title: label, detail: "Longest ride \(label)",
                           imageName: "badge_distance", ringColor: distColor, target: m) { Int($0.longestRideM) }
@@ -847,11 +642,22 @@ enum VerifiedBadgeCatalog {
             VerifiedBadge(id: "speed_\(kmh)", title: "\(kmh) km/h", detail: "Top speed \(kmh) km/h",
                           imageName: "badge_speed", ringColor: speedColor, target: kmh) { Int($0.maxSpeedMs * 3.6) }
         }
+        func total(_ m: Int, _ label: String) -> VerifiedBadge {
+            VerifiedBadge(id: "total_\(m)", title: label, detail: "\(label) total distance",
+                          imageName: "badge_total", ringColor: totalColor, target: m) { Int($0.totalDistanceM) }
+        }
+        func session(_ n: Int) -> VerifiedBadge {
+            VerifiedBadge(id: "sessions_\(n)", title: n == 1 ? "First Session" : "\(n) Sessions",
+                          detail: "\(n) verified session\(n == 1 ? "" : "s")",
+                          imageName: "badge_session", ringColor: sessionColor, target: n) { $0.sessionCount }
+        }
         return [
-            wave(1), wave(10), wave(25),
             dist(50, "50 m"), dist(100, "100 m"), dist(250, "250 m"), dist(500, "500 m"),
             dist(1000, "1 km"), dist(5000, "5 km"), dist(10000, "10 km"),
             speed(15), speed(20), speed(25), speed(30), speed(35),
+            total(5000, "5 km"), total(25000, "25 km"), total(100000, "100 km"),
+            total(250000, "250 km"), total(500000, "500 km"),
+            session(1), session(10), session(25), session(50), session(100),
         ]
     }()
 }
@@ -875,7 +681,7 @@ private extension Color {
 
 - [ ] **Step 4: Add a verified-capable initializer + shield to BadgeMedalView**
 
-In `Next Wave/Views/BadgeMedalView.swift`, replace the stored `let badge: Badge` / `isEarned` / `size` properties and the `assetName`/`illustration` so the view renders from explicit fields, keeping the existing `init(badge:isEarned:size:)`. Replace the top of the struct (the property block + the `body`'s use of `assetName`/`badge.category.ringColor`) with:
+In `Next Wave/Views/BadgeMedalView.swift`, replace the `struct BadgeMedalView { … }` definition (the stored `badge`/`isEarned`/`size`, the `assetName`/`illustration`, and `body`) with the following, keeping the existing `extension BadgeCategory { … }` and `private extension Color { init(badgeHex:) }` unchanged below it:
 
 ```swift
 struct BadgeMedalView: View {
@@ -959,12 +765,10 @@ struct BadgeMedalView: View {
 }
 ```
 
-Keep the existing `extension BadgeCategory { ringColor; imageName }` and the existing `private extension Color { init(badgeHex:) }` in the file (do NOT duplicate them — they remain unchanged below this struct).
-
 - [ ] **Step 5: Run the tests to verify they pass**
 
 Run: `xcodebuild test -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:"Next WaveTests/VerifiedBadgeTests"`
-Expected: PASS (3 tests). Also confirm `BadgeEvaluatorTests` still pass (BadgeMedalView change is render-only).
+Expected: PASS (4 tests). Also confirm `BadgeEvaluatorTests` still pass.
 
 - [ ] **Step 6: Commit**
 
@@ -975,14 +779,14 @@ git commit -m "feat: verified badge catalog + BadgeMedalView verified shield"
 
 ---
 
-### Task 7: GPXImportCoordinator (orchestration)
+### Task 6: GPXImportCoordinator
 
 **Files:**
 - Create: `Next Wave/ViewModels/GPXImportCoordinator.swift`
 
 **Interfaces:**
-- Consumes: `GPXParser`, `SessionMetrics`, `GeoMath`, `WaveMatcher`/`CandidateDeparture`, `VerifiedRidesAPI`, `TransportAPI.getStationboard`, `Lake.Station`, `Journey`.
-- Produces: `struct GPXImportSummary`; `@MainActor final class GPXImportCoordinator: ObservableObject` with `@Published var summary: GPXImportSummary?` and `func handleFile(_ url: URL, stations: [Lake.Station]) async`.
+- Consumes: `GPXParser`, `SessionMetrics`, `VerifiedRidesAPI`.
+- Produces: `struct GPXImportSummary`; `@MainActor final class GPXImportCoordinator: ObservableObject` with `@Published var summary: GPXImportSummary?` and `func handleFile(_ url: URL) async`.
 
 - [ ] **Step 1: Implement the coordinator**
 
@@ -993,12 +797,11 @@ import CryptoKit
 
 struct GPXImportSummary: Identifiable {
     let id = UUID()
-    enum Outcome { case imported, alreadyImported, failed }
+    enum Outcome { case imported, alreadyImported, notFoilmotion, failed }
     let outcome: Outcome
     let totalDistanceM: Double
-    let verifiedWaves: Int
-    let topSpeedKmh: Double
     let longestRideM: Double
+    let topSpeedKmh: Double
     let message: String?
 }
 
@@ -1012,80 +815,59 @@ final class GPXImportCoordinator: ObservableObject {
 
     private static func sessionKey(_ session: GPXSession) -> String {
         let creator = session.metadata.creator ?? "?"
-        let start = session.metadata.startTime?.timeIntervalSince1970 ?? session.points.first?.time.timeIntervalSince1970 ?? 0
+        let start = session.metadata.startTime?.timeIntervalSince1970
+            ?? session.points.first?.time.timeIntervalSince1970 ?? 0
         let raw = "\(creator)|\(Int(start))|\(session.points.count)"
-        let digest = SHA256.hash(data: Data(raw.utf8))
-        return digest.map { String(format: "%02x", $0) }.joined()
+        return SHA256.hash(data: Data(raw.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    func handleFile(_ url: URL, stations: [Lake.Station]) async {
+    private func fail(_ outcome: GPXImportSummary.Outcome, _ message: String,
+                      _ metrics: SessionMetrics? = nil) {
+        summary = GPXImportSummary(
+            outcome: outcome,
+            totalDistanceM: metrics?.totalDistance ?? 0,
+            longestRideM: metrics?.longestRideDistance ?? 0,
+            topSpeedKmh: (metrics?.maxSpeed ?? 0) * 3.6,
+            message: message)
+    }
+
+    func handleFile(_ url: URL) async {
         isBusy = true
         defer { isBusy = false }
 
-        // Parse off the main actor.
         let session: GPXSession
         do {
             session = try await Task.detached { try GPXParser.parse(url: url) }.value
         } catch {
-            summary = GPXImportSummary(outcome: .failed, totalDistanceM: 0, verifiedWaves: 0,
-                                       topSpeedKmh: 0, longestRideM: 0, message: "Couldn't read the GPX file.")
-            return
+            fail(.failed, "Couldn't read the GPX file."); return
+        }
+
+        // Foilmotion authenticity gate.
+        guard (session.metadata.creator ?? "").lowercased().contains("foilmotion") else {
+            fail(.notFoilmotion, "Only Foilmotion GPX files are supported."); return
         }
 
         guard let metrics = SessionMetrics.compute(from: session.points) else {
-            summary = GPXImportSummary(outcome: .failed, totalDistanceM: 0, verifiedWaves: 0,
-                                       topSpeedKmh: 0, longestRideM: 0, message: "The track has too few points.")
-            return
+            fail(.failed, "The track has too few points."); return
         }
 
         let key = Self.sessionKey(session)
         if (try? await VerifiedRidesAPI.shared.sessionExists(key: key)) == true {
             summary = GPXImportSummary(outcome: .alreadyImported, totalDistanceM: metrics.totalDistance,
-                                       verifiedWaves: 0, topSpeedKmh: metrics.maxSpeed * 3.6,
-                                       longestRideM: metrics.longestRideDistance, message: "Already imported.")
+                                       longestRideM: metrics.longestRideDistance,
+                                       topSpeedKmh: metrics.maxSpeed * 3.6, message: "Already imported.")
             return
         }
-
-        // Candidate stations within 400 m of any track point.
-        let candidates = stations.filter { station in
-            guard let c = station.coordinates else { return false }
-            return session.points.contains {
-                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude) <= 400
-            }
-        }
-
-        // Build departures from each candidate's schedule for the session date.
-        var departures: [CandidateDeparture] = []
-        let api = TransportAPI()
-        for station in candidates {
-            guard let c = station.coordinates, let uic = station.uic_ref else { continue }
-            let journeys = (try? await api.getStationboard(stationId: uic, for: metrics.start, limit: 200)) ?? []
-            for j in journeys {
-                guard let ts = j.stop.departureTimestamp else { continue }
-                let route = (j.name ?? "")
-                    .replacingOccurrences(of: "^0+", with: "", options: .regularExpression)
-                departures.append(CandidateDeparture(
-                    stationId: station.id, stationName: station.name, stationUicRef: station.uic_ref,
-                    stationLat: c.latitude, stationLon: c.longitude,
-                    departure: Date(timeIntervalSince1970: TimeInterval(ts)), routeNumber: route))
-            }
-        }
-
-        let rides = WaveMatcher.match(points: session.points, departures: departures)
 
         do {
-            try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key, rides: rides)
+            try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key)
         } catch {
-            summary = GPXImportSummary(outcome: .failed, totalDistanceM: metrics.totalDistance,
-                                       verifiedWaves: rides.count, topSpeedKmh: metrics.maxSpeed * 3.6,
-                                       longestRideM: metrics.longestRideDistance,
-                                       message: "Imported locally but upload failed — try again later.")
-            return
+            fail(.failed, "Couldn't upload — check your connection and try again.", metrics); return
         }
 
         summary = GPXImportSummary(outcome: .imported, totalDistanceM: metrics.totalDistance,
-                                   verifiedWaves: rides.count, topSpeedKmh: metrics.maxSpeed * 3.6,
-                                   longestRideM: metrics.longestRideDistance, message: nil)
+                                   longestRideM: metrics.longestRideDistance,
+                                   topSpeedKmh: metrics.maxSpeed * 3.6, message: nil)
     }
 }
 ```
@@ -1093,18 +875,18 @@ final class GPXImportCoordinator: ObservableObject {
 - [ ] **Step 2: Build to verify it compiles**
 
 Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
-Expected: BUILD SUCCEEDED. (Confirm `Journey.stop.departureTimestamp` and `Lake.Station.coordinates` member names compile.)
+Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add "Next Wave/ViewModels/GPXImportCoordinator.swift"
-git commit -m "feat: GPXImportCoordinator (parse → match → upload → summary)"
+git commit -m "feat: GPXImportCoordinator (parse → Foilmotion gate → upload → summary)"
 ```
 
 ---
 
-### Task 8: Import wiring (document type + onOpenURL + summary sheet)
+### Task 7: Import wiring (document type + onOpenURL + summary sheet)
 
 **Files:**
 - Modify: `Next Wave/Info.plist`
@@ -1112,11 +894,10 @@ git commit -m "feat: GPXImportCoordinator (parse → match → upload → summar
 - Create: `Next Wave/Views/GPXImportSummaryView.swift`
 
 **Interfaces:**
-- Consumes: `GPXImportCoordinator.shared`, `GPXImportSummary`, `lakeStationsViewModel.lakes`.
+- Consumes: `GPXImportCoordinator.shared`, `GPXImportSummary`.
 
 - [ ] **Step 1: Register the GPX document type (Info.plist)**
 
-Run (adds the imported UTI + document type):
 ```bash
 cd "/Users/federi/Documents/Next-Wave"
 F="Next Wave/Info.plist"
@@ -1138,7 +919,7 @@ F="Next Wave/Info.plist"
 /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:LSItemContentTypes:0 string com.topografix.gpx" "$F"
 /usr/libexec/PlistBuddy -c "Add :CFBundleDocumentTypes:0:LSItemContentTypes:1 string public.xml" "$F"
 ```
-Verify: `/usr/libexec/PlistBuddy -c "Print :CFBundleDocumentTypes" "Next Wave/Info.plist"` shows the entry.
+Verify: `/usr/libexec/PlistBuddy -c "Print :CFBundleDocumentTypes" "Next Wave/Info.plist"`.
 
 - [ ] **Step 2: Create the summary sheet**
 
@@ -1152,22 +933,18 @@ struct GPXImportSummaryView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Image(systemName: summary.outcome == .imported ? "checkmark.seal.fill"
-                  : (summary.outcome == .alreadyImported ? "tray.full" : "exclamationmark.triangle"))
+            Image(systemName: icon)
                 .font(.system(size: 48))
-                .foregroundColor(summary.outcome == .failed ? .orange : .green)
+                .foregroundColor(summary.outcome == .imported ? .green : .orange)
                 .padding(.top, 24)
 
             Text(title).font(.title2.bold())
 
-            if summary.outcome != .failed {
+            if summary.outcome == .imported || summary.outcome == .alreadyImported {
                 VStack(spacing: 8) {
                     row("Distance", String(format: "%.2f km", summary.totalDistanceM / 1000))
                     row("Longest ride", String(format: "%.0f m", summary.longestRideM))
                     row("Top speed", String(format: "%.1f km/h", summary.topSpeedKmh))
-                    if summary.outcome == .imported {
-                        row("Verified waves", "\(summary.verifiedWaves)")
-                    }
                 }
                 .padding(.horizontal)
             }
@@ -1175,23 +952,28 @@ struct GPXImportSummaryView: View {
                 Text(m).font(.subheadline).foregroundColor(.secondary).multilineTextAlignment(.center)
             }
 
-            Button("Done", action: onDone)
-                .font(.headline)
-                .padding(.top, 8)
+            Button("Done", action: onDone).font(.headline).padding(.top, 8)
             Spacer()
         }
         .padding()
         .presentationDetents([.medium])
     }
 
+    private var icon: String {
+        switch summary.outcome {
+        case .imported: return "checkmark.seal.fill"
+        case .alreadyImported: return "tray.full"
+        case .notFoilmotion, .failed: return "exclamationmark.triangle"
+        }
+    }
     private var title: String {
         switch summary.outcome {
         case .imported: return "Session imported! 🏄"
         case .alreadyImported: return "Already imported"
+        case .notFoilmotion: return "Unsupported file"
         case .failed: return "Import failed"
         }
     }
-
     private func row(_ label: String, _ value: String) -> some View {
         HStack { Text(label).foregroundColor(.secondary); Spacer(); Text(value).fontWeight(.semibold) }
     }
@@ -1200,23 +982,17 @@ struct GPXImportSummaryView: View {
 
 - [ ] **Step 3: Wire onOpenURL + present the sheet**
 
-In `Next Wave/NextWaveApp.swift`, add `@StateObject private var importCoordinator = GPXImportCoordinator.shared` (alongside the other state objects). Replace the existing `.onOpenURL { url in handleDeepLink(url) }` (line ~252) with:
+In `Next Wave/NextWaveApp.swift`, add `@StateObject private var importCoordinator = GPXImportCoordinator.shared` next to the other state objects. Replace `.onOpenURL { url in handleDeepLink(url) }` (line ~252) with:
 
 ```swift
                 .onOpenURL { url in
                     if url.isFileURL && url.pathExtension.lowercased() == "gpx" {
                         let didAccess = url.startAccessingSecurityScopedResource()
-                        // Copy to a temp file we control, then release the security scope.
                         let temp = FileManager.default.temporaryDirectory
                             .appendingPathComponent(UUID().uuidString).appendingPathExtension("gpx")
                         try? FileManager.default.copyItem(at: url, to: temp)
                         if didAccess { url.stopAccessingSecurityScopedResource() }
-                        let stations = lakeStationsViewModel.lakes.flatMap { $0.stations }
-                        Task {
-                            if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
-                            let s = lakeStationsViewModel.lakes.flatMap { $0.stations }
-                            await importCoordinator.handleFile(temp, stations: s.isEmpty ? stations : s)
-                        }
+                        Task { await importCoordinator.handleFile(temp) }
                     } else {
                         handleDeepLink(url)
                     }
@@ -1229,22 +1005,22 @@ In `Next Wave/NextWaveApp.swift`, add `@StateObject private var importCoordinato
 - [ ] **Step 4: Build to verify it compiles**
 
 Run: `xcodebuild build -scheme "NextWave" -destination 'platform=iOS Simulator,name=iPhone 17'`
-Expected: BUILD SUCCEEDED. (`lakeStationsViewModel.loadLakes()` exists per the deep-link handler that already calls it.)
+Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 5: Manual verification**
 
-In the simulator: drag a `.gpx` onto it / use Files → "Share" → Next Wave (or `xcrun simctl openurl`). Expected: the summary sheet appears with distance/top speed (verified waves will be 0 for pumpfoil samples — no ferry). Re-open the same file → "Already imported".
+Share a Foilmotion `.gpx` to Next Wave (Files → Share → Next Wave, or drag onto the simulator). Expected: summary sheet with distance / longest ride / top speed. Re-share the same file → "Already imported". A non-Foilmotion GPX → "Unsupported file".
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add "Next Wave/Info.plist" "Next Wave/NextWaveApp.swift" "Next Wave/Views/GPXImportSummaryView.swift"
-git commit -m "feat: import GPX via document type, parse + show summary sheet"
+git commit -m "feat: import Foilmotion GPX via document type + summary sheet"
 ```
 
 ---
 
-### Task 9: Verified section in My Badges
+### Task 8: Verified section in My Badges
 
 **Files:**
 - Modify: `Next Wave/ViewModels/StatsStore.swift`
@@ -1260,7 +1036,7 @@ In `Next Wave/ViewModels/StatsStore.swift`, add published state next to the exis
     @Published private(set) var verifiedStats: VerifiedStats = .empty
     @Published private(set) var verifiedBadges: [EvaluatedVerifiedBadge] = VerifiedBadgeEvaluator.evaluate(.empty)
 ```
-And at the end of `refresh(seenIds:onSeen:)`, after the existing independent `stationCounts` load, add another independent block:
+At the end of `refresh(seenIds:onSeen:)`, after the independent `stationCounts` block, add another independent block:
 ```swift
         do {
             let vs = try await VerifiedRidesAPI.shared.verifiedStats()
@@ -1273,7 +1049,7 @@ And at the end of `refresh(seenIds:onSeen:)`, after the existing independent `st
 
 - [ ] **Step 2: Add the Verified section to StatsView**
 
-In `Next Wave/Views/StatsView.swift`, after the "Locked" section block (`if !lockedBadges.isEmpty { badgeSection(...) }`), add:
+In `Next Wave/Views/StatsView.swift`, after the "Locked" section block, add:
 ```swift
                 // MARK: Verified badges
                 if store.verifiedStats.sessionCount > 0 || store.verifiedBadges.contains(where: { $0.isEarned }) {
@@ -1286,7 +1062,8 @@ And add these helpers next to `badgeSection(_:_:)`:
         VStack(alignment: .leading, spacing: 28) {
             sectionHeader("Verified")
             HStack(alignment: .firstTextBaseline, spacing: 16) {
-                stat("\(store.verifiedStats.verifiedWaves)", "waves")
+                stat("\(store.verifiedStats.sessionCount)", "sessions")
+                stat(String(format: "%.0f km", store.verifiedStats.totalDistanceM / 1000), "total")
                 stat(String(format: "%.0f m", store.verifiedStats.longestRideM), "longest")
                 stat(String(format: "%.0f", store.verifiedStats.maxSpeedMs * 3.6), "km/h top")
             }
@@ -1324,7 +1101,7 @@ Expected: BUILD SUCCEEDED.
 
 - [ ] **Step 4: Manual verification**
 
-After importing a GPX with verified data, open "My Badges" → a **Verified** section shows the verified figures + badges (with the green shield). Earned ones colored, others greyed/locked.
+After importing a Foilmotion GPX, open "My Badges" → a **Verified** section shows sessions / total / longest / top-speed + verified badges (green shield; earned colored, others greyed).
 
 - [ ] **Step 5: Commit**
 
@@ -1337,7 +1114,6 @@ git commit -m "feat: Verified section (stats + verified badges) in My Badges"
 
 ## Self-Review Notes (reconciled)
 
-- **Spec coverage:** import/document type (Task 8); parse (Task 1); metrics incl. longest continuous ride (Task 2); matching by proximity+window+motion with check-in `wave_id` (Task 3); Supabase tables + RLS + RPC + dedup (Tasks 4–5); verified badges with thresholds + shield (Task 6); orchestration + dedup `session_key` (Task 7); summary sheet + error handling (Tasks 7–8); Verified UI section (Task 9); tests for parser/metrics/matcher/badges (Tasks 1–3, 6) + SQL verify (Task 4).
-- **Type consistency:** `VerifiedRide`/`CandidateDeparture` (Task 3) consumed by Coordinator (Task 7) and `VerifiedRidesAPI.upload` (Task 5); `VerifiedStats` keys match the RPC columns (Tasks 4/5); `BadgeMedalView(imageName:ringColor:isEarned:verified:size:)` (Task 6) used in Task 9; `Journey.stop.departureTimestamp` + `Lake.Station.coordinates/uic_ref/id` are the real members.
-- **Open items (from spec):** tuning values (thresholds/radii/window) to confirm with real ferry-wave GPX; verified badge artwork (`badge_verified_wave/distance/speed` show a category-color placeholder until added); whether to also fire the local badge notification on import.
-- **Note:** the sample GPX are pumpfoil (no ferry) → expect 0 verified waves but valid distance/speed. Confirm wave-matching with a real ferry-wave recording.
+- **Spec coverage:** import/document type (Task 7); parse (Task 1); Foilmotion gate (Task 6); metrics incl. longest continuous ride (Task 2); `verified_sessions` table + RLS + RPC + dedup (Tasks 3–4); verified badges (longest ride / speed / total / sessions) + shield (Task 5); orchestration + `session_key` dedup (Task 6); summary sheet + error handling (Tasks 6–7); Verified UI section (Task 8); tests for parser/metrics/badges (Tasks 1, 2, 5) + SQL verify (Task 3). No ferry-wave matching (removed per "always pump-foil").
+- **Type consistency:** `VerifiedStats` keys ↔ RPC columns (Tasks 3/4); `VerifiedRidesAPI.upload(metrics:sessionKey:)` (Task 4) called by the coordinator (Task 6); `BadgeMedalView(imageName:ringColor:isEarned:verified:size:)` (Task 5) used in Task 8; `GPXImportCoordinator.handleFile(_:)` (Task 6) called from `onOpenURL` (Task 7).
+- **Open items:** `FOIL_SPEED_THRESHOLD` confirm with real data; verified badge artwork (`badge_distance/speed/total/session` show a category-color placeholder until added); whether to also fire the local badge notification on import.

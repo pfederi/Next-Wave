@@ -106,6 +106,9 @@ struct StatsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private var earnedVerified: [EvaluatedVerifiedBadge] { store.verifiedBadges.filter { $0.isEarned } }
+    private var lockedVerified: [EvaluatedVerifiedBadge] { store.verifiedBadges.filter { !$0.isEarned } }
+
     private var verifiedSection: some View {
         VStack(alignment: .leading, spacing: 28) {
             sectionHeader("Verified")
@@ -115,8 +118,20 @@ struct StatsView: View {
                 stat(String(format: "%.0f m", store.verifiedStats.longestRideM), "longest")
                 stat(String(format: "%.0f", store.verifiedStats.maxSpeedMs * 3.6), "km/h top")
             }
+            if !earnedVerified.isEmpty {
+                verifiedSubsection("Earned (\(earnedVerified.count))", earnedVerified)
+            }
+            if !lockedVerified.isEmpty {
+                verifiedSubsection("Locked (\(lockedVerified.count))", lockedVerified)
+            }
+        }
+    }
+
+    private func verifiedSubsection(_ title: String, _ items: [EvaluatedVerifiedBadge]) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text(title).font(.headline).foregroundColor(.secondary)
             LazyVGrid(columns: columns, spacing: 32) {
-                ForEach(store.verifiedBadges) { item in
+                ForEach(items) { item in
                     VStack(spacing: 20) {
                         BadgeMedalView(imageName: item.badge.imageName, ringColor: item.badge.ringColor,
                                        isEarned: item.isEarned, verified: true, size: 120)

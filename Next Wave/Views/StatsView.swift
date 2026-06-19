@@ -146,12 +146,16 @@ struct StatsView: View {
             Text("Verified badges come from your Foilmotion sessions. Record a session in Foilmotion, then share the GPX file to Next Wave.")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            Button {
-                openFoilmotion()
-            } label: {
-                Text("Open Foilmotion →").font(.caption.weight(.semibold))
+            HStack(spacing: 16) {
+                Button {
+                    openFoilmotion()
+                } label: {
+                    Text("Open Foilmotion →").font(.caption.weight(.semibold))
+                }
+                .buttonStyle(.plain)
+                Link("FAQ →", destination: URL(string: "https://www.nextwaveapp.ch/faq")!)
+                    .font(.caption.weight(.semibold))
             }
-            .buttonStyle(.plain)
             .foregroundColor(.accentColor)
             if store.verifiedStats.sessionCount > 0 {
                 HStack(alignment: .firstTextBaseline, spacing: 16) {

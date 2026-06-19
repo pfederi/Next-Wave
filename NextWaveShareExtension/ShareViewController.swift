@@ -33,8 +33,13 @@ final class ShareViewController: UIViewController {
             default:
                 fileURL = nil
             }
-            if let fileURL { self.openHostApp(name: fileURL.lastPathComponent) }
-            self.finish()
+            // The loadItem callback runs on a background thread; opening the host
+            // app (responder-chain → openURL:) must happen on the main thread.
+            DispatchQueue.main.async {
+                if let fileURL { self.openHostApp(name: fileURL.lastPathComponent) }
+                // Give the open a moment to fire before tearing the extension down.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { self.finish() }
+            }
         }
     }
 

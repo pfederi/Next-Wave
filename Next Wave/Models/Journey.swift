@@ -30,6 +30,7 @@ extension Journey {
         let prognosis: Prognosis
         let station: Station
         let arrival: String?
+        let arrivalTimestamp: Int?
         
         var id: String { station.id }
         

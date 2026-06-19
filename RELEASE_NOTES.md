@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## Version 4.0.0 (June 19, 2026)
+
+### New
+- **Verified Rides with Foilmotion**: Import a Foilmotion GPX session and earn verified badges
+  - Next Wave matches your track against the Swiss boat timetable and credits the waves you rode behind a Kursschiff
+  - Verified badges for longest ride, top speed, total distance, and number of sessions
+  - Verified and regular badges share the same Earned/Locked grids, marked with the Foilmotion logo
+  - Import summary shows how many wake-thieving rides were detected
+  - New manga-style badge artwork
+
 ## Version 3.8.0 (June 16, 2026)
 
 ### New

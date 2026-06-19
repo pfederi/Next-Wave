@@ -65,6 +65,14 @@ For detailed technical documentation, see [Arc42 Documentation](ARC42_DOCUMENTAT
   - Live counter per departure, updated across devices in real time
   - See who's going by name, or join anonymously
   - Set your display name once in Settings; optional and can be turned off
+- 🏆 **Leaderboard** — see how your total waves rank, overall and per station
+
+### Badges & Achievements
+- 🏅 **Badges** for milestones, stations and lakes explored, streaks, seasons, and special moments
+  - "My Badges" screen with earned badges up top and locked ones with progress below
+- ✅ **Verified rides with Foilmotion** — import a recorded GPX session and earn verified badges
+  - The track is matched against the Swiss boat timetable; only waves ridden behind a Kursschiff count
+  - Verified badges for longest ride, top speed, total distance, and number of sessions
 
 ### User Experience
 - 🗺️ **Interactive map** with OpenStreetMap
@@ -137,6 +145,7 @@ For detailed usage scenarios and workflows, see the [Arc42 Documentation - Runti
 - Location data is only used to show nearest station and your position on the map and is never stored or shared
 - Location access can be denied without losing core app functionality
 - **Wave Check-in (optional):** when you check in to a wave, your chosen display name (or "anonymous") and an anonymous device identifier are shared with other users so the group can see who plans to ride. Check-ins are stored only until the departure has passed, then deleted automatically. The feature can be turned off in Settings, and you can join anonymously.
+- **Verified Rides (optional):** when you import a Foilmotion GPX, the file is parsed on device and only aggregate metrics (distance, top speed, ride count) are stored, tied to your anonymous identity so your verified badges sync across devices. The GPX file itself is not stored. The feature is only used when you import a session.
 - All other data stays on device
 
 ## Data Sources & Attribution
@@ -149,6 +158,7 @@ Next Wave aggregates data from various public sources:
 - **Weather Data**: [OpenWeather](https://openweathermap.org) - Weather forecasts and conditions
 - **Sun Times**: [Sunrise-Sunset.org](https://sunrise-sunset.org) - Sunrise, sunset, and twilight data
 - **Maps**: [OpenStreetMap](https://www.openstreetmap.org) contributors - Map tiles and geographic data
+- **Verified Rides**: [Foilmotion](https://foilmotion.webchoice.ch) - GPX session recordings imported by the user (referenced with permission)
 
 We are grateful to these services for providing public access to their data.
 

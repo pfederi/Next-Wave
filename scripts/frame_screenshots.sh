@@ -33,12 +33,6 @@ detect_bezel() {
     esac
 }
 
-# Detect the screen cutout of a bezel (transparent region not touching the border).
-hole_geometry() {
-    magick "$1" -alpha extract -negate -bordercolor white -border 1 \
-        -fill black -floodfill +0+0 white -shave 1x1 -trim -format "%w %h %O" info:
-}
-
 FRAMED=0; SKIPPED=0
 for shot in "$SCREENSHOTS_DIR"/*.png; do
     [ -f "$shot" ] || continue
@@ -55,12 +49,9 @@ for shot in "$SCREENSHOTS_DIR"/*.png; do
         echo -e "${YELLOW}  ⚠ no matching bezel — skipping${NC}"; SKIPPED=$((SKIPPED+1)); continue
     fi
 
-    geo=$(hole_geometry "$bezel")
-    hw=$(echo "$geo" | awk '{print $1}'); hh=$(echo "$geo" | awk '{print $2}'); off=$(echo "$geo" | awk '{print $3}')
     out="${shot%.png}-framed.png"
-
-    magick "$shot" -resize ${hw}x${hh}\! /tmp/_fs_scr.png
-    magick "$bezel" /tmp/_fs_scr.png -geometry "$off" -compose DstOver -composite "$out"
+    # Native size, centered, behind the bezel (no scaling → no distortion).
+    magick "$bezel" "$shot" -gravity center -compose DstOver -composite "$out"
     echo -e "${GREEN}  ✓ $(basename "$out")${NC}"
     FRAMED=$((FRAMED+1))
 done

@@ -175,9 +175,6 @@ FRAMEME_AVAILABLE=false
 if command -v magick >/dev/null 2>&1; then
     if [ -f "$BEZEL_PATH" ]; then
         FRAMEME_AVAILABLE=true
-        # Detect the bezel's transparent screen cutout once ("W H +X+Y").
-        BEZEL_HOLE=$(magick "$BEZEL_PATH" -alpha extract -negate -bordercolor white -border 1 \
-            -fill black -floodfill +0+0 white -shave 1x1 -trim -format "%w %h %O" info:)
         echo -e "${GREEN}✓ ImageMagick + bezel found - screenshots will be framed${NC}"
     else
         echo -e "${YELLOW}⚠️  Bezel not found at:${NC}"
@@ -395,12 +392,9 @@ if [ "$FRAMEME_AVAILABLE" = true ]; then
                 
                 echo -e "${BLUE}  → Framing $(basename "$screenshot")...${NC}"
 
-                # Composite the screenshot into the bezel's screen cutout (ImageMagick).
-                hw=$(echo "$BEZEL_HOLE" | awk '{print $1}')
-                hh=$(echo "$BEZEL_HOLE" | awk '{print $2}')
-                off=$(echo "$BEZEL_HOLE" | awk '{print $3}')
-                magick "$screenshot" -resize ${hw}x${hh}\! /tmp/_cap_scr.png 2>/dev/null
-                magick "$BEZEL_PATH" /tmp/_cap_scr.png -geometry "$off" -compose DstOver -composite "$framed_path" 2>/dev/null
+                # Composite the screenshot at native size, centered, behind the bezel
+                # (no scaling → no distortion).
+                magick "$BEZEL_PATH" "$screenshot" -gravity center -compose DstOver -composite "$framed_path" 2>/dev/null
 
                 if [ -f "$framed_path" ]; then
                     # Delete original unframed screenshot

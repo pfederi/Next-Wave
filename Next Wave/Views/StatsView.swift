@@ -153,7 +153,7 @@ struct StatsView: View {
                     Text("Open Foilmotion →").font(.caption.weight(.semibold))
                 }
                 .buttonStyle(.plain)
-                Link("FAQ →", destination: URL(string: "https://www.nextwaveapp.ch/faq")!)
+                Link("Guide →", destination: URL(string: "https://www.nextwaveapp.ch/faq")!)
                     .font(.caption.weight(.semibold))
             }
             .foregroundColor(.accentColor)

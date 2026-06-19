@@ -44,10 +44,12 @@ Zwei Scripts für einfaches Screenshot-Management:
 
 **Automatisches Framing von bestehenden Screenshots mit Device-Erkennung**
 
-Dieses Script analysiert die Dimensionen deiner Screenshots und wählt automatisch den richtigen Bezel:
-- **iPhone 17 Pro**: 1290x2796px → Deep Blue Frame
+Dieses Script analysiert die Dimensionen deiner Screenshots und wählt automatisch den richtigen Bezel. Das Framing macht **ImageMagick** (kein externes `frameme` mehr nötig): Der Screenshot wird in den transparenten Screen-Ausschnitt des echten Geräte-Bezel-PNGs gelegt.
+- **iPhone 17 Pro**: 1206x2622px → Deep Blue Frame
 - **iPad Air 13-inch**: 2048x2732px → Space Gray Frame  
 - **Apple Watch Ultra 3**: 416x496px → Black Ocean Band Frame
+
+> Voraussetzung: `brew install imagemagick` und der Bezel-Ordner unter `~/Library/CloudStorage/Dropbox/Apps/Bezels`.
 
 ## 🚀 Verwendung
 
@@ -108,7 +110,7 @@ Das Script erkennt automatisch folgende Geräte:
 
 | Device | Auflösung | Bezel |
 |--------|-----------|-------|
-| iPhone 17 Pro | 1290 x 2796 px | Deep Blue - Portrait |
+| iPhone 17 Pro | 1206 x 2622 px | Deep Blue - Portrait |
 | iPad Air 13-inch | 2048 x 2732 px | Space Gray - Portrait |
 | Apple Watch Ultra 3 | 416 x 496 px | Black + Ocean Band Black |
 
@@ -117,10 +119,10 @@ Bearbeite die `detect_device()` Funktion in `frame_screenshots.sh` und füge die
 
 ## 🔧 Troubleshooting
 
-### "frameme not found"
-Stelle sicher, dass frameme installiert ist:
+### "ImageMagick not found"
+Installiere ImageMagick:
 ```bash
-ls -la /tmp/frameme
+brew install imagemagick
 ```
 
 ### "Device bezel not found"

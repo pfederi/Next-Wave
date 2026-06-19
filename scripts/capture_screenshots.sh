@@ -12,7 +12,6 @@ NC='\033[0m' # No Color
 
 # Paths
 SCREENSHOTS_DIR="Screenshots/en-US"
-FRAMEME_PATH="/tmp/frameme"
 BEZEL_DIR="/Users/federi/Library/CloudStorage/Dropbox/Apps/Bezels"
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -171,22 +170,23 @@ else
     exit 1
 fi
 
-# Check if frameme exists (optional - screenshots work fine without frames for App Store)
+# Framing uses ImageMagick to composite into the real device bezel (optional).
 FRAMEME_AVAILABLE=false
-if [ -f "$FRAMEME_PATH" ]; then
-    FRAMEME_AVAILABLE=true
-    echo -e "${GREEN}✓ frameme found - screenshots will be framed${NC}"
-    
-    # Check if bezel exists
-    if [ ! -f "$BEZEL_PATH" ]; then
-        echo -e "${YELLOW}⚠️  Warning: Bezel not found at:${NC}"
+if command -v magick >/dev/null 2>&1; then
+    if [ -f "$BEZEL_PATH" ]; then
+        FRAMEME_AVAILABLE=true
+        # Detect the bezel's transparent screen cutout once ("W H +X+Y").
+        BEZEL_HOLE=$(magick "$BEZEL_PATH" -alpha extract -negate -bordercolor white -border 1 \
+            -fill black -floodfill +0+0 white -shave 1x1 -trim -format "%w %h %O" info:)
+        echo -e "${GREEN}✓ ImageMagick + bezel found - screenshots will be framed${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Bezel not found at:${NC}"
         echo -e "${YELLOW}   $BEZEL_PATH${NC}"
         echo -e "${YELLOW}   Screenshots will be saved without frames${NC}"
-        FRAMEME_AVAILABLE=false
     fi
 else
-    echo -e "${YELLOW}⚠️  frameme not found - screenshots will be saved without frames${NC}"
-    echo -e "${YELLOW}   (This is perfectly fine for App Store submissions)${NC}"
+    echo -e "${YELLOW}⚠️  ImageMagick not found - screenshots will be saved without frames${NC}"
+    echo -e "${YELLOW}   Install with: brew install imagemagick${NC}"
 fi
 
 # Create screenshots directory if it doesn't exist
@@ -394,22 +394,18 @@ if [ "$FRAMEME_AVAILABLE" = true ]; then
                 fi
                 
                 echo -e "${BLUE}  → Framing $(basename "$screenshot")...${NC}"
-                
-                # Run frameme - it will create screenshot-name_framed.png
-                "$FRAMEME_PATH" "$BEZEL_PATH" "$screenshot" > /dev/null 2>&1
-                
-                # Wait a moment for file to be written
-                sleep 1
-                
-                # Check if frameme created the _framed version (with underscore)
-                frameme_output="${screenshot%.png}_framed.png"
-                if [ -f "$frameme_output" ]; then
-                    # Rename to our naming convention (dash instead of underscore)
-                    mv "$frameme_output" "$framed_path"
-                    
+
+                # Composite the screenshot into the bezel's screen cutout (ImageMagick).
+                hw=$(echo "$BEZEL_HOLE" | awk '{print $1}')
+                hh=$(echo "$BEZEL_HOLE" | awk '{print $2}')
+                off=$(echo "$BEZEL_HOLE" | awk '{print $3}')
+                magick "$screenshot" -resize ${hw}x${hh}\! /tmp/_cap_scr.png 2>/dev/null
+                magick "$BEZEL_PATH" /tmp/_cap_scr.png -geometry "$off" -compose DstOver -composite "$framed_path" 2>/dev/null
+
+                if [ -f "$framed_path" ]; then
                     # Delete original unframed screenshot
                     rm -f "$screenshot"
-                    
+
                     echo -e "${GREEN}  ✓ Framed successfully: $(basename "$framed_path")${NC}"
                 else
                     echo -e "${YELLOW}  ⚠ Framing produced no output${NC}"

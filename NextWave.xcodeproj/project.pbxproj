@@ -11,6 +11,7 @@
 		8A5C5B012DF0CFD500569B58 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8A5C5B0A2DF0CFD600569B58 /* NextWaveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8A5C5AFF2DF0CFD500569B58 /* NextWaveWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AAE38CB2DEF48870053668D /* Next Wave Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8AB452DB2FE51F5D0015792F /* NextWaveShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AB452D12FE51F5C0015792F /* NextWaveShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AD40C442DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD40C422DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift */; };
 		8AFF99642DFB163800F3E1FB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */; };
 		8AFF99652DFB163800F3E1FB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
@@ -47,6 +48,13 @@
 			remoteGlobalIDString = 8AAE38C02DEF48860053668D;
 			remoteInfo = "Next Wave Watch Watch App";
 		};
+		8AB452D92FE51F5D0015792F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8A225F292D0ABC6F008BA92B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8AB452D02FE51F5C0015792F;
+			remoteInfo = NextWaveShareExtension;
+		};
 		8AFF996C2DFB163900F3E1FB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8A225F292D0ABC6F008BA92B /* Project object */;
@@ -70,6 +78,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				8AB452DB2FE51F5D0015792F /* NextWaveShareExtension.appex in Embed Foundation Extensions */,
 				8A5C5B0A2DF0CFD600569B58 /* NextWaveWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -108,6 +117,7 @@
 		8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Next Wave Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AB452D12FE51F5C0015792F /* NextWaveShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NextWaveShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AD40C412DFB4A7900FF448A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8AD40C422DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextWaveWatchWidgetExtension.swift; sourceTree = "<group>"; };
 		8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NextWaveWatchWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,6 +138,13 @@
 				Info.plist,
 			);
 			target = 8A225F302D0ABC6F008BA92B /* Next Wave */;
+		};
+		8AB452DF2FE51F5D0015792F /* Exceptions for "NextWaveShareExtension" folder in "NextWaveShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8AB452D02FE51F5C0015792F /* NextWaveShareExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -166,6 +183,14 @@
 		8AAE38C22DEF48860053668D /* Next Wave Watch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Next Wave Watch Watch App";
+			sourceTree = "<group>";
+		};
+		8AB452D22FE51F5C0015792F /* NextWaveShareExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8AB452DF2FE51F5D0015792F /* Exceptions for "NextWaveShareExtension" folder in "NextWaveShareExtension" target */,
+			);
+			path = NextWaveShareExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -209,6 +234,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8AB452CE2FE51F5C0015792F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8AFF99602DFB163800F3E1FB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -231,6 +263,7 @@
 				8A225F4E2D0ABC70008BA92B /* Next WaveUITests */,
 				8AAE38C22DEF48860053668D /* Next Wave Watch Watch App */,
 				8A5C5B022DF0CFD500569B58 /* NextWaveWidget */,
+				8AB452D22FE51F5C0015792F /* NextWaveShareExtension */,
 				8A8B5B262DEF4195006C5A78 /* Frameworks */,
 				8A225F322D0ABC6F008BA92B /* Products */,
 				8A6C289C2D15F67600F0A5A9 /* soundfiles */,
@@ -247,6 +280,7 @@
 				8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */,
 				8A5C5AFF2DF0CFD500569B58 /* NextWaveWidgetExtension.appex */,
 				8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */,
+				8AB452D12FE51F5C0015792F /* NextWaveShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -287,6 +321,7 @@
 			dependencies = (
 				8AAE38CA2DEF48870053668D /* PBXTargetDependency */,
 				8A5C5B092DF0CFD600569B58 /* PBXTargetDependency */,
+				8AB452DA2FE51F5D0015792F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				8A225F332D0ABC6F008BA92B /* Next Wave */,
@@ -393,6 +428,28 @@
 			productReference = 8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		8AB452D02FE51F5C0015792F /* NextWaveShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8AB452DE2FE51F5D0015792F /* Build configuration list for PBXNativeTarget "NextWaveShareExtension" */;
+			buildPhases = (
+				8AB452CD2FE51F5C0015792F /* Sources */,
+				8AB452CE2FE51F5C0015792F /* Frameworks */,
+				8AB452CF2FE51F5C0015792F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8AB452D22FE51F5C0015792F /* NextWaveShareExtension */,
+			);
+			name = NextWaveShareExtension;
+			packageProductDependencies = (
+			);
+			productName = NextWaveShareExtension;
+			productReference = 8AB452D12FE51F5C0015792F /* NextWaveShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		8AFF99622DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8AFF996F2DFB163900F3E1FB /* Build configuration list for PBXNativeTarget "NextWaveWatchWidgetExtensionExtension" */;
@@ -419,7 +476,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2650;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					8A225F302D0ABC6F008BA92B = {
@@ -439,6 +496,9 @@
 					};
 					8AAE38C02DEF48860053668D = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					8AB452D02FE51F5C0015792F = {
+						CreatedOnToolsVersion = 26.5;
 					};
 					8AFF99622DFB163800F3E1FB = {
 						CreatedOnToolsVersion = 16.4;
@@ -468,6 +528,7 @@
 				8AAE38C02DEF48860053668D /* Next Wave Watch Watch App */,
 				8A5C5AFE2DF0CFD500569B58 /* NextWaveWidgetExtension */,
 				8AFF99622DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension */,
+				8AB452D02FE51F5C0015792F /* NextWaveShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -502,6 +563,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		8AAE38BF2DEF48860053668D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8AB452CF2FE51F5C0015792F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -553,6 +621,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8AB452CD2FE51F5C0015792F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8AFF995F2DFB163800F3E1FB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -583,6 +658,11 @@
 			isa = PBXTargetDependency;
 			target = 8AAE38C02DEF48860053668D /* Next Wave Watch Watch App */;
 			targetProxy = 8AAE38C92DEF48870053668D /* PBXContainerItemProxy */;
+		};
+		8AB452DA2FE51F5D0015792F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8AB452D02FE51F5C0015792F /* NextWaveShareExtension */;
+			targetProxy = 8AB452D92FE51F5D0015792F /* PBXContainerItemProxy */;
 		};
 		8AFF996D2DFB163900F3E1FB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1004,6 +1084,66 @@
 			};
 			name = Release;
 		};
+		8AB452DC2FE51F5D0015792F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD7648W7NV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NextWaveShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NextWaveShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.NextWaveShareExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8AB452DD2FE51F5D0015792F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD7648W7NV;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NextWaveShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NextWaveShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.federi.Next-Wave.NextWaveShareExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		8AFF99702DFB163900F3E1FB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1123,6 +1263,15 @@
 			buildConfigurations = (
 				8AAE38CD2DEF48870053668D /* Debug */,
 				8AAE38CE2DEF48870053668D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8AB452DE2FE51F5D0015792F /* Build configuration list for PBXNativeTarget "NextWaveShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8AB452DC2FE51F5D0015792F /* Debug */,
+				8AB452DD2FE51F5D0015792F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -5,6 +5,10 @@
 ## Version 4.0.0 (June 19, 2026)
 
 ### New
+- **Badges & Achievements**: Collect badges as you ride
+  - Earn badges for milestones, stations and lakes explored, streaks, seasons, time of day, and special moments
+  - New "My Badges" screen shows earned badges up top and locked ones with their progress below
+  - See how your total waves rank on the leaderboard, overall and per station
 - **Verified Rides with Foilmotion**: Import a Foilmotion GPX session and earn verified badges
   - Next Wave matches your track against the Swiss boat timetable and credits the waves you rode behind a Kursschiff
   - Verified badges for longest ride, top speed, total distance, and number of sessions

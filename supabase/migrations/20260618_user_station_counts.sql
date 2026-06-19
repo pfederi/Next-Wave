@@ -14,3 +14,4 @@ as $$
 $$;
 
 grant execute on function public.user_station_counts() to authenticated;
+ich ha

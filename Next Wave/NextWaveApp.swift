@@ -252,15 +252,22 @@ struct NextWaveApp: App {
                 }
                 .onOpenURL { url in
                     if url.isFileURL && url.pathExtension.lowercased() == "gpx" {
+                        // Direct "Open in Next Wave" of a .gpx file.
                         let didAccess = url.startAccessingSecurityScopedResource()
                         let temp = FileManager.default.temporaryDirectory
                             .appendingPathComponent(UUID().uuidString).appendingPathExtension("gpx")
                         try? FileManager.default.copyItem(at: url, to: temp)
                         if didAccess { url.stopAccessingSecurityScopedResource() }
-                        Task {
-                            if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
-                            let stations = lakeStationsViewModel.lakes.flatMap { $0.stations }
-                            await importCoordinator.handleFile(temp, stations: stations)
+                        importSharedGPX(at: temp)
+                    } else if url.scheme == "nextwave" && url.host == "import-gpx" {
+                        // Handed over by the Share Extension via the shared App Group container.
+                        let name = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                            .queryItems?.first(where: { $0.name == "name" })?.value
+                        if let name, let shared = FileManager.default
+                            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.federi.Next-Wave")?
+                            .appendingPathComponent("GPXInbox", isDirectory: true)
+                            .appendingPathComponent(name) {
+                            importSharedGPX(at: shared, removeAfter: true)
                         }
                     } else {
                         handleDeepLink(url)
@@ -272,6 +279,17 @@ struct NextWaveApp: App {
         }
     }
     
+    /// Run the verified-rides import for a GPX file the app can read directly
+    /// (a temp copy, or a file the Share Extension dropped in the shared container).
+    private func importSharedGPX(at url: URL, removeAfter: Bool = false) {
+        Task {
+            if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
+            let stations = lakeStationsViewModel.lakes.flatMap { $0.stations }
+            await importCoordinator.handleFile(url, stations: stations)
+            if removeAfter { try? FileManager.default.removeItem(at: url) }
+        }
+    }
+
     @MainActor
     private func loadWidgetDataInBackground() async {
         print("🚀 App went to background - loading widget data...")

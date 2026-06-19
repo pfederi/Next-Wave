@@ -39,8 +39,7 @@ struct ContentView: View {
                                     HStack(spacing: 8) {
                                         Text("Ready to ride?")
                                             .foregroundColor(Color("text-color"))
-                                        Image(systemName: "water.waves")
-                                            .foregroundColor(.blue)
+                                        Text("🤙")
                                     }
                                     .font(.title2)
                                     .padding(.top, 32)

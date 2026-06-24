@@ -28,6 +28,7 @@ detect_bezel() {
         1290x2796) echo "iPhone 17 Pro - Deep Blue - Portrait.png|iPhone 17 Pro (Max)" ;;
         2048x2732) echo "iPad Air 13\" - M2 - Space Gray - Portrait.png|iPad Air 13-inch" ;;
         2064x2752) echo "iPad Air 13\" - M2 - Space Gray - Portrait.png|iPad Air 13-inch" ;;
+        1640x2360) echo "iPad Air 11\" - M2 - Space Gray - Portrait.png|iPad Air 11-inch" ;;
         416x496)   echo "AW Ultra 3 - Black + Ocean Band Black.png|Apple Watch Ultra 3" ;;
         *)         echo "|Unknown (${1}x${2})" ;;
     esac

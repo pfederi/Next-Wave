@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## Version 4.0.1 (June 25, 2026)
+
+### New
+- **Greifensee**: Added the boats on Greifensee — 5 stations (Maur, Fällanden, Greifensee, Uster, Mönchaltorf), now selectable in the list and on the map
+
+### Improvements
+- **More accurate ride distance**: Verified rides now measure distance from speed over time instead of summing GPS points, which removes the ~10% overshoot from GPS scatter (now matches Foilmotion closely)
+- **Verified rides count everywhere**: A verified Foilmotion session now counts as a wave on the leaderboard (overall and at its station), in "My Stations", and toward the station/lake badges
+- **Verified station badges**: New verified badges for riding at 3, 5, and 10 different stations
+- **Leaderboard**: Riders without a display name now appear as "Anonymous", so ranks always match the list (no more skipped places)
+
+### Fixed
+- **Leaderboard ranking**: Fixed your rank showing a gap (e.g. #3 with only two riders visible) when an unnamed rider sat in between
+
 ## Version 4.0.0 (June 19, 2026)
 
 ### New

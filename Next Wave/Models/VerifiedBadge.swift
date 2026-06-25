@@ -26,6 +26,7 @@ enum VerifiedBadgeCatalog {
     private static let speedColor = Color(verifiedHex: "#E53935")
     private static let totalColor = Color(verifiedHex: "#43A047")
     private static let sessionColor = Color(verifiedHex: "#00897B")
+    private static let stationColor = Color(verifiedHex: "#8E24AA")
 
     static let all: [VerifiedBadge] = {
         func dist(_ m: Int, _ label: String) -> VerifiedBadge {
@@ -45,6 +46,10 @@ enum VerifiedBadgeCatalog {
                           detail: "\(n) verified session\(n == 1 ? "" : "s")",
                           imageName: "badge_session", ringColor: sessionColor, target: n) { $0.sessionCount }
         }
+        func station(_ n: Int, _ label: String) -> VerifiedBadge {
+            VerifiedBadge(id: "vstations_\(n)", title: label, detail: "Verified rides at \(n) stations",
+                          imageName: "badge_stations", ringColor: stationColor, target: n) { $0.distinctStations }
+        }
         return [
             dist(50, "50 m"), dist(100, "100 m"), dist(250, "250 m"), dist(500, "500 m"),
             dist(1000, "1 km"), dist(5000, "5 km"), dist(10000, "10 km"),
@@ -52,6 +57,7 @@ enum VerifiedBadgeCatalog {
             total(5000, "5 km"), total(25000, "25 km"), total(100000, "100 km"),
             total(250000, "250 km"), total(500000, "500 km"),
             session(1), session(10), session(25), session(50), session(100),
+            station(3, "Explorer"), station(5, "Wanderer"), station(10, "Nomad"),
         ]
     }()
 }

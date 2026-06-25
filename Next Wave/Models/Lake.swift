@@ -111,7 +111,8 @@ private func calculateWaterLevelDifference(for lakeName: String, currentLevel: S
         "Zugersee": 413.57,
         "Walensee": 419.03,
         "Hallwilersee": 448.66,
-        "Ägerisee": 723.76
+        "Ägerisee": 723.76,
+        "Greifensee": 435.10
     ]
     
     guard let averageLevel = averageLevels[lakeName] else { return nil }

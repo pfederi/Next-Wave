@@ -20,9 +20,21 @@ struct SessionMetrics: Equatable {
         var total = 0.0, maxSpeed = 0.0, moving = 0.0, currentRide = 0.0, longestRide = 0.0
         for i in 1..<points.count {
             let a = points[i - 1], b = points[i]
-            let seg = GeoMath.distance(lat1: a.lat, lon1: a.lon, lat2: b.lat, lon2: b.lon)
             let dt = b.time.timeIntervalSince(a.time)
-            let speed = b.speed ?? (dt > 0 ? seg / dt : 0)
+            let geoSeg = GeoMath.distance(lat1: a.lat, lon1: a.lon, lat2: b.lat, lon2: b.lon)
+            let speed = b.speed ?? (dt > 0 ? geoSeg / dt : 0)
+
+            // Speed-based distance (∫ speed dt) is more accurate than summing raw
+            // location diffs: GPS points scatter sideways, so location-based distance
+            // overshoots by ~10%. Integrate speed*dt (trapezoidal) whenever the track
+            // carries speed samples; fall back to great-circle distance otherwise.
+            let seg: Double
+            if dt > 0, a.speed != nil || b.speed != nil {
+                let v = ((a.speed ?? b.speed!) + (b.speed ?? a.speed!)) / 2
+                seg = v * dt
+            } else {
+                seg = geoSeg
+            }
 
             total += seg
             maxSpeed = max(maxSpeed, speed)

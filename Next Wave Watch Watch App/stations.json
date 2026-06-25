@@ -2162,6 +2162,54 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "Greifensee",
+            "operators": [
+                "SGG"
+            ],
+            "stations": [
+                {
+                    "name": "Maur (See)",
+                    "uic_ref": "8530645",
+                    "coordinates": {
+                        "latitude": 47.340193,
+                        "longitude": 8.678834
+                    }
+                },
+                {
+                    "name": "Fällanden (See)",
+                    "uic_ref": "8530647",
+                    "coordinates": {
+                        "latitude": 47.365786,
+                        "longitude": 8.652539
+                    }
+                },
+                {
+                    "name": "Greifensee (See)",
+                    "uic_ref": "8530648",
+                    "coordinates": {
+                        "latitude": 47.364318,
+                        "longitude": 8.674761
+                    }
+                },
+                {
+                    "name": "Uster (See)",
+                    "uic_ref": "8530646",
+                    "coordinates": {
+                        "latitude": 47.343289,
+                        "longitude": 8.690394
+                    }
+                },
+                {
+                    "name": "Mönchaltorf (See)",
+                    "uic_ref": "8530696",
+                    "coordinates": {
+                        "latitude": 47.325965,
+                        "longitude": 8.700148
+                    }
+                }
+            ]
         }
     ]
 }

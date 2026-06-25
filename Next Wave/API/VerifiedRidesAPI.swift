@@ -17,6 +17,7 @@ actor VerifiedRidesAPI {
         let start_at: String, end_at: String
         let total_distance: Double, duration: Int, moving_time: Int
         let max_speed: Double, longest_ride: Double
+        let station_id: String?, lake_id: String?
     }
 
     func sessionExists(key: String) async throws -> Bool {
@@ -32,7 +33,8 @@ actor VerifiedRidesAPI {
         return !rows.isEmpty
     }
 
-    func upload(metrics: SessionMetrics, sessionKey: String) async throws {
+    func upload(metrics: SessionMetrics, sessionKey: String,
+                stationId: String?, lakeId: String?) async throws {
         let userId = try await SupabaseManager.shared.ensureSession()
         let client = SupabaseManager.shared.client
         let row = SessionRow(
@@ -40,7 +42,8 @@ actor VerifiedRidesAPI {
             start_at: Self.iso.string(from: metrics.start), end_at: Self.iso.string(from: metrics.end),
             total_distance: metrics.totalDistance, duration: Int(metrics.duration),
             moving_time: Int(metrics.movingTime), max_speed: metrics.maxSpeed,
-            longest_ride: metrics.longestRideDistance)
+            longest_ride: metrics.longestRideDistance,
+            station_id: stationId, lake_id: lakeId)
         try await client.from("verified_sessions").upsert(row, onConflict: "user_id,session_key", ignoreDuplicates: true).execute()
     }
 

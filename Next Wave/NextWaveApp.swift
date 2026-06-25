@@ -260,8 +260,7 @@ struct NextWaveApp: App {
                         if didAccess { url.stopAccessingSecurityScopedResource() }
                         Task {
                             if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
-                            let stations = lakeStationsViewModel.lakes.flatMap { $0.stations }
-                            await importCoordinator.handleFile(temp, stations: stations)
+                            await importCoordinator.handleFile(temp, lakes: lakeStationsViewModel.lakes)
                         }
                     } else {
                         handleDeepLink(url)

@@ -39,9 +39,11 @@ final class GPXImportCoordinator: ObservableObject {
             message: message)
     }
 
-    func handleFile(_ url: URL, stations: [Lake.Station]) async {
+    func handleFile(_ url: URL, lakes: [Lake]) async {
         isBusy = true
         defer { isBusy = false }
+
+        let stations = lakes.flatMap { $0.stations }
 
         let session: GPXSession
         do {
@@ -78,8 +80,18 @@ final class GPXImportCoordinator: ObservableObject {
             return
         }
 
+        // Attribute the session to its primary dock (the matched-ride station
+        // closest to where the rides happened) so it also counts on that
+        // station's leaderboard; nil when no dock could be determined.
+        let primary = Self.primaryDock(rides: rides, docks: docks)
+        let stationId = primary?.id
+        let lakeId = primary.flatMap { dock in
+            lakes.first(where: { $0.stations.contains(where: { $0.id == dock.id }) })?.name
+        }
+
         do {
-            try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key)
+            try await VerifiedRidesAPI.shared.upload(metrics: metrics, sessionKey: key,
+                                                     stationId: stationId, lakeId: lakeId)
         } catch {
             report(.failed, message: "Couldn't upload — check your connection and try again.",
                    metrics: metrics, rideCount: rideCount)
@@ -87,6 +99,22 @@ final class GPXImportCoordinator: ObservableObject {
         }
 
         report(.imported, metrics: metrics, rideCount: rideCount)
+    }
+
+    /// The dock physically closest to where the matched rides happened — the
+    /// session's "primary" station. Falls back to the first dock when ride
+    /// points are unavailable, and nil when there are no docks at all.
+    private static func primaryDock(rides: [MatchedRide], docks: [Lake.Station]) -> Lake.Station? {
+        guard !docks.isEmpty else { return nil }
+        let ridePoints = rides.flatMap { $0.points }
+        guard !ridePoints.isEmpty else { return docks.first }
+        func nearestDistance(to station: Lake.Station) -> Double {
+            guard let c = station.coordinates else { return .infinity }
+            return ridePoints.map {
+                GeoMath.distance(lat1: $0.lat, lon1: $0.lon, lat2: c.latitude, lon2: c.longitude)
+            }.min() ?? .infinity
+        }
+        return docks.min { nearestDistance(to: $0) < nearestDistance(to: $1) }
     }
 
     /// Docks (boat stations) within `WaveMatcher.dockRadius` of any track point.

@@ -469,6 +469,97 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer" } },
         "it" : { "stringUnit" : { "state" : "translated", "value" : "Salva" } }
       }
+    },
+    "Anonymous" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anonym" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Anonyme" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Anonimo" } }
+      }
+    },
+    "Not set" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nicht festgelegt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Non défini" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Non impostato" } }
+      }
+    },
+    "Select your station" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wähle deine Station" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez votre station" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Seleziona la tua stazione" } }
+      }
+    },
+    "Check the timetable" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Prüfe den Fahrplan" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Consultez l'horaire" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Controlla l'orario" } }
+      }
+    },
+    "Set notifications with a swipe from right to left" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Richte Benachrichtigungen mit einem Wisch von rechts nach links ein" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Configurez les notifications en balayant de droite à gauche" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Imposta le notifiche scorrendo da destra a sinistra" } }
+      }
+    },
+    "Enjoy your ride!" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Viel Spaß bei der Fahrt!" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Profitez de votre balade !" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Goditi il giro!" } }
+      }
+    },
+    "Be respectful to other water users" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sei rücksichtsvoll gegenüber anderen Wassernutzern" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Soyez respectueux envers les autres usagers de l'eau" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sii rispettoso verso gli altri utenti dell'acqua" } }
+      }
+    },
+    "Follow local regulations" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Halte dich an die örtlichen Vorschriften" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Respectez la réglementation locale" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rispetta le normative locali" } }
+      }
+    },
+    "Real-time boat schedule tracking" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bootsfahrplan in Echtzeit verfolgen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Suivi des horaires de bateaux en temps réel" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Monitoraggio in tempo reale degli orari dei battelli" } }
+      }
+    },
+    "Smart notifications 3, 5, 10 or 15 minutes before waves" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Intelligente Benachrichtigungen 3, 5, 10 oder 15 Minuten vor den Waves" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifications intelligentes 3, 5, 10 ou 15 minutes avant les Waves" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Notifiche intelligenti 3, 5, 10 o 15 minuti prima delle Waves" } }
+      }
+    },
+    "Easy station selection on Swiss Lakes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einfache Stationsauswahl auf Schweizer Seen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sélection facile des stations sur les lacs suisses" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Selezione facile delle stazioni sui laghi svizzeri" } }
+      }
+    },
+    "Precise wave timing information" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Präzise Timing-Informationen zu den Waves" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Informations précises sur le timing des Waves" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Informazioni precise sui tempi delle Waves" } }
+      }
+    },
+    "Custom boat horn notifications" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Individuelle Benachrichtigungen mit Bootshorn" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifications personnalisées avec la corne du bateau" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Notifiche personalizzate con la sirena della barca" } }
+      }
     }
   },
   "version" : "1.1"

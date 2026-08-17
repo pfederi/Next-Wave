@@ -600,7 +600,7 @@ struct HowItWorksSection: View {
 
 struct StepView: View {
     let number: Int
-    let text: String
+    let text: LocalizedStringKey
     
     var body: some View {
         HStack {
@@ -611,7 +611,7 @@ struct StepView: View {
 }
 
 struct FeaturesSection: View {
-    let features = [
+    let features: [LocalizedStringKey] = [
         "Real-time boat schedule tracking",
         "Smart notifications 3, 5, 10 or 15 minutes before waves",
         "Easy station selection on Swiss Lakes",
@@ -622,8 +622,8 @@ struct FeaturesSection: View {
     var body: some View {
         DisclosureGroup("Features") {
             VStack(alignment: .leading, spacing: 8) {
-                ForEach(features, id: \.self) { feature in
-                    SafetyRuleView(rule: feature)
+                ForEach(features.indices, id: \.self) { index in
+                    SafetyRuleView(rule: features[index])
                 }
             }
             .font(.body)
@@ -770,7 +770,7 @@ struct FooterSection: View {
 
 // MARK: - Supporting Views
 struct SafetyRuleView: View {
-    let rule: String
+    let rule: LocalizedStringKey
     
     var body: some View {
         HStack(alignment: .top, spacing: 8) {

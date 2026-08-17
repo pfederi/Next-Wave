@@ -1,6 +1,55 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Stats" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Statistiken" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Statistiques" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Statistiche" } }
+      }
+    },
+    "Earned (%lld)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erhalten (%lld)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Obtenus (%lld)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ottenuti (%lld)" } }
+      }
+    },
+    "Locked (%lld)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gesperrt (%lld)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Verrouillés (%lld)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Bloccati (%lld)" } }
+      }
+    },
+    "sessions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sessions" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "sessions" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "sessioni" } }
+      }
+    },
+    "total" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gesamt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "total" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "totale" } }
+      }
+    },
+    "longest" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Längste" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "plus longue" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "più lunga" } }
+      }
+    },
+    "km/h top" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "km/h Spitze" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "km/h max" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "km/h max" } }
+      }
+    },
     "🎉 New badge%@!" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "🎉 Neue Badge%@!" } },

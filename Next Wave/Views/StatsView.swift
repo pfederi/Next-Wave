@@ -129,7 +129,7 @@ struct StatsView: View {
         }
     }
 
-    private func sectionHeader(_ title: String) -> some View {
+    private func sectionHeader(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .font(.title3.weight(.bold))
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -179,7 +179,7 @@ struct StatsView: View {
         }
     }
 
-    private func stat(_ value: String, _ label: String) -> some View {
+    private func stat(_ value: String, _ label: LocalizedStringKey) -> some View {
         VStack(spacing: 2) {
             Text(value).font(.title3.bold())
             Text(label).font(.caption).foregroundColor(.secondary)
@@ -197,7 +197,7 @@ struct StatsView: View {
         }
     }
 
-    private func badgeSection(_ title: String, _ items: [GridBadge]) -> some View {
+    private func badgeSection(_ title: LocalizedStringKey, _ items: [GridBadge]) -> some View {
         VStack(alignment: .leading, spacing: 28) {
             sectionHeader(title)
             LazyVGrid(columns: columns, spacing: 32) {

@@ -9,6 +9,7 @@ struct WaveCheckinBadge: View {
     let onToggle: () -> Void
 
     @State private var showDetails = false
+    @Environment(\.locale) private var locale
 
     var body: some View {
         Button(action: { showDetails = true }) {
@@ -32,7 +33,7 @@ struct WaveCheckinBadge: View {
     private func spelledOut(_ n: Int) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .spellOut
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.locale = locale
         guard let word = formatter.string(from: NSNumber(value: n)) else { return "\(n)" }
         return word.prefix(1).uppercased() + word.dropFirst()
     }

@@ -37,3 +37,6 @@ Gemfile.lock
 
 # Supabase CLI local state
 supabase/.temp/
+
+# Git worktrees
+.worktrees/

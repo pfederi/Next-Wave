@@ -11,18 +11,24 @@ class SharedDataManager {
     private let departuresKey = "nextDepartures"
     private let nearestStationKey = "nearestStation"
     private let widgetSettingsKey = "widgetSettings"
-    
+    private let languageKey = "appLanguage"
+
     private init() {}
-    
+
     // MARK: - Favorites
-    
+
     func saveFavoriteStations(_ stations: [FavoriteStation]) {
         if let encoded = try? JSONEncoder().encode(stations) {
             userDefaults?.set(encoded, forKey: favoritesKey)
             userDefaults?.synchronize() // Force immediate synchronization
         }
     }
-    
+
+    func saveAppLanguage(_ language: String) {
+        userDefaults?.set(language, forKey: languageKey)
+        userDefaults?.synchronize()
+    }
+
     func loadFavoriteStations() -> [FavoriteStation] {
         if let data = userDefaults?.data(forKey: favoritesKey),
            let stations = try? JSONDecoder().decode([FavoriteStation].self, from: data) {

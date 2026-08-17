@@ -25,6 +25,8 @@ class AppSettings: ObservableObject {
     @Published var language: AppLanguage {
         didSet {
             UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
+            SharedDataManager.shared.saveAppLanguage(language.rawValue)
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 

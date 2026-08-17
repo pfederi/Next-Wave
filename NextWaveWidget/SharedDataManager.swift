@@ -12,7 +12,8 @@ class SharedDataManager {
     private let favoriteStationsKey = "favoriteStations"
     private let nearestStationKey = "nearestStation"
     private let widgetSettingsKey = "widgetSettings"
-    
+    private let languageKey = "appLanguage"
+
     private init() {}
     
     func saveNextDepartures(_ departures: [DepartureInfo]) {
@@ -92,7 +93,13 @@ class SharedDataManager {
         sharedDataLogger.info("🔍 No favorites found in either App Group, standard UserDefaults, or shared file")
         return []
     }
-    
+
+    // MARK: - Language
+
+    func loadAppLanguage() -> String {
+        userDefaults?.string(forKey: languageKey) ?? "system"
+    }
+
     private func loadFromSharedFile() -> [FavoriteStation]? {
         do {
             let groupURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.federi.Next-Wave")

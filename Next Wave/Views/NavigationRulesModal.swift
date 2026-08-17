@@ -411,8 +411,8 @@ struct CommunityGuidelinesCard: View {
 struct IdentificationItem: View {
     let icon: String
     let color: Color
-    let title: String
-    let description: String
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -438,8 +438,8 @@ struct IdentificationItem: View {
 struct CriticalRuleItem: View {
     let icon: String
     let color: Color
-    let title: String
-    let description: String
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -465,8 +465,8 @@ struct CriticalRuleItem: View {
 struct SafetyEquipmentItem: View {
     let icon: String
     let color: Color
-    let title: String
-    let description: String
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

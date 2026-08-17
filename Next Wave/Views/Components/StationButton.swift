@@ -3,7 +3,14 @@ import SwiftUI
 struct StationButton: View {
     let stationName: String?
     @Binding var showPicker: Bool
-    
+
+    private var displayText: Text {
+        if let stationName = stationName {
+            return Text(stationName)
+        }
+        return Text("Select Station")
+    }
+
     var body: some View {
         Button(action: { showPicker = true }) {
             HStack {
@@ -11,8 +18,8 @@ struct StationButton: View {
                     .foregroundColor(Color("text-color"))
                     .font(.system(size: 20))
                     .padding(.trailing, 8)
-                
-                Text(stationName ?? "Select Station")
+
+                displayText
                     .foregroundColor(Color("text-color"))
                     .font(.system(size: 17, weight: .semibold))
                 

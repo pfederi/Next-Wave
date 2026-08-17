@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import CryptoKit
 
 struct GPXImportSummary: Identifiable {
@@ -9,7 +10,7 @@ struct GPXImportSummary: Identifiable {
     let longestRideM: Double
     let topSpeedKmh: Double
     let rideCount: Int
-    let message: String?
+    let message: LocalizedStringKey?
 }
 
 @MainActor
@@ -28,7 +29,7 @@ final class GPXImportCoordinator: ObservableObject {
         return SHA256.hash(data: Data(raw.utf8)).map { String(format: "%02x", $0) }.joined()
     }
 
-    private func report(_ outcome: GPXImportSummary.Outcome, message: String? = nil,
+    private func report(_ outcome: GPXImportSummary.Outcome, message: LocalizedStringKey? = nil,
                         metrics: SessionMetrics? = nil, rideCount: Int = 0) {
         summary = GPXImportSummary(
             outcome: outcome,

@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 class SchedulePeriodService: ObservableObject {
     @Published var scheduleData: SchedulePeriodsData?
@@ -100,7 +101,7 @@ class SchedulePeriodService: ObservableObject {
     }
     
     /// Get a formatted message for the schedule countdown
-    func getScheduleCountdownMessage(for lakeName: String) -> String? {
+    func getScheduleCountdownMessage(for lakeName: String) -> LocalizedStringKey? {
         logger.debug("Getting schedule countdown for lake: \(lakeName)")
         
         guard let lake = scheduleData?.lakes.first(where: { $0.name == lakeName }) else {
@@ -124,20 +125,20 @@ class SchedulePeriodService: ObservableObject {
     }
     
     /// Get witty messages based on schedule transitions
-    private func getWittyMessage(days: Int, scheduleType: ScheduleType, isEnding: Bool = false) -> String {
-        let timeText: String
+    private func getWittyMessage(days: Int, scheduleType: ScheduleType, isEnding: Bool = false) -> LocalizedStringKey {
+        let timeText: Text
         if days == 0 {
-            timeText = "Today"
+            timeText = Text("Today")
         } else if days == 1 {
-            timeText = "Tomorrow"
+            timeText = Text("Tomorrow")
         } else {
-            timeText = "\(days) days"
+            timeText = Text("\(days) days")
         }
-        
+
         switch scheduleType {
         case .summer:
             if days == 0 || days == 1 {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText): More boats, more waves! \(scheduleType.emoji)",
                     "\(timeText): Summer boat festival begins! \(scheduleType.emoji)",
                     "\(timeText): Maximum boat chaos incoming! \(scheduleType.emoji)",
@@ -145,7 +146,7 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText): Summer schedule begins! \(scheduleType.emoji)"
             } else {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText) until more boats, more waves! \(scheduleType.emoji)",
                     "\(timeText) until summer boat festival! \(scheduleType.emoji)",
                     "\(timeText) until wave-hopping paradise! \(scheduleType.emoji)",
@@ -153,18 +154,18 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText) until summer schedule! \(scheduleType.emoji)"
             }
-            
+
         case .winter:
             if days == 0 || days == 1 {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText): Boats entering hibernation \(scheduleType.emoji)",
-                    "\(timeText): Winter chill mode activated \(scheduleType.emoji)", 
+                    "\(timeText): Winter chill mode activated \(scheduleType.emoji)",
                     "\(timeText): Quality over quantity season \(scheduleType.emoji)",
                     "\(timeText): Boats need their winter sleep \(scheduleType.emoji)"
                 ]
                 return messages.randomElement() ?? "\(timeText): Winter schedule begins! \(scheduleType.emoji)"
             } else {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText) until boats hibernate \(scheduleType.emoji)",
                     "\(timeText) until winter chill mode \(scheduleType.emoji)",
                     "\(timeText) until fewer boats, more peace \(scheduleType.emoji)",
@@ -172,10 +173,10 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText) until winter schedule! \(scheduleType.emoji)"
             }
-            
+
         case .autumn:
             if days == 0 || days == 1 {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText): Boats getting sleepy \(scheduleType.emoji)",
                     "\(timeText): Farewell summer crowds! \(scheduleType.emoji)",
                     "\(timeText): Cozy boat season begins \(scheduleType.emoji)",
@@ -183,7 +184,7 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText): Autumn schedule begins! \(scheduleType.emoji)"
             } else {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText) until boats get sleepy \(scheduleType.emoji)",
                     "\(timeText) until farewell summer crowds \(scheduleType.emoji)",
                     "\(timeText) until cozy boat season \(scheduleType.emoji)",
@@ -191,10 +192,10 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText) until autumn schedule! \(scheduleType.emoji)"
             }
-            
+
         case .spring:
             if days == 0 || days == 1 {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText): Boats wake up from winter naps! \(scheduleType.emoji)",
                     "\(timeText): More waves returning! \(scheduleType.emoji)",
                     "\(timeText): Spring awakening on the lake \(scheduleType.emoji)",
@@ -202,7 +203,7 @@ class SchedulePeriodService: ObservableObject {
                 ]
                 return messages.randomElement() ?? "\(timeText): Spring schedule begins! \(scheduleType.emoji)"
             } else {
-                let messages = [
+                let messages: [LocalizedStringKey] = [
                     "\(timeText) until boats wake up! \(scheduleType.emoji)",
                     "\(timeText) until more waves return \(scheduleType.emoji)",
                     "\(timeText) until spring awakening \(scheduleType.emoji)",
@@ -390,19 +391,19 @@ class SchedulePeriodService: ObservableObject {
 // MARK: - Extension for easier access
 extension SchedulePeriodService {
     /// Get countdown message for a station
-    func getCountdownMessageForStation(_ stationName: String) -> String? {
+    func getCountdownMessageForStation(_ stationName: String) -> LocalizedStringKey? {
         logger.debug("Getting countdown message for station: \(stationName)")
-        
-        guard let lakeName = getLakeForStation(stationName) else { 
+
+        guard let lakeName = getLakeForStation(stationName) else {
             logger.debug("No lake found for station: \(stationName)")
-            return nil 
+            return nil
         }
-        
+
         logger.debug("Found lake: \(lakeName) for station: \(stationName)")
-        
+
         let message = getScheduleCountdownMessage(for: lakeName)
-        logger.debug("Schedule countdown message: \(message ?? "nil")")
-        
+        logger.debug("Schedule countdown message: \(message == nil ? "nil" : "found")")
+
         return message
     }
 }

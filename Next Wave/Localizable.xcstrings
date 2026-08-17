@@ -1,6 +1,524 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "During daytime:" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Tagsüber:" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "De jour :" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Di giorno:" } }
+      }
+    },
+    "Green ball at the highest point." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Grüner Ball am höchsten Punkt." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Boule verte au point le plus haut." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sfera verde nel punto più alto." } }
+      }
+    },
+    "At night:" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nachts:" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "De nuit :" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Di notte:" } }
+      }
+    },
+    "White light at bow (front), green light on starboard (right), red light on port (left), and green light at highest point." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Weißes Licht am Bug (vorne), grünes Licht an Steuerbord (rechts), rotes Licht an Backbord (links) und grünes Licht am höchsten Punkt." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Feu blanc à la proue (avant), feu vert à tribord (droite), feu rouge à bâbord (gauche) et feu vert au point le plus haut." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Luce bianca a prua (davanti), luce verde a tribordo (destra), luce rossa a babordo (sinistra) e luce verde nel punto più alto." } }
+      }
+    },
+    "NEVER ride in front of the ship" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fahre NIEMALS vor dem Schiff" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ne roulez JAMAIS devant le navire" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Non andare MAI davanti alla nave" } }
+      }
+    },
+    "Always stay behind or to the side." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bleibe immer dahinter oder seitlich davon." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Restez toujours derrière ou sur le côté." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Resta sempre dietro o di lato." } }
+      }
+    },
+    "Best waves are further back anyway" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die besten Waves sind ohnehin weiter hinten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "De toute façon, les meilleures Waves sont plus loin derrière" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Le Wave migliori sono comunque più indietro" } }
+      }
+    },
+    "You'll get better waves staying behind." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wenn du dahinter bleibst, bekommst du bessere Waves." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En restant derrière, vous obtiendrez de meilleures Waves." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Restando dietro otterrai Wave migliori." } }
+      }
+    },
+    "Leave the priority route as quickly as possible" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verlasse die Vorfahrtsroute so schnell wie möglich" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Quittez la route prioritaire le plus rapidement possible" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Lascia la rotta prioritaria il più rapidamente possibile" } }
+      }
+    },
+    "Don't linger in shipping lanes. Shipping lanes are visible on the map." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Halte dich nicht in Schifffahrtsrouten auf. Schifffahrtsrouten sind auf der Karte sichtbar." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ne vous attardez pas dans les voies de navigation. Les voies de navigation sont visibles sur la carte." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Non sostare nelle rotte di navigazione. Le rotte di navigazione sono visibili sulla mappa." } }
+      }
+    },
+    "Highly visible head protection" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gut sichtbarer Kopfschutz" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Protection de tête bien visible" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Protezione per la testa ben visibile" } }
+      }
+    },
+    "Wear bright, easily visible headgear for safety." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Trage zur Sicherheit eine leuchtende, gut sichtbare Kopfbedeckung." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Portez un couvre-chef vif et bien visible pour votre sécurité." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Indossa un copricapo vivace e ben visibile per sicurezza." } }
+      }
+    },
+    "Life jacket required outside shore zone (300m)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rettungsweste außerhalb der Uferzone (300m) erforderlich" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gilet de sauvetage obligatoire en dehors de la zone riveraine (300m)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Giubbotto di salvataggio obbligatorio fuori dalla zona rivierasca (300m)" } }
+      }
+    },
+    "Minimum 50N buoyancy required when leaving 300m shore zone." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mindestens 50N Auftrieb erforderlich, wenn die 300m-Uferzone verlassen wird." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Flottabilité minimale de 50N requise en quittant la zone riveraine de 300m." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Galleggiabilità minima di 50N richiesta quando si esce dalla zona rivierasca di 300m." } }
+      }
+    },
+    "Session imported! 🏄" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Session importiert! 🏄" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Session importée ! 🏄" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sessione importata! 🏄" } }
+      }
+    },
+    "Already imported" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bereits importiert" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Déjà importée" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Già importata" } }
+      }
+    },
+    "No boat waves" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Bootswaves" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune Wave de bateau" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessuna Wave di barca" } }
+      }
+    },
+    "Unsupported file" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nicht unterstützte Datei" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fichier non pris en charge" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "File non supportato" } }
+      }
+    },
+    "Import failed" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Import fehlgeschlagen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échec de l'importation" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Importazione non riuscita" } }
+      }
+    },
+    "Wake-thieving rides" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wake-thieving-Fahrten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sorties de Wake-thieving" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Uscite di Wake-thieving" } }
+      }
+    },
+    "Distance (behind ships)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Distanz (hinter Schiffen)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Distance (derrière les navires)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Distanza (dietro le navi)" } }
+      }
+    },
+    "Longest ride" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Längste Fahrt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sortie la plus longue" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Uscita più lunga" } }
+      }
+    },
+    "Top speed" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Höchstgeschwindigkeit" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vitesse de pointe" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Velocità massima" } }
+      }
+    },
+    "Couldn't read the GPX file." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die GPX-Datei konnte nicht gelesen werden." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de lire le fichier GPX." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impossibile leggere il file GPX." } }
+      }
+    },
+    "Only Foilmotion GPX files are supported." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Es werden nur Foilmotion-GPX-Dateien unterstützt." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Seuls les fichiers GPX Foilmotion sont pris en charge." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sono supportati solo i file GPX di Foilmotion." } }
+      }
+    },
+    "The track has too few points." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Strecke hat zu wenige Punkte." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le tracé comporte trop peu de points." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Il tracciato ha troppo pochi punti." } }
+      }
+    },
+    "Already imported." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bereits importiert." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Déjà importée." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Già importata." } }
+      }
+    },
+    "No boat dock near your track — verified rides need a scheduled-boat (Kursschiff) wave." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kein Bootsanleger in der Nähe deiner Strecke — verifizierte Fahrten benötigen eine Wave von einem Kursschiff." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun débarcadère à proximité de votre tracé — les sorties vérifiées nécessitent une Wave d'un bateau de ligne (Kursschiff)." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessun pontile nelle vicinanze del tuo tracciato — le uscite verificate richiedono una Wave di un battello di linea (Kursschiff)." } }
+      }
+    },
+    "No boat timetable available for %@. Verified rides only work for recent sessions (the current timetable period)." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Für %@ ist kein Bootsfahrplan verfügbar. Verifizierte Fahrten funktionieren nur für aktuelle Sessions (die aktuelle Fahrplanperiode)." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucun horaire de bateau disponible pour le %@. Les sorties vérifiées ne fonctionnent que pour les sessions récentes (la période d'horaire actuelle)." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessun orario battelli disponibile per il %@. Le uscite verificate funzionano solo per le sessioni recenti (il periodo di orario attuale)." } }
+      }
+    },
+    "No wave rides detected behind a boat in this session." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In dieser Session wurden keine Wave-Fahrten hinter einem Boot erkannt." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune sortie de Wave derrière un bateau n'a été détectée dans cette session." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "In questa sessione non sono state rilevate uscite di Wave dietro una barca." } }
+      }
+    },
+    "Couldn't upload — check your connection and try again." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Hochladen fehlgeschlagen — überprüfe deine Verbindung und versuche es erneut." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Échec du téléchargement — vérifiez votre connexion et réessayez." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Caricamento non riuscito — controlla la tua connessione e riprova." } }
+      }
+    },
+    "Today" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aujourd'hui" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Oggi" } }
+      }
+    },
+    "Tomorrow" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Morgen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Demain" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Domani" } }
+      }
+    },
+    "%lld days" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Tage" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld jours" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld giorni" } }
+      }
+    },
+    "%@: More boats, more waves! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Mehr Boote, mehr Waves! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : plus de bateaux, plus de Waves ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: più barche, più Wave! %@" } }
+      }
+    },
+    "%@: Summer boat festival begins! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Das Sommer-Bootsfestival beginnt! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : le festival estival des bateaux commence ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia il festival estivo delle barche! %@" } }
+      }
+    },
+    "%@: Maximum boat chaos incoming! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Maximales Boots-Chaos steht bevor! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : chaos maximal de bateaux en approche ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: in arrivo il caos massimo delle barche! %@" } }
+      }
+    },
+    "%@: All aboard the summer madness! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Alle an Bord des Sommerwahnsinns! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : tout le monde à bord de la folie estivale ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: tutti a bordo della follia estiva! %@" } }
+      }
+    },
+    "%@: Summer schedule begins! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Der Sommerfahrplan beginnt! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : l'horaire d'été commence ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia l'orario estivo! %@" } }
+      }
+    },
+    "%@ until more boats, more waves! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis mehr Boote, mehr Waves! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant plus de bateaux, plus de Waves ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ a più barche, più Wave! %@" } }
+      }
+    },
+    "%@ until summer boat festival! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Sommer-Bootsfestival! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le festival estival des bateaux ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al festival estivo delle barche! %@" } }
+      }
+    },
+    "%@ until wave-hopping paradise! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Wave-Hopping-Paradies! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le paradis du Wave-hopping ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al paradiso del Wave-hopping! %@" } }
+      }
+    },
+    "%@ until maximum boat chaos! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum maximalen Boots-Chaos! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le chaos maximal de bateaux ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al caos massimo delle barche! %@" } }
+      }
+    },
+    "%@ until summer schedule! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Sommerfahrplan! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'horaire d'été ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ all'orario estivo! %@" } }
+      }
+    },
+    "%@: Boats entering hibernation %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Boote gehen in den Winterschlaf %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : les bateaux entrent en hibernation %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: le barche vanno in letargo %@" } }
+      }
+    },
+    "%@: Winter chill mode activated %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Winter-Chill-Modus aktiviert %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : mode détente hivernale activé %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: modalità relax invernale attivata %@" } }
+      }
+    },
+    "%@: Quality over quantity season %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Qualität statt Quantität %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : la saison de la qualité plutôt que la quantité %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: la stagione della qualità sulla quantità %@" } }
+      }
+    },
+    "%@: Boats need their winter sleep %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Die Boote brauchen ihren Winterschlaf %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : les bateaux ont besoin de leur sommeil hivernal %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: le barche hanno bisogno del loro sonno invernale %@" } }
+      }
+    },
+    "%@: Winter schedule begins! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Der Winterfahrplan beginnt! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : l'horaire d'hiver commence ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia l'orario invernale! %@" } }
+      }
+    },
+    "%@ until boats hibernate %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis die Boote überwintern %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'hibernation des bateaux %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al letargo delle barche %@" } }
+      }
+    },
+    "%@ until winter chill mode %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Winter-Chill-Modus %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le mode détente hivernale %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ alla modalità relax invernale %@" } }
+      }
+    },
+    "%@ until fewer boats, more peace %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis weniger Boote, mehr Ruhe %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant moins de bateaux, plus de tranquillité %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ a meno barche, più tranquillità %@" } }
+      }
+    },
+    "%@ until quality over quantity %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis Qualität statt Quantität %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant la qualité plutôt que la quantité %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ alla qualità sulla quantità %@" } }
+      }
+    },
+    "%@ until winter schedule! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Winterfahrplan! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'horaire d'hiver ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ all'orario invernale! %@" } }
+      }
+    },
+    "%@: Boats getting sleepy %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Die Boote werden müde %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : les bateaux commencent à somnoler %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: le barche iniziano ad appisolarsi %@" } }
+      }
+    },
+    "%@: Farewell summer crowds! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Abschied von den Sommermassen! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : adieu aux foules estivales ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: addio alla folla estiva! %@" } }
+      }
+    },
+    "%@: Cozy boat season begins %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Die gemütliche Bootssaison beginnt %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : la saison cocooning des bateaux commence %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia la stagione accogliente delle barche %@" } }
+      }
+    },
+    "%@: Golden hour boat rides %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Bootsfahrten zur goldenen Stunde %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : balades en bateau à l'heure dorée %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: gite in barca all'ora d'oro %@" } }
+      }
+    },
+    "%@: Autumn schedule begins! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Der Herbstfahrplan beginnt! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : l'horaire d'automne commence ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia l'orario autunnale! %@" } }
+      }
+    },
+    "%@ until boats get sleepy %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis die Boote müde werden %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant que les bateaux ne somnolent %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ a quando le barche si appisoleranno %@" } }
+      }
+    },
+    "%@ until farewell summer crowds %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Abschied von den Sommermassen %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'adieu aux foules estivales %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ all'addio alla folla estiva %@" } }
+      }
+    },
+    "%@ until cozy boat season %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zur gemütlichen Bootssaison %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant la saison cocooning des bateaux %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ alla stagione accogliente delle barche %@" } }
+      }
+    },
+    "%@ until golden hour rides %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zu Fahrten in der goldenen Stunde %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant les balades à l'heure dorée %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ alle gite all'ora d'oro %@" } }
+      }
+    },
+    "%@ until autumn schedule! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Herbstfahrplan! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'horaire d'automne ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ all'orario autunnale! %@" } }
+      }
+    },
+    "%@: Boats wake up from winter naps! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Die Boote erwachen aus dem Winterschlaf! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : les bateaux se réveillent de leur sieste hivernale ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: le barche si risvegliano dal riposo invernale! %@" } }
+      }
+    },
+    "%@: More waves returning! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Mehr Waves kehren zurück! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : le retour de plus de Waves ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: tornano più Wave! %@" } }
+      }
+    },
+    "%@: Spring awakening on the lake %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Frühlingserwachen am See %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : réveil printanier sur le lac %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: risveglio primaverile sul lago %@" } }
+      }
+    },
+    "%@: Boats bloom like flowers %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Die Boote erblühen wie Blumen %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : les bateaux fleurissent comme des fleurs %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: le barche sbocciano come fiori %@" } }
+      }
+    },
+    "%@: Spring schedule begins! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@: Der Frühlingsfahrplan beginnt! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ : l'horaire de printemps commence ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@: inizia l'orario primaverile! %@" } }
+      }
+    },
+    "%@ until boats wake up! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis die Boote erwachen! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le réveil des bateaux ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al risveglio delle barche! %@" } }
+      }
+    },
+    "%@ until more waves return %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis mehr Waves zurückkehren %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le retour de plus de Waves %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al ritorno di più Wave %@" } }
+      }
+    },
+    "%@ until spring awakening %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Frühlingserwachen %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant le réveil printanier %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ al risveglio primaverile %@" } }
+      }
+    },
+    "%@ until boats bloom again %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis die Boote wieder erblühen %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant que les bateaux refleurissent %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ a quando le barche sbocceranno di nuovo %@" } }
+      }
+    },
+    "%@ until spring schedule! %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch %@ bis zum Frühlingsfahrplan! %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Plus que %@ avant l'horaire de printemps ! %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mancano %@ all'orario primaverile! %@" } }
+      }
+    },
     "Welcome to NextWave! 🌊" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Willkommen bei NextWave! 🌊" } },

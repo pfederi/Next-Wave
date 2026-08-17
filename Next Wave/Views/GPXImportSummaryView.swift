@@ -41,7 +41,7 @@ struct GPXImportSummaryView: View {
         case .notFoilmotion, .failed: return "exclamationmark.triangle"
         }
     }
-    private var title: String {
+    private var title: LocalizedStringKey {
         switch summary.outcome {
         case .imported: return "Session imported! 🏄"
         case .alreadyImported: return "Already imported"
@@ -50,7 +50,7 @@ struct GPXImportSummaryView: View {
         case .failed: return "Import failed"
         }
     }
-    private func row(_ label: String, _ value: String) -> some View {
+    private func row(_ label: LocalizedStringKey, _ value: String) -> some View {
         HStack { Text(label).foregroundColor(.secondary); Spacer(); Text(value).fontWeight(.semibold) }
     }
 }

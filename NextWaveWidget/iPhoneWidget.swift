@@ -893,7 +893,7 @@ struct SystemMediumMultipleView: View {
     
     private func formatDepartureTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.timeStyle = .short
+        formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
 }
@@ -996,7 +996,7 @@ struct SystemLargeMultipleView: View {
     
     private func formatDepartureTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.timeStyle = .short
+        formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }
 }

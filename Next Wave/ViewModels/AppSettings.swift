@@ -26,6 +26,7 @@ class AppSettings: ObservableObject {
         didSet {
             UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
             SharedDataManager.shared.saveAppLanguage(language.rawValue)
+            WatchConnectivityManager.shared.updateLanguageSetting(language.rawValue)
             WidgetCenter.shared.reloadAllTimelines()
         }
     }

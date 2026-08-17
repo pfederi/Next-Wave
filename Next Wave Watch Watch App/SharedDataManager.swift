@@ -54,6 +54,7 @@ class SharedDataManager {
     private let departuresKey = "nextDepartures"
     private let nearestStationKey = "nearestStation"
     private let widgetSettingsKey = "widgetSettings"
+    private let languageKey = "appLanguage"
     private var notificationToken: NSObjectProtocol?
     
     private init() {
@@ -216,7 +217,17 @@ class SharedDataManager {
         }
         return settings
     }
-    
+
+    func saveAppLanguage(_ language: String) {
+        userDefaults?.set(language, forKey: languageKey)
+        userDefaults?.synchronize()
+        logger.debug("Saved app language: \(language)")
+    }
+
+    func loadAppLanguage() -> String {
+        userDefaults?.string(forKey: languageKey) ?? "system"
+    }
+
     // MARK: - Widget Logic  
     func getNextDepartureForWidget() -> DepartureInfo? {
         let settings = loadWidgetSettings()

@@ -1,7 +1,475 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-
+    "Settings" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impostazioni" } }
+      }
+    },
+    "iPhone Widget Settings" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "iPhone-Widget-Einstellungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages du widget iPhone" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impostazioni widget iPhone" } }
+      }
+    },
+    "Widget Display Mode" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Widget-Anzeigemodus" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode d'affichage du widget" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modalità di visualizzazione del widget" } }
+      }
+    },
+    "Choose between nearest station or first favorite" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wähle zwischen nächstgelegener Station oder erstem Favorit" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez entre la station la plus proche ou le premier favori" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Scegli tra la stazione più vicina o il primo preferito" } }
+      }
+    },
+    "Watch Settings" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Watch-Einstellungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages Watch" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impostazioni Watch" } }
+      }
+    },
+    "Use Nearest Station" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstgelegene Station verwenden" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Utiliser la station la plus proche" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Usa la stazione più vicina" } }
+      }
+    },
+    "Show nearest station in widget and on top of favorites in Watch App" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstgelegene Station im Widget und oben in den Favoriten der Watch-App anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher la station la plus proche dans le widget et en haut des favoris dans l'app Watch" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra la stazione più vicina nel widget e in cima ai preferiti nell'app Watch" } }
+      }
+    },
+    "Display Options" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anzeigeoptionen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Options d'affichage" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Opzioni di visualizzazione" } }
+      }
+    },
+    "Show Nearest Station" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstgelegene Station anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher la station la plus proche" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra la stazione più vicina" } }
+      }
+    },
+    "Show Weather Information" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterinformationen anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les informations météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra le informazioni meteo" } }
+      }
+    },
+    "Enable Albis-Class Filter" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Albis-Klassen-Filter aktivieren" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Activer le filtre classe Albis" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Attiva il filtro classe Albis" } }
+      }
+    },
+    "Flip device 180° in departure view to filter for best waves (Zürichsee)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gerät in der Abfahrtsansicht um 180° drehen, um nach den besten Waves zu filtern (Zürichsee)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retournez l'appareil à 180° dans la vue des départs pour filtrer les meilleures Waves (Zürichsee)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Capovolgi il dispositivo di 180° nella vista partenze per filtrare le Waves migliori (Zürichsee)" } }
+      }
+    },
+    "Show Promo Tiles" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Promo-Kacheln anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les tuiles promo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra i riquadri promozionali" } }
+      }
+    },
+    "Display announcements and updates on home screen" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ankündigungen und Updates auf dem Startbildschirm anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les annonces et mises à jour sur l'écran d'accueil" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra annunci e aggiornamenti nella schermata principale" } }
+      }
+    },
+    "Reset Dismissed Tiles" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ausgeblendete Kacheln zurücksetzen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réinitialiser les tuiles masquées" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ripristina i riquadri nascosti" } }
+      }
+    },
+    "Show all promo tiles again that you dismissed" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alle von dir ausgeblendeten Promo-Kacheln wieder anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réafficher toutes les tuiles promo que vous avez masquées" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra di nuovo tutti i riquadri promozionali che hai nascosto" } }
+      }
+    },
+    "Notification Lead Time" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Benachrichtigungsvorlaufzeit" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Délai de notification" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Anticipo di notifica" } }
+      }
+    },
+    "Notification Sound" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Benachrichtigungston" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Son de notification" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Suono di notifica" } }
+      }
+    },
+    "Data Management" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Datenverwaltung" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Gestion des données" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Gestione dati" } }
+      }
+    },
+    "Clear All Cache" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gesamten Cache leeren" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vider tout le cache" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cancella tutta la cache" } }
+      }
+    },
+    "Clear all cached data (departures, ships, weather, water temp, water level)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alle zwischengespeicherten Daten löschen (Abfahrten, Schiffe, Wetter, Wassertemperatur, Wasserstand)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Effacer toutes les données en cache (départs, bateaux, météo, température de l'eau, niveau de l'eau)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cancella tutti i dati memorizzati nella cache (partenze, battelli, meteo, temperatura dell'acqua, livello dell'acqua)" } }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Annulla" } }
+      }
+    },
+    "Clear All" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alles löschen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Tout effacer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cancella tutto" } }
+      }
+    },
+    "This will clear all cached data including departures, ship names, weather data, water temperatures, water levels, and HTTP cache. All data will be freshly loaded from the server." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dadurch werden alle zwischengespeicherten Daten gelöscht, einschließlich Abfahrten, Schiffsnamen, Wetterdaten, Wassertemperaturen, Wasserständen und HTTP-Cache. Alle Daten werden neu vom Server geladen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Cela effacera toutes les données en cache, y compris les départs, les noms des bateaux, les données météo, les températures de l'eau, les niveaux d'eau et le cache HTTP. Toutes les données seront rechargées depuis le serveur." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Questa operazione cancellerà tutti i dati memorizzati nella cache, comprese partenze, nomi dei battelli, dati meteo, temperature dell'acqua, livelli dell'acqua e cache HTTP. Tutti i dati verranno ricaricati dal server." } }
+      }
+    },
+    "%lld minutes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld Minuten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld minutes" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld minuti" } }
+      }
+    },
+    "Information" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Informationen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Informations" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Informazioni" } }
+      }
+    },
+    "Safety First" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sicherheit zuerst" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "La sécurité d'abord" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "La sicurezza prima di tutto" } }
+      }
+    },
+    "Wakethieving Rules & Safety Guidelines" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wakethieving-Regeln & Sicherheitsrichtlinien" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Règles de Wakethieving et consignes de sécurité" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Regole del Wakethieving e linee guida di sicurezza" } }
+      }
+    },
+    "We support the" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wir unterstützen den" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nous soutenons le" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sosteniamo il" } }
+      }
+    },
+    "Pumpfoilers Code of Conduct" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Pumpfoilers Code of Conduct" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pumpfoilers Code of Conduct" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Pumpfoilers Code of Conduct" } }
+      }
+    },
+    "How it works" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "So funktioniert's" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Comment ça marche" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Come funziona" } }
+      }
+    },
+    "Features" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Funktionen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fonctionnalités" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Funzionalità" } }
+      }
+    },
+    "Other Useful Foiling Apps" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Weitere nützliche Foiling-Apps" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Autres applications de Foiling utiles" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Altre app di Foiling utili" } }
+      }
+    },
+    "%lld." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld." } }
+      }
+    },
+    "•" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "•" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "•" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "•" } }
+      }
+    },
+    "A big thank you to all our amazing supporters who help keep this app running!" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ein großes Dankeschön an all unsere großartigen Unterstützer, die diese App am Laufen halten!" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Un grand merci à tous nos incroyables supporters qui aident à faire fonctionner cette application !" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Un grande grazie a tutti i nostri fantastici sostenitori che aiutano a mantenere viva questa app!" } }
+      }
+    },
+    "View Our Supporters" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Unsere Unterstützer ansehen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Voir nos supporters" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Vedi i nostri sostenitori" } }
+      }
+    },
+    "Release Notes" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Versionshinweise" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notes de version" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Note di rilascio" } }
+      }
+    },
+    "Privacy Policy" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Datenschutzrichtlinie" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Politique de confidentialité" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Informativa sulla privacy" } }
+      }
+    },
+    "Made with 💙 by " : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erstellt mit 💙 von " } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Fait avec 💙 par " } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Realizzato con 💙 da " } }
+      }
+    },
+    "Lakeshore Studios" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lakeshore Studios" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Lakeshore Studios" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Lakeshore Studios" } }
+      }
+    },
+    "Version %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Version %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Version %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Versione %@" } }
+      }
+    },
+    "Appearance" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erscheinungsbild" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Apparence" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Aspetto" } }
+      }
+    },
+    "System" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "System" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Système" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sistema" } }
+      }
+    },
+    "Light Mode" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heller Modus" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode clair" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modalità chiara" } }
+      }
+    },
+    "Dark Mode" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dunkler Modus" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode sombre" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modalità scura" } }
+      }
+    },
+    "Language" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sprache" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Langue" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Lingua" } }
+      }
+    },
+    "Ready to ride?" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bereit zu fahren?" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prêt à partir ?" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Pronto a partire?" } }
+      }
+    },
+    "Pick a station to catch the next wave." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wähle eine Station, um die nächste Wave zu erwischen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Choisissez une station pour attraper la prochaine Wave." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Scegli una stazione per prendere la prossima Wave." } }
+      }
+    },
+    "Nearest Station" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächstgelegene Station" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Station la plus proche" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Stazione più vicina" } }
+      }
+    },
+    "Back" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zurück" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Retour" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Indietro" } }
+      }
+    },
+    "NextWave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "NextWave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "NextWave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "NextWave" } }
+      }
+    },
+    "First Favorite" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erster Favorit" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Premier favori" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Primo preferito" } }
+      }
+    },
+    "Shows your first favorite from the list" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeigt deinen ersten Favoriten aus der Liste" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Affiche votre premier favori de la liste" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra il tuo primo preferito dalla lista" } }
+      }
+    },
+    "Shows the nearest station based on your location" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zeigt die nächstgelegene Station basierend auf deinem Standort" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Affiche la station la plus proche selon votre position" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra la stazione più vicina in base alla tua posizione" } }
+      }
+    },
+    "This setting determines which station is displayed in your widgets. Changes will be applied on the next widget update." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Diese Einstellung bestimmt, welche Station in deinen Widgets angezeigt wird. Änderungen werden bei der nächsten Widget-Aktualisierung übernommen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ce réglage détermine quelle station est affichée dans vos widgets. Les modifications seront appliquées lors de la prochaine mise à jour du widget." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Questa impostazione determina quale stazione viene visualizzata nei tuoi widget. Le modifiche verranno applicate al prossimo aggiornamento del widget." } }
+      }
+    },
+    "Widget Settings" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Widget-Einstellungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Réglages du widget" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impostazioni widget" } }
+      }
+    },
+    "Done" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fertig" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Terminé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Fatto" } }
+      }
+    },
+    "Wave Check-in" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wave-Check-in" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Check-in Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Check-in Wave" } }
+      }
+    },
+    "Show Wave Check-ins" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wave-Check-ins anzeigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Afficher les Check-in Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mostra i Check-in Wave" } }
+      }
+    },
+    "See how many foilers plan to ride each wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sieh, wie viele Foiler jede Wave fahren wollen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Découvrez combien de foilers prévoient de rider chaque Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Scopri quanti foiler pensano di cavalcare ogni Wave" } }
+      }
+    },
+    "Check-in Name" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Check-in-Name" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nom de check-in" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nome check-in" } }
+      }
+    },
+    "Your name is visible to other foilers on this wave. Choose anonymous to be counted without a name. See our privacy policy for details." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dein Name ist für andere Foiler auf dieser Wave sichtbar. Wähle anonym, um ohne Namen gezählt zu werden. Details findest du in unserer Datenschutzrichtlinie." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Votre nom est visible par les autres foilers sur cette Wave. Choisissez anonyme pour être compté sans nom. Consultez notre politique de confidentialité pour plus de détails." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Il tuo nome è visibile agli altri foiler su questa Wave. Scegli anonimo per essere conteggiato senza nome. Consulta la nostra informativa sulla privacy per i dettagli." } }
+      }
+    },
+    "Your name" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Dein Name" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Votre nom" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Il tuo nome" } }
+      }
+    },
+    "Join anonymously" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anonym teilnehmen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Participer anonymement" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Partecipa in modo anonimo" } }
+      }
+    },
+    "How others see you" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wie andere dich sehen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Comment les autres vous voient" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Come ti vedono gli altri" } }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Speichern" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Enregistrer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Salva" } }
+      }
+    }
   },
   "version" : "1.1"
 }

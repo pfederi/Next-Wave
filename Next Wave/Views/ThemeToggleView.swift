@@ -62,13 +62,7 @@ struct ThemeToggleView: View {
                     .font(.system(size: 20))
                     .padding(.trailing, 8)
                     
-                    Text({
-                        switch appSettings.theme {
-                        case .light: return "Light Mode"
-                        case .dark: return "Dark Mode"
-                        case .system: return "System"
-                        }
-                    }())
+                    Text(themeDisplayKey)
                     .foregroundColor(Color("text-color"))
                     .font(.system(size: 17, weight: .semibold))
                     
@@ -93,4 +87,12 @@ struct ThemeToggleView: View {
             .frame(maxWidth: .infinity)
         }
     }
-} 
+
+    private var themeDisplayKey: LocalizedStringKey {
+        switch appSettings.theme {
+        case .light: return "Light Mode"
+        case .dark: return "Dark Mode"
+        case .system: return "System"
+        }
+    }
+}

@@ -1,6 +1,167 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Welcome to NextWave! 🌊" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Willkommen bei NextWave! 🌊" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Bienvenue sur NextWave ! 🌊" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Benvenuto su NextWave! 🌊" } }
+      }
+    },
+    "Before you start catching waves, please read these important wakethieving rules for your safety and to preserve access to this amazing sport." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bevor du beginnst, Waves zu fangen, lies bitte diese wichtigen Wakethieving-Regeln zu deiner Sicherheit und um den Zugang zu diesem großartigen Sport zu bewahren." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Avant de commencer à attraper des Waves, veuillez lire ces règles importantes de Wakethieving pour votre sécurité et pour préserver l'accès à ce sport formidable." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Prima di iniziare a prendere le Wave, leggi queste importanti regole di Wakethieving per la tua sicurezza e per preservare l'accesso a questo fantastico sport." } }
+      }
+    },
+    "Safe Distance Requirements" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anforderungen an den Sicherheitsabstand" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Exigences de distance de sécurité" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Requisiti di distanza di sicurezza" } }
+      }
+    },
+    "Identifying Priority Vessels" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorfahrtsschiffe erkennen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Identifier les navires prioritaires" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Identificare le imbarcazioni prioritarie" } }
+      }
+    },
+    "Critical Safety Rules" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Kritische Sicherheitsregeln" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Règles de sécurité critiques" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Regole di sicurezza critiche" } }
+      }
+    },
+    "Required Safety Equipment" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erforderliche Sicherheitsausrüstung" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Équipement de sécurité requis" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Equipaggiamento di sicurezza richiesto" } }
+      }
+    },
+    "Why This Matters" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Warum das wichtig ist" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pourquoi c'est important" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Perché è importante" } }
+      }
+    },
+    "Join Our Community" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Werde Teil unserer Community" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rejoignez notre communauté" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Unisciti alla nostra comunità" } }
+      }
+    },
+    "Enjoy your waves responsibly! 🏄‍♂️" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Genieße deine Waves verantwortungsvoll! 🏄‍♂️" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Profitez de vos Waves de manière responsable ! 🏄‍♂️" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Goditi le tue Wave in modo responsabile! 🏄‍♂️" } }
+      }
+    },
+    "Wakethieving Rules" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wakethieving-Regeln" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Règles de Wakethieving" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Regole del Wakethieving" } }
+      }
+    },
+    "50 meters on each side" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "50 Meter auf jeder Seite" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "50 mètres de chaque côté" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "50 metri su ogni lato" } }
+      }
+    },
+    "Maintain at least 50 meters distance from priority vessels (passenger ships) on both sides." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Halte auf beiden Seiten mindestens 50 Meter Abstand zu Vorfahrtsschiffen (Passagierschiffen)." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Maintenez une distance d'au moins 50 mètres des navires prioritaires (bateaux à passagers) des deux côtés." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mantieni una distanza di almeno 50 metri dalle imbarcazioni prioritarie (battelli passeggeri) su entrambi i lati." } }
+      }
+    },
+    "50 meters ≈ one boat length for most ships." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "50 Meter ≈ eine Schiffslänge bei den meisten Schiffen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "50 mètres ≈ une longueur de bateau pour la plupart des navires." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "50 metri ≈ una lunghezza di battello per la maggior parte delle imbarcazioni." } }
+      }
+    },
+    "Priority vessels are marked with:" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vorfahrtsschiffe sind gekennzeichnet mit:" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les navires prioritaires sont identifiés par :" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Le imbarcazioni prioritarie sono contrassegnate da:" } }
+      }
+    },
+    "Restube offers inflatable life jackets perfect for this requirement." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Restube bietet aufblasbare Rettungswesten, die perfekt für diese Anforderung geeignet sind." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Restube propose des gilets de sauvetage gonflables parfaitement adaptés à cette exigence." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Restube offre giubbotti di salvataggio gonfiabili perfetti per questo requisito." } }
+      }
+    },
+    "In an emergency stop, the captain must put the ship in reverse. This creates a powerful suction from the propeller that can be extremely dangerous." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bei einer Notbremsung muss der Kapitän das Schiff rückwärts fahren lassen. Dadurch entsteht ein starker Sog durch den Propeller, der extrem gefährlich sein kann." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En cas d'arrêt d'urgence, le capitaine doit mettre le navire en marche arrière. Cela crée une forte aspiration de l'hélice qui peut être extrêmement dangereuse." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "In caso di arresto di emergenza, il capitano deve mettere la nave in retromarcia. Questo crea una forte aspirazione dall'elica che può essere estremamente pericolosa." } }
+      }
+    },
+    "Following these rules prevents accidents and keeps wakethieving legal!" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Diese Regeln zu befolgen verhindert Unfälle und hält Wakethieving legal!" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Respecter ces règles permet d'éviter les accidents et de garder le Wakethieving légal !" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Seguire queste regole previene incidenti e mantiene legale il Wakethieving!" } }
+      }
+    },
+    "Be part of the responsible pumpfoiling movement in Switzerland" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Werde Teil der verantwortungsbewussten Pumpfoiling-Bewegung in der Schweiz" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Faites partie du mouvement pumpfoiling responsable en Suisse" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Fai parte del movimento responsabile del pumpfoiling in Svizzera" } }
+      }
+    },
+    "Swiss Pumpfoilers Code of Conduct" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Swiss Pumpfoilers Code of Conduct" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Swiss Pumpfoilers Code of Conduct" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Swiss Pumpfoilers Code of Conduct" } }
+      }
+    },
+    "Join the community commitment" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mach mit bei der Community-Verpflichtung" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rejoignez l'engagement de la communauté" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Unisciti all'impegno della comunità" } }
+      }
+    },
+    "Dismiss" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ausblenden" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Masquer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nascondi" } }
+      }
+    },
+    "Promo" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Promo" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Promo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Promo" } }
+      }
+    },
+    "Loading departures..." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abfahrten werden geladen..." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chargement des départs..." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Caricamento partenze..." } }
+      }
+    },
     "Stats" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Statistiken" } },

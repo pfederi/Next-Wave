@@ -641,7 +641,7 @@ struct SystemSmallView: View {
     let departure: DepartureInfo
     let isNearestStation: Bool
     let isFavoriteStation: Bool
-    let departureTimeText: String
+    let departureTimeText: Text
     
     var body: some View {
         VStack(spacing: 6) {
@@ -696,7 +696,7 @@ struct SystemSmallView: View {
                     .font(.caption2)
                     .foregroundColor(.white.opacity(0.7))
                 
-                Text(departureTimeText)
+                departureTimeText
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -723,7 +723,7 @@ struct SystemMediumView: View {
     let departure: DepartureInfo
     let isNearestStation: Bool
     let isFavoriteStation: Bool
-    let departureTimeText: String
+    let departureTimeText: Text
     
     var body: some View {
         VStack(spacing: 4) {
@@ -786,7 +786,7 @@ struct SystemMediumView: View {
             
             // Zeit - kompakt mit Next Departure oben
             VStack(alignment: .leading, spacing: 4) {
-                Text(departureTimeText)
+                departureTimeText
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
@@ -1005,7 +1005,7 @@ struct SystemLargeView: View {
     let departure: DepartureInfo
     let isNearestStation: Bool
     let isFavoriteStation: Bool
-    let departureTimeText: String
+    let departureTimeText: Text
     
     var body: some View {
         VStack(spacing: 16) {
@@ -1065,7 +1065,7 @@ struct SystemLargeView: View {
                     .font(.headline)
                     .foregroundColor(.white.opacity(0.9))
                 
-                Text(departureTimeText)
+                departureTimeText
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
@@ -1092,8 +1092,8 @@ struct SystemLargeView: View {
 // MARK: - Empty State Views for iPhone Widgets
 
 struct SystemSmallEmptyView: View {
-    let message: String
-    let subtitle: String
+    let message: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     
     init() {
         _ = SharedDataManager.shared.loadWidgetSettings()
@@ -1154,8 +1154,8 @@ struct SystemSmallEmptyView: View {
 }
 
 struct SystemMediumEmptyView: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let iconName: String
     
     init() {
@@ -1232,10 +1232,10 @@ struct SystemMediumEmptyView: View {
 }
 
 struct SystemLargeEmptyView: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let iconName: String
-    let actionText: String
+    let actionText: LocalizedStringKey
     
     init() {
         let favoriteStations = SharedDataManager.shared.loadFavoriteStations()
@@ -1261,7 +1261,9 @@ struct SystemLargeEmptyView: View {
                     self.actionText = "This may take a moment - departure data is being loaded in the background"
                 } else if hours < 2 {
                     self.title = "Refresh Needed"
-                    self.subtitle = "Departure data is about \(Int(hours)) hour\(hours >= 2 ? "s" : "") old"
+                    self.subtitle = hours >= 2
+                        ? "Departure data is about \(Int(hours)) hours old"
+                        : "Departure data is about \(Int(hours)) hour old"
                     self.iconName = "arrow.clockwise.circle"
                     self.actionText = "Open NextWave app to load fresh schedules and departure times"
                 } else if days < 1 {
@@ -1271,7 +1273,9 @@ struct SystemLargeEmptyView: View {
                     self.actionText = "Open app to refresh and see current departure times"
                 } else {
                     self.title = "Update Required"
-                    self.subtitle = "Departure data is \(Int(days)) day\(days >= 2 ? "s" : "") old"
+                    self.subtitle = days >= 2
+                        ? "Departure data is \(Int(days)) days old"
+                        : "Departure data is \(Int(days)) day old"
                     self.iconName = "wifi.exclamationmark"
                     self.actionText = "Open NextWave app to download fresh ferry schedules"
                 }
@@ -1363,22 +1367,22 @@ struct iPhoneWidgetEntryView: View {
         return entry.displayMode == .firstFavorite
     }
     
-    private var departureTimeText: String {
-        guard let departure = entry.departure else { return "--:--" }
-        
+    private var departureTimeText: Text {
+        guard let departure = entry.departure else { return Text(verbatim: "--:--") }
+
         let now = Date()
-        
+
         // Check if departure is in the next few minutes (show "now" for immediate departures)
         let minutesUntil = Int(departure.nextDeparture.timeIntervalSince(now) / 60)
         if minutesUntil <= 0 {
-            return "now"
+            return Text("now")
         }
-        
+
         // Always show "at HH:MM" regardless of day - simpler and clearer
         // This avoids issues with TMRW not updating after midnight
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        return "at \(formatter.string(from: departure.nextDeparture))"
+        return Text("at \(formatter.string(from: departure.nextDeparture))")
     }
 
     var body: some View {
@@ -1477,19 +1481,19 @@ struct iPhoneMultipleWidgetEntryView: View {
         }
     }
     
-    private func formatDepartureTime(_ date: Date) -> String {
+    private func formatDepartureTime(_ date: Date) -> Text {
         let now = Date()
         let minutesUntil = Int(date.timeIntervalSince(now) / 60)
-        
+
         // Check if departure is in the next few minutes (show "now" for immediate departures)
         if minutesUntil <= 0 {
-            return "now"
+            return Text("now")
         }
-        
+
         // Always show just the time - the smart logic already handles multi-day scenarios
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        return "at \(formatter.string(from: date))"
+        return Text("at \(formatter.string(from: date))")
     }
 }
 

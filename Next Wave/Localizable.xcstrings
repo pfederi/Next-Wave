@@ -792,6 +792,195 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifier" } },
         "it" : { "stringUnit" : { "state" : "translated", "value" : "Notifica" } }
       }
+    },
+    "Weather Condition" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterbedingung" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Condition météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Condizione meteo" } }
+      }
+    },
+    "Current weather condition (sunny, cloudy, rainy, etc.)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktuelle Wetterbedingung (sonnig, bewölkt, regnerisch usw.)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Condition météo actuelle (ensoleillé, nuageux, pluvieux, etc.)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Condizione meteo attuale (soleggiato, nuvoloso, piovoso, ecc.)" } }
+      }
+    },
+    "Air Temperature" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lufttemperatur" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Température de l'air" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Temperatura dell'aria" } }
+      }
+    },
+    "Current air temperature in degrees Celsius" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktuelle Lufttemperatur in Grad Celsius" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Température de l'air actuelle en degrés Celsius" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Temperatura dell'aria attuale in gradi Celsius" } }
+      }
+    },
+    "Water Temperature" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wassertemperatur" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Température de l'eau" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Temperatura dell'acqua" } }
+      }
+    },
+    "Current lake water temperature in degrees Celsius" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Aktuelle Wassertemperatur des Sees in Grad Celsius" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Température actuelle de l'eau du lac en degrés Celsius" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Temperatura attuale dell'acqua del lago in gradi Celsius" } }
+      }
+    },
+    "Wetsuit Thickness" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neoprenanzug-Dicke" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Épaisseur de la combinaison" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Spessore della muta" } }
+      }
+    },
+    "Recommended wetsuit thickness in millimeters based on water temperature and wind chill. If air + water temp < 30°C, one size thicker is recommended (e.g. 3/2mm, 4/3mm)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Empfohlene Neoprenanzug-Dicke in Millimetern basierend auf Wassertemperatur und gefühlter Kälte. Wenn Luft- + Wassertemperatur < 30 °C, wird eine Stufe dicker empfohlen (z. B. 3/2mm, 4/3mm)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Épaisseur de combinaison recommandée en millimètres selon la température de l'eau et la sensation de froid. Si température air + eau < 30 °C, une épaisseur supérieure est recommandée (p. ex. 3/2mm, 4/3mm)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Spessore della muta consigliato in millimetri in base alla temperatura dell'acqua e alla sensazione di freddo. Se temperatura aria + acqua < 30 °C, si consiglia uno spessore maggiore (es. 3/2mm, 4/3mm)" } }
+      }
+    },
+    "Wind Speed & Direction" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Windgeschwindigkeit & -richtung" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vitesse et direction du vent" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Velocità e direzione del vento" } }
+      }
+    },
+    "Wind speed in knots (kn) and wind direction (N, NE, E, SE, S, SW, W, NW)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Windgeschwindigkeit in Knoten (kn) und Windrichtung (N, NE, E, SE, S, SW, W, NW)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vitesse du vent en nœuds (kn) et direction du vent (N, NE, E, SE, S, SW, W, NW)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Velocità del vento in nodi (kn) e direzione del vento (N, NE, E, SE, S, SW, W, NW)" } }
+      }
+    },
+    "Night Time" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nachtzeit" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Période nocturne" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ora notturna" } }
+      }
+    },
+    "Departure is before sunrise or after sunset. Moon icon indicates full darkness, moon with stars indicates twilight (dusk/dawn)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Abfahrt liegt vor Sonnenaufgang oder nach Sonnenuntergang. Das Mond-Symbol zeigt völlige Dunkelheit an, der Mond mit Sternen zeigt Dämmerung an (Abend-/Morgendämmerung)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Le départ a lieu avant le lever ou après le coucher du soleil. L'icône de lune indique l'obscurité totale, la lune avec des étoiles indique le crépuscule (aube/crépuscule)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "La partenza avviene prima dell'alba o dopo il tramonto. L'icona della luna indica buio totale, la luna con le stelle indica il crepuscolo (alba/tramonto)" } }
+      }
+    },
+    "Water Level" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wasserpegel" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Niveau d'eau" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Livello dell'acqua" } }
+      }
+    },
+    "Difference from average water level in centimeters. Arrow up (↑) indicates higher water level, arrow down (↓) indicates lower water level (only shown for today)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abweichung vom durchschnittlichen Wasserpegel in Zentimetern. Pfeil nach oben (↑) zeigt höheren Wasserpegel, Pfeil nach unten (↓) zeigt niedrigeren Wasserpegel (nur für heute angezeigt)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Écart par rapport au niveau d'eau moyen en centimètres. La flèche vers le haut (↑) indique un niveau d'eau plus élevé, la flèche vers le bas (↓) indique un niveau d'eau plus bas (affiché uniquement pour aujourd'hui)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Differenza rispetto al livello medio dell'acqua in centimetri. La freccia verso l'alto (↑) indica un livello dell'acqua più alto, la freccia verso il basso (↓) indica un livello dell'acqua più basso (mostrato solo per oggi)" } }
+      }
+    },
+    "Clear Sky" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Klarer Himmel" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ciel dégagé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cielo sereno" } }
+      }
+    },
+    "Sunny weather with no clouds" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Sonniges Wetter ohne Wolken" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Temps ensoleillé sans nuages" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Tempo soleggiato senza nuvole" } }
+      }
+    },
+    "Partly Cloudy" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Teilweise bewölkt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Partiellement nuageux" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Parzialmente nuvoloso" } }
+      }
+    },
+    "Mix of sun and clouds" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mischung aus Sonne und Wolken" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mélange de soleil et de nuages" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Misto di sole e nuvole" } }
+      }
+    },
+    "Cloudy" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bewölkt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nuageux" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nuvoloso" } }
+      }
+    },
+    "Overcast sky" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bedeckter Himmel" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ciel couvert" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cielo coperto" } }
+      }
+    },
+    "Rain" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pluie" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Pioggia" } }
+      }
+    },
+    "Rainy weather" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Regnerisches Wetter" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Temps pluvieux" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Tempo piovoso" } }
+      }
+    },
+    "Today, %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Heute, %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aujourd'hui, %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Oggi, %@" } }
+      }
+    },
+    "missed" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "verpasst" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "manqué" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "perso" } }
+      }
+    },
+    "now" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "jetzt" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "maintenant" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "ora" } }
+      }
+    },
+    "%lldh %lldm" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lldh %lldm" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lldh %lldm" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lldh %lldm" } }
+      }
+    },
+    "%lldm" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lldm" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lldm" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lldm" } }
+      }
     }
   },
   "version" : "1.1"

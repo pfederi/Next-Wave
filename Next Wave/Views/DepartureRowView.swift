@@ -466,17 +466,17 @@ private struct RemainingTimeView: View {
         let hours = abs(minutes) / 60
         let remainingMinutes = abs(minutes) % 60
         
-        Text({
+        Group {
             if timeInterval <= -300 {
-                return "missed"
+                Text("missed")
             } else if timeInterval <= 300 {
-                return "now"
+                Text("now")
             } else if hours > 0 {
-                return "\(hours)h \(remainingMinutes)m"
+                Text("\(hours)h \(remainingMinutes)m")
             } else {
-                return "\(minutes)m"
+                Text("\(minutes)m")
             }
-        }())
+        }
         .font(.caption)
         .foregroundColor({
             if timeInterval <= -300 { 
@@ -1007,8 +1007,8 @@ struct WeatherLegendView: View {
 struct LegendRow: View {
     let icon: String
     let iconColor: Color
-    let title: String
-    let description: String
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

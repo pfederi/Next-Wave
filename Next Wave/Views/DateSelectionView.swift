@@ -104,21 +104,22 @@ struct DatePillView: View {
     let isToday: Bool
     let namespace: Namespace.ID
     
-    private var displayText: String {
+    private var displayText: Text {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
-        
+
         if isToday {
             formatter.dateFormat = "d MMM"
-            return "Today, \(formatter.string(from: date))"
+            let dateString = formatter.string(from: date)
+            return Text("Today, \(dateString)")
         } else {
             formatter.dateFormat = "EEE, d MMM"
-            return formatter.string(from: date)
+            return Text(formatter.string(from: date))
         }
     }
-    
+
     var body: some View {
-        Text(displayText)
+        displayText
             .font(.system(size: 15, weight: isSelected ? .semibold : .regular))
             .foregroundColor(isSelected ? .white : Color("text-color"))
             .padding(.horizontal, 16)

@@ -6,10 +6,12 @@ struct CheckinSettingsSection: View {
     @ObservedObject var appSettings: AppSettings
     @State private var showIdentitySheet = false
 
-    private var identityLabel: String {
-        if appSettings.checkinAnonymous { return "Anonymous" }
+    private var identityText: Text {
+        if appSettings.checkinAnonymous {
+            return Text("Anonymous")
+        }
         let name = appSettings.checkinName.trimmingCharacters(in: .whitespacesAndNewlines)
-        return name.isEmpty ? "Not set" : name
+        return name.isEmpty ? Text("Not set") : Text(name)
     }
 
     var body: some View {
@@ -49,7 +51,7 @@ struct CheckinSettingsSection: View {
                             Text("Check-in Name")
                                 .foregroundColor(Color("text-color"))
                                 .font(.system(size: 17, weight: .regular))
-                            Text(identityLabel)
+                            identityText
                                 .foregroundColor(Color("text-color").opacity(0.7))
                                 .font(.system(size: 14))
                         }

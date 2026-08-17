@@ -560,6 +560,238 @@
         "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifications personnalisées avec la corne du bateau" } },
         "it" : { "stringUnit" : { "state" : "translated", "value" : "Notifiche personalizzate con la sirena della barca" } }
       }
+    },
+    "Albis-Class Filter Active" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Albis-Klasse-Filter aktiv" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Filtre classe Albis actif" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Filtro classe Albis attivo" } }
+      }
+    },
+    "🚢" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "🚢" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "🚢" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "🚢" } }
+      }
+    },
+    "Loading..." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Lädt..." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chargement..." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Caricamento..." } }
+      }
+    },
+    "Maximum Favorites Reached" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Maximale Anzahl an Favoriten erreicht" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Nombre maximum de favoris atteint" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Numero massimo di preferiti raggiunto" } }
+      }
+    },
+    "You can have a maximum of %lld favorite spots. Please remove one before adding another." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Du kannst maximal %lld Favoriten haben. Bitte entferne einen, bevor du einen weiteren hinzufügst." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vous pouvez avoir un maximum de %lld favoris. Veuillez en supprimer un avant d'en ajouter un autre." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Puoi avere un massimo di %lld preferiti. Rimuovine uno prima di aggiungerne un altro." } }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "OK" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "OK" } }
+      }
+    },
+    "(%@ km)" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "(%@ km)" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "(%@ km)" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "(%@ km)" } }
+      }
+    },
+    "Next wave: %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nächste Wave: %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prochaine Wave : %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Prossima Wave: %@" } }
+      }
+    },
+    "%@mm" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@mm" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@mm" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@mm" } }
+      }
+    },
+    "%@ cm" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ cm" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ cm" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@ cm" } }
+      }
+    },
+    "%lld. Wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld. Wave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld. Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld. Wave" } }
+      }
+    },
+    "%lld kn %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld kn %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld kn %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld kn %@" } }
+      }
+    },
+    "Weather forecast for tomorrow" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wettervorhersage für morgen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Prévisions météo pour demain" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Previsioni meteo per domani" } }
+      }
+    },
+    "|" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "|" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "|" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "|" } }
+      }
+    },
+    "Loading weather..." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetter wird geladen..." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chargement de la météo..." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Caricamento meteo..." } }
+      }
+    },
+    "→" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "→" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "→" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "→" } }
+      }
+    },
+    "Share or save your next wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Teile oder speichere deine nächste Wave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Partagez ou enregistrez votre prochaine Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Condividi o salva la tua prossima Wave" } }
+      }
+    },
+    "Fertig" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Fertig" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Terminé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Fatto" } }
+      }
+    },
+    "Weather Information" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterinformationen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Informations météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Informazioni meteo" } }
+      }
+    },
+    "Weather Conditions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetterbedingungen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Conditions météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Condizioni meteo" } }
+      }
+    },
+    "Weather Legend" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wetter-Legende" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Légende météo" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Legenda meteo" } }
+      }
+    },
+    "Favorite Stations" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Favoriten-Stationen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Stations favorites" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Stazioni preferite" } }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Bearbeiten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modifica" } }
+      }
+    },
+    "Add at least two favorite spots to enable reordering" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Füge mindestens zwei Favoriten hinzu, um die Reihenfolge ändern zu können" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ajoutez au moins deux favoris pour activer le réordonnancement" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Aggiungi almeno due preferiti per abilitare il riordino" } }
+      }
+    },
+    "Edit Favorites" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Favoriten bearbeiten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Modifier les favoris" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modifica preferiti" } }
+      }
+    },
+    "No rides recorded yet — catch a wave! 🌊" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch keine Fahrten aufgezeichnet — schnapp dir eine Wave! 🌊" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune sortie enregistrée pour l'instant — attrape une Wave ! 🌊" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessuna uscita registrata finora — prendi una Wave! 🌊" } }
+      }
+    },
+    "My Stations" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Meine Stationen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mes stations" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Le mie stazioni" } }
+      }
+    },
+    "View Mode" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anzeigemodus" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mode d'affichage" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Modalità di visualizzazione" } }
+      }
+    },
+    "List" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Liste" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Liste" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Elenco" } }
+      }
+    },
+    "Map" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Karte" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Carte" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Mappa" } }
+      }
+    },
+    "Select Station" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Station auswählen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sélectionner une station" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Seleziona stazione" } }
+      }
+    },
+    "Remove" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Entfernen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Supprimer" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Rimuovi" } }
+      }
+    },
+    "Notify" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Benachrichtigen" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Notifier" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Notifica" } }
+      }
     }
   },
   "version" : "1.1"

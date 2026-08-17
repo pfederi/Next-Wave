@@ -1,6 +1,258 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "🎉 New badge%@!" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "🎉 Neue Badge%@!" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "🎉 Nouveau badge%@ !" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "🎉 Nuovo badge%@!" } }
+      }
+    },
+    "%lld" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld" } }
+      }
+    },
+    "wave ridden" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wave geritten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Wave surfée" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Wave cavalcata" } }
+      }
+    },
+    "waves ridden" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Waves geritten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Waves surfées" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Wave cavalcate" } }
+      }
+    },
+    "Leaderboard" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rangliste" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Classement" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Classifica" } }
+      }
+    },
+    "You — #%lld" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Du — #%lld" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Vous — #%lld" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Tu — #%lld" } }
+      }
+    },
+    "Not ranked yet" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch nicht platziert" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pas encore classé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Non ancora classificato" } }
+      }
+    },
+    "My Badges" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Meine Badges" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Mes Badges" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "I miei Badge" } }
+      }
+    },
+    "Verified rides" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verifizierte Fahrten" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sorties vérifiées" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Uscite verificate" } }
+      }
+    },
+    "Verified badges come from your Foilmotion sessions. Record a session in Foilmotion, then share the GPX file to Next Wave." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verifizierte Badges stammen aus deinen Foilmotion-Sessions. Zeichne eine Session in Foilmotion auf und teile dann die GPX-Datei mit Next Wave." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Les Badges vérifiés proviennent de vos sessions Foilmotion. Enregistrez une session dans Foilmotion, puis partagez le fichier GPX avec Next Wave." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "I Badge verificati provengono dalle tue sessioni Foilmotion. Registra una sessione in Foilmotion, poi condividi il file GPX con Next Wave." } }
+      }
+    },
+    "Open Foilmotion →" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Foilmotion öffnen →" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir Foilmotion →" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Apri Foilmotion →" } }
+      }
+    },
+    "Guide →" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Anleitung →" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Guide →" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Guida →" } }
+      }
+    },
+    "No waves available" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine Waves verfügbar" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune Wave disponible" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessuna Wave disponibile" } }
+      }
+    },
+    "No Good Surf Sessions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Keine guten Surf-Sessions" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune bonne session de surf" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Nessuna buona sessione di surf" } }
+      }
+    },
+    "Not enough waves in this time period for a good surf session. A good session needs at least 3 waves within a reasonable time frame." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nicht genügend Waves in diesem Zeitraum für eine gute Surf-Session. Eine gute Session benötigt mindestens 3 Waves innerhalb eines angemessenen Zeitraums." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pas assez de Waves dans cette période pour une bonne session de surf. Une bonne session nécessite au moins 3 Waves dans un délai raisonnable." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Non ci sono abbastanza Wave in questo periodo per una buona sessione di surf. Una buona sessione richiede almeno 3 Wave in un lasso di tempo ragionevole." } }
+      }
+    },
+    "Best Surf Sessions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beste Surf-Sessions" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Meilleures sessions de surf" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Migliori sessioni di surf" } }
+      }
+    },
+    "Wave Timeline" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Wave-Zeitleiste" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Chronologie Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Cronologia Wave" } }
+      }
+    },
+    "All waves for this spot, recommended session highlighted in yellow" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alle Waves für diesen Spot, die empfohlene Session ist gelb hervorgehoben" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Toutes les Waves pour ce spot, la session recommandée est surlignée en jaune" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Tutte le Wave per questo spot, la sessione consigliata è evidenziata in giallo" } }
+      }
+    },
+    "Recommended Session" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Empfohlene Session" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Session recommandée" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sessione consigliata" } }
+      }
+    },
+    "%@ - %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ - %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ - %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@ - %@" } }
+      }
+    },
+    "%lld %@" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld %@" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld %@" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld %@" } }
+      }
+    },
+    "%lldmin session" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lldmin Session" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "session de %lldmin" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "sessione di %lldmin" } }
+      }
+    },
+    "Alternative Sessions" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Alternative Sessions" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Sessions alternatives" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Sessioni alternative" } }
+      }
+    },
+    "%lld waves" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld waves" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld waves" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld waves" } }
+      }
+    },
+    "Verified badge" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Verifiziertes Badge" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Badge vérifié" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Badge verificato" } }
+      }
+    },
+    "Earned badge" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erhaltenes Badge" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Badge obtenu" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Badge ottenuto" } }
+      }
+    },
+    "Locked badge" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gesperrtes Badge" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Badge verrouillé" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Badge bloccato" } }
+      }
+    },
+    "No one yet — be the first!" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch niemand — sei der Erste!" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Personne pour l'instant — soyez le premier !" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ancora nessuno — sii il primo!" } }
+      }
+    },
+    "%@ riding this wave 🌊" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ auf dieser Wave 🌊" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ sur cette Wave 🌊" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@ su questa Wave 🌊" } }
+      }
+    },
+    "%@ anonymous" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%@ anonym" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%@ anonyme" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%@ anonimo" } }
+      }
+    },
+    "Maybe next wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Vielleicht nächste Wave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Peut-être la prochaine Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Forse la prossima Wave" } }
+      }
+    },
+    "I'm in! 🤙" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Ich bin dabei! 🤙" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Je suis partant ! 🤙" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ci sto! 🤙" } }
+      }
+    },
+    "No rides recorded yet — be the first! 🌊" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch keine Fahrten aufgezeichnet — sei der Erste! 🌊" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Aucune sortie enregistrée pour l'instant — soyez le premier ! 🌊" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ancora nessuna uscita registrata — sii il primo! 🌊" } }
+      }
+    },
+    "Couldn't load the leaderboard. Pull to retry." : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rangliste konnte nicht geladen werden. Zum Wiederholen ziehen." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Impossible de charger le classement. Tirez pour réessayer." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Impossibile caricare la classifica. Trascina per riprovare." } }
+      }
+    },
+    "#%lld" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "#%lld" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "#%lld" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "#%lld" } }
+      }
+    },
+    "First Wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Erste Wave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Première Wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Prima Wave" } }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen" } },

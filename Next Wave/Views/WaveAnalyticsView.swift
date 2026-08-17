@@ -69,7 +69,7 @@ struct WaveAnalyticsView: View {
                             
                             HStack {
                                 Label {
-                                    Text("\(analytics.timeSlots[0].waveCount) \(analytics.timeSlots[0].waveCount == 1 ? "wave" : "waves")")
+                                    Text(analytics.timeSlots[0].waveCount == 1 ? "\(analytics.timeSlots[0].waveCount) wave" : "\(analytics.timeSlots[0].waveCount) waves")
                                 } icon: {
                                     Image(systemName: "water.waves")
                                 }
@@ -100,7 +100,7 @@ struct WaveAnalyticsView: View {
                                             
                                             Spacer()
                                             
-                                            Text("\(slot.waveCount) \(slot.waveCount == 1 ? "wave" : "waves")")
+                                            Text(slot.waveCount == 1 ? "\(slot.waveCount) wave" : "\(slot.waveCount) waves")
                                                 .foregroundColor(.secondary)
                                         }
                                         

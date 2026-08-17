@@ -218,6 +218,13 @@
         "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld waves" } }
       }
     },
+    "%lld wave" : {
+      "localizations" : {
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "%lld wave" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "%lld wave" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "%lld wave" } }
+      }
+    },
     "Verified badge" : {
       "localizations" : {
         "de" : { "stringUnit" : { "state" : "translated", "value" : "Verifiziertes Badge" } },

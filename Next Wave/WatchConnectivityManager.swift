@@ -54,11 +54,14 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
             let widgetSettings = SharedDataManager.shared.loadWidgetSettings()
             let widgetSettingsData = try JSONEncoder().encode(widgetSettings)
             
-            let context = [
+            var context: [String: Any] = [
                 "favoriteStations": favoritesData,
                 "widgetSettings": widgetSettingsData
             ]
-            
+            if let currentLanguage = session.applicationContext["appLanguage"] as? String {
+                context["appLanguage"] = currentLanguage
+            }
+
             try session.updateApplicationContext(context)
             logger.debug("Successfully sent favorites and widget settings to Watch")
             
@@ -96,6 +99,9 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
             var context: [String: Any] = ["widgetSettings": widgetSettingsData]
             if let currentFavoritesData = session.applicationContext["favoriteStations"] as? Data {
                 context["favoriteStations"] = currentFavoritesData
+            }
+            if let currentLanguage = session.applicationContext["appLanguage"] as? String {
+                context["appLanguage"] = currentLanguage
             }
             try session.updateApplicationContext(context)
             

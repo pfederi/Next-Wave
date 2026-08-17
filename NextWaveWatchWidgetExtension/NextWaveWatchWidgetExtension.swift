@@ -218,7 +218,7 @@ struct SimpleWatchWidgetView: View {
                     Image(systemName: "ferry.fill")
                         .font(.system(.caption2, weight: .medium))
                         .foregroundColor(.cyan)
-                    Text(formatTime(departure.nextDeparture))
+                    formatTime(departure.nextDeparture)
                         .font(.system(.caption, design: .rounded, weight: .bold))
                         .foregroundColor(.cyan)
                 }
@@ -241,7 +241,7 @@ struct SimpleWatchWidgetView: View {
                     Text("→ \(departure.direction)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    Text(formatTime(departure.nextDeparture))
+                    formatTime(departure.nextDeparture)
                         .font(.subheadline)
                         .foregroundColor(.cyan)
                         .fontWeight(.bold)
@@ -249,7 +249,7 @@ struct SimpleWatchWidgetView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 
             default:
-                Text(formatTime(departure.nextDeparture))
+                formatTime(departure.nextDeparture)
                     .foregroundColor(.cyan)
             }
         } else {
@@ -285,19 +285,19 @@ struct SimpleWatchWidgetView: View {
         }
     }
     
-    private func formatTime(_ date: Date) -> String {
+    private func formatTime(_ date: Date) -> Text {
         let now = Date()
-        
+
         let minutesUntil = Int(date.timeIntervalSince(now) / 60)
         if minutesUntil <= 0 {
-            return "now"
+            return Text("now")
         }
-        
+
         // Always show "at HH:MM" regardless of day - simpler and clearer
         // This avoids issues with TMRW not updating after midnight
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        return "at \(formatter.string(from: date))"
+        return Text("at \(formatter.string(from: date))")
     }
 }
 

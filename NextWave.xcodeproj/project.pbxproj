@@ -12,6 +12,7 @@
 		8A5C5B0A2DF0CFD600569B58 /* NextWaveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8A5C5AFF2DF0CFD500569B58 /* NextWaveWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AAE38CB2DEF48870053668D /* Next Wave Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 8AAE38C12DEF48860053668D /* Next Wave Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		8AD40C442DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD40C422DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift */; };
+		BEEF00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BEEF00000000000000000001 /* Localizable.xcstrings */; };
 		8AFF99642DFB163800F3E1FB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B272DEF4195006C5A78 /* WidgetKit.framework */; };
 		8AFF99652DFB163800F3E1FB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A8B5B292DEF4195006C5A78 /* SwiftUI.framework */; };
 		8AFF996E2DFB163900F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -112,6 +113,7 @@
 		8AD40C422DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextWaveWatchWidgetExtension.swift; sourceTree = "<group>"; };
 		8AFF99632DFB163800F3E1FB /* NextWaveWatchWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NextWaveWatchWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AFF99752DFB1ACC00F3E1FB /* NextWaveWatchWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NextWaveWatchWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
+		BEEF00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -265,6 +267,7 @@
 			children = (
 				8AD40C412DFB4A7900FF448A /* Info.plist */,
 				8AD40C422DFB4A7900FF448A /* NextWaveWatchWidgetExtension.swift */,
+				BEEF00000000000000000001 /* Localizable.xcstrings */,
 			);
 			path = NextWaveWatchWidgetExtension;
 			sourceTree = "<group>";
@@ -450,6 +453,9 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				de,
+				fr,
+				it,
 				Base,
 			);
 			mainGroup = 8A225F282D0ABC6F008BA92B;
@@ -512,6 +518,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEEF00000000000000000002 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

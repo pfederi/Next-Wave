@@ -21,7 +21,13 @@ class AppSettings: ObservableObject {
             UserDefaults.standard.set(theme.rawValue, forKey: "theme")
         }
     }
-    
+
+    @Published var language: AppLanguage {
+        didSet {
+            UserDefaults.standard.set(language.rawValue, forKey: "appLanguage")
+        }
+    }
+
     @Published var lastLocationPickerMode: LocationPickerMode {
         didSet {
             UserDefaults.standard.set(lastLocationPickerMode.rawValue, forKey: "lastLocationPickerMode")
@@ -148,11 +154,18 @@ class AppSettings: ObservableObject {
             return UITraitCollection.current.userInterfaceStyle == .dark
         }
     }
-    
+
+    var effectiveLocale: Locale {
+        AppLanguage.resolveEffectiveLocale(for: language)
+    }
+
     init() {
         let savedTheme = UserDefaults.standard.string(forKey: "theme") ?? Theme.system.rawValue
         self.theme = Theme(rawValue: savedTheme) ?? .system
-        
+
+        let savedLanguage = UserDefaults.standard.string(forKey: "appLanguage") ?? AppLanguage.system.rawValue
+        self.language = AppLanguage(rawValue: savedLanguage) ?? .system
+
         let savedMode = UserDefaults.standard.string(forKey: "lastLocationPickerMode") ?? LocationPickerMode.list.rawValue
         self.lastLocationPickerMode = LocationPickerMode(rawValue: savedMode) ?? .list
         
@@ -364,4 +377,43 @@ struct MapRegion: Codable {
     let longitude: Double
     let latitudeDelta: Double
     let longitudeDelta: Double
-} 
+}
+
+enum AppLanguage: String, Codable, CaseIterable, Identifiable {
+    case system, en, de, fr, it
+    var id: String { rawValue }
+
+    static let supportedLocaleCodes = ["en", "de", "fr", "it"]
+
+    /// The language's own name in its own script (e.g. "Deutsch"), always shown
+    /// this way regardless of the app's current display language. `nil` for
+    /// `.system`, whose label is translated instead of shown as a language name.
+    var nativeName: String? {
+        switch self {
+        case .system: return nil
+        case .en: return "English"
+        case .de: return "Deutsch"
+        case .fr: return "Français"
+        case .it: return "Italiano"
+        }
+    }
+
+    static func resolveEffectiveLocale(
+        for language: AppLanguage,
+        preferredSystemLanguages: [String] = Locale.preferredLanguages
+    ) -> Locale {
+        switch language {
+        case .en, .de, .fr, .it:
+            return Locale(identifier: language.rawValue)
+        case .system:
+            for preferred in preferredSystemLanguages {
+                let code = Locale(identifier: preferred).language.languageCode?.identifier
+                    ?? String(preferred.prefix(2))
+                if supportedLocaleCodes.contains(code) {
+                    return Locale(identifier: code)
+                }
+            }
+            return Locale(identifier: "en")
+        }
+    }
+}

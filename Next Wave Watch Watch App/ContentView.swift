@@ -310,21 +310,19 @@ struct DepartureRow: View {
         return AppDateFormatter.formatTime(departure.nextDeparture)
     }
     
-    private var minutesText: String {
-        if isTomorrow {
-            return "" // Keine Zeitanzeige für morgen
-        } else if minutesUntilDeparture == 0 {
-            return "now"
+    private var minutesText: Text {
+        if minutesUntilDeparture == 0 {
+            return Text("now")
         } else if minutesUntilDeparture > 60 {
             let hours = minutesUntilDeparture / 60
             let remainingMinutes = minutesUntilDeparture % 60
             if remainingMinutes == 0 {
-                return "\(hours)h"
+                return Text("\(hours)h")
             } else {
-                return "\(hours)h \(remainingMinutes)min"
+                return Text("\(hours)h \(remainingMinutes)min")
             }
         } else {
-            return "\(minutesUntilDeparture)min"
+            return Text("\(minutesUntilDeparture)min")
         }
     }
     
@@ -366,8 +364,8 @@ struct DepartureRow: View {
                 
                 Spacer()
                 
-                if !minutesText.isEmpty {
-                    Text(minutesText)
+                if !isTomorrow {
+                    minutesText
                         .font(.system(.body, design: .monospaced))
                         .foregroundColor(minutesColor)
                         .fontWeight(.bold)

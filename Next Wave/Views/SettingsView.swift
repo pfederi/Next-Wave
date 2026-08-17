@@ -23,7 +23,11 @@ struct SettingsView: View {
                 // Theme section
                 ThemeToggleView()
                 Divider()
-                
+
+                // Language section
+                LanguageSettingsSection()
+                Divider()
+
                 // Display options section
                 DisplayOptionsSection(appSettings: appSettings)
 

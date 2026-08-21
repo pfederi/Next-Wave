@@ -25,12 +25,15 @@ struct FavoriteStationTileView: View, Equatable {
         return lhs.station.id == rhs.station.id
     }
     
-    private let timeFormatter: DateFormatter = {
+    @Environment(\.locale) private var locale
+
+    private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
+        formatter.locale = locale
         return formatter
-    }()
-    
+    }
+
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 8) {

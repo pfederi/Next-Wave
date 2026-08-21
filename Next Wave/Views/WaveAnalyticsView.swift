@@ -5,13 +5,16 @@ struct WaveAnalyticsView: View {
     let spotId: String
     let spotName: String
     let allWaves: [WaveEvent]
-    
-    private let timeFormatter: DateFormatter = {
+
+    @Environment(\.locale) private var locale
+
+    private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
+        formatter.locale = locale
         return formatter
-    }()
-    
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {

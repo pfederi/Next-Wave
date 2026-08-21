@@ -67,6 +67,28 @@
         }
       }
     },
+    "Shows your next boat departure" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt deine nächste Bootsabfahrt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiche votre prochain départ de bateau"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostra la tua prossima partenza in battello"
+          }
+        }
+      }
+    },
     "at %@" : {
       "localizations" : {
         "de" : {

@@ -18,20 +18,24 @@ struct NearestStationTileView: View {
     @State private var weatherInfo: WeatherAPI.WeatherInfo?
     @State private var isLoadingWeather: Bool = true
     @State private var weatherError: String?
-    
-    private let timeFormatter: DateFormatter = {
+
+    @Environment(\.locale) private var locale
+
+    private var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
+        formatter.locale = locale
         return formatter
-    }()
-    
-    private let distanceFormatter: NumberFormatter = {
+    }
+
+    private var distanceFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.maximumFractionDigits = 1
         formatter.minimumFractionDigits = 1
+        formatter.locale = locale
         return formatter
-    }()
-    
+    }
+
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 8) {

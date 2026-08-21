@@ -463,6 +463,28 @@
         }
       }
     },
+    "NextWave - Next 3": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NextWave – Nächste 3"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NextWave – 3 prochains"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NextWave – Prossime 3"
+          }
+        }
+      }
+    },
     "No Favorites Set": {
       "localizations": {
         "de": {
@@ -723,6 +745,50 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gli orari risalgono a %lld ore fa e potrebbero non essere aggiornati"
+          }
+        }
+      }
+    },
+    "Shows your next 3 boat departures": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt deine nächsten 3 Bootsabfahrten"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affiche vos 3 prochains départs de bateau"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra le tue prossime 3 partenze in battello"
+          }
+        }
+      }
+    },
+    "Shows your next boat departure on iPhone": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeigt deine nächste Bootsabfahrt auf dem iPhone"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Affiche votre prochain départ de bateau sur iPhone"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra la tua prossima partenza in battello su iPhone"
           }
         }
       }

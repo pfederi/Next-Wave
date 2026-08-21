@@ -103,10 +103,11 @@ struct DatePillView: View {
     let isSelected: Bool
     let isToday: Bool
     let namespace: Namespace.ID
-    
+    @Environment(\.locale) private var locale
+
     private var displayText: Text {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
+        formatter.locale = locale
 
         if isToday {
             formatter.dateFormat = "d MMM"

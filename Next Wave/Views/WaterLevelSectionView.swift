@@ -72,7 +72,7 @@ struct WaterLevelSectionView: View {
                 statTile(title: "Current", value: stats.current)
                 statTile(title: "Median", value: referenceLevel, showsLegendSwatch: true)
                 deltaTile(title: "vs. median", delta: deltaToReference)
-                deltaTile(title: "Since yesterday", delta: stats.deltaSinceYesterday)
+                deltaTile(title: "24h", delta: stats.deltaSinceYesterday)
             }
         }
         .padding()

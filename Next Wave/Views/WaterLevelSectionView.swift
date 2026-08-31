@@ -48,8 +48,17 @@ struct WaterLevelSectionView: View {
             Chart(history, id: \.date) { point in
                 LineMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
                     .foregroundStyle(Color.accentColor)
+                // AreaMark fills down to the (off-screen) zero baseline, not the
+                // visible domain's floor, so a flat opacity would solidly wash
+                // the whole chart below the line — fade it out instead.
                 AreaMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
-                    .foregroundStyle(Color.accentColor.opacity(0.15))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color.accentColor.opacity(0.25), Color.accentColor.opacity(0)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
             }
             .chartYScale(domain: yDomain)
             .frame(height: 120)

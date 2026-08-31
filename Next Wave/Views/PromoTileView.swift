@@ -46,13 +46,13 @@ struct PromoTileView: View {
                     
                     Spacer()
                     
-                    Text("Promo")
+                    Text(chipText)
                         .font(.caption2)
                         .fontWeight(.medium)
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.accentColor)
+                        .background(chipColor)
                         .cornerRadius(8)
                 }
                 
@@ -180,6 +180,16 @@ struct PromoTileView: View {
         .frame(height: isDismissed ? 0 : nil)
     }
     
+    /// Chip label for the tile's top-right badge, driven by `tile.chipType`.
+    /// Missing or unrecognized values fall back to "promo".
+    private var chipText: LocalizedStringKey {
+        tile.chipType?.lowercased() == "info" ? "Info" : "Promo"
+    }
+
+    private var chipColor: Color {
+        tile.chipType?.lowercased() == "info" ? .orange : .accentColor
+    }
+
     private func loadImage(from urlString: String) async {
         guard let url = URL(string: urlString) else { return }
         

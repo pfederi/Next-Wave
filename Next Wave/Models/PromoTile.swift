@@ -12,7 +12,8 @@ struct PromoTile: Codable, Identifiable {
     let validFrom: Date?
     let validUntil: Date?
     let targetOS: String?
-    
+    let chipType: String?
+
     // Custom CodingKeys für API-Mapping
     enum CodingKeys: String, CodingKey {
         case id
@@ -26,8 +27,9 @@ struct PromoTile: Codable, Identifiable {
         case validFrom
         case validUntil
         case targetOS
+        case chipType
     }
-    
+
     // Standard Initializer für Tests/Previews
     init(
         id: String,
@@ -40,7 +42,8 @@ struct PromoTile: Codable, Identifiable {
         priority: Int = 1,
         validFrom: Date? = nil,
         validUntil: Date? = nil,
-        targetOS: String? = nil
+        targetOS: String? = nil,
+        chipType: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -53,6 +56,7 @@ struct PromoTile: Codable, Identifiable {
         self.validFrom = validFrom
         self.validUntil = validUntil
         self.targetOS = targetOS
+        self.chipType = chipType
     }
     
     // Custom Decoder für fehlende Felder
@@ -72,6 +76,7 @@ struct PromoTile: Codable, Identifiable {
         validFrom = try container.decodeIfPresent(Date.self, forKey: .validFrom)
         validUntil = try container.decodeIfPresent(Date.self, forKey: .validUntil)
         targetOS = try container.decodeIfPresent(String.self, forKey: .targetOS)
+        chipType = try container.decodeIfPresent(String.self, forKey: .chipType)
     }
     
     var isValid: Bool {

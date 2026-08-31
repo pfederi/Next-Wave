@@ -6,6 +6,16 @@ struct WaterLevelSectionView: View {
 
     private var stats: WaterLevelStats { WaterLevelStats(history: history) }
 
+    /// Lake levels sit around ~400 m with a range of only a few centimetres over
+    /// 40 days. Swift Charts' automatic y-domain would include the zero baseline
+    /// of the `AreaMark` and flatten the curve into an invisible sliver, so pin
+    /// the domain to the actual data range plus a little padding.
+    private var yDomain: ClosedRange<Double> {
+        guard let lo = stats.min, let hi = stats.max else { return 0...1 }
+        let pad = Swift.max((hi - lo) * 0.15, 0.02)
+        return (lo - pad)...(hi + pad)
+    }
+
     var body: some View {
         Group {
             if !history.isEmpty {
@@ -25,6 +35,7 @@ struct WaterLevelSectionView: View {
                 AreaMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
                     .foregroundStyle(Color.accentColor.opacity(0.15))
             }
+            .chartYScale(domain: yDomain)
             .frame(height: 120)
 
             if history.count < 7 {
@@ -61,16 +72,32 @@ struct WaterLevelSectionView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// Whole centimetres, rounded — matches the convention used by
+    /// `calculateWaterLevelDifference` in `Lake.swift`.
+    private var deltaCm: Int? {
+        stats.deltaSinceYesterday.map { Int(round($0 * 100)) }
+    }
+
+    private func deltaText(_ cm: Int) -> String {
+        if cm > 0 {
+            return "+\(cm) cm"
+        } else if cm < 0 {
+            return "\(cm) cm"
+        } else {
+            return "±0 cm"
+        }
+    }
+
     private var deltaTile: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Since yesterday")
                 .font(.caption)
                 .foregroundColor(.secondary)
-            if let delta = stats.deltaSinceYesterday {
+            if let cm = deltaCm {
                 HStack(spacing: 2) {
-                    Image(systemName: delta >= 0 ? "water.waves.and.arrow.trianglehead.up" : "water.waves.and.arrow.trianglehead.down")
+                    Image(systemName: cm >= 0 ? "water.waves.and.arrow.trianglehead.up" : "water.waves.and.arrow.trianglehead.down")
                         .font(.caption)
-                    Text(String(format: "%+.0f cm", delta * 100))
+                    Text(deltaText(cm))
                         .font(.subheadline)
                         .fontWeight(.medium)
                 }

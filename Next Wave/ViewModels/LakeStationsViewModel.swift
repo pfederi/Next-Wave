@@ -227,11 +227,15 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
     /// the redundant network call on later same-day foreground refreshes.
     private func recordWaterLevelIfNeeded(lake: String, levelMeters: Double) {
         let key = "waterLevelRecorded_\(lake)"
-        let today = cacheFormatter.string(from: Date())
+        // Must use the same formatter `recordLevel` writes the `date` column
+        // with, otherwise the "already recorded today" guard and the row that
+        // actually gets upserted can refer to different calendar days.
+        let now = Date()
+        let today = WaterLevelHistoryAPI.dateOnlyFormatter.string(from: now)
         guard UserDefaults.standard.string(forKey: key) != today else { return }
         Task {
             do {
-                try await WaterLevelHistoryAPI.shared.recordLevel(lake: lake, levelMeters: levelMeters)
+                try await WaterLevelHistoryAPI.shared.recordLevel(lake: lake, levelMeters: levelMeters, date: now)
                 UserDefaults.standard.set(today, forKey: key)
             } catch {
                 print("⚠️ [WaterLevelHistory] Failed to record level for \(lake): \(error)")

@@ -42,8 +42,7 @@ struct WaveAnalyticsView: View {
                     } else {
                         Text("Best Surf Sessions")
                             .font(.title2)
-                            .padding(.top, -12)
-                        
+
                         Text("Wave Timeline")
                             .font(.headline)
                             .padding(.top, 8)

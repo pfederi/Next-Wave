@@ -54,13 +54,10 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
             let widgetSettings = SharedDataManager.shared.loadWidgetSettings()
             let widgetSettingsData = try JSONEncoder().encode(widgetSettings)
             
-            var context: [String: Any] = [
+            let context: [String: Any] = [
                 "favoriteStations": favoritesData,
                 "widgetSettings": widgetSettingsData
             ]
-            if let currentLanguage = session.applicationContext["appLanguage"] as? String {
-                context["appLanguage"] = currentLanguage
-            }
 
             try session.updateApplicationContext(context)
             logger.debug("Successfully sent favorites and widget settings to Watch")
@@ -100,9 +97,6 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
             if let currentFavoritesData = session.applicationContext["favoriteStations"] as? Data {
                 context["favoriteStations"] = currentFavoritesData
             }
-            if let currentLanguage = session.applicationContext["appLanguage"] as? String {
-                context["appLanguage"] = currentLanguage
-            }
             try session.updateApplicationContext(context)
             
             // Send immediate message for instant update
@@ -129,53 +123,6 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
             logger.error("Failed to send widget settings to Watch: \(error.localizedDescription)")
         }
     }
-
-    func updateLanguageSetting(_ language: String) {
-        let session = WCSession.default
-        guard session.activationState == .activated else {
-            logger.error("Cannot update language setting - WatchConnectivity session not activated")
-            return
-        }
-
-        guard session.isPaired && session.isWatchAppInstalled else {
-            logger.error("Cannot update language setting - Watch not available")
-            return
-        }
-
-        var context: [String: Any] = ["appLanguage": language]
-        if let currentFavoritesData = session.applicationContext["favoriteStations"] as? Data {
-            context["favoriteStations"] = currentFavoritesData
-        }
-        if let currentWidgetSettingsData = session.applicationContext["widgetSettings"] as? Data {
-            context["widgetSettings"] = currentWidgetSettingsData
-        }
-
-        do {
-            try session.updateApplicationContext(context)
-        } catch {
-            logger.error("Failed to update application context with language: \(error.localizedDescription)")
-        }
-
-        let message: [String: Any] = [
-            "action": "updateLanguage",
-            "appLanguage": language,
-            "timestamp": Date().timeIntervalSince1970
-        ]
-
-        if session.isReachable {
-            session.sendMessage(message, replyHandler: { response in
-                self.logger.debug("Language setting message sent successfully: \(response)")
-            }, errorHandler: { error in
-                self.logger.error("Failed to send language setting message: \(error.localizedDescription)")
-            })
-        } else {
-            session.transferUserInfo(message)
-            logger.debug("Language setting queued for transfer via userInfo")
-        }
-
-        logger.debug("Successfully sent language setting to Watch - appLanguage: \(language)")
-    }
-
 
     func triggerWidgetUpdate() {
         let session = WCSession.default
@@ -229,10 +176,6 @@ class WatchConnectivityManager: NSObject, WCSessionDelegate {
         // Send current widget settings
         let currentSettings = SharedDataManager.shared.loadWidgetSettings()
         updateWidgetSettings(currentSettings.useNearestStation)
-
-        // Send current language
-        let currentLanguage = UserDefaults.standard.string(forKey: "appLanguage") ?? AppLanguage.system.rawValue
-        updateLanguageSetting(currentLanguage)
 
         // Also send current favorites if available
         let favoritesData = SharedDataManager.shared.loadFavoriteStations()

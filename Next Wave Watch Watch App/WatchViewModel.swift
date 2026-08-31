@@ -13,7 +13,6 @@ class WatchViewModel: ObservableObject {
     @Published var refreshTrigger = Date() // Force UI refresh every 30 seconds
     @Published var nearestStation: FavoriteStation? = nil
     @Published var useNearestStationForWidget: Bool = false
-    @Published var language: String = "system"
 
     private let sharedDataManager = SharedDataManager.shared
     private let transportAPI = TransportAPI()
@@ -25,7 +24,6 @@ class WatchViewModel: ObservableObject {
     private var connectivityObserver: NSObjectProtocol?
     private var forceUpdateObserver: NSObjectProtocol?
     private var widgetSettingsObserver: NSObjectProtocol?
-    private var languageObserver: NSObjectProtocol?
     private var contextUpdateObserver: NSObjectProtocol?
     private var cancellables = Set<AnyCancellable>()
     
@@ -35,10 +33,8 @@ class WatchViewModel: ObservableObject {
         setupConnectivityObserver()
         setupForceUpdateObserver()
         setupWidgetSettingsObserver()
-        setupLanguageObserver()
         setupLocationObserver()
         loadWidgetSettings()
-        language = sharedDataManager.loadAppLanguage()
         startLocationServices()
         startPeriodicUpdates()
         startUIRefreshTimer()
@@ -77,9 +73,6 @@ class WatchViewModel: ObservableObject {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = widgetSettingsObserver {
-            NotificationCenter.default.removeObserver(observer)
-        }
-        if let observer = languageObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         if let observer = contextUpdateObserver {
@@ -164,23 +157,6 @@ class WatchViewModel: ObservableObject {
                 self.logger.info("Triggered widget update from widget settings change")
             }
         }
-    }
-
-    private func setupLanguageObserver() {
-        languageObserver = NotificationCenter.default.addObserver(
-            forName: .languageUpdated,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self = self else { return }
-                self.language = self.sharedDataManager.loadAppLanguage()
-            }
-        }
-    }
-
-    var effectiveLocale: Locale {
-        AppLanguage.resolveEffectiveLocale(for: AppLanguage(rawValue: language) ?? .system)
     }
 
     private func startPeriodicUpdates() {

@@ -208,7 +208,6 @@ struct NextWaveApp: App {
                 .environmentObject(appSettings)
                 .environmentObject(lakeStationsViewModel)
                 .environmentObject(CheckinStore.shared)
-                .environment(\.locale, appSettings.effectiveLocale)
                 .preferredColorScheme(appSettings.theme == .system ? nil : (appSettings.isDarkMode ? .dark : .light))
                 .task {
                     // Establish anonymous Supabase session for wave check-ins (best effort)

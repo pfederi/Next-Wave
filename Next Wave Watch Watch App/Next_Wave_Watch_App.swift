@@ -10,7 +10,6 @@ struct Next_Wave_Watch_App: App {
                 ContentView()
                     .environmentObject(viewModel)
             }
-            .environment(\.locale, viewModel.effectiveLocale)
         }
     }
 } 

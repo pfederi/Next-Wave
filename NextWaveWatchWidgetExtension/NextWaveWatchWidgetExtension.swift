@@ -24,31 +24,6 @@ struct FavoriteStation: Codable {
     let uic_ref: String?
 }
 
-enum AppLanguage: String {
-    case system, en, de, fr, it
-
-    static let supportedLocaleCodes = ["en", "de", "fr", "it"]
-
-    static func resolveEffectiveLocale(
-        for language: AppLanguage,
-        preferredSystemLanguages: [String] = Locale.preferredLanguages
-    ) -> Locale {
-        switch language {
-        case .en, .de, .fr, .it:
-            return Locale(identifier: language.rawValue)
-        case .system:
-            for preferred in preferredSystemLanguages {
-                let code = Locale(identifier: preferred).language.languageCode?.identifier
-                    ?? String(preferred.prefix(2))
-                if supportedLocaleCodes.contains(code) {
-                    return Locale(identifier: code)
-                }
-            }
-            return Locale(identifier: "en")
-        }
-    }
-}
-
 class SharedDataManager {
     static let shared = SharedDataManager()
 
@@ -57,7 +32,6 @@ class SharedDataManager {
     private let favoriteStationsKey = "favoriteStations"
     private let nearestStationKey = "nearestStation"
     private let widgetSettingsKey = "widgetSettings"
-    private let languageKey = "appLanguage"
 
     private init() {}
     
@@ -95,10 +69,6 @@ class SharedDataManager {
             return WidgetSettings(useNearestStation: false)
         }
         return settings
-    }
-
-    func loadAppLanguage() -> String {
-        userDefaults?.string(forKey: languageKey) ?? "system"
     }
 
     func getNextDepartureForWidget() -> DepartureInfo? {
@@ -178,20 +148,12 @@ struct SimpleWatchProvider: TimelineProvider {
 
 // MARK: - Watch Complication Widget
 
-extension Widget {
-    static var effectiveLocale: Locale {
-        let raw = SharedDataManager.shared.loadAppLanguage()
-        return AppLanguage.resolveEffectiveLocale(for: AppLanguage(rawValue: raw) ?? .system)
-    }
-}
-
 struct NextWaveWatchComplication: Widget {
     let kind: String = "NextWaveWatchComplication"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: SimpleWatchProvider()) { entry in
             SimpleWatchWidgetView(entry: entry)
-                .environment(\.locale, Self.effectiveLocale)
         }
         .configurationDisplayName("NextWave")
         .description("Shows your next boat departure")

@@ -1502,13 +1502,6 @@ struct iPhoneMultipleWidgetEntryView: View {
 
 // MARK: - iPhone Widget Definition
 
-extension Widget {
-    static var effectiveLocale: Locale {
-        let raw = SharedDataManager.shared.loadAppLanguage()
-        return AppLanguage.resolveEffectiveLocale(for: AppLanguage(rawValue: raw) ?? .system)
-    }
-}
-
 struct NextWaveiPhoneWidget: Widget {
     let kind: String = "NextWaveiPhoneWidget"
 
@@ -1516,7 +1509,6 @@ struct NextWaveiPhoneWidget: Widget {
         StaticConfiguration(kind: kind, provider: iPhoneProvider()) { entry in
             iPhoneWidgetEntryView(entry: entry)
                 .widgetURL(createDeepLink(for: entry.departure))
-                .environment(\.locale, Self.effectiveLocale)
         }
         .configurationDisplayName("NextWave")
         .description("Shows your next boat departure on iPhone")
@@ -1552,7 +1544,6 @@ struct NextWaveiPhoneMultipleWidget: Widget {
         StaticConfiguration(kind: kind, provider: iPhoneMultipleProvider()) { entry in
             iPhoneMultipleWidgetEntryView(entry: entry)
                 .widgetURL(createDeepLink(for: entry.departure))
-                .environment(\.locale, Self.effectiveLocale)
         }
         .configurationDisplayName("NextWave - Next 3")
         .description("Shows your next 3 boat departures")

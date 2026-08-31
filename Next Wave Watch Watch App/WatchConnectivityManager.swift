@@ -6,7 +6,6 @@ extension Notification.Name {
     static let favoritesUpdated = Notification.Name("favoritesUpdated")
     static let forceWidgetUpdate = Notification.Name("forceWidgetUpdate")
     static let widgetSettingsUpdated = Notification.Name("widgetSettingsUpdated")
-    static let languageUpdated = Notification.Name("languageUpdated")
 }
 
 class WatchConnectivityManager: NSObject, ObservableObject {
@@ -89,17 +88,6 @@ extension WatchConnectivityManager: WCSessionDelegate {
                     }
                 }
 
-            case "updateLanguage":
-                if let language = message["appLanguage"] as? String {
-                    logger.info("📱 Received language update - appLanguage: \(language)")
-
-                    DispatchQueue.main.async {
-                        SharedDataManager.shared.saveAppLanguage(language)
-                        NotificationCenter.default.post(name: .languageUpdated, object: nil)
-                        replyHandler(["status": "language_updated", "appLanguage": language, "timestamp": Date().timeIntervalSince1970])
-                    }
-                }
-
             default:
                 logger.warning("📱 Unknown action in message: \(action)")
                 replyHandler(["status": "unknown_action", "timestamp": Date().timeIntervalSince1970])
@@ -136,16 +124,6 @@ extension WatchConnectivityManager: WCSessionDelegate {
                         
                         // Update widgets
                         WidgetCenter.shared.reloadAllTimelines()
-                    }
-                }
-
-            case "updateLanguage":
-                if let language = userInfo["appLanguage"] as? String {
-                    logger.info("📱 Received language update via user info - appLanguage: \(language)")
-
-                    DispatchQueue.main.async {
-                        SharedDataManager.shared.saveAppLanguage(language)
-                        NotificationCenter.default.post(name: .languageUpdated, object: nil)
                     }
                 }
 
@@ -198,16 +176,6 @@ extension WatchConnectivityManager: WCSessionDelegate {
             }
         } else {
             logger.debug("📱 No widget settings data in application context")
-        }
-
-        // Process language setting
-        if let language = context["appLanguage"] as? String {
-            logger.info("📱 Received language setting from iOS: \(language)")
-            DispatchQueue.main.async {
-                SharedDataManager.shared.saveAppLanguage(language)
-                NotificationCenter.default.post(name: .languageUpdated, object: nil)
-            }
-            hasUpdates = true
         }
 
         // Update widgets if we had any updates

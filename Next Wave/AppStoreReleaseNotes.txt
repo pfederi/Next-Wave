@@ -1,15 +1,6 @@
-What's New in Version 4.0.1:
+What's New in Version 4.1.0:
 
 New
-• Greifensee – added the boats on Greifensee with 5 stations (Maur, Fällanden, Greifensee, Uster, Mönchaltorf), selectable in the list and on the map
-
-Improvements
-• More accurate verified distances – ride distance is now measured from speed over time instead of raw GPS points, removing the small overshoot from GPS scatter
-• Verified rides now count as waves on the leaderboard (overall and per station), in "My Stations", and toward your station and lake badges
-• New verified badges for riding at 3, 5, and 10 different stations
-• Riders without a name now appear as "Anonymous", so ranks always match the list
-
-Fixed
-• Fixed your leaderboard rank showing a gap when an unnamed rider sat in between
+• Water level history – see the last 40 days of water level for your lake right above Best Surf Sessions, with current level, long-term median, and day-over-day change
 
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

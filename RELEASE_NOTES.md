@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## Version 4.1.0 (August 31, 2026)
+
+### New
+- **Water level history**: See the last 40 days of water level for your lake, right above Best Surf Sessions
+  - Line chart of the daily level over the last 40 days, with a marked long-term median
+  - Current level, median, and day-over-day change shown as quick stats
+
 ## Version 4.0.1 (June 25, 2026)
 
 ### New

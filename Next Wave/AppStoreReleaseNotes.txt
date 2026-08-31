@@ -3,4 +3,7 @@ What's New in Version 4.1.0:
 New
 • Water level history – see the last 40 days of water level for your lake right above Best Surf Sessions, with current level, long-term median, and day-over-day change
 
+Improvements
+• Info banners – app banners can now show as "Info" as well as "Promo", so we can flag important notices separately from promotions
+
 Thank you for using NextWave! We're continuously working to improve your wakethieving experience.

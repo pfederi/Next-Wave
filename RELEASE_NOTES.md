@@ -9,6 +9,9 @@
   - Line chart of the daily level over the last 40 days, with a marked long-term median
   - Current level, median, and day-over-day change shown as quick stats
 
+### Improvements
+- **Info banners**: App banners can now show as "Info" as well as "Promo", so important notices are visually distinct from promotions
+
 ## Version 4.0.1 (June 25, 2026)
 
 ### New

@@ -2,10 +2,12 @@ import Foundation
 
 class WaveAnalyticsViewModel: ObservableObject {
     @Published var spotAnalytics: [SpotAnalytics] = []
+    @Published var waterLevelHistory: [WaterLevelHistoryAPI.WaterLevelPoint] = []
     private let maxWaveGap: TimeInterval = 3600 // 1 hour max between waves
     private let minSessionDuration: TimeInterval = 3600 // minimum 1 hour session
     private let maxSessionDuration: TimeInterval = 7200 // maximum 2 hour session
     private var currentTask: Task<Void, Never>?
+    private var waterLevelTask: Task<Void, Never>?
 
     func analyzeWaves(_ waves: [WaveEvent], for spotId: String, spotName: String) {
         // Cancel a prior analysis so a slower, older run can't overwrite newer results.
@@ -75,7 +77,25 @@ class WaveAnalyticsViewModel: ObservableObject {
             }
         }
     }
-    
+
+    func loadWaterLevelHistory(lake: String) {
+        guard !lake.isEmpty else {
+            waterLevelHistory = []
+            return
+        }
+        waterLevelTask?.cancel()
+        waterLevelTask = Task { [weak self] in
+            do {
+                let history = try await WaterLevelHistoryAPI.shared.getHistory(lake: lake, days: 40)
+                if Task.isCancelled { return }
+                await MainActor.run { self?.waterLevelHistory = history }
+            } catch {
+                if Task.isCancelled { return }
+                await MainActor.run { self?.waterLevelHistory = [] }
+            }
+        }
+    }
+
     private func calculateSessionScore(_ slot: WaveTimeSlot, sunTimes: SunTimes?) -> Double {
         // Berechne Qualitätsscore basierend auf Schiffstypen (wichtigster Faktor)
         let qualityScore = calculateWaveQualityScore(for: slot.waves)

@@ -87,9 +87,16 @@ extension Lake.Station {
     static func == (lhs: Lake.Station, rhs: Lake.Station) -> Bool {
         lhs.id == rhs.id
     }
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+extension Lake {
+    /// Extracts the numeric value from a level string like "405.96 m.ü.M.".
+    static func parseLevelMeters(from text: String) -> Double? {
+        text.components(separatedBy: " ").first.flatMap(Double.init)
     }
 }
 
@@ -116,11 +123,8 @@ private func calculateWaterLevelDifference(for lakeName: String, currentLevel: S
     ]
     
     guard let averageLevel = averageLevels[lakeName] else { return nil }
-    
-    // Extract numeric value from string like "405.96 m.ü.M."
-    let components = currentLevel.components(separatedBy: " ")
-    guard let levelString = components.first,
-          let current = Double(levelString) else { return nil }
+
+    guard let current = Lake.parseLevelMeters(from: currentLevel) else { return nil }
     
     // Calculate difference in cm
     let differenceCm = Int(round((current - averageLevel) * 100))

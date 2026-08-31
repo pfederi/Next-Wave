@@ -19,16 +19,18 @@ struct WaterLevelSectionView: View {
     var body: some View {
         Group {
             if !history.isEmpty {
-                content
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Water Level")
+                        .font(.title2)
+
+                    content
+                }
             }
         }
     }
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Water Level")
-                .font(.title2)
-
             Chart(history, id: \.date) { point in
                 LineMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
                     .foregroundStyle(Color.accentColor)
@@ -46,9 +48,9 @@ struct WaterLevelSectionView: View {
 
             HStack(spacing: 16) {
                 statTile(title: "Current", value: stats.current)
-                statTile(title: "Min", value: stats.min)
-                statTile(title: "Max", value: stats.max)
-                deltaTile
+                statTile(title: "Median", value: stats.median)
+                deltaTile(title: "vs. median", delta: stats.deltaToMedian)
+                deltaTile(title: "Since yesterday", delta: stats.deltaSinceYesterday)
             }
         }
         .padding()
@@ -74,10 +76,6 @@ struct WaterLevelSectionView: View {
 
     /// Whole centimetres, rounded — matches the convention used by
     /// `calculateWaterLevelDifference` in `Lake.swift`.
-    private var deltaCm: Int? {
-        stats.deltaSinceYesterday.map { Int(round($0 * 100)) }
-    }
-
     private func deltaText(_ cm: Int) -> String {
         if cm > 0 {
             return "+\(cm) cm"
@@ -88,12 +86,13 @@ struct WaterLevelSectionView: View {
         }
     }
 
-    private var deltaTile: some View {
+    private func deltaTile(title: LocalizedStringKey, delta: Double?) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Since yesterday")
+            Text(title)
                 .font(.caption)
                 .foregroundColor(.secondary)
-            if let cm = deltaCm {
+            if let delta {
+                let cm = Int(round(delta * 100))
                 HStack(spacing: 2) {
                     Image(systemName: cm >= 0 ? "water.waves.and.arrow.trianglehead.up" : "water.waves.and.arrow.trianglehead.down")
                         .font(.caption)

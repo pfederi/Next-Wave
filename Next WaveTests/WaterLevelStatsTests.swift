@@ -13,7 +13,9 @@ struct WaterLevelStatsTests {
         #expect(stats.current == nil)
         #expect(stats.min == nil)
         #expect(stats.max == nil)
+        #expect(stats.median == nil)
         #expect(stats.deltaSinceYesterday == nil)
+        #expect(stats.deltaToMedian == nil)
     }
 
     @Test func singlePointHasNoDelta() {
@@ -21,7 +23,9 @@ struct WaterLevelStatsTests {
         #expect(stats.current == 405.5)
         #expect(stats.min == 405.5)
         #expect(stats.max == 405.5)
+        #expect(stats.median == 405.5)
         #expect(stats.deltaSinceYesterday == nil)
+        #expect(stats.deltaToMedian == 0)
     }
 
     @Test func computesCurrentMinMaxAndDelta() {
@@ -42,6 +46,22 @@ struct WaterLevelStatsTests {
         #expect(stats.min == 405.0)
         #expect(stats.max == 405.4)
         #expect(stats.deltaSinceYesterday == nil)
+    }
+
+    @Test func medianOddCount() {
+        let history = [pt(2, 405.0), pt(1, 405.5), pt(0, 405.2)]
+        let stats = WaterLevelStats(history: history)
+        #expect(stats.median == 405.2)
+        #expect(abs(stats.deltaToMedian! - 0) < 0.0001) // current (405.2) == median
+    }
+
+    @Test func medianEvenCountAverages() {
+        let history = [pt(3, 405.0), pt(2, 405.2), pt(1, 405.4), pt(0, 405.8)]
+        let stats = WaterLevelStats(history: history)
+        // sorted levels: 405.0, 405.2, 405.4, 405.8 -> median of middle two
+        #expect(abs(stats.median! - 405.3) < 0.0001)
+        #expect(stats.current == 405.8)
+        #expect(abs(stats.deltaToMedian! - 0.5) < 0.0001)
     }
 
     @Test func unsortedInputIsSortedInternally() {

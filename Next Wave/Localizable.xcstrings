@@ -1,6 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "–" : {},
     "(%@ km)" : {
       "localizations" : {
         "de" : {
@@ -2135,6 +2136,28 @@
         }
       }
     },
+    "Current" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuell"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actuel"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attuale"
+          }
+        }
+      }
+    },
     "Current air temperature in degrees Celsius" : {
       "localizations" : {
         "de" : {
@@ -2267,6 +2290,7 @@
         }
       }
     },
+    "Date" : {},
     "Departure is before sunrise or after sunset. Moon icon indicates full darkness, moon with stars indicates twilight (dusk/dawn)" : {
       "localizations" : {
         "de" : {
@@ -3264,6 +3288,7 @@
         }
       }
     },
+    "Level" : {},
     "Life jacket required outside shore zone (300m)" : {
       "localizations" : {
         "de" : {
@@ -3550,6 +3575,28 @@
         }
       }
     },
+    "Max" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max"
+          }
+        }
+      }
+    },
     "Maximum Favorites Reached" : {
       "localizations" : {
         "de" : {
@@ -3590,6 +3637,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Forse la prossima Wave"
+          }
+        }
+      }
+    },
+    "Min" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min"
           }
         }
       }
@@ -4008,6 +4077,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessuna Wave disponibile"
+          }
+        }
+      }
+    },
+    "Not enough data yet" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nicht genug Daten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore assez de données"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dati non ancora sufficienti"
           }
         }
       }
@@ -5086,6 +5177,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostra il tuo primo preferito dalla lista"
+          }
+        }
+      }
+    },
+    "Since yesterday" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit gestern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "depuis hier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "da ieri"
           }
         }
       }
@@ -6212,112 +6325,46 @@
         }
       }
     },
-    "Current" : {
+    "Median" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktuell"
+            "value" : "Median"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Actuel"
+            "value" : "Médiane"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attuale"
+            "value" : "Mediana"
           }
         }
       }
     },
-    "Min" : {
+    "vs. median" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Min"
+            "value" : "vs. Median"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Min"
+            "value" : "vs médiane"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Min"
-          }
-        }
-      }
-    },
-    "Max" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Max"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Max"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Max"
-          }
-        }
-      }
-    },
-    "Since yesterday" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seit gestern"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "depuis hier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "da ieri"
-          }
-        }
-      }
-    },
-    "Not enough data yet" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch nicht genug Daten"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pas encore assez de données"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dati non ancora sufficienti"
+            "value" : "vs mediana"
           }
         }
       }

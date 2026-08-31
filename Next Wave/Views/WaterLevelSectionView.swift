@@ -22,12 +22,15 @@ struct WaterLevelSectionView: View {
 
     /// Lake levels sit around ~400 m with a range of only a few centimetres over
     /// 40 days. Swift Charts' automatic y-domain would include the zero baseline
-    /// of the `AreaMark` and flatten the curve into an invisible sliver, so pin
-    /// the domain to the actual data range plus a little padding.
+    /// and flatten the curve into an invisible sliver, so pin the domain to the
+    /// actual data range (plus the median line, so it's never clipped out) with
+    /// a little padding.
     private var yDomain: ClosedRange<Double> {
         guard let lo = stats.min, let hi = stats.max else { return 0...1 }
-        let pad = Swift.max((hi - lo) * 0.15, 0.02)
-        return (lo - pad)...(hi + pad)
+        let expandedLo = referenceLevel.map { Swift.min(lo, $0) } ?? lo
+        let expandedHi = referenceLevel.map { Swift.max(hi, $0) } ?? hi
+        let pad = Swift.max((expandedHi - expandedLo) * 0.15, 0.02)
+        return (expandedLo - pad)...(expandedHi + pad)
     }
 
     var body: some View {
@@ -45,9 +48,16 @@ struct WaterLevelSectionView: View {
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Chart(history, id: \.date) { point in
-                LineMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
-                    .foregroundStyle(Color.accentColor)
+            Chart {
+                ForEach(history, id: \.date) { point in
+                    LineMark(x: .value("Date", point.date), y: .value("Level", point.levelM))
+                        .foregroundStyle(Color.accentColor)
+                }
+                if let referenceLevel {
+                    RuleMark(y: .value("Median", referenceLevel))
+                        .foregroundStyle(.secondary)
+                        .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
+                }
             }
             .chartYScale(domain: yDomain)
             .frame(height: 120)

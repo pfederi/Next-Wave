@@ -20,7 +20,14 @@ struct DeparturesListView: View {
     private var isCurrentDay: Bool {
         Calendar.current.isDateInToday(viewModel.selectedDate)
     }
-    
+
+    private var lakeName: String {
+        guard let selectedStation else { return "" }
+        return viewModel.lakes.first(where: { lake in
+            lake.stations.contains(where: { $0.name == selectedStation.name })
+        })?.name ?? ""
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             if showingAnalytics {
@@ -28,6 +35,7 @@ struct DeparturesListView: View {
                     viewModel: analyticsViewModel,
                     spotId: selectedStation?.id ?? "",
                     spotName: selectedStation?.name ?? "",
+                    lakeName: lakeName,
                     allWaves: scheduleViewModel.nextWaves
                 )
             } else {
@@ -186,6 +194,7 @@ struct DeparturesListView: View {
                                     for: selectedStation?.id ?? "",
                                     spotName: selectedStation?.name ?? ""
                                 )
+                                analyticsViewModel.loadWaterLevelHistory(lake: lakeName)
                             }
                         }) {
                             Image(systemName: showingAnalytics ? "list.bullet" : "chart.bar")

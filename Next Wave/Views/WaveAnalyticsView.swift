@@ -4,6 +4,7 @@ struct WaveAnalyticsView: View {
     @ObservedObject var viewModel: WaveAnalyticsViewModel
     let spotId: String
     let spotName: String
+    let lakeName: String
     let allWaves: [WaveEvent]
 
     @Environment(\.locale) private var locale
@@ -18,7 +19,9 @@ struct WaveAnalyticsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                
+
+                WaterLevelSectionView(history: viewModel.waterLevelHistory)
+
                 if let analytics = viewModel.spotAnalytics.first(where: { $0.spotId == spotId }) {
                     if analytics.timeSlots.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {

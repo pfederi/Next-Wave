@@ -85,13 +85,14 @@ class WaveAnalyticsViewModel: ObservableObject {
         }
         waterLevelTask?.cancel()
         waterLevelTask = Task { [weak self] in
+            guard let self else { return }
             do {
                 let history = try await WaterLevelHistoryAPI.shared.getHistory(lake: lake, days: 40)
                 if Task.isCancelled { return }
-                await MainActor.run { self?.waterLevelHistory = history }
+                await MainActor.run { self.waterLevelHistory = history }
             } catch {
                 if Task.isCancelled { return }
-                await MainActor.run { self?.waterLevelHistory = [] }
+                await MainActor.run { self.waterLevelHistory = [] }
             }
         }
     }

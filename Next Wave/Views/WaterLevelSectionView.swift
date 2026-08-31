@@ -70,7 +70,7 @@ struct WaterLevelSectionView: View {
 
             HStack(spacing: 16) {
                 statTile(title: "Current", value: stats.current)
-                statTile(title: "Median", value: referenceLevel)
+                statTile(title: "Median", value: referenceLevel, showsLegendSwatch: true)
                 deltaTile(title: "vs. median", delta: deltaToReference)
                 deltaTile(title: "Since yesterday", delta: stats.deltaSinceYesterday)
             }
@@ -84,16 +84,33 @@ struct WaterLevelSectionView: View {
         )
     }
 
-    private func statTile(title: LocalizedStringKey, value: Double?) -> some View {
+    private func statTile(title: LocalizedStringKey, value: Double?, showsLegendSwatch: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
+            HStack(spacing: 4) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                // Matches the chart's dashed median RuleMark, so it reads as
+                // that line's legend rather than a floating stat.
+                if showsLegendSwatch {
+                    dashedLineSwatch
+                }
+            }
             Text(value.map { String(format: "%.2f", $0) } ?? "–")
                 .font(.subheadline)
                 .fontWeight(.medium)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var dashedLineSwatch: some View {
+        Path { path in
+            path.move(to: CGPoint(x: 0, y: 0.5))
+            path.addLine(to: CGPoint(x: 12, y: 0.5))
+        }
+        .stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 2]))
+        .foregroundColor(.secondary)
+        .frame(width: 12, height: 1)
     }
 
     /// Whole centimetres, rounded — matches the convention used by

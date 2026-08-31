@@ -1,7 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "–" : {},
+    "–" : {
+
+    },
     "(%@ km)" : {
       "localizations" : {
         "de" : {
@@ -2290,7 +2292,9 @@
         }
       }
     },
-    "Date" : {},
+    "Date" : {
+
+    },
     "Departure is before sunrise or after sunset. Moon icon indicates full darkness, moon with stars indicates twilight (dusk/dawn)" : {
       "localizations" : {
         "de" : {
@@ -3288,7 +3292,9 @@
         }
       }
     },
-    "Level" : {},
+    "Level" : {
+
+    },
     "Life jacket required outside shore zone (300m)" : {
       "localizations" : {
         "de" : {
@@ -3576,6 +3582,7 @@
       }
     },
     "Max" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3641,7 +3648,30 @@
         }
       }
     },
+    "Median" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Median"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Médiane"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mediana"
+          }
+        }
+      }
+    },
     "Min" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5665,6 +5695,28 @@
         }
       }
     },
+    "vs. median" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs. Median"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs médiane"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vs mediana"
+          }
+        }
+      }
+    },
     "Wake-thieving rides" : {
       "localizations" : {
         "de" : {
@@ -6321,50 +6373,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il tuo nome è visibile agli altri foiler su questa Wave. Scegli anonimo per essere conteggiato senza nome. Consulta la nostra informativa sulla privacy per i dettagli."
-          }
-        }
-      }
-    },
-    "Median" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Median"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Médiane"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mediana"
-          }
-        }
-      }
-    },
-    "vs. median" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vs. Median"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vs médiane"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "vs mediana"
           }
         }
       }

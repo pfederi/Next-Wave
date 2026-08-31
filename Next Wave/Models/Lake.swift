@@ -98,12 +98,12 @@ extension Lake {
     static func parseLevelMeters(from text: String) -> Double? {
         text.components(separatedBy: " ").first.flatMap(Double.init)
     }
-}
 
-// Helper function to calculate water level difference
-private func calculateWaterLevelDifference(for lakeName: String, currentLevel: String) -> String? {
-    // Reference levels from lake-water-levels.json
-    let averageLevels: [String: Double] = [
+    /// Long-term reference (average) level per lake, from lake-water-levels.json.
+    /// Used both for the existing "+7cm" badges and as the water-level card's
+    /// "Median" baseline, since a real 40-day computed median needs weeks to
+    /// become meaningful.
+    static let referenceLevels: [String: Double] = [
         "Zürichsee": 405.94,
         "Vierwaldstättersee": 433.57,
         "Bodensee": 395.60,
@@ -121,8 +121,15 @@ private func calculateWaterLevelDifference(for lakeName: String, currentLevel: S
         "Ägerisee": 723.76,
         "Greifensee": 435.10
     ]
-    
-    guard let averageLevel = averageLevels[lakeName] else { return nil }
+
+    static func referenceLevelMeters(for lakeName: String) -> Double? {
+        referenceLevels[lakeName]
+    }
+}
+
+// Helper function to calculate water level difference
+private func calculateWaterLevelDifference(for lakeName: String, currentLevel: String) -> String? {
+    guard let averageLevel = Lake.referenceLevelMeters(for: lakeName) else { return nil }
 
     guard let current = Lake.parseLevelMeters(from: currentLevel) else { return nil }
     

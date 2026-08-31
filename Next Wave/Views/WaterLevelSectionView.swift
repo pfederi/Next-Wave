@@ -3,8 +3,22 @@ import Charts
 
 struct WaterLevelSectionView: View {
     let history: [WaterLevelHistoryAPI.WaterLevelPoint]
+    let lakeName: String
 
     private var stats: WaterLevelStats { WaterLevelStats(history: history) }
+
+    /// The long-term reference level, not a median computed from `history` —
+    /// the 40-day table is too thin right after launch for a real median to
+    /// mean anything, so this reuses the same reference value the existing
+    /// "+7cm" badges elsewhere in the app already rely on.
+    private var referenceLevel: Double? {
+        Lake.referenceLevelMeters(for: lakeName)
+    }
+
+    private var deltaToReference: Double? {
+        guard let current = stats.current, let referenceLevel else { return nil }
+        return current - referenceLevel
+    }
 
     /// Lake levels sit around ~400 m with a range of only a few centimetres over
     /// 40 days. Swift Charts' automatic y-domain would include the zero baseline
@@ -48,8 +62,8 @@ struct WaterLevelSectionView: View {
 
             HStack(spacing: 16) {
                 statTile(title: "Current", value: stats.current)
-                statTile(title: "Median", value: stats.median)
-                deltaTile(title: "vs. median", delta: stats.deltaToMedian)
+                statTile(title: "Median", value: referenceLevel)
+                deltaTile(title: "vs. median", delta: deltaToReference)
                 deltaTile(title: "Since yesterday", delta: stats.deltaSinceYesterday)
             }
         }
@@ -111,11 +125,14 @@ struct WaterLevelSectionView: View {
 }
 
 #Preview {
-    WaterLevelSectionView(history: (0..<40).map { offset in
-        WaterLevelHistoryAPI.WaterLevelPoint(
-            date: Calendar.current.date(byAdding: .day, value: -offset, to: Date())!,
-            levelM: 405.0 + Double.random(in: -0.3...0.3)
-        )
-    })
+    WaterLevelSectionView(
+        history: (0..<40).map { offset in
+            WaterLevelHistoryAPI.WaterLevelPoint(
+                date: Calendar.current.date(byAdding: .day, value: -offset, to: Date())!,
+                levelM: 405.0 + Double.random(in: -0.3...0.3)
+            )
+        },
+        lakeName: "Zürichsee"
+    )
     .padding()
 }

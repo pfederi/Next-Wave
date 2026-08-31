@@ -13,4 +13,12 @@ struct LakeWaterLevelParsingTests {
     @Test func returnsNilForNonNumericPrefix() {
         #expect(Lake.parseLevelMeters(from: "n/a m.ü.M.") == nil)
     }
+
+    @Test func referenceLevelKnownLake() {
+        #expect(Lake.referenceLevelMeters(for: "Zürichsee") == 405.94)
+    }
+
+    @Test func referenceLevelUnknownLakeIsNil() {
+        #expect(Lake.referenceLevelMeters(for: "Nichtsee") == nil)
+    }
 }

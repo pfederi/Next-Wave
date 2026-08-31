@@ -20,7 +20,7 @@ struct WaveAnalyticsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
 
-                WaterLevelSectionView(history: viewModel.waterLevelHistory)
+                WaterLevelSectionView(history: viewModel.waterLevelHistory, lakeName: lakeName)
 
                 if let analytics = viewModel.spotAnalytics.first(where: { $0.spotId == spotId }) {
                     if analytics.timeSlots.isEmpty {

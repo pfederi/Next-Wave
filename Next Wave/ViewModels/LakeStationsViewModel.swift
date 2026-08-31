@@ -158,6 +158,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
                     var updatedLake = lakes[i]
                     updatedLake.waterLevel = level.waterLevel
                     lakes[i] = updatedLake
+
+                    if let waterLevelString = level.waterLevel,
+                       let levelMeters = Lake.parseLevelMeters(from: waterLevelString) {
+                        recordWaterLevelIfNeeded(lake: lakeName, levelMeters: levelMeters)
+                    }
                 }
             }
         } catch {
@@ -216,7 +221,24 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
             print("✅ [Temperature] \(alplakesCount) from Alplakes (with forecast), \(fallbackCount) from MeteoNews (fallback) in \(String(format: "%.2f", duration))s")
         }
     }
-    
+
+    /// Persists today's water level reading once per lake per day. The DB
+    /// upsert (Task 1) is correct even without this check — this just skips
+    /// the redundant network call on later same-day foreground refreshes.
+    private func recordWaterLevelIfNeeded(lake: String, levelMeters: Double) {
+        let key = "waterLevelRecorded_\(lake)"
+        let today = cacheFormatter.string(from: Date())
+        guard UserDefaults.standard.string(forKey: key) != today else { return }
+        Task {
+            do {
+                try await WaterLevelHistoryAPI.shared.recordLevel(lake: lake, levelMeters: levelMeters)
+                UserDefaults.standard.set(today, forKey: key)
+            } catch {
+                print("⚠️ [WaterLevelHistory] Failed to record level for \(lake): \(error)")
+            }
+        }
+    }
+
     private struct LakesResponse: Codable {
         let lakes: [Lake]
     }

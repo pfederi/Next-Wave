@@ -47,16 +47,24 @@ class FavoriteStationsManager: ObservableObject {
             print("🔍 Found favorites data: \(data.count) bytes")
             
             if let decoded = try? JSONDecoder().decode([FavoriteStation].self, from: data) {
-                favorites = decoded
+                let migrated = Self.migrateStationData(decoded)
+                favorites = migrated
                 print("🔍 Loaded \(favorites.count) favorites from UserDefaults")
                 for favorite in favorites {
                     print("🔍   - \(favorite.name)")
                 }
-                
+
+                if migrated.map(\.id) != decoded.map(\.id) {
+                    // Persist through the normal path so widget + Watch mirrors get the fix
+                    print("🔍 Migrated favorites with corrected station data")
+                    saveFavorites()
+                    return
+                }
+
                 // Also ensure SharedDataManager has the same data for widgets
                 SharedDataManager.shared.saveFavoriteStations(favorites)
                 print("🔍 Synced favorites to SharedDataManager")
-                
+
                 // Send initial state to Watch - let Watch handle widget updates
                 watchConnectivityManager.updateFavorites(favorites)
             } else {
@@ -67,6 +75,32 @@ class FavoriteStationsManager: ObservableObject {
         }
     }
     
+    // Stations whose data was corrected in stations.json. Favorites saved before the fix
+    // still carry the old uic_ref (and composite id), so map them to the corrected entry.
+    // Matching on name + old uic_ref keeps this idempotent.
+    private static let stationDataFixes: [(name: String, oldUIC: String?, fixed: FavoriteStation)] = [
+        ("Herrliberg (See)", "8503661",
+         FavoriteStation(id: "Herrliberg (See)_8503660", name: "Herrliberg (See)",
+                         latitude: 47.283303, longitude: 8.6095295, uic_ref: "8503660")),
+        ("Lindau (Bodensee)", "8506467",
+         FavoriteStation(id: "Lindau (Bodensee)_8014655", name: "Lindau (Bodensee)",
+                         latitude: 47.54378, longitude: 9.682267, uic_ref: "8014655")),
+        // Had a trailing space in the name and the name as uic_ref
+        ("Engelberg-Wingreis ", "Engelberg-Wingreis",
+         FavoriteStation(id: "Engelberg-Wingreis_8504373", name: "Engelberg-Wingreis",
+                         latitude: 47.102154, longitude: 7.177546, uic_ref: "8504373")),
+        // Was a bare name without uic_ref/coordinates
+        ("Interlaken Ost (See)", nil,
+         FavoriteStation(id: "Interlaken Ost (See)_8508370", name: "Interlaken Ost (See)",
+                         latitude: 46.691693, longitude: 7.869188, uic_ref: "8508370"))
+    ]
+
+    private static func migrateStationData(_ favorites: [FavoriteStation]) -> [FavoriteStation] {
+        favorites.map { favorite in
+            stationDataFixes.first { $0.name == favorite.name && $0.oldUIC == favorite.uic_ref }?.fixed ?? favorite
+        }
+    }
+
     private var widgetReloadTask: Task<Void, Never>?
 
     private func saveFavorites() {

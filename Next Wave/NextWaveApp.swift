@@ -301,56 +301,84 @@ struct NextWaveApp: App {
     private func handleDeepLink(_ url: URL) {
         print("🔗 Deep link received: \(url)")
         
-        guard url.scheme == "nextwave" else {
-            print("🔗 Invalid scheme: \(url.scheme ?? "nil")")
-            return
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        func queryValue(_ name: String) -> String? {
+            components?.queryItems?.first(where: { $0.name == name })?.value
         }
         
-        if url.host == "station" {
-            // Parse station name and date from query parameters
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            guard let stationName = components?.queryItems?.first(where: { $0.name == "name" })?.value else {
-                print("🔗 No station name in deep link")
+        var stationUIC: String? = nil
+        var stationName: String? = nil
+        var targetDate: Date? = nil
+        
+        switch url.scheme?.lowercased() {
+        case "https", "http":
+            // Universal link: https://nextwaveapp.ch/s/{uic} (trailing slash / query ignored)
+            let host = url.host?.lowercased()
+            let path = url.pathComponents.filter { $0 != "/" }
+            guard host == "nextwaveapp.ch" || host == "www.nextwaveapp.ch",
+                  path.count == 2, path[0] == "s" else {
+                print("🔗 Unsupported universal link: \(url)")
                 return
             }
+            stationUIC = path[1]
+        case "nextwave":
+            guard url.host == "station" else {
+                print("🔗 Unknown deep link host: \(url.host ?? "nil")")
+                return
+            }
+            // nextwave://station?uic=<uic> or ?name=<name>; uic wins if both are given
+            stationUIC = queryValue("uic")
+            stationName = queryValue("name")
             
             // Parse optional date parameter (ISO format: YYYY-MM-DD)
-            var targetDate: Date? = nil
-            if let dateString = components?.queryItems?.first(where: { $0.name == "date" })?.value {
+            if let dateString = queryValue("date") {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd"
                 targetDate = formatter.date(from: dateString)
                 print("🔗 Deep link date parameter: \(dateString) -> \(targetDate?.description ?? "invalid")")
             }
+        default:
+            print("🔗 Invalid scheme: \(url.scheme ?? "nil")")
+            return
+        }
+        
+        guard stationUIC != nil || stationName != nil else {
+            print("🔗 No station uic or name in deep link")
+            return
+        }
+        
+        // Shared station links (by uic) always open today's departures
+        if stationUIC != nil && targetDate == nil {
+            targetDate = Date()
+        }
+        
+        print("🔗 Opening station: \(stationUIC ?? stationName ?? "")" + (targetDate != nil ? " on \(targetDate!)" : ""))
+        
+        // Find the station and select it
+        Task { @MainActor in
+            if lakeStationsViewModel.lakes.isEmpty { await lakeStationsViewModel.loadLakes() }
             
-            print("🔗 Opening station: \(stationName)" + (targetDate != nil ? " on \(targetDate!)" : ""))
-            
-            // Find the station by name and select it
-            Task { @MainActor in
-                await lakeStationsViewModel.loadLakes()
-                
-                // Search for the station across all lakes
-                for lake in lakeStationsViewModel.lakes {
-                    if let station = lake.stations.first(where: { $0.name == stationName }) {
-                        print("🔗 Found station: \(station.name) with ID: \(station.id)")
-                        
-                        // Set the target date if provided
-                        if let targetDate = targetDate {
-                            print("🔗 Setting date to: \(targetDate)")
-                            lakeStationsViewModel.selectedDate = targetDate
-                            viewModel.selectedDate = targetDate
-                        }
-                        
-                        // Select the station (this will trigger departure loading)
-                        lakeStationsViewModel.selectStation(station)
-                        return
-                    }
+            let station = stationUIC.flatMap { lakeStationsViewModel.station(withUIC: $0) }
+                ?? stationName.flatMap { name in
+                    lakeStationsViewModel.lakes.lazy.flatMap { $0.stations }.first { $0.name == name }
                 }
-                
-                print("🔗 Station not found: \(stationName)")
+            
+            guard let station else {
+                // Unknown station: the app simply stays where it is
+                print("🔗 Station not found: \(stationUIC ?? stationName ?? "")")
+                return
             }
-        } else {
-            print("🔗 Unknown deep link host: \(url.host ?? "nil")")
+            print("🔗 Found station: \(station.name) with ID: \(station.id)")
+            
+            // Set the target date if provided (ContentView/DateSelectionView sync from the view model)
+            if let targetDate = targetDate {
+                print("🔗 Setting date to: \(targetDate)")
+                lakeStationsViewModel.selectedDate = targetDate
+                viewModel.selectedDate = targetDate
+            }
+            
+            // Select the station (this will trigger departure loading)
+            lakeStationsViewModel.selectStation(station)
         }
     }
     

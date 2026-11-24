@@ -4,8 +4,8 @@ import Foundation
 class WaterLevelAPI {
     static let shared = WaterLevelAPI()
     
-    // Vercel API URL - anpassen an deine Deployment URL
-    private let baseURL = "https://vesseldata-api.vercel.app/api/water-temperature"
+    // next-wave-api on Coolify (formerly vesseldata-api.vercel.app)
+    private let baseURL = "https://api.nextwaveapp.ch/water-temperature"
     
     // MARK: - Mock Data für Tests (setze auf false nach Vercel-Deployment)
     private let useMockData = false

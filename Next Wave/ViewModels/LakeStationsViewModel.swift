@@ -389,6 +389,11 @@ class LakeStationsViewModel: ObservableObject, @unchecked Sendable {
         }
     }
     
+    /// Looks up a station by its SBB/DIDOK number (uic_ref), e.g. for universal links.
+    func station(withUIC uic: String) -> Lake.Station? {
+        lakes.lazy.flatMap { $0.stations }.first { $0.uic_ref == uic }
+    }
+
     func selectStation(withId id: String) {
         print("🎯 [ViewModel] Selecting station with ID: \(id)")
         

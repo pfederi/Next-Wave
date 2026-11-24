@@ -168,7 +168,7 @@
                 },
                 {
                     "name": "Herrliberg (See)",
-                    "uic_ref": "8503661",
+                    "uic_ref": "8503660",
                     "coordinates": {
                         "latitude": 47.283303,
                         "longitude": 8.6095295
@@ -498,10 +498,10 @@
             "stations": [
                 {
                     "name": "Lindau (Bodensee)",
-                    "uic_ref": "8506467",
+                    "uic_ref": "8014655",
                     "coordinates": {
-                        "latitude": 47.497518,
-                        "longitude": 9.561171
+                        "latitude": 47.54378,
+                        "longitude": 9.682267
                     }
                 },
                 {
@@ -1176,7 +1176,14 @@
                 "BLS"
             ],
             "stations": [
-                "Interlaken Ost (See)",
+                {
+                    "name": "Interlaken Ost (See)",
+                    "uic_ref": "8508370",
+                    "coordinates": {
+                        "latitude": 46.691693,
+                        "longitude": 7.869188
+                    }
+                },
                 {
                     "name": "Bönigen",
                     "uic_ref": "8508371",
@@ -1538,8 +1545,8 @@
                     }
                 },
                 {
-                    "name": "Engelberg-Wingreis ",
-                    "uic_ref": "Engelberg-Wingreis",
+                    "name": "Engelberg-Wingreis",
+                    "uic_ref": "8504373",
                     "coordinates": {
                         "latitude": 47.102154,
                         "longitude": 7.177546

@@ -5,7 +5,6 @@ struct Journey: Codable, Identifiable {
     let name: String?
     let category: String?
     let subcategory: String?
-    let categoryCode: String?
     let number: String?
     let operatorName: String?
     let to: String?
@@ -16,7 +15,7 @@ struct Journey: Codable, Identifiable {
     var id: String { name ?? UUID().uuidString }
     
     enum CodingKeys: String, CodingKey {
-        case stop, name, category, subcategory, categoryCode, number
+        case stop, name, category, subcategory, number
         case operatorName = "operator"
         case to, passList, capacity1st, capacity2nd
     }

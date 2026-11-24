@@ -753,7 +753,22 @@ struct FooterSection: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 4)
-            
+
+            // Required attribution for Alplakes water temperatures (CC BY 4.0)
+            Button(action: {
+                if let url = URL(string: "https://www.alplakes.eawag.ch") {
+                    openURL(url)
+                }
+            }) {
+                Text("Water temperature data: Alplakes, Eawag (CC BY 4.0)")
+                    .font(.caption2)
+                    .foregroundColor(Color("text-color"))
+                    .opacity(0.6)
+                    .underline(true, color: Color("text-color").opacity(0.6))
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.bottom, 4)
+
             Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
                 .font(.caption2)
                 .foregroundColor(Color("text-color"))
